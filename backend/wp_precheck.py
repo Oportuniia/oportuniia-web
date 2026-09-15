@@ -472,3 +472,79 @@ def run_capability_discovery() -> dict:
 
     out["WORDPRESS_REQUESTS_EXECUTED"] = req
     return out
+
+
+# Allow-listed rest bases for the single-item READ-ONLY probe. No generic proxy.
+_ITEM_ALLOWED_BASES = {"elementor_library", "pages", "posts"}
+
+
+def run_item_read(post_id: int, rest_base: str = "elementor_library") -> dict:
+    """READ-ONLY single-item GET: /wp/v2/<rest_base>/<id>?context=edit.
+
+    Host is fixed (WP_SITE_URL), method is GET, id is an integer, and rest_base
+    must be allow-listed. No writes, no role changes, not a generic proxy.
+    """
+    out = {
+        "HTTP_STATUS": None,
+        "REST_ERROR_CODE": "NONE",
+        "TITLE": "NOT ACCESSIBLE",
+        "STATUS": "NOT ACCESSIBLE",
+        "POST_TYPE": "NOT ACCESSIBLE",
+        "ELEMENTOR_DATA_ACCESSIBLE": "FAIL",
+        "ELEMENTOR_META_COMPLETE": "UNKNOWN",
+        "META_KEYS": [],
+        "WRITE_REQUESTS_EXECUTED": 0,
+        "PRODUCTION_MUTATIONS": 0,
+        "BLOCKER": "NONE",
+    }
+    if not isinstance(post_id, int) or post_id <= 0:
+        out["BLOCKER"] = "invalid post id"
+        return out
+    if rest_base not in _ITEM_ALLOWED_BASES:
+        out["BLOCKER"] = "rest_base not allow-listed"
+        return out
+
+    site, user, app_pw = _get_env()
+    base_url, base_host = _normalize_base(site)
+    if not base_url:
+        out["BLOCKER"] = "WP_SITE_URL missing/invalid"
+        return out
+    if not user or not app_pw:
+        out["BLOCKER"] = "secrets not set"
+        return out
+
+    auth = _auth_header(user, app_pw)
+    with httpx.Client(headers={"User-Agent": "OPORTUNIIA-ControlApp-Precheck/1.4 (read-only)"}) as client:
+        try:
+            r = _get(client, base_url, base_host,
+                    f"{_WP_V2}/{rest_base}/{post_id}?context=edit", headers=auth)
+            out["HTTP_STATUS"] = r.get("http")
+            if r.get("resp") is not None:
+                try:
+                    j = r["resp"].json()
+                except Exception:
+                    j = {}
+                if r["http"] == 200 and isinstance(j, dict):
+                    t = j.get("title")
+                    out["TITLE"] = (t.get("rendered") or t.get("raw")) if isinstance(t, dict) else (t or "")
+                    out["STATUS"] = j.get("status", "UNKNOWN")
+                    out["POST_TYPE"] = j.get("type", rest_base)
+                    meta = j.get("meta") or {}
+                    out["META_KEYS"] = list(meta.keys())[:40]
+                    has_el = ("_elementor_data" in meta) or ("_elementor_edit_mode" in meta)
+                    if has_el:
+                        out["ELEMENTOR_DATA_ACCESSIBLE"] = "PASS"
+                        out["ELEMENTOR_META_COMPLETE"] = "YES"
+                    else:
+                        # Item readable but _elementor_data not in REST meta.
+                        out["ELEMENTOR_DATA_ACCESSIBLE"] = "FAIL"
+                        out["ELEMENTOR_META_COMPLETE"] = "NO"
+                elif isinstance(j, dict) and j.get("code"):
+                    out["REST_ERROR_CODE"] = j.get("code")
+                    out["BLOCKER"] = j.get("message", "")[:200]
+        except RedirectBlocked as e:
+            out["BLOCKER"] = f"OFF-HOST REDIRECT BLOCKED: {e}"
+        except Exception as e:
+            out["BLOCKER"] = f"Unexpected error: {type(e).__name__}"
+    return out
+
