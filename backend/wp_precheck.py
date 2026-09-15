@@ -23,16 +23,10 @@ import httpx
 
 logger = logging.getLogger("wp_precheck")
 
-# Fixed, allow-listed READ-ONLY paths (relative to the WP host). GET only.
 _ROOT_DISCOVERY = "/wp-json/"
 _WP_V2 = "/wp-json/wp/v2"
 
-_TIMEOUT = httpx.Timeout(15.0, connect=10.0)
-
-
-def _redact(msg: str) -> str:
-    """Defensive: never let secret-ish tokens reach logs."""
-    return msg
+_TIMEOUT = httpx.Timeout(20.0, connect=10.0)
 
 
 def _get_env():
@@ -43,7 +37,6 @@ def _get_env():
 
 
 def _normalize_base(site_url: str):
-    """Return (base_url_without_trailing_slash, host) or (None, None) if invalid."""
     if not site_url:
         return None, None
     parsed = urlparse(site_url)
@@ -53,53 +46,34 @@ def _normalize_base(site_url: str):
     return base, parsed.netloc.lower()
 
 
-class SecretsMissing(Exception):
-    pass
-
-
 class RedirectBlocked(Exception):
     pass
 
 
 def _auth_header(user: str, app_pw: str) -> dict:
-    """Build Basic auth header for WP Application Password. Never logged."""
     token = base64.b64encode(f"{user}:{app_pw}".encode("utf-8")).decode("ascii")
     return {"Authorization": f"Basic {token}"}
 
 
 def _log_call(path: str, status, duration_ms: float, result: str):
-    # Allowed logging ONLY: path, HTTP code, duration, PASS/FAIL. No secrets/headers.
-    logger.info(
-        "wp_precheck GET %s -> http=%s dur_ms=%.0f %s",
-        path, status if status is not None else "ERR", duration_ms, result,
-    )
-
-
-def _same_host_or_block(base_host: str, response: httpx.Response):
-    """If any hop redirected off the WP host, block it."""
-    for hop in list(response.history) + [response]:
-        h = urlparse(str(hop.url)).netloc.lower()
-        if h and h != base_host:
-            raise RedirectBlocked(f"redirect off-host to '{h}' blocked")
+    logger.info("wp_precheck GET %s -> http=%s dur_ms=%.0f %s",
+                path, status if status is not None else "ERR", duration_ms, result)
 
 
 def _get(client: httpx.Client, base_url: str, base_host: str, path: str,
          headers: dict | None = None):
-    """Single hardened GET. Returns dict summary; raises RedirectBlocked on off-host."""
+    """Single hardened GET. Host-locked, no auto redirect off-host."""
     url = base_url + path
     started = time.perf_counter()
     status = None
     try:
-        # follow_redirects=False by design; we inspect and block off-host hops.
         resp = client.get(url, headers=headers or {}, timeout=_TIMEOUT,
                           follow_redirects=False)
         status = resp.status_code
-        # Manual, host-locked redirect handling (max 3 same-host hops).
         hops = 0
         while resp.is_redirect and hops < 3:
             loc = resp.headers.get("location", "")
-            nxt = urlparse(loc)
-            nxt_host = nxt.netloc.lower()
+            nxt_host = urlparse(loc).netloc.lower()
             if nxt_host and nxt_host != base_host:
                 raise RedirectBlocked(f"redirect off-host to '{nxt_host}' blocked")
             follow_path = loc if loc.startswith("http") else base_url + loc
@@ -121,39 +95,59 @@ def _get(client: httpx.Client, base_url: str, base_host: str, path: str,
         return {"path": path, "http": None, "error": type(e).__name__, "resp": None}
 
 
-def _match_target(items, keywords):
-    """Find a post/page/template whose title matches all keywords (case-insensitive)."""
+def _title_of(it):
+    t = it.get("title")
+    if isinstance(t, dict):
+        return t.get("rendered") or t.get("raw") or ""
+    if isinstance(t, str):
+        return t
+    return ""
+
+
+def _match(items, keyword_sets):
+    """items: list of dicts. keyword_sets: list of keyword-lists (OR of ANDs)."""
     hits = []
     for it in items:
-        title = ""
-        t = it.get("title")
-        if isinstance(t, dict):
-            title = (t.get("rendered") or t.get("raw") or "")
-        elif isinstance(t, str):
-            title = t
-        low = title.lower()
-        if all(k in low for k in keywords):
-            hits.append({
-                "id": it.get("id"),
-                "title": title,
-                "type": it.get("type"),
-                "status": it.get("status"),
-                "slug": it.get("slug"),
-            })
+        low = _title_of(it).lower()
+        for ks in keyword_sets:
+            if all(k in low for k in ks):
+                hits.append({
+                    "id": it.get("id"),
+                    "title": _title_of(it),
+                    "type": it.get("type"),
+                    "status": it.get("status"),
+                    "slug": it.get("slug"),
+                })
+                break
     return hits
 
 
+def _as_list(resp):
+    try:
+        data = resp.json()
+        return data if isinstance(data, list) else []
+    except Exception:
+        return []
+
+
+# READ-ONLY post types to scan for the drafts (all queried via GET).
+_SCAN_TYPES = [
+    "pages",
+    "posts",
+    "elementor_library",   # Elementor saved templates / theme parts
+    "elementor-hf",        # some header/footer builders
+    "e-landing-page",
+]
+
+
 def run_precheck() -> dict:
-    """
-    Execute the READ-ONLY precheck. GET-only. Called ONLY on explicit request.
-    Returns a JSON-serializable gate report. Never includes secrets.
-    """
     site, user, app_pw = _get_env()
     base_url, base_host = _normalize_base(site)
 
     gate = {
         "WORDPRESS_REST_AUTH": "FAIL",
         "TECHNICAL_USER": "FAIL",
+        "TECHNICAL_USER_CAPS": {},
         "HOME_2_0_DETECTED": "FAIL",
         "HOME_2_0_ID": "NOT FOUND",
         "HOME_2_0_POST_TYPE": "UNKNOWN",
@@ -169,6 +163,8 @@ def run_precheck() -> dict:
         "SAFE_WRITE_PATH_IDENTIFIED": "NO",
         "CUSTOM_ENDPOINT_PLUGIN_REQUIRED": "UNKNOWN",
         "REST_NAMESPACES": [],
+        "WORDPRESS_REQUESTS_EXECUTED": 0,
+        "WRITE_REQUESTS_EXECUTED": 0,
         "PRODUCTION_MUTATIONS": 0,
         "WORDPRESS_CONTACTED": "YES",
         "BLOCKER": "NONE",
@@ -176,144 +172,175 @@ def run_precheck() -> dict:
     }
 
     if not base_url:
-        gate["BLOCKER"] = "WP_SITE_URL missing or invalid (needs scheme+host, e.g. https://oportuniia.com)"
+        gate["BLOCKER"] = "WP_SITE_URL missing/invalid"
         gate["WORDPRESS_CONTACTED"] = "NO"
         return gate
     if not user or not app_pw:
-        gate["BLOCKER"] = "WP_USERNAME and/or WP_APPLICATION_PASSWORD not set in server environment"
+        gate["BLOCKER"] = "WP_USERNAME/WP_APPLICATION_PASSWORD not set"
         gate["WORDPRESS_CONTACTED"] = "NO"
         return gate
 
     auth = _auth_header(user, app_pw)
+    req = 0
 
-    with httpx.Client(headers={"User-Agent": "OPORTUNIIA-ControlApp-Precheck/1.0 (read-only)"}) as client:
+    with httpx.Client(headers={"User-Agent": "OPORTUNIIA-ControlApp-Precheck/1.1 (read-only)"}) as client:
         try:
-            # 1) Root discovery (unauthenticated GET) -> namespaces & routes
-            root = _get(client, base_url, base_host, _ROOT_DISCOVERY)
-            if root.get("resp") is not None and root["http"] == 200:
-                try:
-                    data = root["resp"].json()
-                    ns = data.get("namespaces", [])
-                    gate["REST_NAMESPACES"] = ns
-                    routes = list((data.get("routes") or {}).keys())
-                    gate["diagnostics"].append({"root_discovery": "PASS",
-                                                "namespaces": ns,
-                                                "route_count": len(routes)})
-                    # Detect Elementor / Theme Builder related namespaces/routes.
-                    el_hits = [r for r in routes if "elementor" in r.lower()]
-                    tb_hits = [r for r in routes if "template" in r.lower()
-                               or "theme" in r.lower() or "e-template" in r.lower()]
-                    if el_hits:
-                        gate["ELEMENTOR_DATA_ACCESSIBLE"] = "PASS"
-                        gate["ELEMENTOR_DATA_LOCATION"] = f"REST routes: {el_hits[:8]}"
-                    if any("elementor" in n.lower() for n in ns):
-                        gate["THEME_BUILDER_RELATIONSHIP_IDENTIFIED"] = "YES"
-                    gate["diagnostics"].append({"elementor_routes": el_hits[:20],
-                                                "template_like_routes": tb_hits[:20]})
-                except Exception as e:
-                    gate["diagnostics"].append({"root_discovery": f"parse_error:{type(e).__name__}"})
-            else:
+            # 1) Root discovery
+            root = _get(client, base_url, base_host, _ROOT_DISCOVERY); req += 1
+            if not (root.get("resp") is not None and root["http"] == 200):
                 gate["BLOCKER"] = "WP REST root (/wp-json/) not reachable"
+                gate["WORDPRESS_REQUESTS_EXECUTED"] = req
                 return gate
+            try:
+                rj = root["resp"].json()
+                ns = rj.get("namespaces", [])
+                routes = list((rj.get("routes") or {}).keys())
+                gate["REST_NAMESPACES"] = ns
+                el_routes = [r for r in routes if "elementor" in r.lower()]
+                tb_routes = [r for r in routes if "site-editor" in r.lower()
+                             or "templates" in r.lower()]
+                if el_routes:
+                    gate["ELEMENTOR_DATA_ACCESSIBLE"] = "PASS"
+                    gate["ELEMENTOR_DATA_LOCATION"] = f"Elementor REST namespaces present ({len(el_routes)} routes)"
+                if any("elementor" in n.lower() for n in ns) and \
+                   any("site-editor" in r.lower() for r in routes):
+                    gate["THEME_BUILDER_RELATIONSHIP_IDENTIFIED"] = "YES"
+                gate["diagnostics"].append({"route_count": len(routes),
+                                            "elementor_routes_sample": el_routes[:12],
+                                            "theme_builder_routes_sample": tb_routes[:12]})
+            except Exception as e:
+                gate["diagnostics"].append({"root_parse_error": type(e).__name__})
 
-            # 2) Authenticated identity check via GET /wp/v2/users/me
-            me = _get(client, base_url, base_host, f"{_WP_V2}/users/me?context=edit", headers=auth)
-            if me.get("resp") is not None and me["http"] == 200:
+            # 2) Auth + capabilities
+            me = _get(client, base_url, base_host, f"{_WP_V2}/users/me?context=edit", headers=auth); req += 1
+            authed = me.get("resp") is not None and me["http"] == 200
+            if authed:
                 gate["WORDPRESS_REST_AUTH"] = "PASS"
                 gate["TECHNICAL_USER"] = "PASS"
                 try:
-                    me_json = me["resp"].json()
-                    gate["diagnostics"].append({
-                        "auth_user_caps_present": bool(me_json.get("capabilities")),
-                        "auth_user_roles": me_json.get("roles", []),
-                    })
+                    mj = me["resp"].json()
+                    caps = mj.get("capabilities") or {}
+                    watch = ["edit_posts", "edit_pages", "edit_others_pages",
+                             "edit_others_posts", "publish_pages", "publish_posts",
+                             "manage_options", "edit_theme_options", "edit_published_pages"]
+                    gate["TECHNICAL_USER_CAPS"] = {c: bool(caps.get(c)) for c in watch}
+                    gate["diagnostics"].append({"roles": mj.get("roles", [])})
                 except Exception:
                     pass
             else:
-                gate["diagnostics"].append({"auth": "FAIL", "http": me.get("http")})
-                gate["BLOCKER"] = "Authenticated GET /wp/v2/users/me failed (auth or permissions)"
-                # Continue read-only discovery of public pages regardless.
+                gate["BLOCKER"] = f"Auth GET /users/me failed (http={me.get('http')})"
 
-            # 3) Locate HOME 2.0 among pages (include drafts via context=edit if authed)
-            ctx = "&context=edit" if gate["WORDPRESS_REST_AUTH"] == "PASS" else ""
-            pages = _get(client, base_url, base_host,
-                        f"{_WP_V2}/pages?per_page=100&status=any&search=home{ctx}"
-                        if ctx else f"{_WP_V2}/pages?per_page=100&search=home")
-            home_items = []
-            if pages.get("resp") is not None and pages["http"] == 200:
+            # 3) Scan post types for HOME 2.0 / HEADER 2.0 (GET, context=edit if authed)
+            ctx = "context=edit&" if authed else ""
+            home_kw = [["home", "2.0"], ["home", "2"], ["home 2"], ["inicio", "2"]]
+            header_kw = [["header", "2.0"], ["header", "2"], ["header 2"],
+                         ["cabecera", "2"], ["encabezado", "2"]]
+            scan_report = {}
+            all_home_hits, all_header_hits = [], []
+            for pt in _SCAN_TYPES:
+                q = f"{_WP_V2}/{pt}?{ctx}per_page=100&status=any"
+                r = _get(client, base_url, base_host, q); req += 1
+                http = r.get("http")
+                items = _as_list(r["resp"]) if r.get("resp") is not None and http == 200 else []
+                titles = [{"id": i.get("id"), "t": _title_of(i), "s": i.get("status")} for i in items][:60]
+                scan_report[pt] = {"http": http, "count": len(items),
+                                   "titles": [f'{x["id"]}:{x["t"]}({x["s"]})' for x in titles][:60]}
+                h = _match(items, home_kw)
+                for x in h:
+                    x["source_type"] = pt
+                all_home_hits += h
+                hd = _match(items, header_kw)
+                for x in hd:
+                    x["source_type"] = pt
+                all_header_hits += hd
+            gate["diagnostics"].append({"scan": scan_report})
+
+            # 3b) Theme Builder documents (Elementor) — GET read-only
+            tb = _get(client, base_url, base_host,
+                     "/wp-json/elementor/v1/site-editor/templates", headers=auth); req += 1
+            if tb.get("resp") is not None and tb["http"] == 200:
                 try:
-                    home_items = pages["resp"].json()
-                except Exception:
-                    home_items = []
-            home_hits = _match_target(home_items, ["home", "2.0"]) or _match_target(home_items, ["home", "2"])
-            if home_hits:
-                h = home_hits[0]
+                    tbj = tb["resp"].json()
+                    tb_items = tbj if isinstance(tbj, list) else tbj.get("data") or tbj.get("templates") or []
+                    if isinstance(tb_items, dict):
+                        tb_items = list(tb_items.values())
+                    norm = []
+                    for it in (tb_items or []):
+                        if isinstance(it, dict):
+                            norm.append({"id": it.get("id") or it.get("template_id"),
+                                         "title": it.get("title") or it.get("name") or "",
+                                         "type": it.get("type") or it.get("doc_type"),
+                                         "status": it.get("status")})
+                    gate["diagnostics"].append({"theme_builder_templates":
+                                                [f'{x["id"]}:{x["title"]}({x.get("type")})' for x in norm][:60]})
+                    all_header_hits += _match(norm, header_kw)
+                    all_home_hits += _match(norm, home_kw)
+                except Exception as e:
+                    gate["diagnostics"].append({"tb_parse_error": type(e).__name__})
+            else:
+                gate["diagnostics"].append({"theme_builder_templates_http": tb.get("http")})
+
+            # Resolve HOME
+            if all_home_hits:
+                h = all_home_hits[0]
                 gate["HOME_2_0_DETECTED"] = "PASS"
                 gate["HOME_2_0_ID"] = h["id"]
-                gate["HOME_2_0_POST_TYPE"] = h.get("type") or "page"
+                gate["HOME_2_0_POST_TYPE"] = h.get("type") or h.get("source_type") or "page"
                 gate["HOME_2_0_STATUS"] = h.get("status") or "UNKNOWN"
-                gate["diagnostics"].append({"home_candidates": home_hits[:5]})
-
-            # 4) Locate HEADER 2.0 (Elementor templates are often a CPT, e.g. elementor_library)
-            header_hits = []
-            for cpt_path in [f"{_WP_V2}/pages", f"{_WP_V2}/elementor_library",
-                             f"{_WP_V2}/elementor-template", f"{_WP_V2}/e-floating-buttons"]:
-                q = f"{cpt_path}?per_page=100&status=any&search=header&context=edit" if ctx \
-                    else f"{cpt_path}?per_page=100&search=header"
-                r = _get(client, base_url, base_host, q)
-                if r.get("resp") is not None and r["http"] == 200:
-                    try:
-                        items = r["resp"].json()
-                        hits = _match_target(items, ["header", "2.0"]) or _match_target(items, ["header", "2"])
-                        for hh in hits:
-                            hh["source_route"] = cpt_path
-                        header_hits.extend(hits)
-                    except Exception:
-                        pass
-            if header_hits:
-                h = header_hits[0]
+                gate["diagnostics"].append({"home_candidates": all_home_hits[:6]})
+            # Resolve HEADER
+            if all_header_hits:
+                h = all_header_hits[0]
                 gate["HEADER_2_0_DETECTED"] = "PASS"
                 gate["HEADER_2_0_ID"] = h["id"]
-                gate["HEADER_2_0_POST_TYPE"] = h.get("type") or h.get("source_route") or "UNKNOWN"
+                gate["HEADER_2_0_POST_TYPE"] = h.get("type") or h.get("source_type") or "UNKNOWN"
                 gate["HEADER_2_0_STATUS"] = h.get("status") or "UNKNOWN"
-                gate["diagnostics"].append({"header_candidates": header_hits[:5]})
+                gate["diagnostics"].append({"header_candidates": all_header_hits[:6]})
 
-            # 5) Inspect Elementor meta completeness on HOME 2.0 (READ-ONLY, authed)
-            if gate["HOME_2_0_DETECTED"] == "PASS" and gate["WORDPRESS_REST_AUTH"] == "PASS":
+            # 4) Elementor meta completeness on HOME 2.0 (READ-ONLY)
+            if gate["HOME_2_0_DETECTED"] == "PASS" and authed and \
+               gate["HOME_2_0_POST_TYPE"] in ("page", "pages", "post", "posts"):
                 hid = gate["HOME_2_0_ID"]
+                pt = "pages" if gate["HOME_2_0_POST_TYPE"] in ("page", "pages") else "posts"
                 meta = _get(client, base_url, base_host,
-                           f"{_WP_V2}/pages/{hid}?context=edit", headers=auth)
+                           f"{_WP_V2}/{pt}/{hid}?context=edit", headers=auth); req += 1
                 if meta.get("resp") is not None and meta["http"] == 200:
                     try:
                         mj = meta["resp"].json()
                         meta_obj = mj.get("meta") or {}
-                        has_el_data = ("_elementor_data" in meta_obj) or ("_elementor_edit_mode" in meta_obj)
-                        if has_el_data:
+                        has_el = ("_elementor_data" in meta_obj) or ("_elementor_edit_mode" in meta_obj)
+                        gate["diagnostics"].append({"home_meta_keys": list(meta_obj.keys())[:40],
+                                                    "elementor_data_in_rest_meta": has_el})
+                        if has_el:
                             gate["ELEMENTOR_DATA_ACCESSIBLE"] = "PASS"
-                            gate["ELEMENTOR_DATA_LOCATION"] = "post meta: _elementor_data (exposed via REST meta)"
+                            gate["ELEMENTOR_DATA_LOCATION"] = "post meta _elementor_data exposed via REST 'meta'"
                             gate["ELEMENTOR_META_COMPLETE"] = "YES"
                             gate["SAFE_WRITE_PATH_IDENTIFIED"] = "YES"
                             gate["CUSTOM_ENDPOINT_PLUGIN_REQUIRED"] = "NO"
                         else:
                             gate["ELEMENTOR_META_COMPLETE"] = "NO"
-                            gate["ELEMENTOR_DATA_LOCATION"] = (
-                                "_elementor_data NOT exposed in REST 'meta' (not registered with show_in_rest)"
-                            )
+                            gate["ELEMENTOR_DATA_LOCATION"] = "_elementor_data NOT in REST 'meta' (not registered show_in_rest)"
                             gate["SAFE_WRITE_PATH_IDENTIFIED"] = "NO"
                             gate["CUSTOM_ENDPOINT_PLUGIN_REQUIRED"] = "YES"
-                        gate["diagnostics"].append({
-                            "home_meta_keys": list(meta_obj.keys())[:40],
-                            "elementor_data_in_meta": has_el_data,
-                        })
                     except Exception as e:
-                        gate["diagnostics"].append({"home_meta": f"parse_error:{type(e).__name__}"})
+                        gate["diagnostics"].append({"home_meta_parse_error": type(e).__name__})
+
+            if gate["HOME_2_0_DETECTED"] == "FAIL" or gate["HEADER_2_0_DETECTED"] == "FAIL":
+                missing = []
+                if gate["HOME_2_0_DETECTED"] == "FAIL":
+                    missing.append("HOME 2.0")
+                if gate["HEADER_2_0_DETECTED"] == "FAIL":
+                    missing.append("HEADER 2.0")
+                gate["BLOCKER"] = f"Not located: {', '.join(missing)} (see diagnostics.scan for visible titles / permissions)"
 
         except RedirectBlocked as e:
-            gate["BLOCKER"] = f"OFF-HOST REDIRECT BLOCKED: {str(e)} — STOP"
-            gate["WORDPRESS_REST_AUTH"] = "FAIL"
+            gate["BLOCKER"] = f"OFF-HOST REDIRECT BLOCKED: {e} — STOP"
+            gate["WORDPRESS_REQUESTS_EXECUTED"] = req
             return gate
         except Exception as e:
             gate["BLOCKER"] = f"Unexpected error: {type(e).__name__}"
+            gate["WORDPRESS_REQUESTS_EXECUTED"] = req
             return gate
 
+    gate["WORDPRESS_REQUESTS_EXECUTED"] = req
     return gate
