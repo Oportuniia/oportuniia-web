@@ -22,9 +22,18 @@ ESPAÑOL. Responder siempre en español.
 - VR01 — RECHAZADO.
 - VR02 — RECHAZADO (navy oscuro + Fraunces + interruptor pequeño + vacío lateral).
 - VR03 — "Mejora clara" pero no cerrado.
-- VR04 — ENTREGADO (iteración sobre VR03), pendiente de aprobación de Rafa. Archivo: `/app/frontend/public/web2.html`.
+- VR04 — "Mejora clara" pero con exceso de contenido / copy formal.
+- VR05 — ENTREGADO (simplificación + foco producto/diferencial), pendiente de aprobación. Archivo: `/app/frontend/public/web2.html`.
 
-### VR04 — correcciones aplicadas sobre VR03
+### VR05 — cambios aplicados sobre VR04
+- Eliminado el panel/caja duplicada de deal-flow del hero (§7). Hero full-width editorial, headline gigante.
+- Botón "Entrar en el Universo Acuerdos" PEGADO justo debajo de las 3 tarjetas (§2). Bloque diferencial compacto: titular + A (vía judicial/recuperación) + B (vía acuerdo/resolución) en una línea cada uno (§3).
+- Tarjetas simplificadas (§4/§5): Valor de compra (masked), ROI objetivo VISIBLE (20/28/18%), Horizonte VISIBLE, Estrategia, estado en badge. Sin chips. Nota de valores demostrativos.
+- Mutación al activar (§6): ROI (12/16/24%), plazos, estrategia, status, foto (duotono teal) y atmósfera cambian → "la misma operación, dos formas de resolverse".
+- Acceso (§8/§9): Inversor / Colaborador / Suscriptor; copy más natural; Suscriptor corregido ("sigue el deal flow, recibe cada oportunidad antes que el mercado").
+- NOTA: el brief V05 llegó cortado en §9 (definición de modalidades). Aplicadas definiciones profesionales; ajustar si Rafa envía el texto completo.
+
+### VR04 — cambios (histórico)
 - Tarjetas NPL/CDR/REO: firma grande sobre imagen (duotono) con foto elegante por modalidad (residencial / corporativo / costa); estructura lista para sustituir por operaciones reales.
 - Momento diferencial integrado JUSTO debajo de las 3 tarjetas; copy simplificado a "Dos maneras de entenderlo" (vía judicial/recuperación vs vía acuerdo/resolución) + CTA grande.
 - Al activar Universo Acuerdos: las MISMAS 3 tarjetas mutan (foto→duotono teal, datos ROI/timing/framing, status y chips) + auto-scroll a las tarjetas para percibir la mutación.

@@ -148,21 +148,22 @@ header.sc{background:color-mix(in srgb,var(--bg) 78%,transparent);
 .burger span::before{top:-7px}.burger span::after{top:7px}
 
 /* ============ HERO ============ */
-.hero{position:relative;padding:190px 0 96px;overflow:hidden}
-.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:60px;align-items:end}
-.hero-meta{display:flex;gap:46px;margin-bottom:42px;flex-wrap:wrap}
+.hero{position:relative;padding:190px 0 84px;overflow:hidden}
+.hero-grid{display:grid;grid-template-columns:1fr;gap:0}
+.hero-meta{display:flex;gap:46px;margin-bottom:40px;flex-wrap:wrap}
 .hero-meta .mi{}
 .hero-meta .mk{font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--faint);margin-bottom:8px}
 .hero-meta .mv{font-size:14px;color:var(--ink2);font-weight:400}
-.hero h1{font-size:clamp(48px,7.4vw,122px);font-weight:600;letter-spacing:-.05em;line-height:.92;color:var(--ink)}
+.hero h1{font-size:clamp(52px,10.5vw,168px);font-weight:600;letter-spacing:-.05em;line-height:.9;color:var(--ink)}
 .hero h1 .l{display:block;overflow:hidden}
 .hero h1 .l span{display:block;transform:translateY(105%);
   transition:transform 1s var(--ease)}
 .hero.in h1 .l span{transform:translateY(0)}
 .hero h1 .l:nth-child(2) span{transition-delay:.12s}
 .hero h1 em{font-style:normal;color:var(--brand);transition:color var(--deep) var(--ease)}
-.hero-lead{margin-top:36px;max-width:560px;font-size:clamp(16px,1.5vw,19px);color:var(--ink2);font-weight:300;line-height:1.7}
-.hero-cta{margin-top:44px;display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.hero-bottom{display:flex;justify-content:space-between;align-items:flex-end;gap:48px;margin-top:40px;flex-wrap:wrap}
+.hero-lead{max-width:560px;font-size:clamp(16px,1.5vw,19px);color:var(--ink2);font-weight:300;line-height:1.7}
+.hero-cta{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
 .scrollcue{margin-top:64px;display:inline-flex;align-items:center;gap:12px;font-size:11px;
   letter-spacing:.26em;text-transform:uppercase;color:var(--faint)}
 .scrollcue .bar{width:52px;height:1px;background:var(--line);position:relative;overflow:hidden}
@@ -259,6 +260,8 @@ body.acuerdos .deal-media::after{background:linear-gradient(180deg,rgba(46,154,1
 .dl .r:last-child{border-bottom:none}
 .dl .k{color:var(--ink2);font-weight:300}
 .dl .v{color:var(--ink);font-weight:500;letter-spacing:.02em}
+.dl .v.big{font-size:20px;font-weight:700;color:var(--brand);letter-spacing:-.01em}
+.dl .r.roi{padding:6px 0}
 .mask{filter:blur(4.5px);opacity:.72;user-select:none;color:var(--brand)!important}
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .chip{font-size:11px;color:var(--ink2);border:1px solid var(--line);border-radius:40px;padding:5px 12px;letter-spacing:.02em}
@@ -327,6 +330,16 @@ body.acuerdos .diff-cta{border-left-color:var(--line)}
 /* CTA GIGANTE — activa la transformación */
 .switch{margin:64px auto 0;max-width:760px}
 .diff-cta .switch{margin:0;max-width:none;width:100%}
+/* bloque diferencial compacto pegado a las tarjetas */
+.switchwrap{margin-top:30px;border:1px solid var(--brand-line);border-radius:18px;
+  background:linear-gradient(180deg,var(--brand-tint),var(--surface));
+  padding:clamp(30px,3.4vw,48px);transition:background var(--deep) var(--ease),border-color var(--deep) var(--ease)}
+.sw-copy{text-align:center;max-width:780px;margin:0 auto}
+.sw-copy h3{font-size:clamp(24px,3.1vw,42px);font-weight:600;color:var(--ink);letter-spacing:-.03em;line-height:1.04}
+.sw-ways{margin-top:18px;display:flex;gap:12px 44px;justify-content:center;flex-wrap:wrap}
+.sw-ways .wy{font-size:14px;color:var(--ink2);font-weight:300}
+.sw-ways .wy b{color:var(--ink);font-weight:600}
+.switchwrap .switch{margin:26px auto 0;max-width:840px}
 .switch-btn{width:100%;position:relative;display:flex;align-items:center;justify-content:space-between;
   gap:24px;padding:30px 36px;border-radius:8px;overflow:hidden;color:#fff;
   transition:transform .5s var(--ease),box-shadow .5s var(--ease),background .6s var(--ease);
@@ -556,37 +569,12 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
           <span class="l"><span>Humanizamos</span></span>
           <span class="l"><span>la <em>deuda.</em></span></span>
         </h1>
-        <p class="hero-lead">Analizamos, estructuramos y resolvemos carteras de deuda con criterio humano y tecnología propia. Producto real, acceso controlado, decisiones trazables.</p>
-        <div class="hero-cta">
-          <a href="#producto" class="btn" data-testid="hero-cta-primary">Ver oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-          <a href="#acuerdos" class="btn line" data-testid="hero-cta-secondary">Descubrir el diferencial</a>
-        </div>
-        <div class="scrollcue">Deal flow privado <span class="bar"></span></div>
-      </div>
-      <div class="hero-panel" data-testid="hero-panel">
-        <span class="hp-scan" aria-hidden="true"></span>
-        <div class="hp-head">
-          <span class="hp-live"><span class="p"></span>Deal flow</span>
-          <span class="hp-tag">Acceso verificado</span>
-        </div>
-        <div class="hp-row">
-          <span class="hp-code">NPL</span>
-          <span class="hp-mid"><div class="m1">Cartera hipotecaria</div><div class="m2">Levante · residencial</div></span>
-          <span class="hp-val"><div class="n">€ ••.•••.•••</div><div class="st">Análisis</div></span>
-        </div>
-        <div class="hp-row">
-          <span class="hp-code">CDR</span>
-          <span class="hp-mid"><div class="m1">Créditos corporativos</div><div class="m2">Península · multi-deudor</div></span>
-          <span class="hp-val"><div class="n">€ •••.•••.•••</div><div class="st">En curso</div></span>
-        </div>
-        <div class="hp-row">
-          <span class="hp-code">REO</span>
-          <span class="hp-mid"><div class="m1">Activos adjudicados</div><div class="m2">Costa · uso mixto</div></span>
-          <span class="hp-val"><div class="n">€ •••.•••</div><div class="st">Disponible</div></span>
-        </div>
-        <div class="hp-foot">
-          <span class="lk"><i data-lucide="lock"></i>Detalle bajo acceso</span>
-          <span>3 operaciones · +•• en pipeline</span>
+        <div class="hero-bottom">
+          <p class="hero-lead">Compramos, estructuramos y resolvemos carteras de deuda. La misma oportunidad, dos formas de resolverla.</p>
+          <div class="hero-cta">
+            <a href="#producto" class="btn" data-testid="hero-cta-primary">Ver oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
+            <a href="#acceso" class="btn line" data-testid="hero-cta-secondary">Solicitar acceso</a>
+          </div>
         </div>
       </div>
     </div>
@@ -638,14 +626,12 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
           <h3>Cartera hipotecaria garantizada</h3>
           <div class="loc"><i data-lucide="map-pin"></i>Levante · España</div>
           <div class="dl">
-            <div class="r"><span class="k">Asset class</span><span class="v">Residencial garantizado</span></div>
-            <div class="r"><span class="k main-only">Descuento s/ nominal</span><span class="k alt">Recuperación est.</span><span class="v mask">3• %</span></div>
-            <div class="r"><span class="k main-only">Retorno objetivo</span><span class="k alt">Vía de resolución</span><span class="v main-only mask">1• %</span><span class="v alt">Acuerdo / dación</span></div>
-            <div class="r"><span class="k main-only">Horizonte inversión</span><span class="k alt">Timing acuerdo</span><span class="v main-only mask">•• meses</span><span class="v alt mask">•—•• meses</span></div>
+            <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••</span></div>
+            <div class="r roi"><span class="k main-only">ROI objetivo</span><span class="k alt">ROI acuerdo</span><span class="v big main-only">20%</span><span class="v big alt">12%</span></div>
+            <div class="r"><span class="k">Horizonte</span><span class="v main-only">24 meses</span><span class="v alt">8 meses</span></div>
+            <div class="r"><span class="k">Estrategia</span><span class="v main-only">Recuperación</span><span class="v alt">Acuerdo / dación</span></div>
           </div>
-          <div class="chips main-only"><span class="chip">Garantía real</span><span class="chip">Judicializado</span><span class="chip">Due diligence</span></div>
-          <div class="chips alt"><span class="chip">Acuerdo amistoso</span><span class="chip">Dación</span><span class="chip">Quita negociada</span></div>
-          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Detalle bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
+          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
       </div>
       <!-- CDR -->
@@ -659,14 +645,12 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
           <h3>Créditos dudosos corporativos</h3>
           <div class="loc"><i data-lucide="map-pin"></i>Península · multi-deudor</div>
           <div class="dl">
-            <div class="r"><span class="k">Asset class</span><span class="v">Corporate unsecured</span></div>
-            <div class="r"><span class="k main-only">Exposición</span><span class="k alt">Recuperación est.</span><span class="v mask">€ •••.•••.•••</span></div>
-            <div class="r"><span class="k main-only">Retorno objetivo</span><span class="k alt">Vía de resolución</span><span class="v main-only mask">•• %</span><span class="v alt">Reestructuración</span></div>
-            <div class="r"><span class="k main-only">Horizonte inversión</span><span class="k alt">Timing acuerdo</span><span class="v main-only mask">•• meses</span><span class="v alt mask">•—•• meses</span></div>
+            <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••.•••</span></div>
+            <div class="r roi"><span class="k main-only">ROI objetivo</span><span class="k alt">ROI acuerdo</span><span class="v big main-only">28%</span><span class="v big alt">16%</span></div>
+            <div class="r"><span class="k">Horizonte</span><span class="v main-only">30 meses</span><span class="v alt">12 meses</span></div>
+            <div class="r"><span class="k">Estrategia</span><span class="v main-only">Reestructuración</span><span class="v alt">Convenio / quita</span></div>
           </div>
-          <div class="chips main-only"><span class="chip">Multi-jurisdicción</span><span class="chip">Refinanciable</span><span class="chip">Colateral mixto</span></div>
-          <div class="chips alt"><span class="chip">Convenio</span><span class="chip">Refinanciación</span><span class="chip">Espera + quita</span></div>
-          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Detalle bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
+          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
       </div>
       <!-- REO -->
@@ -680,47 +664,36 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
           <h3>Activos adjudicados</h3>
           <div class="loc"><i data-lucide="map-pin"></i>Costa · uso mixto</div>
           <div class="dl">
-            <div class="r"><span class="k">Asset class</span><span class="v">Real estate owned</span></div>
-            <div class="r"><span class="k main-only">Valoración</span><span class="k alt">Recuperación est.</span><span class="v mask">€ •••.•••</span></div>
-            <div class="r"><span class="k main-only">Upside objetivo</span><span class="k alt">Vía de resolución</span><span class="v main-only mask">•• %</span><span class="v alt">Reposicionamiento</span></div>
-            <div class="r"><span class="k main-only">Horizonte inversión</span><span class="k alt">Timing salida</span><span class="v main-only mask">•• meses</span><span class="v alt mask">•—•• meses</span></div>
+            <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••</span></div>
+            <div class="r roi"><span class="k main-only">ROI objetivo</span><span class="k alt">ROI acuerdo</span><span class="v big main-only">18%</span><span class="v big alt">24%</span></div>
+            <div class="r"><span class="k">Horizonte</span><span class="v main-only">18 meses</span><span class="v alt">10 meses</span></div>
+            <div class="r"><span class="k">Estrategia</span><span class="v main-only">Reposicionamiento</span><span class="v alt">Venta / acuerdo</span></div>
           </div>
-          <div class="chips main-only"><span class="chip">Puesta en valor</span><span class="chip">Gestión activa</span><span class="chip">Salida flexible</span></div>
-          <div class="chips alt"><span class="chip">Alquiler + venta</span><span class="chip">Reforma</span><span class="chip">Comercialización</span></div>
-          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Detalle bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
+          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
       </div>
     </div>
-    <p class="deal-note reveal d2">Ves <b>la estructura</b>; el detalle sensible permanece protegido — <b>acceso profesional</b> para desbloquear cada operación.</p>
+    <p class="deal-note reveal d2">ROI y plazos <b>demostrativos</b> a efectos de maqueta · valor de compra bajo acceso · se sustituirán por operaciones reales.</p>
 
-    <!-- DIFERENCIAL: dos maneras + CTA grande, justo bajo las tarjetas -->
-    <div class="diff reveal d1" id="acuerdos" data-testid="portal-acuerdos">
-      <div class="diff-copy">
-        <div class="eyebrow">El diferencial OPORTUNIIA</div>
-        <h3>Dos maneras de entenderlo.</h3>
-        <p class="dlead">La <b>misma</b> oportunidad, dos lecturas. NPL, CDR y REO no cambian: cambia <b>cómo se leen</b>. No es una cuarta categoría.</p>
-        <div class="diff-ways">
-          <div class="way">
-            <span class="wi"><i data-lucide="gavel"></i></span>
-            <span><span class="wt">Vía judicial / recuperación</span><span class="wx">Se ejecuta la garantía y se recupera por la vía legal.</span></span>
-          </div>
-          <div class="way">
-            <span class="wi"><i data-lucide="handshake"></i></span>
-            <span><span class="wt">Vía acuerdo / resolución</span><span class="wx">Se negocia una salida: acuerdo, quita, dación o reposicionamiento.</span></span>
-          </div>
+    <!-- DIFERENCIAL: pegado bajo las tarjetas -->
+    <div class="switchwrap reveal d1" id="acuerdos" data-testid="portal-acuerdos">
+      <div class="sw-copy">
+        <div class="eyebrow" style="justify-content:center;margin-bottom:18px">El diferencial</div>
+        <h3>Dos maneras de entender la misma oportunidad.</h3>
+        <div class="sw-ways">
+          <span class="wy"><b>A · Vía judicial / recuperación</b> — se ejecuta y se recupera.</span>
+          <span class="wy"><b>B · Vía acuerdo / resolución</b> — se negocia la salida.</span>
         </div>
       </div>
-      <div class="diff-cta">
-        <div class="switch">
-          <button class="switch-btn" id="switchBtn" data-testid="universe-toggle" aria-pressed="false">
-            <span class="txt">
-              <span class="k" id="switchK">Activar</span>
-              <span class="t" id="switchT">Entrar en el Universo Acuerdos</span>
-            </span>
-            <span class="switch-knob"><i data-lucide="power"></i></span>
-          </button>
-          <div class="switch-hint">Modo actual: <b id="switchState">Lógica de Inversión</b> — pulsa y verás las 3 oportunidades reinterpretadas</div>
-        </div>
+      <div class="switch">
+        <button class="switch-btn" id="switchBtn" data-testid="universe-toggle" aria-pressed="false">
+          <span class="txt">
+            <span class="k" id="switchK">Pulsa aquí</span>
+            <span class="t" id="switchT">Entrar en el Universo Acuerdos</span>
+          </span>
+          <span class="switch-knob"><i data-lucide="power"></i></span>
+        </button>
+        <div class="switch-hint">Modo actual: <b id="switchState">Inversión</b> — pulsa y verás las 3 operaciones reinterpretadas</div>
       </div>
     </div>
   </div>
@@ -814,7 +787,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <span class="ei"><i data-lucide="trending-up"></i></span>
         <div class="en">Modalidad 01</div>
         <h3>Inversor</h3>
-        <p>Accede al deal flow completo con cifras, documentación y estructura de cada operación.</p>
+        <p>Inviertes en las operaciones. Accedes al deal flow completo: cifras, documentación y estructura de cada deal.</p>
         <ul class="feats">
           <li><i data-lucide="check"></i>NPL · CDR · REO desbloqueados</li>
           <li><i data-lucide="check"></i>Doble lectura: inversión y acuerdo</li>
@@ -826,7 +799,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <span class="ei"><i data-lucide="handshake"></i></span>
         <div class="en">Modalidad 02</div>
         <h3>Colaborador</h3>
-        <p>Servicers, despachos y partners que aportan cartera u originan operación.</p>
+        <p>Aportas cartera, operación o servicio. Servicers, despachos y partners que trabajan con la firma.</p>
         <ul class="feats">
           <li><i data-lucide="check"></i>Canal directo con la firma</li>
           <li><i data-lucide="check"></i>Co-inversión y co-gestión</li>
@@ -835,16 +808,16 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <a href="#" class="ecta" data-testid="entry-colaborador-cta">Proponer colaboración <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
       <div class="entry reveal d3" data-testid="entry-suscriptor">
-        <span class="ei"><i data-lucide="bell"></i></span>
+        <span class="ei"><i data-lucide="radar"></i></span>
         <div class="en">Modalidad 03</div>
         <h3>Suscriptor</h3>
-        <p>Recibe oportunidades seleccionadas y novedades del grupo, sin compromiso.</p>
+        <p>Sigues el deal flow. Recibes cada oportunidad seleccionada antes de que salga al mercado.</p>
         <ul class="feats">
-          <li><i data-lucide="check"></i>Selección curada de deals</li>
-          <li><i data-lucide="check"></i>Novedades del Grupo</li>
-          <li><i data-lucide="check"></i>Salida cuando quieras</li>
+          <li><i data-lucide="check"></i>Nuevas operaciones, primero</li>
+          <li><i data-lucide="check"></i>Selección curada por la firma</li>
+          <li><i data-lucide="check"></i>Sin compromiso · te das de baja cuando quieras</li>
         </ul>
-        <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Suscribirme <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Quiero seguir el deal flow <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
     </div>
     <p class="access-foot reveal d2">Todas las modalidades quedan sujetas a verificación profesional. Sin compromiso.</p>
@@ -917,9 +890,9 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   sw.addEventListener('click',()=>{
     const on=document.body.classList.toggle('acuerdos');
     sw.setAttribute('aria-pressed',on);
-    document.getElementById('switchK').textContent=on?'Volver':'Activar';
+    document.getElementById('switchK').textContent=on?'Volver':'Pulsa aquí';
     document.getElementById('switchT').textContent=on?'Estás en el Universo Acuerdos':'Entrar en el Universo Acuerdos';
-    document.getElementById('switchState').textContent=on?'Lógica de Resolución':'Lógica de Inversión';
+    document.getElementById('switchState').textContent=on?'Resolución':'Inversión';
     document.querySelectorAll('.dealbar .main-only').forEach(e=>e.classList.toggle('on',!on));
     document.querySelectorAll('.dealbar .alt').forEach(e=>{e.style.display=on?'inline-flex':'none';e.classList.toggle('on',on)});
     // llevar la vista a las 3 tarjetas para percibir la mutación
