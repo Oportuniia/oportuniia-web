@@ -14,6 +14,8 @@ SECURITY CONTRACT (enforced by design):
 """
 
 import base64
+import hashlib as _hashlib
+import json as _json
 import logging
 import os
 import time
@@ -492,6 +494,8 @@ def run_item_read(post_id: int, rest_base: str = "elementor_library") -> dict:
         "POST_TYPE": "NOT ACCESSIBLE",
         "ELEMENTOR_DATA_ACCESSIBLE": "FAIL",
         "ELEMENTOR_META_COMPLETE": "UNKNOWN",
+        "ELEMENTOR_DATA_LEN": 0,
+        "ELEMENTOR_DATA_SHA256": None,
         "META_KEYS": [],
         "WRITE_REQUESTS_EXECUTED": 0,
         "PRODUCTION_MUTATIONS": 0,
@@ -535,6 +539,11 @@ def run_item_read(post_id: int, rest_base: str = "elementor_library") -> dict:
                     if has_el:
                         out["ELEMENTOR_DATA_ACCESSIBLE"] = "PASS"
                         out["ELEMENTOR_META_COMPLETE"] = "YES"
+                        ed = meta.get("_elementor_data")
+                        if ed is not None:
+                            ed_str = ed if isinstance(ed, str) else _json.dumps(ed, separators=(",", ":"), ensure_ascii=False)
+                            out["ELEMENTOR_DATA_LEN"] = len(ed_str.encode("utf-8"))
+                            out["ELEMENTOR_DATA_SHA256"] = _hashlib.sha256(ed_str.encode("utf-8")).hexdigest()
                     else:
                         # Item readable but _elementor_data not in REST meta.
                         out["ELEMENTOR_DATA_ACCESSIBLE"] = "FAIL"
