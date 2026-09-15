@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OPORTUNIIA · WEB 2.0 — HOME 2.0 · HEADER 2.0 (Visual Review)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  :root{
+    --navy:#0C1B2A; --dark:#12141F; --blue:#1F6588; --cyan:#42B7C5;
+    --white:#FFFFFF; --mist:#AEBECD; --line:rgba(174,190,205,.14);
+    --line-strong:rgba(66,183,197,.34); --card:#0F2436;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Poppins',sans-serif;background:var(--navy);color:var(--white);
+    -webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden}
+  ::selection{background:var(--cyan);color:var(--navy)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 40px}
+  .eyebrow{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--cyan);
+    font-weight:500;display:inline-flex;align-items:center;gap:12px}
+  .eyebrow::before{content:"";width:28px;height:1px;background:var(--cyan);display:inline-block}
+  .muted{color:var(--mist)}
+
+  /* ===== HEADER 2.0 ===== */
+  header{position:fixed;top:0;left:0;right:0;z-index:50;
+    transition:background-color .4s ease, border-color .4s ease, padding .4s ease;
+    border-bottom:1px solid transparent}
+  header.scrolled{background:rgba(9,20,32,.82);backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--line)}
+  .nav{display:flex;align-items:center;justify-content:space-between;height:78px}
+  .brand{display:flex;align-items:center;gap:12px;font-weight:600;letter-spacing:.06em;font-size:19px}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--cyan);
+    box-shadow:0 0 0 4px rgba(66,183,197,.15)}
+  .brand b{font-weight:700}
+  .menu{display:flex;align-items:center;gap:38px}
+  .menu a{font-size:14px;color:var(--mist);font-weight:400;position:relative;transition:color .25s}
+  .menu a::after{content:"";position:absolute;left:0;bottom:-6px;height:1px;width:0;background:var(--cyan);transition:width .3s}
+  .menu a:hover{color:var(--white)}
+  .menu a:hover::after{width:100%}
+  .hactions{display:flex;align-items:center;gap:22px}
+  .privada{font-size:13px;color:var(--mist);display:inline-flex;align-items:center;gap:8px;
+    padding:9px 16px;border:1px solid var(--line);border-radius:2px;transition:border-color .3s,color .3s}
+  .privada:hover{border-color:var(--line-strong);color:var(--white)}
+  .btn{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;
+    padding:12px 22px;border-radius:2px;transition:transform .25s,background-color .3s,color .3s,border-color .3s;cursor:pointer;border:1px solid transparent}
+  .btn-primary{background:var(--cyan);color:var(--navy);font-weight:600}
+  .btn-primary:hover{transform:translateY(-2px);background:#5ac9d6}
+  .btn-ghost{border:1px solid var(--line-strong);color:var(--white)}
+  .btn-ghost:hover{background:rgba(66,183,197,.08);transform:translateY(-2px)}
+  .burger{display:none;background:none;border:0;color:#fff;cursor:pointer}
+
+  /* ===== HERO ===== */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding-top:78px;overflow:hidden}
+  .hero-grid{position:absolute;inset:0;opacity:.5;
+    background-image:linear-gradient(var(--line) 1px,transparent 1px);background-size:100% 88px;
+    -webkit-mask-image:linear-gradient(to bottom,transparent,#000 22%,#000 68%,transparent);
+    mask-image:linear-gradient(to bottom,transparent,#000 22%,#000 68%,transparent)}
+  .hero-glow{position:absolute;right:-10%;top:8%;width:60vw;height:60vw;
+    background:radial-gradient(circle at center,rgba(31,101,136,.28),transparent 62%);
+    filter:blur(20px);pointer-events:none}
+  .hero-inner{position:relative;z-index:2;width:100%}
+  .hero h1{font-size:clamp(44px,7vw,88px);line-height:1.02;font-weight:600;letter-spacing:-.02em;
+    max-width:16ch;margin:26px 0 0}
+  .hero h1 .cy{color:var(--cyan)}
+  .hero .lead{font-size:clamp(17px,1.6vw,21px);color:var(--mist);max-width:52ch;margin-top:28px;font-weight:300}
+  .hero .lead b{color:#fff;font-weight:500}
+  .hero .principle{margin-top:22px;max-width:50ch;font-size:15px;color:var(--mist);
+    padding-left:18px;border-left:1px solid var(--line-strong)}
+  .hero-cta{display:flex;gap:16px;margin-top:40px;flex-wrap:wrap}
+  .hero-meta{position:absolute;right:40px;bottom:44px;z-index:2;text-align:right;
+    font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:rgba(174,190,205,.55);display:flex;flex-direction:column;gap:8px}
+  .hero-meta span{display:inline-flex;align-items:center;gap:10px;justify-content:flex-end}
+  .hero-meta i{width:5px;height:5px;background:var(--cyan);border-radius:50%;display:inline-block}
+
+  /* ===== SECTIONS ===== */
+  section{position:relative}
+  .band{padding:120px 0}
+  .band-dark{background:var(--dark)}
+  .shead{max-width:64ch}
+  .shead h2{font-size:clamp(30px,3.6vw,46px);font-weight:600;letter-spacing:-.02em;margin-top:20px;line-height:1.1}
+  .shead p{color:var(--mist);margin-top:18px;font-size:17px;font-weight:300}
+
+  .diff{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:60px;background:var(--line)}
+  .diff .cell{background:var(--navy);padding:40px 34px}
+  .band-dark .diff .cell{background:var(--dark)}
+  .diff .cell h3{font-size:19px;font-weight:600;margin:22px 0 10px}
+  .diff .cell p{color:var(--mist);font-size:15px;font-weight:300}
+  .ic{width:44px;height:44px;border:1px solid var(--line-strong);border-radius:3px;display:flex;align-items:center;justify-content:center;color:var(--cyan)}
+
+  /* asset classes */
+  .assets{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:60px}
+  .acard{background:var(--card);border:1px solid var(--line);border-radius:4px;padding:36px 32px;
+    transition:transform .35s,border-color .35s;position:relative;overflow:hidden}
+  .acard::before{content:"";position:absolute;left:0;top:0;height:2px;width:0;background:var(--cyan);transition:width .5s}
+  .acard:hover{transform:translateY(-6px);border-color:var(--line-strong)}
+  .acard:hover::before{width:100%}
+  .acard .tag{font-size:12px;letter-spacing:.24em;color:var(--cyan);font-weight:600}
+  .acard h3{font-size:26px;font-weight:600;margin:14px 0 6px}
+  .acard .sub{color:var(--mist);font-size:14px;font-weight:300;min-height:66px}
+  .acard .meta{display:flex;justify-content:space-between;align-items:center;margin-top:26px;
+    padding-top:20px;border-top:1px solid var(--line);font-size:13px;color:var(--mist)}
+  .lock{display:inline-flex;align-items:center;gap:7px;color:var(--cyan)}
+
+  /* process */
+  .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:60px;background:var(--line)}
+  .step{background:var(--navy);padding:36px 28px}
+  .band-dark .step{background:var(--dark)}
+  .step .n{font-size:13px;color:var(--cyan);letter-spacing:.2em;font-weight:600}
+  .step h4{font-size:18px;font-weight:600;margin:16px 0 8px}
+  .step p{color:var(--mist);font-size:14px;font-weight:300}
+
+  /* ecosystem */
+  .eco{display:grid;grid-template-columns:repeat(7,1fr);gap:16px;margin-top:56px}
+  .node{aspect-ratio:1;border:1px solid var(--line);border-radius:4px;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;gap:12px;transition:border-color .35s,background-color .35s,transform .35s;
+    background:linear-gradient(180deg,rgba(31,101,136,.06),transparent)}
+  .node:hover{border-color:var(--line-strong);background:rgba(31,101,136,.12);transform:translateY(-4px)}
+  .node span{font-size:13px;letter-spacing:.12em;font-weight:500}
+  .node .ec{color:var(--cyan)}
+
+  /* trust / cta */
+  .trust{display:grid;grid-template-columns:1.3fr 1fr;gap:60px;align-items:center;margin-top:20px}
+  .trust ul{list-style:none;margin-top:26px;display:flex;flex-direction:column;gap:16px}
+  .trust li{display:flex;gap:14px;align-items:flex-start;color:var(--mist);font-weight:300}
+  .trust li svg{color:var(--cyan);flex-shrink:0;margin-top:3px}
+  .panel{background:var(--card);border:1px solid var(--line-strong);border-radius:6px;padding:44px 40px}
+  .panel h3{font-size:24px;font-weight:600}
+  .panel p{color:var(--mist);font-weight:300;margin-top:12px}
+  .field{margin-top:18px}
+  .field label{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mist)}
+  .field input,.field select{width:100%;margin-top:8px;background:var(--navy);border:1px solid var(--line);
+    color:#fff;padding:13px 14px;border-radius:3px;font-family:inherit;font-size:15px;outline:none;transition:border-color .3s}
+  .field input:focus,.field select:focus{border-color:var(--cyan)}
+
+  footer{background:#08131f;border-top:1px solid var(--line);padding:80px 0 40px}
+  .fgrid{display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap}
+  .fstatement{font-size:clamp(28px,3.4vw,42px);font-weight:600;letter-spacing:-.02em;max-width:14ch}
+  .fstatement .cy{color:var(--cyan)}
+  .fmeta{color:var(--mist);font-size:13px;font-weight:300;text-align:right;line-height:2}
+  .fbar{margin-top:60px;padding-top:26px;border-top:1px solid var(--line);display:flex;
+    justify-content:space-between;color:rgba(174,190,205,.6);font-size:12px;letter-spacing:.05em;flex-wrap:wrap;gap:12px}
+
+  .reveal{opacity:1;transform:none}
+  @keyframes riseIn{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+  .hero .reveal{animation:riseIn .9s both}
+  .hero .eyebrow{animation-delay:.05s}
+  .hero h1{animation-delay:.15s}
+  .hero .lead{animation-delay:.30s}
+  .hero .principle{animation-delay:.42s}
+  .hero .hero-cta{animation-delay:.54s}
+
+  @media(max-width:1024px){
+    .wrap{padding:0 28px}
+    .eco{grid-template-columns:repeat(4,1fr)}
+    .diff,.steps{grid-template-columns:repeat(2,1fr)}
+    .trust{grid-template-columns:1fr;gap:40px}
+    .hero-meta{display:none}
+    .menu{gap:24px}
+    .menu a:nth-child(n+4){display:none}
+  }
+  @media(max-width:760px){
+    .wrap{padding:0 22px}
+    .menu{display:none}
+    .hactions .privada{display:none}
+    .burger{display:inline-flex}
+    .band{padding:82px 0}
+    .assets{grid-template-columns:1fr}
+    .diff,.steps{grid-template-columns:1fr}
+    .eco{grid-template-columns:repeat(2,1fr)}
+    .hero h1{font-size:42px}
+    .fgrid{flex-direction:column}
+    .fmeta{text-align:left}
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER 2.0 -->
+<header id="hdr">
+  <div class="wrap nav">
+    <div class="brand"><span class="dot"></span>OPORTUN<b>IIA</b></div>
+    <nav class="menu">
+      <a href="#oportunidades">Oportunidades</a>
+      <a href="#tipologias">NPL · CDR · REO</a>
+      <a href="#proceso">Cómo trabajamos</a>
+      <a href="#ecosistema">Ecosistema</a>
+      <a href="#contacto">Contacto</a>
+    </nav>
+    <div class="hactions">
+      <a class="privada" href="#"><svg width="14" height="14" data-lucide="lock"></svg>Área privada</a>
+      <a class="btn btn-primary" href="#contacto">Regístrate</a>
+      <button class="burger" aria-label="Menú"><svg width="24" height="24" data-lucide="menu"></svg></button>
+    </div>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+  <div class="wrap hero-inner">
+    <span class="eyebrow reveal">Firma especialista en deuda</span>
+    <h1 class="reveal">Humanizamos <span class="cy">la deuda.</span></h1>
+    <p class="lead reveal">Convertimos <b>NPL, CDR y REO</b> en oportunidades reales de inversión.</p>
+    <p class="principle reveal">En OPORTUNIIA priorizamos el acuerdo. Si no es viable, buscamos la mayor rentabilidad posible.</p>
+    <div class="hero-cta reveal">
+      <a class="btn btn-primary" href="#oportunidades">Ver Oportunidades <svg width="16" height="16" data-lucide="arrow-right"></svg></a>
+      <a class="btn btn-ghost" href="#contacto">Regístrate</a>
+    </div>
+  </div>
+  <div class="hero-meta">
+    <span>Criterio · Ejecución <i></i></span>
+    <span>Inteligencia · Datos <i></i></span>
+  </div>
+</section>
+
+<!-- WHAT / WHY DIFFERENT -->
+<section class="band" id="firma">
+  <div class="wrap">
+    <div class="shead reveal">
+      <span class="eyebrow">Qué resolvemos</span>
+      <h2>Una lectura precisa de la deuda, con criterio institucional.</h2>
+      <p>Analizamos, estructuramos y ejecutamos operaciones sobre deuda no productiva y activos vinculados. Donde otros ven un expediente, OPORTUNIIA identifica una vía: primero el acuerdo, después la rentabilidad.</p>
+    </div>
+    <div class="diff">
+      <div class="cell reveal"><div class="ic"><svg width="20" height="20" data-lucide="scale"></svg></div><h3>Criterio antes que volumen</h3><p>Cada operación se evalúa por su viabilidad real, no por inercia de cartera.</p></div>
+      <div class="cell reveal"><div class="ic"><svg width="20" height="20" data-lucide="handshake"></svg></div><h3>El acuerdo primero</h3><p>Priorizamos soluciones sostenibles con el deudor cuando son posibles.</p></div>
+      <div class="cell reveal"><div class="ic"><svg width="20" height="20" data-lucide="target"></svg></div><h3>Rentabilidad con disciplina</h3><p>Si el acuerdo no es viable, ejecutamos buscando el mejor resultado posible.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- NPL / CDR / REO -->
+<section class="band band-dark" id="tipologias">
+  <div class="wrap">
+    <div class="shead reveal">
+      <span class="eyebrow">Tipologías</span>
+      <h2>NPL, CDR y REO. Tres realidades, un mismo rigor.</h2>
+    </div>
+    <div class="assets">
+      <div class="acard reveal">
+        <div class="tag">NPL</div>
+        <h3>Non-Performing Loans</h3>
+        <p class="sub">Préstamos deteriorados analizados operación a operación, con foco en recuperabilidad y vía de solución.</p>
+        <div class="meta"><span>Deuda financiera</span><span class="lock"><svg width="14" height="14" data-lucide="lock"></svg>Detalle protegido</span></div>
+      </div>
+      <div class="acard reveal">
+        <div class="tag">CDR</div>
+        <h3>Créditos Dudosos</h3>
+        <p class="sub">Posiciones dudosas y refinanciadas evaluadas con criterio jurídico y financiero combinado.</p>
+        <div class="meta"><span>Posiciones dudosas</span><span class="lock"><svg width="14" height="14" data-lucide="lock"></svg>Detalle protegido</span></div>
+      </div>
+      <div class="acard reveal">
+        <div class="tag">REO</div>
+        <h3>Real Estate Owned</h3>
+        <p class="sub">Activos adjudicados gestionados para preservar y maximizar valor a lo largo del ciclo.</p>
+        <div class="meta"><span>Activos inmobiliarios</span><span class="lock"><svg width="14" height="14" data-lucide="lock"></svg>Detalle protegido</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROCESS -->
+<section class="band" id="proceso">
+  <div class="wrap">
+    <div class="shead reveal">
+      <span class="eyebrow">Cómo trabajamos</span>
+      <h2>De la cartera al resultado, con trazabilidad.</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal"><div class="n">01</div><h4>Análisis</h4><p>Due diligence de cartera y activos con datos verificados.</p></div>
+      <div class="step reveal"><div class="n">02</div><h4>Criterio</h4><p>Definición de estrategia: acuerdo o ejecución según viabilidad.</p></div>
+      <div class="step reveal"><div class="n">03</div><h4>Estructura</h4><p>Diseño jurídico y financiero de la operación.</p></div>
+      <div class="step reveal"><div class="n">04</div><h4>Ejecución</h4><p>Gestión, seguimiento y cierre orientado a resultado.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ECOSYSTEM -->
+<section class="band band-dark" id="ecosistema">
+  <div class="wrap">
+    <div class="shead reveal">
+      <span class="eyebrow">Capacidad operativa · Bajo la superficie</span>
+      <h2>Un ecosistema propio que sostiene cada decisión.</h2>
+      <p>Capacidades internas —no productos separados— que dan profundidad operativa: la tecnología refuerza la autoridad, nunca la sustituye.</p>
+    </div>
+    <div class="eco">
+      <div class="node reveal"><span class="ec"><svg width="22" height="22" data-lucide="cpu"></svg></span><span>CORE</span></div>
+      <div class="node reveal"><span class="ec"><svg width="22" height="22" data-lucide="brain-circuit"></svg></span><span>IA</span></div>
+      <div class="node reveal"><span class="ec"><svg width="22" height="22" data-lucide="gavel"></svg></span><span>LEGAL</span></div>
+      <div class="node reveal"><span class="ec"><svg width="22" height="22" data-lucide="layout-grid"></svg></span><span>APP</span></div>
+      <div class="node reveal"><span class="ec"><svg width="22" height="22" data-lucide="eye"></svg></span><span>VISUAL</span></div>
+      <div class="node reveal"><span class="ec"><svg width="22" height="22" data-lucide="presentation"></svg></span><span>PRESENTACIÓN</span></div>
+      <div class="node reveal"><span class="ec"><svg width="22" height="22" data-lucide="globe"></svg></span><span>WEB</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- OPPORTUNITIES / CONTROLLED ACCESS -->
+<section class="band" id="oportunidades">
+  <div class="wrap">
+    <div class="trust">
+      <div class="reveal">
+        <span class="eyebrow">Oportunidades</span>
+        <h2 style="font-size:clamp(28px,3.4vw,42px);font-weight:600;letter-spacing:-.02em;margin-top:18px;line-height:1.1">Acceso controlado a operaciones reales.</h2>
+        <ul>
+          <li><svg width="20" height="20" data-lucide="shield-check"></svg><span>Previsualización pública de la firma; el detalle sensible permanece protegido.</span></li>
+          <li><svg width="20" height="20" data-lucide="user-check"></svg><span>Acceso profesional para fondos, servicers, bancos, originadores y family offices.</span></li>
+          <li><svg width="20" height="20" data-lucide="file-lock-2"></svg><span>Información de cada operación bajo verificación y confidencialidad.</span></li>
+        </ul>
+      </div>
+      <div class="panel reveal" id="contacto">
+        <h3>Solicitar acceso</h3>
+        <p>Regístrese como inversor profesional para acceder al detalle de oportunidades.</p>
+        <div class="field"><label>Nombre / Entidad</label><input placeholder="Su nombre o entidad" /></div>
+        <div class="field"><label>Email profesional</label><input placeholder="nombre@entidad.com" /></div>
+        <div class="field"><label>Perfil</label>
+          <select><option>Fondo de inversión</option><option>Servicer</option><option>Banco / Originador</option><option>Family office</option><option>Operador especializado</option></select>
+        </div>
+        <a class="btn btn-primary" style="width:100%;justify-content:center;margin-top:22px" href="#">Regístrate <svg width="16" height="16" data-lucide="arrow-right"></svg></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="fgrid">
+      <div class="fstatement reveal">Humanizamos <span class="cy">la deuda.</span></div>
+      <div class="fmeta">
+        OPORTUNIIA · Firma especialista en deuda<br>
+        NPL · CDR · REO · Inversión · Operaciones<br>
+        Acceso profesional · Detalle protegido
+      </div>
+    </div>
+    <div class="fbar">
+      <span>© OPORTUNIIA — WEB 2.0 · Visual Review (borrador, no publicado)</span>
+      <span>Criterio · Inteligencia · Ejecución</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  lucide.createIcons();
+  const hdr=document.getElementById('hdr');
+  const onScroll=()=>{hdr.classList.toggle('scrolled',window.scrollY>24)};
+  onScroll();window.addEventListener('scroll',onScroll,{passive:true});
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:.12});
+  let d=0;document.querySelectorAll('.reveal').forEach(el=>{el.style.transitionDelay=(Math.min(d,240))+'ms';d+=60;io.observe(el)});
+  window.addEventListener('load',()=>{setTimeout(()=>{document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in'))},260)});
+</script>
+</body>
+</html>
