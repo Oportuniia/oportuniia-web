@@ -23,9 +23,19 @@ ESPAÑOL. Responder siempre en español.
 - VR02 — RECHAZADO (navy oscuro + Fraunces + interruptor pequeño + vacío lateral).
 - VR03 — "Mejora clara" pero no cerrado.
 - VR04 — "Mejora clara" pero con exceso de contenido / copy formal.
-- VR05 — ENTREGADO (simplificación + foco producto/diferencial), pendiente de aprobación. Archivo: `/app/frontend/public/web2.html`.
+- VR05 — base sólida; brief llegó cortado en §9.
+- VR05.1 — ENTREGADO (correcciones restantes del brief), pendiente de aprobación. Archivo: `/app/frontend/public/web2.html`.
 
-### VR05 — cambios aplicados sobre VR04
+### VR05.1 — correcciones aplicadas
+- Suscriptor REDEFINIDO: usuario ya vinculado al ecosistema, con código de acceso a su entorno autorizado. CTA "Entrar con mi código" (icono llave). Ya NO es newsletter/follower.
+- Inversor: busca invertir → "Solicitar acceso". Colaborador: aporta operaciones → "Proponer colaboración".
+- Ecosistema REDUCIDO drásticamente: bloque ligero "Tecnología e inteligencia propias..." + tags discretos (CORE·IA·LEGAL·APP·VISUAL·PRESENTACIÓN·WEB sin explicar) + link "Conoce nuestra tecnología". Sin gran grid de 7 cajas.
+- Cómo funciona SIMPLIFICADO a 5 pasos humanos: Analizamos → Estructuramos → Definimos la vía → Presentamos → Ejecutamos.
+- Grupo: cards/logos más pequeños en móvil (aspect 16/9→2/1, grid acotado y centrado).
+- Header móvil: logo + hamburguesa (menú premium), sin texto comprimido.
+- Copy general humanizado (tú a tú, directo, sin jerga jurídica).
+
+### VR05 — base (histórico)
 - Eliminado el panel/caja duplicada de deal-flow del hero (§7). Hero full-width editorial, headline gigante.
 - Botón "Entrar en el Universo Acuerdos" PEGADO justo debajo de las 3 tarjetas (§2). Bloque diferencial compacto: titular + A (vía judicial/recuperación) + B (vía acuerdo/resolución) en una línea cada uno (§3).
 - Tarjetas simplificadas (§4/§5): Valor de compra (masked), ROI objetivo VISIBLE (20/28/18%), Horizonte VISIBLE, Estrategia, estado en badge. Sin chips. Nota de valores demostrativos.

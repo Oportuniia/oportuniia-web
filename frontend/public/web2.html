@@ -362,6 +362,18 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 
 /* ============ ECOSISTEMA — MAQUINARIA ============ */
 .eco{position:relative}
+/* ecolite (versión reducida V05.1) */
+.ecolite-row{display:grid;grid-template-columns:1.1fr .9fr;gap:64px;align-items:center}
+.ecolite-left h2{font-size:clamp(30px,3.8vw,54px);font-weight:600;color:var(--ink);letter-spacing:-.035em;line-height:1.04;margin-top:6px}
+.ecolite-left p{margin-top:20px;font-size:15.5px;color:var(--ink2);font-weight:300;line-height:1.72;max-width:520px}
+.ecolite-right{display:flex;flex-direction:column;align-items:flex-start}
+.ecotags{display:flex;flex-wrap:wrap;gap:10px}
+.ecotags span{font-size:11.5px;letter-spacing:.14em;color:var(--ink2);border:1px solid var(--line);
+  border-radius:40px;padding:9px 17px;transition:border-color .3s,color .3s}
+.ecotags span:hover{border-color:var(--brand);color:var(--brand)}
+.ecolink{margin-top:28px;display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;color:var(--brand)}
+.ecolink svg{width:16px;height:16px;transition:transform .3s}
+.ecolink:hover svg{transform:translate(3px,-3px)}
 .eco-lead{max-width:640px;font-size:15.5px;color:var(--ink2);font-weight:300;line-height:1.75;margin-top:22px}
 .eco-lead b{color:var(--ink);font-weight:500}
 .eco-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:56px;
@@ -382,7 +394,7 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 
 /* ============ CÓMO FUNCIONA ============ */
 .flow{background:var(--bg2);transition:background-color var(--deep) var(--ease)}
-.flow-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:60px;position:relative}
+.flow-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:0;margin-top:60px;position:relative}
 .flow-grid::before{content:"";position:absolute;top:34px;left:6%;right:6%;height:1px;background:var(--line)}
 .step{padding:0 26px;position:relative}
 .step .dot{width:14px;height:14px;border-radius:50%;background:var(--bg2);border:2px solid var(--brand);
@@ -478,6 +490,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   .hero-grid{grid-template-columns:1fr;gap:48px}
   .hero-panel{max-width:520px}
   .eco-grid{grid-template-columns:repeat(2,1fr)}
+  .ecolite-row{grid-template-columns:1fr;gap:32px}
   .foot-grid{grid-template-columns:1fr 1fr}
   .diff{grid-template-columns:1fr}
   .diff-cta{border-left:none;border-top:1px solid var(--line)}
@@ -488,7 +501,8 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   .deal-grid{grid-template-columns:1fr}
   .flow-grid{grid-template-columns:1fr 1fr;gap:44px 26px}
   .flow-grid::before{display:none}
-  .grupo-grid{grid-template-columns:1fr}
+  .grupo-grid{grid-template-columns:1fr;max-width:420px;margin-left:auto;margin-right:auto}
+  .gcard .logo{aspect-ratio:16/9}
   .entry-grid{grid-template-columns:1fr}
   .sec-head{grid-template-columns:1fr;gap:24px}
 }
@@ -497,11 +511,14 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   .hero{padding:140px 0 72px}
   .hero-meta{gap:28px}
   .eco-grid{grid-template-columns:1fr}
+  .flow-grid{grid-template-columns:1fr;gap:28px}
   .foot-grid{grid-template-columns:1fr}
   .switch-btn{flex-direction:column;align-items:flex-start;gap:26px;padding:28px 26px}
   .switch-knob{align-self:flex-end;margin-top:-52px}
   .strip .row{gap:36px;font-size:13px}
   .deal-tag{font-size:32px}
+  .grupo-grid{max-width:340px}
+  .gcard .logo{aspect-ratio:2/1}
 }
 </style>
 </head>
@@ -603,7 +620,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <div class="eyebrow" style="margin-bottom:26px">Deal flow · acceso controlado</div>
         <h2>NPL, CDR y REO.<br>Producto real, antes del registro.</h2>
       </div>
-      <div class="side reveal d1">Tres modalidades, una misma disciplina. Puedes ver la estructura de cada oportunidad; el detalle completo queda bajo acceso verificado. No publicamos rentabilidades ni cifras que no estén autorizadas.</div>
+      <div class="side reveal d1">Tres tipos de operación, un mismo criterio. Puedes ver cómo es cada una; el detalle completo se abre con acceso. No enseñamos cifras que no estén autorizadas.</div>
     </div>
 
     <div class="prod-top reveal d1">
@@ -699,46 +716,41 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   </div>
 </section>
 
-<!-- ================= ECOSISTEMA — MAQUINARIA (PRIMERO) ================= -->
-<section class="sec eco" id="ecosistema" data-testid="ecosistema">
+<!-- ================= TECNOLOGÍA (ecosistema reducido) ================= -->
+<section class="sec ecolite" id="ecosistema" data-testid="ecosistema">
   <div class="wrap">
-    <div class="sec-head">
-      <div class="reveal">
-        <div class="eyebrow" style="margin-bottom:26px">Ecosistema interno · under the hood</div>
-        <h2>La maquinaria que sostiene cada decisión.</h2>
+    <div class="ecolite-row reveal">
+      <div class="ecolite-left">
+        <div class="eyebrow" style="margin-bottom:22px">Tecnología propia</div>
+        <h2>Tecnología e inteligencia propias detrás de cada operación.</h2>
+        <p>Analizamos, estructuramos y presentamos cada oportunidad con herramientas y criterio hechos en casa. Eso es lo que nos deja ir más rápido y más a fondo.</p>
       </div>
-      <div class="side reveal d1"><b style="color:var(--ink)">No son siete productos. No son siete empresas.</b> Son las capacidades internas que trabajan de forma coordinada para que cada operación de OPORTUNIIA tenga profundidad, criterio y velocidad.</div>
+      <div class="ecolite-right">
+        <div class="ecotags" data-testid="eco-tags">
+          <span>CORE</span><span>IA</span><span>LEGAL</span><span>APP</span><span>VISUAL</span><span>PRESENTACIÓN</span><span>WEB</span>
+        </div>
+        <a href="#" class="ecolink" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-up-right"></i></a>
+      </div>
     </div>
-
-    <div class="eco-grid">
-      <div class="eco-cell reveal d1"><span class="n">01</span><div class="ic"><i data-lucide="database"></i></div><h3>CORE</h3><div class="role">Dato base</div><p>Estructura, normaliza y sostiene la información sobre la que se decide.</p></div>
-      <div class="eco-cell reveal d2"><span class="n">02</span><div class="ic"><i data-lucide="brain-circuit"></i></div><h3>IA</h3><div class="role">Inteligencia</div><p>Analiza, prioriza y detecta patrones en cartera y en cada posición.</p></div>
-      <div class="eco-cell reveal d3"><span class="n">03</span><div class="ic"><i data-lucide="scale"></i></div><h3>LEGAL</h3><div class="role">Criterio jurídico</div><p>Valida vías de resolución, garantías y estructura de cada acuerdo.</p></div>
-      <div class="eco-cell reveal d4"><span class="n">04</span><div class="ic"><i data-lucide="app-window"></i></div><h3>APP</h3><div class="role">Operación</div><p>Convierte la decisión en operativa y da acceso verificado al inversor.</p></div>
-      <div class="eco-cell reveal d1"><span class="n">05</span><div class="ic"><i data-lucide="eye"></i></div><h3>VISUAL</h3><div class="role">Representación</div><p>Da forma clara y legible a datos complejos para decidir mejor.</p></div>
-      <div class="eco-cell reveal d2"><span class="n">06</span><div class="ic"><i data-lucide="file-text"></i></div><h3>PRESENTACIÓN</h3><div class="role">Documentación</div><p>Empaqueta cada operación con el rigor que exige el institucional.</p></div>
-      <div class="eco-cell reveal d3"><span class="n">07</span><div class="ic"><i data-lucide="globe"></i></div><h3>WEB</h3><div class="role">Experiencia</div><p>El punto de acceso: dónde se descubre y se solicita el deal flow.</p></div>
-      <div class="eco-cell reveal d4" style="background:var(--brand-tint)"><div class="ic" style="background:var(--brand);color:#fff"><i data-lucide="workflow"></i></div><h3 style="color:var(--brand)">Una sola máquina</h3><p style="color:var(--ink2)">Siete capacidades que operan como un único sistema detrás de cada decisión.</p></div>
-    </div>
-    <div class="eco-foot reveal d2"><i data-lucide="git-merge"></i> Cada capa alimenta a la siguiente: dato → inteligencia → criterio → operación → acceso.</div>
   </div>
 </section>
 
-<!-- ================= CÓMO FUNCIONA (DESPUÉS) ================= -->
+<!-- ================= CÓMO FUNCIONA ================= -->
 <section class="sec flow" id="flow" data-testid="flow">
   <div class="wrap">
     <div class="sec-head">
       <div class="reveal">
         <div class="eyebrow" style="margin-bottom:26px">Cómo funciona</div>
-        <h2>De la cartera al resultado, con trazabilidad.</h2>
+        <h2>De la cartera al resultado.</h2>
       </div>
-      <div class="side reveal d1">Un proceso disciplinado y auditable. Cada operación pasa por las mismas cuatro etapas, sin atajos, con criterio documentado en cada punto.</div>
+      <div class="side reveal d1">Cada operación sigue el mismo camino, sin atajos. Así sabes siempre en qué punto está.</div>
     </div>
     <div class="flow-grid">
-      <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Análisis</h3><p>Due diligence de cartera y activo con dato verificado y contrastado.</p></div>
-      <div class="step reveal d2"><div class="dot"></div><div class="n">02</div><h3>Criterio</h3><p>Decisión sobre vía: inversión, acuerdo o resolución, validada legalmente.</p></div>
-      <div class="step reveal d3"><div class="dot"></div><div class="n">03</div><h3>Estructura</h3><p>Diseño jurídico y financiero de la operación y sus garantías.</p></div>
-      <div class="step reveal d4"><div class="dot"></div><div class="n">04</div><h3>Ejecución</h3><p>Ejecución y cierre orientados a resultado, con seguimiento continuo.</p></div>
+      <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
+      <div class="step reveal d2"><div class="dot"></div><div class="n">02</div><h3>Estructuramos</h3><p>Le damos forma jurídica y financiera a la operación.</p></div>
+      <div class="step reveal d3"><div class="dot"></div><div class="n">03</div><h3>Definimos la vía</h3><p>Decidimos si conviene invertir, recuperar o llegar a un acuerdo.</p></div>
+      <div class="step reveal d4"><div class="dot"></div><div class="n">04</div><h3>Presentamos</h3><p>Te la mostramos clara, con todo lo que necesitas para decidir.</p></div>
+      <div class="step reveal d5"><div class="dot"></div><div class="n">05</div><h3>Ejecutamos</h3><p>Cerramos y acompañamos hasta el resultado.</p></div>
     </div>
   </div>
 </section>
@@ -751,7 +763,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <div class="eyebrow" style="margin-bottom:26px">Quiénes somos</div>
         <h2>Grupo OPORTUNIIA.</h2>
       </div>
-      <div class="side reveal d1">Una estructura con vocación de permanencia. OPORTUNIIA es la firma de deuda; junto a ella, verticales que amplían el criterio del grupo hacia el activo real y la tecnología.</div>
+      <div class="side reveal d1">OPORTUNIIA es la firma de deuda. A su lado, otras compañías del grupo que llevan nuestro criterio al activo real y a la tecnología.</div>
     </div>
     <div class="grupo-grid">
       <a href="#" class="gcard reveal d1" data-testid="grupo-oportuniia">
@@ -780,16 +792,16 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <div class="eyebrow" style="margin-bottom:26px">Acceso profesional</div>
         <h2>¿Cómo vas a entrar?</h2>
       </div>
-      <div class="side reveal d1">Tres formas de relacionarte con OPORTUNIIA. Elige la tuya; el deal flow completo —cifras, documentación y operaciones— se abre siempre bajo verificación.</div>
+      <div class="side reveal d1">Tres formas de estar en OPORTUNIIA. Elige la tuya: el detalle completo de cada operación se abre siempre con verificación.</div>
     </div>
     <div class="entry-grid">
       <div class="entry feat reveal d1" data-testid="entry-inversor">
         <span class="ei"><i data-lucide="trending-up"></i></span>
         <div class="en">Modalidad 01</div>
         <h3>Inversor</h3>
-        <p>Inviertes en las operaciones. Accedes al deal flow completo: cifras, documentación y estructura de cada deal.</p>
+        <p>Buscas dónde invertir. Te damos acceso a las operaciones con toda su información para que decidas.</p>
         <ul class="feats">
-          <li><i data-lucide="check"></i>NPL · CDR · REO desbloqueados</li>
+          <li><i data-lucide="check"></i>NPL · CDR · REO al detalle</li>
           <li><i data-lucide="check"></i>Doble lectura: inversión y acuerdo</li>
           <li><i data-lucide="check"></i>Data room por operación</li>
         </ul>
@@ -799,7 +811,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <span class="ei"><i data-lucide="handshake"></i></span>
         <div class="en">Modalidad 02</div>
         <h3>Colaborador</h3>
-        <p>Aportas cartera, operación o servicio. Servicers, despachos y partners que trabajan con la firma.</p>
+        <p>Aportas operaciones o trabajas con nosotros: servicer, despacho, originador o partner.</p>
         <ul class="feats">
           <li><i data-lucide="check"></i>Canal directo con la firma</li>
           <li><i data-lucide="check"></i>Co-inversión y co-gestión</li>
@@ -808,19 +820,19 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <a href="#" class="ecta" data-testid="entry-colaborador-cta">Proponer colaboración <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
       <div class="entry reveal d3" data-testid="entry-suscriptor">
-        <span class="ei"><i data-lucide="radar"></i></span>
+        <span class="ei"><i data-lucide="key-round"></i></span>
         <div class="en">Modalidad 03</div>
         <h3>Suscriptor</h3>
-        <p>Sigues el deal flow. Recibes cada oportunidad seleccionada antes de que salga al mercado.</p>
+        <p>Ya formas parte de OPORTUNIIA. Entra con tu código y accede a tu entorno autorizado.</p>
         <ul class="feats">
-          <li><i data-lucide="check"></i>Nuevas operaciones, primero</li>
-          <li><i data-lucide="check"></i>Selección curada por la firma</li>
-          <li><i data-lucide="check"></i>Sin compromiso · te das de baja cuando quieras</li>
+          <li><i data-lucide="check"></i>Tu base y tus operaciones</li>
+          <li><i data-lucide="check"></i>Otras operaciones según tus permisos</li>
+          <li><i data-lucide="check"></i>Acceso con código personal</li>
         </ul>
-        <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Quiero seguir el deal flow <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Entrar con mi código <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
     </div>
-    <p class="access-foot reveal d2">Todas las modalidades quedan sujetas a verificación profesional. Sin compromiso.</p>
+    <p class="access-foot reveal d2">Inversores y colaboradores, sujetos a verificación profesional. Suscriptores, acceso con código.</p>
   </div>
 </section>
 
