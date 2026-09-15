@@ -95,6 +95,7 @@ header.sc{background:color-mix(in srgb,var(--bg) 78%,transparent);
   backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:84px}
 .brand{display:flex;align-items:center;gap:13px;flex:0 0 auto}
+.brand-logo-img{height:36px;width:auto;display:block}
 .brand .mark{width:30px;height:30px;color:var(--brand);flex:0 0 auto;display:grid;place-items:center;
   transition:transform .5s var(--ease),color var(--deep) var(--ease)}
 .brand:hover .mark{transform:rotate(90deg)}
@@ -422,8 +423,8 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 .gcard .logo img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
 .gcard:hover .logo img{transform:scale(1.05)}
 .gcard .meta{padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px}
-.gcard .meta .t{font-size:14px;font-weight:600;letter-spacing:.09em;color:#F6F8FA}
-.gcard .meta .s{font-size:11.5px;color:#8DA3B2;font-weight:300;margin-top:3px}
+.gcard .meta .t{font-size:14px;font-weight:600;letter-spacing:.09em;color:#F6F8FA;display:block}
+.gcard .meta .s{font-size:11.5px;color:#8DA3B2;font-weight:300;margin-top:3px;display:block}
 .gcard .meta .go{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.16);
   display:grid;place-items:center;color:#5FA8CC;flex:0 0 auto;transition:.4s}
 .gcard:hover .meta .go{background:#5FA8CC;color:#0A0D11}
@@ -451,6 +452,11 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 .entry .feats{margin-top:20px;display:flex;flex-direction:column;gap:10px;flex:1}
 .entry .feats li{list-style:none;font-size:13px;color:var(--ink2);display:flex;align-items:center;gap:10px}
 .entry .feats li svg{width:15px;height:15px;color:var(--brand);flex:0 0 auto}
+.opts{margin-top:20px;display:flex;flex-direction:column;gap:13px;flex:1}
+.opts li{list-style:none;display:flex;gap:12px;align-items:flex-start;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.opts li b{color:var(--ink);font-weight:600}
+.ob{width:22px;height:22px;border-radius:6px;background:var(--brand-tint);color:var(--brand);
+  font-size:11px;font-weight:700;display:grid;place-items:center;flex:0 0 auto;margin-top:1px}
 .entry .ecta{margin-top:26px;display:inline-flex;align-items:center;justify-content:space-between;gap:10px;
   font-size:13.5px;font-weight:500;color:var(--ink);padding:14px 18px;border:1px solid var(--line);
   border-radius:6px;transition:border-color .35s,color .35s,background-color .35s}
@@ -529,12 +535,8 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
 <header id="hdr" data-testid="site-header">
   <div class="wrap">
     <div class="nav">
-      <!-- LOGO: sustituir el <span class="mark"> por <img> del logo definitivo cuando esté disponible -->
       <a href="#top" class="brand" data-testid="brand-logo">
-        <span class="mark" aria-hidden="true">
-          <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12.6" stroke="currentColor" stroke-width="2.3"/><circle cx="16" cy="16" r="4.1" fill="currentColor"/></svg>
-        </span>
-        <span class="wordmark">OPORTUNIIA</span>
+        <img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/zukoexsi_LOGO%20PARA%20DOCUMENTACION.jpg" alt="OPORTUNIIA" class="brand-logo-img">
       </a>
       <nav class="menu" data-testid="main-nav">
         <div class="navitem" data-testid="nav-quienes">
@@ -635,56 +637,56 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
       <!-- NPL -->
       <div class="deal reveal d1" data-testid="deal-npl">
         <div class="deal-media">
-          <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Cartera residencial" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Préstamo hipotecario" loading="lazy">
           <span class="deal-status"><span class="p"></span><span class="main-only">En análisis</span><span class="alt">Vía de acuerdo</span></span>
-          <span class="deal-tag">NPL<span class="tsub">Non-performing loans</span></span>
+          <span class="deal-tag">NPL<span class="tsub">Non-performing loan</span></span>
         </div>
         <div class="deal-body">
-          <h3>Cartera hipotecaria garantizada</h3>
-          <div class="loc"><i data-lucide="map-pin"></i>Levante · España</div>
+          <h3>Préstamo hipotecario impagado</h3>
+          <div class="loc"><i data-lucide="map-pin"></i>Madrid</div>
           <div class="dl">
             <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••</span></div>
-            <div class="r roi"><span class="k main-only">ROI objetivo</span><span class="k alt">ROI acuerdo</span><span class="v big main-only">20%</span><span class="v big alt">12%</span></div>
-            <div class="r"><span class="k">Horizonte</span><span class="v main-only">24 meses</span><span class="v alt">8 meses</span></div>
-            <div class="r"><span class="k">Estrategia</span><span class="v main-only">Recuperación</span><span class="v alt">Acuerdo / dación</span></div>
+            <div class="r roi"><span class="k">ROI objetivo</span><span class="v big main-only">22%</span><span class="v big alt">14%</span></div>
+            <div class="r"><span class="k">Plazo estimado</span><span class="v main-only">18 meses</span><span class="v alt">8 meses</span></div>
+            <div class="r"><span class="k main-only">Estrategia</span><span class="k alt">Salida</span><span class="v main-only">Recuperación</span><span class="v alt">Dación / quita</span></div>
           </div>
           <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
       </div>
-      <!-- CDR -->
+      <!-- CDR · CESIÓN DE REMATE -->
       <div class="deal reveal d2" data-testid="deal-cdr">
         <div class="deal-media">
-          <img src="https://images.unsplash.com/photo-1481026469463-66327c86e544?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Créditos corporativos" loading="lazy">
-          <span class="deal-status"><span class="p"></span><span class="main-only">En curso</span><span class="alt">Negociación</span></span>
-          <span class="deal-tag">CDR<span class="tsub">Créditos dudosos</span></span>
+          <img src="https://images.unsplash.com/photo-1778663915688-3c15e38c36da?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Cesión de remate — vivienda" loading="lazy">
+          <span class="deal-status"><span class="p"></span><span class="main-only">En proceso</span><span class="alt">Entrega pactada</span></span>
+          <span class="deal-tag">CDR<span class="tsub">Cesión de remate</span></span>
         </div>
         <div class="deal-body">
-          <h3>Créditos dudosos corporativos</h3>
-          <div class="loc"><i data-lucide="map-pin"></i>Península · multi-deudor</div>
+          <h3>Cesión de remate — vivienda</h3>
+          <div class="loc"><i data-lucide="map-pin"></i>Valencia</div>
           <div class="dl">
-            <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••.•••</span></div>
-            <div class="r roi"><span class="k main-only">ROI objetivo</span><span class="k alt">ROI acuerdo</span><span class="v big main-only">28%</span><span class="v big alt">16%</span></div>
-            <div class="r"><span class="k">Horizonte</span><span class="v main-only">30 meses</span><span class="v alt">12 meses</span></div>
-            <div class="r"><span class="k">Estrategia</span><span class="v main-only">Reestructuración</span><span class="v alt">Convenio / quita</span></div>
+            <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••</span></div>
+            <div class="r roi"><span class="k">ROI objetivo</span><span class="v big main-only">30%</span><span class="v big alt">18%</span></div>
+            <div class="r"><span class="k">Plazo estimado</span><span class="v main-only">24 meses</span><span class="v alt">12 meses</span></div>
+            <div class="r"><span class="k main-only">Fase judicial</span><span class="k alt">Posesión</span><span class="v main-only">Remate adjudicado</span><span class="v alt">Ocupado → entrega</span></div>
           </div>
           <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
       </div>
-      <!-- REO -->
+      <!-- REO · ACTIVO ADJUDICADO -->
       <div class="deal reveal d3" data-testid="deal-reo">
         <div class="deal-media">
-          <img src="https://images.unsplash.com/photo-1771154138533-d12e4989ef78?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Activos adjudicados" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1771154138533-d12e4989ef78?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Activo adjudicado" loading="lazy">
           <span class="deal-status"><span class="p"></span><span class="main-only">Disponible</span><span class="alt">Puesta en valor</span></span>
           <span class="deal-tag">REO<span class="tsub">Real estate owned</span></span>
         </div>
         <div class="deal-body">
-          <h3>Activos adjudicados</h3>
-          <div class="loc"><i data-lucide="map-pin"></i>Costa · uso mixto</div>
+          <h3>Activo adjudicado — residencial</h3>
+          <div class="loc"><i data-lucide="map-pin"></i>Málaga</div>
           <div class="dl">
             <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••</span></div>
-            <div class="r roi"><span class="k main-only">ROI objetivo</span><span class="k alt">ROI acuerdo</span><span class="v big main-only">18%</span><span class="v big alt">24%</span></div>
-            <div class="r"><span class="k">Horizonte</span><span class="v main-only">18 meses</span><span class="v alt">10 meses</span></div>
-            <div class="r"><span class="k">Estrategia</span><span class="v main-only">Reposicionamiento</span><span class="v alt">Venta / acuerdo</span></div>
+            <div class="r roi"><span class="k">ROI objetivo</span><span class="v big main-only">20%</span><span class="v big alt">26%</span></div>
+            <div class="r"><span class="k">Plazo estimado</span><span class="v main-only">16 meses</span><span class="v alt">9 meses</span></div>
+            <div class="r"><span class="k main-only">Estado</span><span class="k alt">Salida</span><span class="v main-only">Desocupado</span><span class="v alt">Reposicionar + vender</span></div>
           </div>
           <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
@@ -748,7 +750,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
     <div class="flow-grid">
       <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
       <div class="step reveal d2"><div class="dot"></div><div class="n">02</div><h3>Estructuramos</h3><p>Le damos forma jurídica y financiera a la operación.</p></div>
-      <div class="step reveal d3"><div class="dot"></div><div class="n">03</div><h3>Definimos la vía</h3><p>Decidimos si conviene invertir, recuperar o llegar a un acuerdo.</p></div>
+      <div class="step reveal d3"><div class="dot"></div><div class="n">03</div><h3>Definimos la mejor vía</h3><p>Decidimos si conviene invertir, recuperar o llegar a un acuerdo.</p></div>
       <div class="step reveal d4"><div class="dot"></div><div class="n">04</div><h3>Presentamos</h3><p>Te la mostramos clara, con todo lo que necesitas para decidir.</p></div>
       <div class="step reveal d5"><div class="dot"></div><div class="n">05</div><h3>Ejecutamos</h3><p>Cerramos y acompañamos hasta el resultado.</p></div>
     </div>
@@ -763,24 +765,22 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <div class="eyebrow" style="margin-bottom:26px">Quiénes somos</div>
         <h2>Grupo OPORTUNIIA.</h2>
       </div>
-      <div class="side reveal d1">OPORTUNIIA es la firma de deuda. A su lado, otras compañías del grupo que llevan nuestro criterio al activo real y a la tecnología.</div>
     </div>
     <div class="grupo-grid">
-      <a href="#" class="gcard reveal d1" data-testid="grupo-oportuniia">
+      <a href="https://oportuniia.com" target="_blank" rel="noopener" class="gcard reveal d1" data-testid="grupo-oportuniia">
         <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/jjknh2bb_OPORTUNIIA.png" alt="OPORTUNIIA" loading="lazy"></div>
-        <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Firma de deuda · inversión y resolución</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
+        <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Firma de deuda</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
       <a href="#" class="gcard reveal d2" data-testid="grupo-living">
         <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6f5o2w4o_LIVING.png" alt="LIVING EXPERIENCE" loading="lazy"></div>
         <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">Activo residencial y experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
-      <a href="#" class="gcard soon reveal d3" data-testid="grupo-robotics">
+      <div class="gcard soon reveal d3" data-testid="grupo-robotics">
         <span class="gsoon">Próximamente</span>
         <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6tt8feid_ROBOTICS.png" alt="ROBOTICS" loading="lazy"></div>
         <div class="meta"><span><span class="t">ROBOTICS</span><span class="s">Automatización e industria</span></span><span class="go"><i data-lucide="clock"></i></span></div>
-      </a>
+      </div>
     </div>
-    <p class="grupo-note reveal d2"><b>Grupo</b> ≠ Ecosistema. El Grupo son compañías. El Ecosistema es la maquinaria interna de OPORTUNIIA.</p>
   </div>
 </section>
 
@@ -799,11 +799,11 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <span class="ei"><i data-lucide="trending-up"></i></span>
         <div class="en">Modalidad 01</div>
         <h3>Inversor</h3>
-        <p>Buscas dónde invertir. Te damos acceso a las operaciones con toda su información para que decidas.</p>
-        <ul class="feats">
-          <li><i data-lucide="check"></i>NPL · CDR · REO al detalle</li>
-          <li><i data-lucide="check"></i>Doble lectura: inversión y acuerdo</li>
-          <li><i data-lucide="check"></i>Data room por operación</li>
+        <p>Compras oportunidades. Eliges cuánto quieres que te acompañemos.</p>
+        <ul class="opts">
+          <li><span class="ob">A</span><span><b>Compra y adiós</b> — compras y te facilitamos la operación.</span></li>
+          <li><span class="ob">B</span><span><b>Compra + apoyo jurídico</b> — compras y ponemos el soporte legal.</span></li>
+          <li><span class="ob">C</span><span><b>Servicio integral</b> — te acompañamos hasta el cierre final.</span></li>
         </ul>
         <a href="#" class="ecta" data-testid="entry-inversor-cta">Solicitar acceso <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
@@ -811,11 +811,10 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <span class="ei"><i data-lucide="handshake"></i></span>
         <div class="en">Modalidad 02</div>
         <h3>Colaborador</h3>
-        <p>Aportas operaciones o trabajas con nosotros: servicer, despacho, originador o partner.</p>
-        <ul class="feats">
-          <li><i data-lucide="check"></i>Canal directo con la firma</li>
-          <li><i data-lucide="check"></i>Co-inversión y co-gestión</li>
-          <li><i data-lucide="check"></i>Confidencialidad garantizada</li>
+        <p>Aportas operaciones o trabajas con nosotros. Dos formas de colaborar.</p>
+        <ul class="opts">
+          <li><span class="ob">A</span><span><b>Modelo 50/50</b> — compartimos operación y resultado a partes iguales.</span></li>
+          <li><span class="ob">B</span><span><b>Cobras a tu cliente</b> — no cobras de nosotros; cobras a tu propio cliente.</span></li>
         </ul>
         <a href="#" class="ecta" data-testid="entry-colaborador-cta">Proponer colaboración <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
@@ -841,7 +840,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   <div class="wrap">
     <div class="foot-grid">
       <div class="foot-brand">
-        <div class="b"><span class="mark" style="width:28px;height:28px;color:#5FA8CC" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12.6" stroke="currentColor" stroke-width="2.3"/><circle cx="16" cy="16" r="4.1" fill="currentColor"/></svg></span> <span class="wordmark" style="color:#F6F8FA">OPORTUNIIA</span></div>
+        <div class="b"><span class="wordmark" style="color:#F6F8FA;font-weight:600;font-size:20px;letter-spacing:.16em">OPORTUNIIA</span></div>
         <p>Firma de deuda. Analizamos, estructuramos y resolvemos carteras con criterio humano y tecnología propia.</p>
       </div>
       <div class="foot-col">

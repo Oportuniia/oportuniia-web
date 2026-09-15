@@ -24,9 +24,20 @@ ESPAÑOL. Responder siempre en español.
 - VR03 — "Mejora clara" pero no cerrado.
 - VR04 — "Mejora clara" pero con exceso de contenido / copy formal.
 - VR05 — base sólida; brief llegó cortado en §9.
-- VR05.1 — ENTREGADO (correcciones restantes del brief), pendiente de aprobación. Archivo: `/app/frontend/public/web2.html`.
+- VR05.1 — base válida; errores de producto/terminología.
+- VR05.2 — ENTREGADO (producto real + negocio real), pendiente de aprobación. Archivo: `/app/frontend/public/web2.html`.
 
-### VR05.1 — correcciones aplicadas
+### VR05.2 — correcciones aplicadas
+- CDR = **CESIÓN DE REMATE** en toda la experiencia (ya NO "créditos dudosos corporativos"). Imagen CDR ahora residencial (vivienda).
+- Tarjetas con lógica real: NPL (Madrid, préstamo hipotecario impagado), CDR (Valencia, cesión de remate — vivienda), REO (Málaga, activo adjudicado). Campos: Valor de compra (masked), ROI objetivo (visible), Plazo estimado (visible), Estrategia/Fase/Estado. "Horizonte" → "Plazo estimado". Ciudades concretas (demo).
+- Mutación acuerdo enriquecida: cambian ROI, plazo, estrategia/posesión/ocupación, estado, imagen (duotono), atmósfera.
+- Header: logo REAL (asset zukoexsi_LOGO PARA DOCUMENTACION.jpg), eliminado el mark provisional.
+- Grupo: eliminada explicación superior/lateral; solo "Grupo OPORTUNIIA" + 3 marcas como enlaces directos (OPORTUNIIA→oportuniia.com, LIVING→#, ROBOTICS sin enlace/Próximamente); cards más pequeñas.
+- Inversor: 3 sub-modalidades A/B/C (Compra y adiós · Compra + apoyo jurídico · Servicio integral). Colaborador: 2 A/B (Modelo 50/50 · Cobras a tu cliente). Suscriptor: código.
+- Cómo funciona: 5 pasos (Analizamos → Estructuramos → Definimos la mejor vía → Presentamos → Ejecutamos). Ecosistema ligero.
+- Copy humanizado. Footer wordmark texto (sin icono inventado).
+
+### VR05.1 — histórico
 - Suscriptor REDEFINIDO: usuario ya vinculado al ecosistema, con código de acceso a su entorno autorizado. CTA "Entrar con mi código" (icono llave). Ya NO es newsletter/follower.
 - Inversor: busca invertir → "Solicitar acceso". Colaborador: aporta operaciones → "Proponer colaboración".
 - Ecosistema REDUCIDO drásticamente: bloque ligero "Tecnología e inteligencia propias..." + tags discretos (CORE·IA·LEGAL·APP·VISUAL·PRESENTACIÓN·WEB sin explicar) + link "Conoce nuestra tecnología". Sin gran grid de 7 cajas.
