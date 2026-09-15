@@ -10,7 +10,7 @@ from typing import List
 import uuid
 from datetime import datetime, timezone
 
-from wp_precheck import run_precheck, _get_env, _normalize_base
+from wp_precheck import run_precheck, run_capability_discovery, _get_env, _normalize_base
 
 
 ROOT_DIR = Path(__file__).parent
@@ -105,6 +105,21 @@ async def wp_precheck_run(authorize: str = ""):
             "message": "Not authorized to run. Append ?authorize=RAFA to explicitly execute the READ-ONLY precheck.",
         }
     report = run_precheck()
+    return {"executed": True, **report}
+
+
+@api_router.get("/wp-precheck/capability")
+async def wp_precheck_capability(authorize: str = ""):
+    """READ-ONLY capability discovery for the elementor_library CPT.
+
+    GET-only. Requires ?authorize=RAFA. No role changes, no writes.
+    """
+    if authorize != "RAFA":
+        return {
+            "executed": False,
+            "message": "Not authorized. Append ?authorize=RAFA to run the READ-ONLY capability discovery.",
+        }
+    report = run_capability_discovery()
     return {"executed": True, **report}
 
 

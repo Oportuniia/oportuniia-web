@@ -376,3 +376,99 @@ def run_precheck() -> dict:
 
     gate["WORDPRESS_REQUESTS_EXECUTED"] = req
     return gate
+
+
+
+def run_capability_discovery() -> dict:
+    """READ-ONLY discovery of the capability mapping protecting elementor_library.
+
+    GET only: /wp/v2/types and /wp/v2/types/elementor_library?context=edit.
+    Also does a harmless authenticated GET probe against the collection to record
+    the exact 403 error code returned by WordPress. No writes, no role changes.
+    """
+    site, user, app_pw = _get_env()
+    base_url, base_host = _normalize_base(site)
+
+    out = {
+        "ELEMENTOR_LIBRARY_REGISTERED": "NO",
+        "ELEMENTOR_LIBRARY_REST_BASE": "UNKNOWN",
+        "CAPABILITY_TYPE": "UNKNOWN",
+        "CAPABILITIES_MAPPING": {},
+        "COLLECTION_403_CODE": "UNKNOWN",
+        "WORDPRESS_REQUESTS_EXECUTED": 0,
+        "WRITE_REQUESTS_EXECUTED": 0,
+        "PRODUCTION_MUTATIONS": 0,
+        "BLOCKER": "NONE",
+        "diagnostics": [],
+    }
+    if not base_url:
+        out["BLOCKER"] = "WP_SITE_URL missing/invalid"
+        return out
+    if not user or not app_pw:
+        out["BLOCKER"] = "secrets not set"
+        return out
+
+    auth = _auth_header(user, app_pw)
+    req = 0
+    with httpx.Client(headers={"User-Agent": "OPORTUNIIA-ControlApp-Precheck/1.3 (read-only)"}) as client:
+        try:
+            # 1) Full types list (edit context exposes 'capabilities' + 'capability_type').
+            t = _get(client, base_url, base_host, f"{_WP_V2}/types?context=edit", headers=auth); req += 1
+            if t.get("resp") is not None and t["http"] == 200:
+                try:
+                    tj = t["resp"].json()
+                    el = tj.get("elementor_library")
+                    if el:
+                        out["ELEMENTOR_LIBRARY_REGISTERED"] = "YES"
+                        out["ELEMENTOR_LIBRARY_REST_BASE"] = el.get("rest_base", "elementor_library")
+                        # 'capabilities' present only in edit context.
+                        caps = el.get("capabilities") or {}
+                        out["CAPABILITIES_MAPPING"] = caps
+                        out["CAPABILITY_TYPE"] = el.get("capability_type", "UNKNOWN")
+                        out["diagnostics"].append({"elementor_library_type_keys": list(el.keys())})
+                except Exception as e:
+                    out["diagnostics"].append({"types_parse_error": type(e).__name__})
+
+            # 2) Dedicated single-type endpoint (edit context).
+            ts = _get(client, base_url, base_host,
+                     f"{_WP_V2}/types/elementor_library?context=edit", headers=auth); req += 1
+            if ts.get("resp") is not None and ts["http"] == 200:
+                try:
+                    tsj = ts["resp"].json()
+                    caps = tsj.get("capabilities") or {}
+                    if caps and not out["CAPABILITIES_MAPPING"]:
+                        out["CAPABILITIES_MAPPING"] = caps
+                    if tsj.get("capability_type"):
+                        out["CAPABILITY_TYPE"] = tsj.get("capability_type")
+                    out["ELEMENTOR_LIBRARY_REGISTERED"] = "YES"
+                    if tsj.get("rest_base"):
+                        out["ELEMENTOR_LIBRARY_REST_BASE"] = tsj.get("rest_base")
+                except Exception as e:
+                    out["diagnostics"].append({"type_single_parse_error": type(e).__name__})
+            else:
+                out["diagnostics"].append({"types_elementor_library_http": ts.get("http")})
+
+            # 3) Probe the collection to capture the exact 403 error code (read-only).
+            probe = _get(client, base_url, base_host,
+                        f"{_WP_V2}/elementor_library?context=edit&per_page=1", headers=auth); req += 1
+            if probe.get("resp") is not None:
+                out["diagnostics"].append({"collection_probe_http": probe["http"]})
+                try:
+                    pj = probe["resp"].json()
+                    if isinstance(pj, dict) and pj.get("code"):
+                        out["COLLECTION_403_CODE"] = pj.get("code")
+                        out["diagnostics"].append({"collection_error_message": pj.get("message", "")[:200]})
+                except Exception:
+                    pass
+                # Also probe view context (public read) to see if drafts differ.
+                probe_view = _get(client, base_url, base_host,
+                                 f"{_WP_V2}/elementor_library?per_page=1", headers=auth); req += 1
+                if probe_view.get("resp") is not None:
+                    out["diagnostics"].append({"collection_view_http": probe_view["http"]})
+        except RedirectBlocked as e:
+            out["BLOCKER"] = f"OFF-HOST REDIRECT BLOCKED: {e}"
+        except Exception as e:
+            out["BLOCKER"] = f"Unexpected error: {type(e).__name__}"
+
+    out["WORDPRESS_REQUESTS_EXECUTED"] = req
+    return out
