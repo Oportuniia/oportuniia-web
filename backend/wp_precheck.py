@@ -13,10 +13,10 @@ SECURITY CONTRACT (enforced by design):
 - Nothing here auto-executes. It runs only when its endpoint is called explicitly.
 """
 
-import os
-import time
 import base64
 import logging
+import os
+import time
 from urllib.parse import urlparse
 
 import httpx
@@ -51,7 +51,7 @@ class RedirectBlocked(Exception):
 
 
 def _auth_header(user: str, app_pw: str) -> dict:
-    token = base64.b64encode(f"{user}:{app_pw}".encode("utf-8")).decode("ascii")
+    token = base64.b64encode(f"{user}:{app_pw}".encode()).decode("ascii")
     return {"Authorization": f"Basic {token}"}
 
 
@@ -130,14 +130,21 @@ def _as_list(resp):
         return []
 
 
-# READ-ONLY post types to scan for the drafts (all queried via GET).
-_SCAN_TYPES = [
-    "pages",
-    "posts",
-    "elementor_library",   # Elementor saved templates / theme parts
-    "elementor-hf",        # some header/footer builders
-    "e-landing-page",
-]
+# Valid WordPress REST statuses (NEVER 'any' -> that returns HTTP 400).
+_STATUSES = "publish,draft,pending,private,future"
+
+# Fallback REST bases if /wp/v2/types enumeration is unavailable.
+_FALLBACK_TYPES = ["pages", "posts", "elementor_library"]
+
+
+def _list_type(client, base_url, base_host, rest_base, ctx, headers):
+    """GET a collection with valid statuses; retry without status on 400. Read-only."""
+    q = f"{_WP_V2}/{rest_base}?{ctx}per_page=100&status={_STATUSES}"
+    r = _get(client, base_url, base_host, q, headers=headers)
+    if r.get("http") == 400:
+        q2 = f"{_WP_V2}/{rest_base}?{ctx}per_page=100"
+        r = _get(client, base_url, base_host, q2, headers=headers)
+    return r
 
 
 def run_precheck() -> dict:
@@ -160,6 +167,7 @@ def run_precheck() -> dict:
         "ELEMENTOR_DATA_LOCATION": "UNKNOWN",
         "ELEMENTOR_META_COMPLETE": "UNKNOWN",
         "THEME_BUILDER_RELATIONSHIP_IDENTIFIED": "NO",
+        "THEME_BUILDER_GET": "FAIL",
         "SAFE_WRITE_PATH_IDENTIFIED": "NO",
         "CUSTOM_ENDPOINT_PLUGIN_REQUIRED": "UNKNOWN",
         "REST_NAMESPACES": [],
@@ -230,32 +238,53 @@ def run_precheck() -> dict:
             else:
                 gate["BLOCKER"] = f"Auth GET /users/me failed (http={me.get('http')})"
 
-            # 3) Scan post types for HOME 2.0 / HEADER 2.0 (GET, context=edit if authed)
+            # 3) Enumerate real post types (READ-ONLY) then scan each for the drafts.
             ctx = "context=edit&" if authed else ""
             home_kw = [["home", "2.0"], ["home", "2"], ["home 2"], ["inicio", "2"]]
             header_kw = [["header", "2.0"], ["header", "2"], ["header 2"],
                          ["cabecera", "2"], ["encabezado", "2"]]
             scan_report = {}
             all_home_hits, all_header_hits = [], []
-            for pt in _SCAN_TYPES:
-                q = f"{_WP_V2}/{pt}?{ctx}per_page=100&status=any"
-                r = _get(client, base_url, base_host, q); req += 1
+
+            # 3a) Discover registered post types + their REST base.
+            types_r = _get(client, base_url, base_host, f"{_WP_V2}/types?context=edit",
+                          headers=auth); req += 1
+            rest_bases = []
+            if types_r.get("resp") is not None and types_r["http"] == 200:
+                try:
+                    tj = types_r["resp"].json()
+                    type_map = {}
+                    for slug, meta in (tj or {}).items():
+                        rb = meta.get("rest_base") or slug
+                        type_map[slug] = rb
+                        rest_bases.append(rb)
+                    gate["diagnostics"].append({"registered_types": type_map})
+                except Exception as e:
+                    gate["diagnostics"].append({"types_parse_error": type(e).__name__})
+            if not rest_bases:
+                rest_bases = list(_FALLBACK_TYPES)
+                gate["diagnostics"].append({"types_enumeration": f"fallback http={types_r.get('http')}"})
+
+            # Dedupe, keep it bounded.
+            seen = set()
+            rest_bases = [x for x in rest_bases if not (x in seen or seen.add(x))]
+
+            for rb in rest_bases:
+                r = _list_type(client, base_url, base_host, rb, ctx, auth); req += 1
                 http = r.get("http")
                 items = _as_list(r["resp"]) if r.get("resp") is not None and http == 200 else []
-                titles = [{"id": i.get("id"), "t": _title_of(i), "s": i.get("status")} for i in items][:60]
-                scan_report[pt] = {"http": http, "count": len(items),
+                titles = [{"id": i.get("id"), "t": _title_of(i), "s": i.get("status")} for i in items]
+                scan_report[rb] = {"http": http, "count": len(items),
                                    "titles": [f'{x["id"]}:{x["t"]}({x["s"]})' for x in titles][:60]}
-                h = _match(items, home_kw)
-                for x in h:
-                    x["source_type"] = pt
-                all_home_hits += h
-                hd = _match(items, header_kw)
-                for x in hd:
-                    x["source_type"] = pt
-                all_header_hits += hd
+                for x in _match(items, home_kw):
+                    x["source_type"] = rb
+                    all_home_hits.append(x)
+                for x in _match(items, header_kw):
+                    x["source_type"] = rb
+                    all_header_hits.append(x)
             gate["diagnostics"].append({"scan": scan_report})
 
-            # 3b) Theme Builder documents (Elementor) — GET read-only
+            # 3b) Theme Builder documents (Elementor) — GET read-only, may 403 on minimal role.
             tb = _get(client, base_url, base_host,
                      "/wp-json/elementor/v1/site-editor/templates", headers=auth); req += 1
             if tb.get("resp") is not None and tb["http"] == 200:
@@ -271,6 +300,7 @@ def run_precheck() -> dict:
                                          "title": it.get("title") or it.get("name") or "",
                                          "type": it.get("type") or it.get("doc_type"),
                                          "status": it.get("status")})
+                    gate["THEME_BUILDER_GET"] = "PASS"
                     gate["diagnostics"].append({"theme_builder_templates":
                                                 [f'{x["id"]}:{x["title"]}({x.get("type")})' for x in norm][:60]})
                     all_header_hits += _match(norm, header_kw)
@@ -278,7 +308,9 @@ def run_precheck() -> dict:
                 except Exception as e:
                     gate["diagnostics"].append({"tb_parse_error": type(e).__name__})
             else:
-                gate["diagnostics"].append({"theme_builder_templates_http": tb.get("http")})
+                gate["THEME_BUILDER_GET"] = "FAIL"
+                gate["diagnostics"].append({"theme_builder_templates_http": tb.get("http"),
+                                            "theme_builder_note": "403 => role lacks edit_theme_options/manage_options"})
 
             # Resolve HOME
             if all_home_hits:
