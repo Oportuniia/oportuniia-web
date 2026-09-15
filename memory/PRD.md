@@ -21,9 +21,20 @@ ESPAÑOL. Responder siempre en español.
 ## Estado del diseño (Visual Reviews)
 - VR01 — RECHAZADO.
 - VR02 — RECHAZADO (navy oscuro + Fraunces + interruptor pequeño + vacío lateral).
-- VR03 — ENTREGADO 15/09/2026, pendiente de aprobación de Rafa. Archivo: `/app/frontend/public/web2.html`.
+- VR03 — "Mejora clara" pero no cerrado.
+- VR04 — ENTREGADO (iteración sobre VR03), pendiente de aprobación de Rafa. Archivo: `/app/frontend/public/web2.html`.
 
-### VR03 — Especificación implementada
+### VR04 — correcciones aplicadas sobre VR03
+- Tarjetas NPL/CDR/REO: firma grande sobre imagen (duotono) con foto elegante por modalidad (residencial / corporativo / costa); estructura lista para sustituir por operaciones reales.
+- Momento diferencial integrado JUSTO debajo de las 3 tarjetas; copy simplificado a "Dos maneras de entenderlo" (vía judicial/recuperación vs vía acuerdo/resolución) + CTA grande.
+- Al activar Universo Acuerdos: las MISMAS 3 tarjetas mutan (foto→duotono teal, datos ROI/timing/framing, status y chips) + auto-scroll a las tarjetas para percibir la mutación.
+- Acceso rehecho: "¿Cómo vas a entrar?" → Inversor (destacado) / Colaborador / Suscriptor con microcopy.
+- Grupo: cards más pequeñas y refinadas (4:3, centradas, más aire).
+- Hero: radar sustituido por panel funcional "deal flow" (previsualiza producto, masked).
+- Header logo: marca limar limpia (anillo "O") + wordmark; comentario para swap 1:1 con logo definitivo.
+- Dropdown Quiénes somos: mini-logos (thumbnails), mejor espaciado y separación texto/icono.
+
+### VR03 — Especificación base (conservada)
 - MAIN MODE: Light Premium / editorial (marfil #FCFBF8, gris claro, ink navy #0B1A28,
   acento corporativo #1F6588). Poppins ÚNICA (sin Fraunces).
 - Hero: "HUMANIZAMOS LA DEUDA." grande, sin stock, emblema editorial CSS + reveal.
