@@ -10,7 +10,7 @@ from typing import List
 import uuid
 from datetime import datetime, timezone
 
-from wp_precheck import run_precheck, run_capability_discovery, run_item_read, _get_env, _normalize_base
+from wp_precheck import run_precheck, run_capability_discovery, run_item_read, run_bridge_read, _get_env, _normalize_base
 
 
 ROOT_DIR = Path(__file__).parent
@@ -131,6 +131,16 @@ async def wp_precheck_item(authorize: str = "", id: int = 0, rest_base: str = "e
                 "message": "Not authorized. Append ?authorize=RAFA to run the READ-ONLY item probe."}
     report = run_item_read(id, rest_base)
     return {"executed": True, "requested_id": id, "rest_base": rest_base, **report}
+
+
+@api_router.get("/wp-precheck/bridge")
+async def wp_precheck_bridge(authorize: str = ""):
+    """READ-ONLY validation of the custom HEADER 2.0 bridge route. GET-only."""
+    if authorize != "RAFA":
+        return {"executed": False,
+                "message": "Not authorized. Append ?authorize=RAFA to run the READ-ONLY bridge validation."}
+    report = run_bridge_read()
+    return {"executed": True, **report}
 
 
 # Include the router in the main app

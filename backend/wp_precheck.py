@@ -548,3 +548,67 @@ def run_item_read(post_id: int, rest_base: str = "elementor_library") -> dict:
             out["BLOCKER"] = f"Unexpected error: {type(e).__name__}"
     return out
 
+
+
+# Fixed READ-ONLY bridge route (custom mu/plugin). No id param, hardcoded server-side.
+_BRIDGE_PATH = "/wp-json/oportuniia-control/v1/header"
+
+
+def run_bridge_read() -> dict:
+    """READ-ONLY validation of the custom bridge route for HEADER 2.0 (ID 1641).
+
+    GET only against the fixed bridge path on the WP host. Reports metadata and
+    whether _elementor_data is present + its length (never its content).
+    """
+    out = {
+        "HTTP_STATUS": None,
+        "REST_ERROR_CODE": "NONE",
+        "ID": None,
+        "TITLE": "NOT ACCESSIBLE",
+        "STATUS": "NOT ACCESSIBLE",
+        "POST_TYPE": "NOT ACCESSIBLE",
+        "ELEMENTOR_DATA_ACCESSIBLE": "FAIL",
+        "ELEMENTOR_DATA_LEN": 0,
+        "ELEMENTOR_META_COMPLETE": "NO",
+        "WRITE_REQUESTS_EXECUTED": 0,
+        "PRODUCTION_MUTATIONS": 0,
+        "BLOCKER": "NONE",
+    }
+    site, user, app_pw = _get_env()
+    base_url, base_host = _normalize_base(site)
+    if not base_url:
+        out["BLOCKER"] = "WP_SITE_URL missing/invalid"
+        return out
+    if not user or not app_pw:
+        out["BLOCKER"] = "secrets not set"
+        return out
+
+    auth = _auth_header(user, app_pw)
+    with httpx.Client(headers={"User-Agent": "OPORTUNIIA-ControlApp-Precheck/1.5 (read-only)"}) as client:
+        try:
+            r = _get(client, base_url, base_host, _BRIDGE_PATH, headers=auth)
+            out["HTTP_STATUS"] = r.get("http")
+            if r.get("resp") is not None:
+                try:
+                    j = r["resp"].json()
+                except Exception:
+                    j = {}
+                if r["http"] == 200 and isinstance(j, dict):
+                    out["ID"] = j.get("id")
+                    out["TITLE"] = j.get("title", "")
+                    out["STATUS"] = j.get("status", "UNKNOWN")
+                    out["POST_TYPE"] = j.get("post_type", "UNKNOWN")
+                    ed = j.get("_elementor_data")
+                    if ed:
+                        out["ELEMENTOR_DATA_ACCESSIBLE"] = "PASS"
+                        out["ELEMENTOR_DATA_LEN"] = len(ed) if isinstance(ed, str) else len(str(ed))
+                        out["ELEMENTOR_META_COMPLETE"] = "YES"
+                elif isinstance(j, dict) and j.get("code"):
+                    out["REST_ERROR_CODE"] = j.get("code")
+                    out["BLOCKER"] = j.get("message", "")[:200]
+        except RedirectBlocked as e:
+            out["BLOCKER"] = f"OFF-HOST REDIRECT BLOCKED: {e}"
+        except Exception as e:
+            out["BLOCKER"] = f"Unexpected error: {type(e).__name__}"
+    return out
+
