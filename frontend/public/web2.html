@@ -95,7 +95,7 @@ header.sc{background:color-mix(in srgb,var(--bg) 78%,transparent);
   backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:84px}
 .brand{display:flex;align-items:center;gap:13px;flex:0 0 auto}
-.brand-logo-img{height:36px;width:auto;display:block}
+.brand-logo-img{height:46px;width:auto;display:block}
 .brand .mark{width:30px;height:30px;color:var(--brand);flex:0 0 auto;display:grid;place-items:center;
   transition:transform .5s var(--ease),color var(--deep) var(--ease)}
 .brand:hover .mark{transform:rotate(90deg)}
@@ -375,6 +375,15 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 .ecolink{margin-top:28px;display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;color:var(--brand)}
 .ecolink svg{width:16px;height:16px;transition:transform .3s}
 .ecolink:hover svg{transform:translate(3px,-3px)}
+/* QUIÉNES SOMOS */
+.q-grid{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:start}
+.q-title{font-size:clamp(30px,3.8vw,54px);font-weight:600;color:var(--ink);letter-spacing:-.035em;line-height:1.05}
+.q-body p{font-size:16px;color:var(--ink2);font-weight:300;line-height:1.75;margin-bottom:20px}
+.q-body p b{color:var(--ink);font-weight:600}
+.q-link{display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:500;color:var(--brand);margin-top:8px}
+.q-link svg{width:16px;height:16px;transition:transform .3s}
+.q-link:hover svg{transform:translate(3px,-3px)}
+@media(max-width:900px){.q-grid{grid-template-columns:1fr;gap:28px}}
 .eco-lead{max-width:640px;font-size:15.5px;color:var(--ink2);font-weight:300;line-height:1.75;margin-top:22px}
 .eco-lead b{color:var(--ink);font-weight:500}
 .eco-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:56px;
@@ -415,20 +424,16 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 .grupo h2{color:#F6F8FA}
 .grupo .sec-head .side{color:#9FB2C0}
 .grupo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin:52px auto 0;max-width:1080px}
-.gcard{position:relative;border:1px solid rgba(255,255,255,.10);border-radius:12px;overflow:hidden;
-  background:#0A0D11;transition:transform .55s var(--ease),border-color .55s,box-shadow .55s}
-.gcard:hover{transform:translateY(-6px);border-color:rgba(95,168,204,.5);
-  box-shadow:0 34px 80px -40px rgba(0,0,0,.9)}
-.gcard .logo{aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden;background:#000}
-.gcard .logo img{width:100%;height:100%;object-fit:cover;transition:transform .8s var(--ease)}
-.gcard:hover .logo img{transform:scale(1.05)}
-.gcard .meta{padding:18px 20px;display:flex;justify-content:space-between;align-items:center;gap:14px}
-.gcard .meta .t{font-size:14px;font-weight:600;letter-spacing:.09em;color:#F6F8FA;display:block}
+.gcard{position:relative;border:none;border-radius:0;overflow:visible;background:transparent;
+  transition:transform .55s var(--ease);text-align:center}
+.gcard:hover{transform:translateY(-5px)}
+.gcard .logo{aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;background:transparent}
+.gcard .logo img{width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.gcard:hover .logo img{transform:scale(1.06)}
+.gcard .meta{padding:12px 16px 0;display:flex;flex-direction:column;align-items:center;gap:5px}
+.gcard .meta .t{font-size:15px;font-weight:600;letter-spacing:.09em;color:#F6F8FA;display:block}
 .gcard .meta .s{font-size:11.5px;color:#8DA3B2;font-weight:300;margin-top:3px;display:block}
-.gcard .meta .go{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,.16);
-  display:grid;place-items:center;color:#5FA8CC;flex:0 0 auto;transition:.4s}
-.gcard:hover .meta .go{background:#5FA8CC;color:#0A0D11}
-.gcard .go svg{width:16px;height:16px}
+.gcard .meta .go{display:none}
 .gcard.soon .meta .t{color:#C4D2DC}
 .gsoon{position:absolute;top:14px;right:14px;font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
   color:#C4D2DC;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.18);
@@ -536,21 +541,13 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   <div class="wrap">
     <div class="nav">
       <a href="#top" class="brand" data-testid="brand-logo">
-        <img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/zukoexsi_LOGO%20PARA%20DOCUMENTACION.jpg" alt="OPORTUNIIA" class="brand-logo-img">
+        <img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/mlzub68f_ChatGPT%20Image%2016%20sept%202026%2C%2002_02_35.webp" alt="OPORTUNIIA" class="brand-logo-img">
       </a>
       <nav class="menu" data-testid="main-nav">
-        <div class="navitem" data-testid="nav-quienes">
-          <a>Quiénes somos <i data-lucide="chevron-down" class="chev"></i></a>
-          <div class="drop">
-            <div class="drop-h">Grupo OPORTUNIIA</div>
-            <a href="#grupo" class="drop-i"><span class="thumb"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/jjknh2bb_OPORTUNIIA.png" alt="OPORTUNIIA"></span><span class="dtxt"><span class="t">OPORTUNIIA</span><span class="s">Firma de deuda · inversión y resolución</span></span></a>
-            <a href="#grupo" class="drop-i"><span class="thumb"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6f5o2w4o_LIVING.png" alt="LIVING EXPERIENCE"></span><span class="dtxt"><span class="t">LIVING EXPERIENCE</span><span class="s">Activo residencial y experiencia</span></span></a>
-            <a href="#grupo" class="drop-i soon"><span class="thumb"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6tt8feid_ROBOTICS.png" alt="ROBOTICS"></span><span class="dtxt"><span class="t">ROBOTICS</span><span class="s">Automatización e industria</span></span><span class="soon-tag">Próximamente</span></a>
-          </div>
-        </div>
         <div class="navitem"><a href="#producto">Oportunidades</a></div>
-        <div class="navitem"><a href="#ecosistema">Ecosistema</a></div>
         <div class="navitem"><a href="#flow">Cómo funciona</a></div>
+        <div class="navitem"><a href="#quienes">Quiénes somos</a></div>
+        <div class="navitem"><a href="#grupo">Grupo OPORTUNIIA</a></div>
         <div class="navitem"><a href="#footer">Contacto</a></div>
       </nav>
       <div class="actions">
@@ -564,10 +561,10 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
 
 <!-- mobile menu -->
 <div class="mmenu" id="mmenu" data-testid="mobile-menu">
-  <a href="#grupo">Quiénes somos</a>
   <a href="#producto">Oportunidades</a>
-  <a href="#ecosistema">Ecosistema</a>
   <a href="#flow">Cómo funciona</a>
+  <a href="#quienes">Quiénes somos</a>
+  <a href="#grupo">Grupo OPORTUNIIA</a>
   <a href="#footer">Contacto</a>
   <a href="#acceso" class="btn">Solicitar acceso</a>
 </div>
@@ -579,20 +576,15 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   <div class="wrap">
     <div class="hero-grid">
       <div>
-        <div class="hero-meta">
-          <div class="mi"><div class="mk">Firma</div><div class="mv">Deuda · NPL · CDR · REO</div></div>
-          <div class="mi"><div class="mk">Enfoque</div><div class="mv">Inversión + Resolución</div></div>
-          <div class="mi"><div class="mk">Acceso</div><div class="mv">Institucional · verificado</div></div>
-        </div>
         <h1 class="display" data-testid="hero-title">
           <span class="l"><span>Humanizamos</span></span>
           <span class="l"><span>la <em>deuda.</em></span></span>
         </h1>
         <div class="hero-bottom">
-          <p class="hero-lead">Compramos, estructuramos y resolvemos carteras de deuda. La misma oportunidad, dos formas de resolverla.</p>
+          <p class="hero-lead">Analizamos, estructuramos y resolvemos operaciones de deuda e inmuebles buscando la mejor salida para cada caso.</p>
           <div class="hero-cta">
             <a href="#producto" class="btn" data-testid="hero-cta-primary">Ver oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-            <a href="#acceso" class="btn line" data-testid="hero-cta-secondary">Solicitar acceso</a>
+            <a href="#quienes" class="btn line" data-testid="hero-cta-secondary">Conocer OPORTUNIIA</a>
           </div>
         </div>
       </div>
@@ -619,17 +611,17 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   <div class="wrap">
     <div class="sec-head">
       <div class="reveal">
-        <div class="eyebrow" style="margin-bottom:26px">Deal flow · acceso controlado</div>
-        <h2>NPL, CDR y REO.<br>Producto real, antes del registro.</h2>
+        <div class="eyebrow" style="margin-bottom:26px">Oportunidades</div>
+        <h2>NPL, CDR y REO.</h2>
       </div>
-      <div class="side reveal d1">Tres tipos de operación, un mismo criterio. Puedes ver cómo es cada una; el detalle completo se abre con acceso. No enseñamos cifras que no estén autorizadas.</div>
+      <div class="side reveal d1">Tres formas de entrar en una operación. Mostramos lo necesario para entenderla; el detalle completo se facilita con acceso profesional.</div>
     </div>
 
     <div class="prod-top reveal d1">
-      <div class="deal-note" style="margin:0;text-align:left"><b>Vista pública.</b> Datos sensibles enmascarados.</div>
+      <div class="deal-note" style="margin:0;text-align:left"><b>Vista pública.</b> Datos sensibles protegidos.</div>
       <div class="dealbar" data-testid="mode-indicator">
-        <b class="main-only on">Lógica actual · Inversión</b>
-        <b class="alt on" style="display:none">Lógica actual · Resolución</b>
+        <b class="main-only on">Vista · Recuperación</b>
+        <b class="alt on" style="display:none">Vista · Acuerdo</b>
       </div>
     </div>
 
@@ -646,11 +638,11 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
           <div class="loc"><i data-lucide="map-pin"></i>Madrid</div>
           <div class="dl">
             <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••</span></div>
-            <div class="r roi"><span class="k">ROI objetivo</span><span class="v big main-only">22%</span><span class="v big alt">14%</span></div>
+            <div class="r roi"><span class="k">ROI</span><span class="v big main-only">22%</span><span class="v big alt">14%</span></div>
             <div class="r"><span class="k">Plazo estimado</span><span class="v main-only">18 meses</span><span class="v alt">8 meses</span></div>
             <div class="r"><span class="k main-only">Estrategia</span><span class="k alt">Salida</span><span class="v main-only">Recuperación</span><span class="v alt">Dación / quita</span></div>
           </div>
-          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
+          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Ver operación <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
       </div>
       <!-- CDR · CESIÓN DE REMATE -->
@@ -665,11 +657,11 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
           <div class="loc"><i data-lucide="map-pin"></i>Valencia</div>
           <div class="dl">
             <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••</span></div>
-            <div class="r roi"><span class="k">ROI objetivo</span><span class="v big main-only">30%</span><span class="v big alt">18%</span></div>
+            <div class="r roi"><span class="k">ROI</span><span class="v big main-only">30%</span><span class="v big alt">18%</span></div>
             <div class="r"><span class="k">Plazo estimado</span><span class="v main-only">24 meses</span><span class="v alt">12 meses</span></div>
             <div class="r"><span class="k main-only">Fase judicial</span><span class="k alt">Posesión</span><span class="v main-only">Remate adjudicado</span><span class="v alt">Ocupado → entrega</span></div>
           </div>
-          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
+          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Ver operación <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
       </div>
       <!-- REO · ACTIVO ADJUDICADO -->
@@ -684,11 +676,11 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
           <div class="loc"><i data-lucide="map-pin"></i>Málaga</div>
           <div class="dl">
             <div class="r"><span class="k">Valor de compra</span><span class="v mask">€ •••.•••</span></div>
-            <div class="r roi"><span class="k">ROI objetivo</span><span class="v big main-only">20%</span><span class="v big alt">26%</span></div>
+            <div class="r roi"><span class="k">ROI</span><span class="v big main-only">20%</span><span class="v big alt">26%</span></div>
             <div class="r"><span class="k">Plazo estimado</span><span class="v main-only">16 meses</span><span class="v alt">9 meses</span></div>
             <div class="r"><span class="k main-only">Estado</span><span class="k alt">Salida</span><span class="v main-only">Desocupado</span><span class="v alt">Reposicionar + vender</span></div>
           </div>
-          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Solicitar <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
+          <div class="deal-f"><span class="lock"><i data-lucide="lock"></i>Valor bajo acceso</span><a href="#acceso" class="go">Ver operación <i data-lucide="arrow-up-right" style="width:14px;height:14px"></i></a></div>
         </div>
       </div>
     </div>
@@ -697,41 +689,39 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
     <!-- DIFERENCIAL: pegado bajo las tarjetas -->
     <div class="switchwrap reveal d1" id="acuerdos" data-testid="portal-acuerdos">
       <div class="sw-copy">
-        <div class="eyebrow" style="justify-content:center;margin-bottom:18px">El diferencial</div>
-        <h3>Dos maneras de entender la misma oportunidad.</h3>
+        <div class="eyebrow" style="justify-content:center;margin-bottom:18px">El diferencial OPORTUNIIA</div>
+        <h3>Una misma oportunidad. Dos maneras de abordarla.</h3>
         <div class="sw-ways">
-          <span class="wy"><b>A · Vía judicial / recuperación</b> — se ejecuta y se recupera.</span>
-          <span class="wy"><b>B · Vía acuerdo / resolución</b> — se negocia la salida.</span>
+          <span class="wy"><b>Recuperación</b> — se ejecuta y se recupera por la vía legal.</span>
+          <span class="wy"><b>Acuerdo</b> — se negocia una salida pactada.</span>
         </div>
       </div>
       <div class="switch">
         <button class="switch-btn" id="switchBtn" data-testid="universe-toggle" aria-pressed="false">
           <span class="txt">
-            <span class="k" id="switchK">Pulsa aquí</span>
-            <span class="t" id="switchT">Entrar en el Universo Acuerdos</span>
+            <span class="k" id="switchK">Ver</span>
+            <span class="t" id="switchT">Ver desde Acuerdos</span>
           </span>
           <span class="switch-knob"><i data-lucide="power"></i></span>
         </button>
-        <div class="switch-hint">Modo actual: <b id="switchState">Inversión</b> — pulsa y verás las 3 operaciones reinterpretadas</div>
+        <div class="switch-hint">Vista actual: <b id="switchState">Recuperación</b> — pulsa y verás las 3 operaciones desde Acuerdos</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ================= TECNOLOGÍA (ecosistema reducido) ================= -->
-<section class="sec ecolite" id="ecosistema" data-testid="ecosistema">
+<!-- ================= QUIÉNES SOMOS ================= -->
+<section class="sec quienes" id="quienes" data-testid="quienes">
   <div class="wrap">
-    <div class="ecolite-row reveal">
-      <div class="ecolite-left">
-        <div class="eyebrow" style="margin-bottom:22px">Tecnología propia</div>
-        <h2>Tecnología e inteligencia propias detrás de cada operación.</h2>
-        <p>Analizamos, estructuramos y presentamos cada oportunidad con herramientas y criterio hechos en casa. Eso es lo que nos deja ir más rápido y más a fondo.</p>
+    <div class="q-grid">
+      <div class="reveal">
+        <div class="eyebrow" style="margin-bottom:24px">Quiénes somos</div>
+        <h2 class="q-title">Detrás de cada operación hay personas, patrimonio y decisiones.</h2>
       </div>
-      <div class="ecolite-right">
-        <div class="ecotags" data-testid="eco-tags">
-          <span>CORE</span><span>IA</span><span>LEGAL</span><span>APP</span><span>VISUAL</span><span>PRESENTACIÓN</span><span>WEB</span>
-        </div>
-        <a href="#" class="ecolink" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-up-right"></i></a>
+      <div class="q-body reveal d1">
+        <p>Trabajamos con deuda, pero nunca la miramos solo como un número. OPORTUNIIA nace de años trabajando operaciones complejas y de una idea sencilla: <b>entenderlas mejor para resolverlas mejor</b>.</p>
+        <p>Por eso analizamos cada caso desde todas sus posibilidades, no desde una única salida. Eso es, para nosotros, <b>humanizar la deuda</b>.</p>
+        <a href="#acceso" class="q-link" data-testid="quienes-link">Trabaja con OPORTUNIIA <i data-lucide="arrow-up-right"></i></a>
       </div>
     </div>
   </div>
@@ -742,10 +732,10 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   <div class="wrap">
     <div class="sec-head">
       <div class="reveal">
-        <div class="eyebrow" style="margin-bottom:26px">Cómo funciona</div>
-        <h2>De la cartera al resultado.</h2>
+        <div class="eyebrow" style="margin-bottom:26px">Cómo trabajamos</div>
+        <h2>Una forma de trabajar cada operación.</h2>
       </div>
-      <div class="side reveal d1">Cada operación sigue el mismo camino, sin atajos. Así sabes siempre en qué punto está.</div>
+      <div class="side reveal d1">Cada operación pide su estrategia. Este es el camino que seguimos, sin atajos.</div>
     </div>
     <div class="flow-grid">
       <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
@@ -757,12 +747,28 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   </div>
 </section>
 
+<!-- ================= TECNOLOGÍA ================= -->
+<section class="sec ecolite" id="tecnologia" data-testid="tecnologia">
+  <div class="wrap">
+    <div class="ecolite-row reveal">
+      <div class="ecolite-left">
+        <div class="eyebrow" style="margin-bottom:22px">Tecnología propia</div>
+        <h2>Tecnología que nos ayuda a tomar mejores decisiones.</h2>
+        <p>Hemos desarrollado herramientas propias para analizar, estructurar y presentar cada operación con más información, más criterio y más agilidad. La tecnología está al servicio de la operación, no al revés.</p>
+      </div>
+      <div class="ecolite-right">
+        <a href="#acceso" class="ecolink" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-up-right"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= GRUPO OPORTUNIIA ================= -->
 <section class="grupo sec" id="grupo" data-testid="grupo">
   <div class="wrap">
     <div class="sec-head">
       <div class="reveal">
-        <div class="eyebrow" style="margin-bottom:26px">Quiénes somos</div>
+        <div class="eyebrow" style="margin-bottom:26px">El grupo</div>
         <h2>Grupo OPORTUNIIA.</h2>
       </div>
     </div>
@@ -773,7 +779,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
       </a>
       <a href="#" class="gcard reveal d2" data-testid="grupo-living">
         <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6f5o2w4o_LIVING.png" alt="LIVING EXPERIENCE" loading="lazy"></div>
-        <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">Activo residencial y experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
+        <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La vivienda empieza cuando alguien la imagina</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
       <div class="gcard soon reveal d3" data-testid="grupo-robotics">
         <span class="gsoon">Próximamente</span>
@@ -790,14 +796,14 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
     <div class="sec-head">
       <div class="reveal">
         <div class="eyebrow" style="margin-bottom:26px">Acceso profesional</div>
-        <h2>¿Cómo vas a entrar?</h2>
+        <h2>Elige cómo quieres trabajar con OPORTUNIIA.</h2>
       </div>
-      <div class="side reveal d1">Tres formas de estar en OPORTUNIIA. Elige la tuya: el detalle completo de cada operación se abre siempre con verificación.</div>
+      <div class="side reveal d1">Inversor, colaborador o suscriptor. Cada relación es distinta; elige la tuya.</div>
     </div>
     <div class="entry-grid">
       <div class="entry feat reveal d1" data-testid="entry-inversor">
         <span class="ei"><i data-lucide="trending-up"></i></span>
-        <div class="en">Modalidad 01</div>
+        <div class="en">Para invertir</div>
         <h3>Inversor</h3>
         <p>Compras oportunidades. Eliges cuánto quieres que te acompañemos.</p>
         <ul class="opts">
@@ -809,7 +815,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
       </div>
       <div class="entry reveal d2" data-testid="entry-colaborador">
         <span class="ei"><i data-lucide="handshake"></i></span>
-        <div class="en">Modalidad 02</div>
+        <div class="en">Para colaborar</div>
         <h3>Colaborador</h3>
         <p>Aportas operaciones o trabajas con nosotros. Dos formas de colaborar.</p>
         <ul class="opts">
@@ -820,7 +826,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
       </div>
       <div class="entry reveal d3" data-testid="entry-suscriptor">
         <span class="ei"><i data-lucide="key-round"></i></span>
-        <div class="en">Modalidad 03</div>
+        <div class="en">Ya formas parte</div>
         <h3>Suscriptor</h3>
         <p>Ya formas parte de OPORTUNIIA. Entra con tu código y accede a tu entorno autorizado.</p>
         <ul class="feats">
@@ -841,16 +847,15 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="b"><span class="wordmark" style="color:#F6F8FA;font-weight:600;font-size:20px;letter-spacing:.16em">OPORTUNIIA</span></div>
-        <p>Firma de deuda. Analizamos, estructuramos y resolvemos carteras con criterio humano y tecnología propia.</p>
+        <p><b style="color:#F6F8FA;font-weight:500">Humanizamos la deuda.</b><br>La misma oportunidad, dos maneras de abordarla.</p>
       </div>
       <div class="foot-col">
         <h4>OPORTUNIIA</h4>
-        <a href="#grupo">Quiénes somos</a>
         <a href="#producto">Oportunidades</a>
         <a href="#flow">Cómo funciona</a>
-        <a href="#ecosistema">Ecosistema / Tecnología</a>
-        <a href="#footer">Contacto</a>
-        <a href="#acceso">Área privada</a>
+        <a href="#quienes">Quiénes somos</a>
+        <a href="#tecnologia">Tecnología</a>
+        <a href="#acceso">Acceso profesional</a>
       </div>
       <div class="foot-col">
         <h4>Grupo OPORTUNIIA</h4>
@@ -901,9 +906,9 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   sw.addEventListener('click',()=>{
     const on=document.body.classList.toggle('acuerdos');
     sw.setAttribute('aria-pressed',on);
-    document.getElementById('switchK').textContent=on?'Volver':'Pulsa aquí';
-    document.getElementById('switchT').textContent=on?'Estás en el Universo Acuerdos':'Entrar en el Universo Acuerdos';
-    document.getElementById('switchState').textContent=on?'Resolución':'Inversión';
+    document.getElementById('switchK').textContent=on?'Volver':'Ver';
+    document.getElementById('switchT').textContent=on?'Estás viendo desde Acuerdos':'Ver desde Acuerdos';
+    document.getElementById('switchState').textContent=on?'Acuerdo':'Recuperación';
     document.querySelectorAll('.dealbar .main-only').forEach(e=>e.classList.toggle('on',!on));
     document.querySelectorAll('.dealbar .alt').forEach(e=>{e.style.display=on?'inline-flex':'none';e.classList.toggle('on',on)});
     // llevar la vista a las 3 tarjetas para percibir la mutación

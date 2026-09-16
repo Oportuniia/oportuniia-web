@@ -25,9 +25,25 @@ ESPAÑOL. Responder siempre en español.
 - VR04 — "Mejora clara" pero con exceso de contenido / copy formal.
 - VR05 — base sólida; brief llegó cortado en §9.
 - VR05.1 — base válida; errores de producto/terminología.
-- VR05.2 — ENTREGADO (producto real + negocio real), pendiente de aprobación. Archivo: `/app/frontend/public/web2.html`.
+- VR05.2 — base funcional; se autoriza rebuild profundo.
+- VR06 (Creative Rebuild) — ENTREGADO, pendiente de aprobación. Archivo: `/app/frontend/public/web2.html`.
 
-### VR05.2 — correcciones aplicadas
+### VR06 — Creative Rebuild (Dirección Master)
+- Logo NUEVO aprobado en header (asset mlzub68f webp, horizontal, mayor presencia).
+- Nav simplificada: Oportunidades · Cómo funciona · Quiénes somos · Grupo OPORTUNIIA · Contacto + Área privada + Solicitar acceso.
+- Hero sin microetiquetas (fuera Firma/Enfoque/Acceso); "HUMANIZAMOS LA DEUDA" + subcopy + CTAs "Ver oportunidades" / "Conocer OPORTUNIIA".
+- Oportunidades: eyebrow "Oportunidades", "NPL, CDR y REO.", copy nuevo. Campos: Valor de compra (masked), ROI (no "ROI objetivo"), Plazo estimado, Estrategia/Fase/Estado. CTA "Ver operación". Indicador Vista · Recuperación/Acuerdo.
+- Universo Acuerdos: switch "Ver desde Acuerdos" pegado bajo las 3 tarjetas; concepto "Una misma oportunidad. Dos maneras de abordarla." (Recuperación ↔ Acuerdo). Mutación completa.
+- NUEVA sección "Quiénes somos" (humana, filosofía Humanizamos la deuda).
+- Orden §18: Hero → Oportunidades → Switch → Quiénes somos → Cómo trabajamos (5 pasos) → Tecnología → Grupo → Acceso → Footer.
+- Tecnología reenfocada (sin píldoras CORE/IA/...): "Tecnología que nos ayuda a tomar mejores decisiones" + link.
+- Grupo rebuild: logos integrados sin caja rectangular, centrados, hover scale; LIVING "La vivienda empieza cuando alguien la imagina"; ROBOTICS · Próximamente. Enlaces directos (OPORTUNIIA→oportuniia.com).
+- Acceso: "Elige cómo quieres trabajar con OPORTUNIIA"; Inversor A/B/C, Colaborador A/B, Suscriptor código; sin "Modalidad 0X".
+- Footer: tagline "Humanizamos la deuda." + nav esencial.
+- Copy prohibido eliminado (deal flow, acceso controlado, ROI objetivo, modalidad, etc.). CDR = Cesión de remate.
+- SOBERANÍA ELEMENTOR: el prototipo actual es HTML monolítico (solo para Visual Review). El PORT a WordPress debe hacerse Elementor-native (80-90% editable) vía Write Bridge — pendiente.
+
+### VR05.2 — histórico
 - CDR = **CESIÓN DE REMATE** en toda la experiencia (ya NO "créditos dudosos corporativos"). Imagen CDR ahora residencial (vivienda).
 - Tarjetas con lógica real: NPL (Madrid, préstamo hipotecario impagado), CDR (Valencia, cesión de remate — vivienda), REO (Málaga, activo adjudicado). Campos: Valor de compra (masked), ROI objetivo (visible), Plazo estimado (visible), Estrategia/Fase/Estado. "Horizonte" → "Plazo estimado". Ciudades concretas (demo).
 - Mutación acuerdo enriquecida: cambian ROI, plazo, estrategia/posesión/ocupación, estado, imagen (duotono), atmósfera.
