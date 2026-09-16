@@ -95,7 +95,7 @@ header.sc{background:color-mix(in srgb,var(--bg) 78%,transparent);
   backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:84px}
 .brand{display:flex;align-items:center;gap:13px;flex:0 0 auto}
-.brand-logo-img{height:46px;width:auto;display:block}
+.brand-logo-img{height:60px;width:auto;display:block}
 .brand .mark{width:30px;height:30px;color:var(--brand);flex:0 0 auto;display:grid;place-items:center;
   transition:transform .5s var(--ease),color var(--deep) var(--ease)}
 .brand:hover .mark{transform:rotate(90deg)}
@@ -579,6 +579,69 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   .grupo-grid{max-width:340px}
   .gcard .logo{aspect-ratio:2/1}
 }
+/* ============ V9 REFINEMENTS ============ */
+/* desktop-only forced line breaks */
+.d-break{display:inline}
+@media(max-width:900px){.d-break{display:none}}
+
+/* ROI hero + facts (base = Recuperación) */
+#producto .deal-media{aspect-ratio:auto;height:212px;transition:height .55s var(--ease),filter .55s var(--ease)}
+#producto .deal-roi{display:flex;align-items:flex-end;gap:12px;margin-top:20px}
+#producto .deal-roi .roi-k{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);padding-bottom:7px}
+#producto .deal-roi .roi-v{font-size:46px;font-weight:700;color:var(--brand-2);line-height:.9;letter-spacing:-.03em;
+  transition:font-size .5s var(--ease),color .5s var(--ease)}
+#producto .deal-facts{display:flex;flex-direction:column;margin-top:16px;border-top:1px solid var(--line-2);padding-top:6px}
+#producto .fact{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;
+  border-bottom:1px solid var(--line-2);
+  transition:background .5s var(--ease),padding .5s var(--ease),border-color .5s var(--ease),transform .5s var(--ease)}
+#producto .fact:last-child{border-bottom:none}
+#producto .fact .fk{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);transition:color .5s,letter-spacing .5s}
+#producto .fact .fv{font-size:14px;font-weight:600;color:#fff;text-align:right;transition:font-size .5s var(--ease),color .5s var(--ease)}
+
+/* ACUERDOS transform — misma operación, otra lectura */
+body.acuerdos #producto .deal-media{height:82px;filter:grayscale(.92) brightness(.4)}
+body.acuerdos #producto .deal-media::after{background:linear-gradient(180deg,rgba(7,15,22,.5),rgba(7,15,22,.94))}
+body.acuerdos #producto .deal-tag{font-size:16px;left:18px;bottom:12px;text-shadow:0 1px 10px rgba(0,0,0,.6)}
+body.acuerdos #producto .deal-roi{margin-top:22px}
+body.acuerdos #producto .deal-roi .roi-v{font-size:60px}
+body.acuerdos #producto .fact-occ{order:-1;flex-direction:column;align-items:flex-start;gap:7px;
+  background:linear-gradient(135deg,rgba(46,154,198,.2),rgba(46,154,198,.04));
+  border:1px solid var(--brand-line);border-radius:12px;padding:16px 18px;margin-bottom:10px}
+body.acuerdos #producto .fact-occ .fk{color:var(--brand-2);letter-spacing:.2em}
+body.acuerdos #producto .fact-occ .fv{font-size:26px;color:#fff;text-align:left;line-height:1}
+body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
+
+/* Tecnología — capacidades públicas */
+.tech-caps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:56px;
+  background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.tcap{background:var(--surface);padding:34px 28px 30px;position:relative;transition:background-color .45s var(--ease)}
+.tcap:hover{background:var(--bg2)}
+.tcap .tn{position:absolute;top:22px;right:24px;font-size:11px;letter-spacing:.2em;color:var(--faint)}
+.tcap .tci{width:46px;height:46px;border-radius:8px;display:grid;place-items:center;background:var(--brand-tint);color:var(--brand);margin-bottom:22px}
+.tcap .tci svg{width:22px;height:22px}
+.tcap h3{font-size:17px;font-weight:600;color:var(--ink);letter-spacing:.02em}
+.tcap p{font-size:13px;color:var(--ink2);font-weight:300;line-height:1.62;margin-top:12px}
+
+/* Oportunidades a tu medida (dentro de Acceso) */
+.tailor{margin-top:30px;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(30px,4vw,64px);align-items:center;
+  border:1px solid var(--brand-line);border-radius:18px;padding:clamp(30px,3.6vw,52px);
+  background:linear-gradient(135deg,var(--brand-tint),var(--surface))}
+.tailor-l h3{font-size:clamp(26px,3vw,40px);font-weight:600;color:var(--ink);letter-spacing:-.03em;line-height:1.06;margin-top:6px}
+.tailor-l p{margin-top:16px;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7;max-width:470px}
+.tailor-l .tailor-note{margin-top:12px;font-size:12.5px;color:var(--faint);max-width:470px}
+.tcrit-h{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:16px}
+.tcrit{display:flex;flex-wrap:wrap;gap:10px}
+.tcrit span{font-size:13px;color:var(--ink);font-weight:500;background:var(--surface);border:1px solid var(--line);
+  border-radius:40px;padding:10px 18px;transition:border-color .3s,color .3s,transform .3s}
+.tcrit span:hover{border-color:var(--brand);color:var(--brand);transform:translateY(-2px)}
+
+@media(max-width:1180px){.tech-caps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:900px){.tailor{grid-template-columns:1fr;gap:28px}}
+@media(max-width:640px){.tech-caps{grid-template-columns:1fr}}
+
+/* titulares de composición controlada (2 líneas desktop) */
+#flow .sec-head,#acceso .sec-head{grid-template-columns:1fr;gap:22px;align-items:start;margin-bottom:56px}
+#flow .sec-head .side,#acceso .sec-head .side{max-width:640px;padding-bottom:0}
 </style>
 </head>
 <body data-testid="v03-body">
@@ -657,7 +720,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
 <!-- ================= OPORTUNIDADES ================= -->
 <section class="sec" id="producto" data-testid="producto">
   <div class="prod-hero">
-    <div class="prod-bg"><img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?crop=entropy&cs=srgb&fm=jpg&q=85&w=1600" alt=""></div>
+    <div class="prod-bg"><img src="https://images.pexels.com/photos/17881999/pexels-photo-17881999.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=900&w=1600" alt=""></div>
     <div class="wrap">
       <div class="sec-head">
         <div class="reveal">
@@ -679,20 +742,19 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
       <!-- NPL -->
       <div class="deal reveal d1" data-testid="deal-npl">
         <div class="deal-media">
-          <img src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Viviendas en bloque" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1786507242784-167f2ec6af27?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Edificio de viviendas" loading="lazy">
           <span class="deal-tag">NPL</span>
-          <span class="deal-loc"><i data-lucide="map-pin"></i>Madrid</span>
+          <span class="deal-loc"><i data-lucide="map-pin"></i>Sevilla</span>
         </div>
         <div class="deal-body">
-          <div class="deal-cat">Residencial</div>
-          <h3>Viviendas en bloque</h3>
+          <div class="deal-cat">Residencial · Garantía hipotecaria</div>
+          <h3>Edificio de viviendas</h3>
           <div class="deal-buy"><span class="bk"><i data-lucide="pencil"></i>Valor de compra</span><span class="mask">•••••• €</span></div>
-          <div class="deal-metrics">
-            <div class="roi-box"><span class="roi-k">ROI</span><span class="roi-v main-only">14,5%</span><span class="roi-v alt">11,0%</span></div>
-            <div class="deal-side">
-              <div class="ms"><i data-lucide="calendar"></i><span><span class="mk">Plazo estimado</span><span class="mv main-only">18 meses</span><span class="mv alt">8 meses</span></span></div>
-              <div class="ms"><i data-lucide="file-text"></i><span><span class="mk main-only">Estado</span><span class="mk alt">Ocupación</span><span class="mv main-only">En recuperación</span><span class="mv alt">Ocupada · acuerdo</span></span></div>
-            </div>
+          <div class="deal-roi"><span class="roi-k">ROI</span><span class="roi-v" data-rec="14,5%" data-acu="11,0%">14,5%</span></div>
+          <div class="deal-facts">
+            <div class="fact fact-time"><span class="fk">Plazo estimado</span><span class="fv" data-rec="18 meses" data-acu="8 meses">18 meses</span></div>
+            <div class="fact fact-occ"><span class="fk" data-rec="Estado" data-acu="Ocupación">Estado</span><span class="fv" data-rec="En recuperación" data-acu="Ocupada">En recuperación</span></div>
+            <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Vía hipotecaria" data-acu="Entrega pactada">Vía hipotecaria</span></div>
           </div>
           <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
@@ -700,20 +762,19 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
       <!-- CDR · CESIÓN DE REMATE -->
       <div class="deal reveal d2" data-testid="deal-cdr">
         <div class="deal-media">
-          <img src="https://images.unsplash.com/photo-1771154138533-d12e4989ef78?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Apartamentos turísticos" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1655710647244-bb501a3b9aa5?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Apartamentos turísticos" loading="lazy">
           <span class="deal-tag">CDR</span>
-          <span class="deal-loc"><i data-lucide="map-pin"></i>Málaga</span>
+          <span class="deal-loc"><i data-lucide="map-pin"></i>Alicante</span>
         </div>
         <div class="deal-body">
           <div class="deal-cat">Residencial · Cesión de remate</div>
           <h3>Apartamentos turísticos</h3>
           <div class="deal-buy"><span class="bk"><i data-lucide="pencil"></i>Valor de compra</span><span class="mask">•••••• €</span></div>
-          <div class="deal-metrics">
-            <div class="roi-box"><span class="roi-k">ROI</span><span class="roi-v main-only">18,2%</span><span class="roi-v alt">13,5%</span></div>
-            <div class="deal-side">
-              <div class="ms"><i data-lucide="calendar"></i><span><span class="mk">Plazo estimado</span><span class="mv main-only">24 meses</span><span class="mv alt">12 meses</span></span></div>
-              <div class="ms"><i data-lucide="file-text"></i><span><span class="mk main-only">Estado</span><span class="mk alt">Ocupación</span><span class="mv main-only">En proceso judicial</span><span class="mv alt">Ocupada · entrega pactada</span></span></div>
-            </div>
+          <div class="deal-roi"><span class="roi-k">ROI</span><span class="roi-v" data-rec="18,2%" data-acu="13,5%">18,2%</span></div>
+          <div class="deal-facts">
+            <div class="fact fact-time"><span class="fk">Plazo estimado</span><span class="fv" data-rec="24 meses" data-acu="12 meses">24 meses</span></div>
+            <div class="fact fact-occ"><span class="fk" data-rec="Estado" data-acu="Ocupación">Estado</span><span class="fv" data-rec="En proceso judicial" data-acu="Ocupada">En proceso judicial</span></div>
+            <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Cesión de remate" data-acu="Entrega pactada">Cesión de remate</span></div>
           </div>
           <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
@@ -723,18 +784,17 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <div class="deal-media">
           <img src="https://images.pexels.com/photos/36006588/pexels-photo-36006588.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Nave logística" loading="lazy">
           <span class="deal-tag">REO</span>
-          <span class="deal-loc"><i data-lucide="map-pin"></i>Valencia</span>
+          <span class="deal-loc"><i data-lucide="map-pin"></i>Zaragoza</span>
         </div>
         <div class="deal-body">
-          <div class="deal-cat">Industrial</div>
+          <div class="deal-cat">Industrial · Activo adjudicado</div>
           <h3>Nave logística</h3>
           <div class="deal-buy"><span class="bk"><i data-lucide="pencil"></i>Valor de compra</span><span class="mask">•••••• €</span></div>
-          <div class="deal-metrics">
-            <div class="roi-box"><span class="roi-k">ROI</span><span class="roi-v main-only">11,7%</span><span class="roi-v alt">15,0%</span></div>
-            <div class="deal-side">
-              <div class="ms"><i data-lucide="calendar"></i><span><span class="mk">Plazo estimado</span><span class="mv main-only">16 meses</span><span class="mv alt">9 meses</span></span></div>
-              <div class="ms"><i data-lucide="file-text"></i><span><span class="mk main-only">Estado</span><span class="mk alt">Ocupación</span><span class="mv main-only">Disponible</span><span class="mv alt">Libre · venta pactada</span></span></div>
-            </div>
+          <div class="deal-roi"><span class="roi-k">ROI</span><span class="roi-v" data-rec="11,7%" data-acu="15,0%">11,7%</span></div>
+          <div class="deal-facts">
+            <div class="fact fact-time"><span class="fk">Plazo estimado</span><span class="fv" data-rec="16 meses" data-acu="9 meses">16 meses</span></div>
+            <div class="fact fact-occ"><span class="fk" data-rec="Estado" data-acu="Ocupación">Estado</span><span class="fv" data-rec="Disponible" data-acu="Libre">Disponible</span></div>
+            <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Venta directa" data-acu="Venta pactada">Venta directa</span></div>
           </div>
           <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
@@ -768,9 +828,9 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
     <div class="sec-head">
       <div class="reveal">
         <div class="eyebrow" style="margin-bottom:26px">Cómo trabajamos</div>
-        <h2>Una forma de trabajar cada operación.</h2>
+        <h2>Una forma de trabajar.<br class="d-break"> Cada operación, una estrategia.</h2>
       </div>
-      <div class="side reveal d1">Cada operación pide su estrategia. Este es el camino que seguimos, sin atajos.</div>
+      <div class="side reveal d1">Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
     </div>
     <div class="flow-grid">
       <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
@@ -792,8 +852,14 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <p>Hemos desarrollado herramientas propias para analizar, estructurar y presentar cada operación con más información, más criterio y más agilidad. La tecnología está al servicio de la operación, no al revés.</p>
       </div>
       <div class="ecolite-right">
-        <a href="#acceso" class="ecolink" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-up-right"></i></a>
+        <a href="#tech-capacidades" class="ecolink" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-down-right"></i></a>
       </div>
+    </div>
+    <div class="tech-caps" id="tech-capacidades" data-testid="tech-capacidades">
+      <div class="tcap reveal d1"><span class="tn">01</span><span class="tci"><i data-lucide="search"></i></span><h3>Analizar</h3><p>Leemos y ordenamos la información de cada operación para entenderla a fondo.</p></div>
+      <div class="tcap reveal d2"><span class="tn">02</span><span class="tci"><i data-lucide="layers"></i></span><h3>Estructurar</h3><p>Damos forma jurídica y financiera a cada operación sobre una base sólida.</p></div>
+      <div class="tcap reveal d3"><span class="tn">03</span><span class="tci"><i data-lucide="git-compare"></i></span><h3>Contrastar</h3><p>Comparamos escenarios y posibles salidas antes de decidir la mejor vía.</p></div>
+      <div class="tcap reveal d4"><span class="tn">04</span><span class="tci"><i data-lucide="presentation"></i></span><h3>Presentar</h3><p>Mostramos cada oportunidad con claridad, para decidir con criterio y agilidad.</p></div>
     </div>
   </div>
 </section>
@@ -831,9 +897,9 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
     <div class="sec-head">
       <div class="reveal">
         <div class="eyebrow" style="margin-bottom:26px">Acceso profesional</div>
-        <h2>Elige cómo quieres trabajar con OPORTUNIIA.</h2>
+        <h2>Elige cómo quieres trabajar<br class="d-break"> con OPORTUNIIA.</h2>
       </div>
-      <div class="side reveal d1">Inversor, colaborador o suscriptor. Cada relación es distinta; elige la tuya.</div>
+      <div class="side reveal d1">Inversor, colaborador o suscriptor. Tres formas distintas de relacionarte con OPORTUNIIA.</div>
     </div>
     <div class="entry-grid">
       <div class="entry feat reveal d1" data-testid="entry-inversor">
@@ -866,6 +932,20 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
         <h3>Suscriptor</h3>
         <p>Ya formas parte de OPORTUNIIA. Accede con tu código a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p>
         <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Entrar con mi código <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+      </div>
+    </div>
+    <div class="tailor reveal d2" data-testid="tailor">
+      <div class="tailor-l">
+        <div class="eyebrow" style="margin-bottom:18px">Oportunidades a tu medida</div>
+        <h3>Dinos qué buscas.<br class="d-break"> Nosotros acotamos el terreno.</h3>
+        <p>Con tu cuenta podrás definir qué tipo de oportunidades te interesan. Nosotros ajustamos lo que te mostramos a tus criterios. Cualquier modalidad, cualquier ubicación.</p>
+        <p class="tailor-note">Definición de criterios prevista para cuentas verificadas · próximamente.</p>
+      </div>
+      <div class="tailor-r">
+        <span class="tcrit-h">Criterios que podrás combinar</span>
+        <div class="tcrit">
+          <span>NPL</span><span>CDR</span><span>REO</span><span>Tipo de activo</span><span>Importe</span><span>Ubicación</span><span>Situación</span><span>Estrategia</span>
+        </div>
       </div>
     </div>
     <p class="access-foot reveal d2">Inversores y colaboradores, sujetos a verificación profesional. Suscriptores, acceso con código.</p>
@@ -932,11 +1012,13 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   burger.addEventListener('click',()=>{mmenu.classList.toggle('open');document.body.style.overflow=mmenu.classList.contains('open')?'hidden':''});
   mmenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mmenu.classList.remove('open');document.body.style.overflow=''}));
 
-  // ===== RECUPERACIÓN ↔ ACUERDO (segmentado, misma sección) =====
+  // ===== RECUPERACIÓN ↔ ACUERDO (segmentado, misma sección · mutación in-place) =====
   const segbtns=document.querySelectorAll('.segbtn');
+  const swapEls=document.querySelectorAll('#producto [data-rec]');
   function setMode(on){
     document.body.classList.toggle('acuerdos',on);
     segbtns.forEach(b=>b.classList.toggle('on',(b.dataset.mode==='acu')===on));
+    swapEls.forEach(el=>{el.textContent=on?el.dataset.acu:el.dataset.rec});
   }
   segbtns.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode==='acu')));
 </script>

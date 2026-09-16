@@ -1,126 +1,36 @@
-# OPORTUNIIA · WEB 2.0 — PRD / Control Environment
+# OPORTUNIIA · WEB 2.0 — PRD
 
-## Problema original
-Proyecto "Full App Execution" (no web nueva): entorno de control FastAPI/React para
-conectarse de forma segura al WordPress de producción (`oportuniia.com`) vía REST API,
-y editar EXCLUSIVAMENTE dos borradores Elementor autorizados: HOME 2.0 (ID 1630) y
-HEADER 2.0 (ID 1641), bajo modelo estricto de "cero mutaciones sin autorización".
-Objetivo creativo: experiencia visual extremadamente premium, sobria e institucional
-(nivel Blackstone/Apollo/KKR) para la firma de deuda OPORTUNIIA. Presentar prototipo
-("Visual Review") y, tras aprobación, portar estructura nativa Elementor (`_elementor_data`).
-
-## Idioma
-ESPAÑOL. Responder siempre en español.
+## Contexto
+"Full App Execution Project": entorno de control (FastAPI/React) para editar borradores de Elementor en un WordPress de producción bajo modelo estricto de "CERO MUTACIONES". Fase actual: diseño visual premium/institucional en prototipo local `/app/frontend/public/web2.html`. NO tocar WordPress hasta orden explícita "VISUAL REVIEW APPROVED, PROCEDE AL PORT".
 
 ## Reglas duras
-- ZERO MUTATIONS a WordPress producción sin autorización explícita.
-- Secretos WP solo en runtime desplegado (no en `.env` local). curl contra URL externa.
-- No portar a WordPress hasta aprobación del Visual Review.
-- Estética institucional: NO SaaS/startup/fintech/crypto/agencia.
+- CERO mutaciones a WordPress / Write Bridge / Elementor / producción.
+- Terminología: CDR = CESIÓN DE REMATE. ROI = ROI (nunca "ROI objetivo/potencial"). Prohibidos: Deal flow, Acceso controlado, Modalidad 01/02/03, etc.
+- Switch Oportunidades: MISMAS 3 operaciones, in-place (nada de duplicar/ocultar tarjetas).
+- Screenshots del prototipo: usar query `?v=N` para saltar caché.
 
-## Estado del diseño (Visual Reviews)
-- VR01 — RECHAZADO.
-- VR02 — RECHAZADO (navy oscuro + Fraunces + interruptor pequeño + vacío lateral).
-- VR03 — "Mejora clara" pero no cerrado.
-- VR04 — "Mejora clara" pero con exceso de contenido / copy formal.
-- VR05 — base sólida; brief llegó cortado en §9.
-- VR05.1 — base válida; errores de producto/terminología.
-- VR05.2 — base funcional; se autoriza rebuild profundo.
-- VR06 (Creative Rebuild) — base.
-- VR06.2 (Creative Rebuild V2) — ENTREGADO, pendiente aprobación. Bloque Oportunidades oscuro/inmersivo (imagen de fondo, switch segmentado Recuperación↔Acuerdo, cards con categoría + ROI grande cian con decimales + Plazo + Estado/Ocupación, CTA "Ver operación"). Copys nuevos: Grupo (OPORTUNIIA "Transformamos deuda en oportunidades", ROBOTICS "Optimizamos recursos…"), Inversor A/B/C (Compra directa · +acompañamiento jurídico · Gestión integral, CTA "Ver oportunidades"), Colaborador A/B (Compartimos el resultado · Tú mantienes a tu cliente → "La colaboración tiene que sumar." · CTA "Hablemos"), Suscriptor (código · "Entrar con mi código"). Toggle main/alt con !important (fix especificidad). Archivo: `/app/frontend/public/web2.html`.
+## Archivo único de trabajo
+`/app/frontend/public/web2.html` (HTML+CSS+JS vanilla, tipografía Poppins).
 
-### VR06 — Creative Rebuild (Dirección Master)
-- Logo NUEVO aprobado en header (asset mlzub68f webp, horizontal, mayor presencia).
-- Nav simplificada: Oportunidades · Cómo funciona · Quiénes somos · Grupo OPORTUNIIA · Contacto + Área privada + Solicitar acceso.
-- Hero sin microetiquetas (fuera Firma/Enfoque/Acceso); "HUMANIZAMOS LA DEUDA" + subcopy + CTAs "Ver oportunidades" / "Conocer OPORTUNIIA".
-- Oportunidades: eyebrow "Oportunidades", "NPL, CDR y REO.", copy nuevo. Campos: Valor de compra (masked), ROI (no "ROI objetivo"), Plazo estimado, Estrategia/Fase/Estado. CTA "Ver operación". Indicador Vista · Recuperación/Acuerdo.
-- Universo Acuerdos: switch "Ver desde Acuerdos" pegado bajo las 3 tarjetas; concepto "Una misma oportunidad. Dos maneras de abordarla." (Recuperación ↔ Acuerdo). Mutación completa.
-- NUEVA sección "Quiénes somos" (humana, filosofía Humanizamos la deuda).
-- Orden §18: Hero → Oportunidades → Switch → Quiénes somos → Cómo trabajamos (5 pasos) → Tecnología → Grupo → Acceso → Footer.
-- Tecnología reenfocada (sin píldoras CORE/IA/...): "Tecnología que nos ayuda a tomar mejores decisiones" + link.
-- Grupo rebuild: logos integrados sin caja rectangular, centrados, hover scale; LIVING "La vivienda empieza cuando alguien la imagina"; ROBOTICS · Próximamente. Enlaces directos (OPORTUNIIA→oportuniia.com).
-- Acceso: "Elige cómo quieres trabajar con OPORTUNIIA"; Inversor A/B/C, Colaborador A/B, Suscriptor código; sin "Modalidad 0X".
-- Footer: tagline "Humanizamos la deuda." + nav esencial.
-- Copy prohibido eliminado (deal flow, acceso controlado, ROI objetivo, modalidad, etc.). CDR = Cesión de remate.
-- SOBERANÍA ELEMENTOR: el prototipo actual es HTML monolítico (solo para Visual Review). El PORT a WordPress debe hacerse Elementor-native (80-90% editable) vía Write Bridge — pendiente.
+## Estado — CREATIVE REBUILD V9 (implementado, 2026-06)
+Refinamiento quirúrgico sobre base V2 (aceptada). Verificado en desktop/tablet/móvil vía screenshot_tool:
+1. Logo header +presencia (46px→60px) sin subir altura header (84px).
+2. "Cómo trabajamos": titular 2 líneas desktop ("Una forma de trabajar." / "Cada operación, una estrategia.") + copy lateral nuevo. Sec-head a ancho completo para forzar 2 líneas sin reducir tipografía.
+3. "Acceso profesional": titular 2 líneas ("Elige cómo quieres trabajar" / "con OPORTUNIIA.") + copy lateral nuevo.
+4. Nuevo bloque "Oportunidades a tu medida" dentro de Acceso (beneficio de cuenta, no SaaS; claim "Dinos qué buscas. Nosotros acotamos el terreno."; chips NPL/CDR/REO/tipo/importe/ubicación/situación/estrategia; nota "próximamente").
+5. Switch Recuperación↔Acuerdos INEQUÍVOCO: en Acuerdos la foto se repliega a franja oscura (identidad preservada por tag+ubicación), ROI protagonista (60px), OCUPACIÓN en caja destacada, + Tiempo/Acuerdo. Mutación in-place vía data-rec/data-acu en JS.
+6. Fotografía: fachadas/edificios reconocibles (sin aéreas). Ubicaciones variadas: Sevilla (NPL), Alicante (CDR), Zaragoza (REO).
+7. ROI mayor jerarquía en tarjetas.
+8. Tecnología: CTA "Conoce nuestra tecnología →" ahora enlaza a bloque real de CAPACIDADES (Analizar/Estructurar/Contrastar/Presentar), no a Acceso.
+9. Grupo OPORTUNIIA: intacto (oscuro, logos protagonistas). OPORTUNIIA→oportuniia.com; LIVING sin URL confirmada (href="#" preparado); ROBOTICS sin enlace (Próximamente).
 
-### VR05.2 — histórico
-- CDR = **CESIÓN DE REMATE** en toda la experiencia (ya NO "créditos dudosos corporativos"). Imagen CDR ahora residencial (vivienda).
-- Tarjetas con lógica real: NPL (Madrid, préstamo hipotecario impagado), CDR (Valencia, cesión de remate — vivienda), REO (Málaga, activo adjudicado). Campos: Valor de compra (masked), ROI objetivo (visible), Plazo estimado (visible), Estrategia/Fase/Estado. "Horizonte" → "Plazo estimado". Ciudades concretas (demo).
-- Mutación acuerdo enriquecida: cambian ROI, plazo, estrategia/posesión/ocupación, estado, imagen (duotono), atmósfera.
-- Header: logo REAL (asset zukoexsi_LOGO PARA DOCUMENTACION.jpg), eliminado el mark provisional.
-- Grupo: eliminada explicación superior/lateral; solo "Grupo OPORTUNIIA" + 3 marcas como enlaces directos (OPORTUNIIA→oportuniia.com, LIVING→#, ROBOTICS sin enlace/Próximamente); cards más pequeñas.
-- Inversor: 3 sub-modalidades A/B/C (Compra y adiós · Compra + apoyo jurídico · Servicio integral). Colaborador: 2 A/B (Modelo 50/50 · Cobras a tu cliente). Suscriptor: código.
-- Cómo funciona: 5 pasos (Analizamos → Estructuramos → Definimos la mejor vía → Presentamos → Ejecutamos). Ecosistema ligero.
-- Copy humanizado. Footer wordmark texto (sin icono inventado).
+Estado: PASS — READY FOR HUMAN REVIEW.
 
-### VR05.1 — histórico
-- Suscriptor REDEFINIDO: usuario ya vinculado al ecosistema, con código de acceso a su entorno autorizado. CTA "Entrar con mi código" (icono llave). Ya NO es newsletter/follower.
-- Inversor: busca invertir → "Solicitar acceso". Colaborador: aporta operaciones → "Proponer colaboración".
-- Ecosistema REDUCIDO drásticamente: bloque ligero "Tecnología e inteligencia propias..." + tags discretos (CORE·IA·LEGAL·APP·VISUAL·PRESENTACIÓN·WEB sin explicar) + link "Conoce nuestra tecnología". Sin gran grid de 7 cajas.
-- Cómo funciona SIMPLIFICADO a 5 pasos humanos: Analizamos → Estructuramos → Definimos la vía → Presentamos → Ejecutamos.
-- Grupo: cards/logos más pequeños en móvil (aspect 16/9→2/1, grid acotado y centrado).
-- Header móvil: logo + hamburguesa (menú premium), sin texto comprimido.
-- Copy general humanizado (tú a tú, directo, sin jerga jurídica).
+## Backlog (bloqueado hasta aprobación visual)
+- P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
+- P1: Ejecutar Write Bridge (solo tras autorización explícita).
+- P2: QA responsive dentro de Elementor tras escritura.
+- Pendiente confirmar: URL oficial LIVING EXPERIENCE; destino público definitivo de Tecnología.
 
-### VR05 — base (histórico)
-- Eliminado el panel/caja duplicada de deal-flow del hero (§7). Hero full-width editorial, headline gigante.
-- Botón "Entrar en el Universo Acuerdos" PEGADO justo debajo de las 3 tarjetas (§2). Bloque diferencial compacto: titular + A (vía judicial/recuperación) + B (vía acuerdo/resolución) en una línea cada uno (§3).
-- Tarjetas simplificadas (§4/§5): Valor de compra (masked), ROI objetivo VISIBLE (20/28/18%), Horizonte VISIBLE, Estrategia, estado en badge. Sin chips. Nota de valores demostrativos.
-- Mutación al activar (§6): ROI (12/16/24%), plazos, estrategia, status, foto (duotono teal) y atmósfera cambian → "la misma operación, dos formas de resolverse".
-- Acceso (§8/§9): Inversor / Colaborador / Suscriptor; copy más natural; Suscriptor corregido ("sigue el deal flow, recibe cada oportunidad antes que el mercado").
-- NOTA: el brief V05 llegó cortado en §9 (definición de modalidades). Aplicadas definiciones profesionales; ajustar si Rafa envía el texto completo.
-
-### VR04 — cambios (histórico)
-- Tarjetas NPL/CDR/REO: firma grande sobre imagen (duotono) con foto elegante por modalidad (residencial / corporativo / costa); estructura lista para sustituir por operaciones reales.
-- Momento diferencial integrado JUSTO debajo de las 3 tarjetas; copy simplificado a "Dos maneras de entenderlo" (vía judicial/recuperación vs vía acuerdo/resolución) + CTA grande.
-- Al activar Universo Acuerdos: las MISMAS 3 tarjetas mutan (foto→duotono teal, datos ROI/timing/framing, status y chips) + auto-scroll a las tarjetas para percibir la mutación.
-- Acceso rehecho: "¿Cómo vas a entrar?" → Inversor (destacado) / Colaborador / Suscriptor con microcopy.
-- Grupo: cards más pequeñas y refinadas (4:3, centradas, más aire).
-- Hero: radar sustituido por panel funcional "deal flow" (previsualiza producto, masked).
-- Header logo: marca limar limpia (anillo "O") + wordmark; comentario para swap 1:1 con logo definitivo.
-- Dropdown Quiénes somos: mini-logos (thumbnails), mejor espaciado y separación texto/icono.
-
-### VR03 — Especificación base (conservada)
-- MAIN MODE: Light Premium / editorial (marfil #FCFBF8, gris claro, ink navy #0B1A28,
-  acento corporativo #1F6588). Poppins ÚNICA (sin Fraunces).
-- Hero: "HUMANIZAMOS LA DEUDA." grande, sin stock, emblema editorial CSS + reveal.
-- Producto NPL/CDR/REO como ventanas de private deal flow con masking (3•%, € •••.•••).
-  Cero métricas inventadas.
-- Momento diferencial protagonista: "Descubre nuestras oportunidades / Entra en el
-  Universo Acuerdos" + explicación (2 lecturas de la MISMA oportunidad, no 4ª categoría)
-  + CTA/switch GIGANTE que activa la transformación.
-- SECOND MODE (Universo Acuerdos): transformación radical (~0.62s) a modo inmersivo
-  oscuro/grafito con #1F6588 (→#2E9AC6) protagonista. Re-framing de las ventanas
-  (Inversión ↔ Resolución/Acuerdo).
-- Orden: PRIMERO Ecosistema ("La maquinaria que sostiene cada decisión": CORE·IA·LEGAL·
-  APP·VISUAL·PRESENTACIÓN·WEB, explicados + "una sola máquina"), DESPUÉS Cómo funciona
-  ("De la cartera al resultado").
-- Nav "Quiénes somos" → dropdown Grupo. Sección GRUPO OPORTUNIIA con banda oscura y los
-  3 logos reales suministrados: OPORTUNIIA / LIVING EXPERIENCE / ROBOTICS (label
-  "Próximamente"). Grupo ≠ Ecosistema.
-- Footer corporativo (sin URLs/textos legales inventados).
-- Responsive independiente: breakpoints 1180 / 900 (hamburguesa + menú móvil) / 640.
-  Verificado desktop 1920, tablet ≤900, móvil 390 (ambos modos).
-
-### Logos reales (assets del usuario)
-- OPORTUNIIA: https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/jjknh2bb_OPORTUNIIA.png
-- LIVING: https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6f5o2w4o_LIVING.png
-- ROBOTICS: https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6tt8feid_ROBOTICS.png
-
-## Arquitectura
-- backend/: server.py, wp_precheck.py (endpoints Read-Only WP), .env
-- frontend/public/web2.html: prototipo Visual Review (actual = VR03)
-- wordpress-bridge/: Read Bridge v1.0.1 (instalado y validado)
-- wordpress-write-bridge/: Write Bridge v0.1.0-rc1 (empaquetado, pendiente instalación por usuario)
-
-## Endpoints clave
-- GET /api/wp-precheck/run?authorize=RAFA
-- GET /api/wp-precheck/item?authorize=RAFA&id=...
-- GET /api/wp-precheck/bridge?authorize=RAFA
-
-## Backlog / próximo
-- P0: Iterar VR03 según feedback de Rafa.
-- P1 (BLOQUEADO por aprobación): Portar VR03 a Elementor JSON (`_elementor_data`) nativo,
-  editable, para HOME 1630 y HEADER 1641 vía Write Bridge (snapshot + rollback).
-- P2: QA responsive dentro de WordPress/Elementor tras escritura.
+## Salud
+- Roto: ninguno. Mock: ROI/plazos/ubicaciones/valor de compra son DEMO (se sustituirán por operaciones reales 1:1).
