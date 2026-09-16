@@ -95,7 +95,7 @@ header.sc{background:color-mix(in srgb,var(--bg) 78%,transparent);
   backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:84px}
 .brand{display:flex;align-items:center;gap:13px;flex:0 0 auto}
-.brand-logo-img{height:60px;width:auto;display:block}
+.brand-logo-img{height:46px;width:auto;display:block}
 .brand .mark{width:30px;height:30px;color:var(--brand);flex:0 0 auto;display:grid;place-items:center;
   transition:transform .5s var(--ease),color var(--deep) var(--ease)}
 .brand:hover .mark{transform:rotate(90deg)}
@@ -585,10 +585,10 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
 @media(max-width:900px){.d-break{display:none}}
 
 /* ROI hero + facts (base = Recuperación) */
-#producto .deal-media{aspect-ratio:auto;height:212px;transition:height .55s var(--ease),filter .55s var(--ease)}
+#producto .deal-media{aspect-ratio:auto;height:256px;transition:height .55s var(--ease),filter .55s var(--ease)}
 #producto .deal-roi{display:flex;align-items:flex-end;gap:12px;margin-top:20px}
 #producto .deal-roi .roi-k{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);padding-bottom:7px}
-#producto .deal-roi .roi-v{font-size:46px;font-weight:700;color:var(--brand-2);line-height:.9;letter-spacing:-.03em;
+#producto .deal-roi .roi-v{font-size:52px;font-weight:700;color:var(--brand-2);line-height:.9;letter-spacing:-.03em;
   transition:font-size .5s var(--ease),color .5s var(--ease)}
 #producto .deal-facts{display:flex;flex-direction:column;margin-top:16px;border-top:1px solid var(--line-2);padding-top:6px}
 #producto .fact{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:12px 0;
@@ -599,17 +599,28 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
 #producto .fact .fv{font-size:14px;font-weight:600;color:#fff;text-align:right;transition:font-size .5s var(--ease),color .5s var(--ease)}
 
 /* ACUERDOS transform — misma operación, otra lectura */
-body.acuerdos #producto .deal-media{height:82px;filter:grayscale(.92) brightness(.4)}
-body.acuerdos #producto .deal-media::after{background:linear-gradient(180deg,rgba(7,15,22,.5),rgba(7,15,22,.94))}
-body.acuerdos #producto .deal-tag{font-size:16px;left:18px;bottom:12px;text-shadow:0 1px 10px rgba(0,0,0,.6)}
+body.acuerdos #producto .deal-media{height:128px;filter:grayscale(.5) brightness(.62) contrast(1.02)}
+body.acuerdos #producto .deal-media::after{background:linear-gradient(180deg,rgba(7,15,22,.28),rgba(7,15,22,.86))}
+body.acuerdos #producto .deal-tag{font-size:16px;left:18px;bottom:14px;text-shadow:0 1px 10px rgba(0,0,0,.6)}
 body.acuerdos #producto .deal-roi{margin-top:22px}
-body.acuerdos #producto .deal-roi .roi-v{font-size:60px}
+body.acuerdos #producto .deal-roi .roi-v{font-size:66px}
 body.acuerdos #producto .fact-occ{order:-1;flex-direction:column;align-items:flex-start;gap:7px;
-  background:linear-gradient(135deg,rgba(46,154,198,.2),rgba(46,154,198,.04));
+  background:linear-gradient(135deg,rgba(46,154,198,.22),rgba(46,154,198,.05));
   border:1px solid var(--brand-line);border-radius:12px;padding:16px 18px;margin-bottom:10px}
 body.acuerdos #producto .fact-occ .fk{color:var(--brand-2);letter-spacing:.2em}
-body.acuerdos #producto .fact-occ .fv{font-size:26px;color:#fff;text-align:left;line-height:1}
+body.acuerdos #producto .fact-occ .fv{font-size:29px;color:#fff;text-align:left;line-height:1}
 body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
+
+/* SWITCH RECUPERACIÓN / ACUERDOS — pieza protagonista sobre las operaciones */
+.modeswitch{max-width:720px;margin:0 auto 42px;text-align:center}
+.ms-pill{display:grid;grid-template-columns:1fr 1fr;gap:8px;background:rgba(255,255,255,.05);
+  border:1px solid var(--brand-line);border-radius:16px;padding:8px;backdrop-filter:blur(12px)}
+.ms-btn{padding:19px 20px;border-radius:11px;font-size:15px;font-weight:600;letter-spacing:.02em;color:#AFC4D2;cursor:pointer;
+  transition:background-color .4s var(--ease),color .4s var(--ease),box-shadow .4s var(--ease)}
+.ms-btn.on{background:var(--brand);color:#fff;box-shadow:0 18px 42px -16px rgba(46,154,198,.85)}
+.ms-btn:not(.on):hover{color:#fff}
+.ms-hint{margin-top:16px;font-size:12px;color:var(--faint);letter-spacing:.05em}
+@media(max-width:560px){.ms-btn{padding:16px 12px;font-size:13.5px}}
 
 /* Tecnología — capacidades públicas */
 .tech-caps{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-top:56px;
@@ -652,7 +663,7 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
   <div class="wrap">
     <div class="nav">
       <a href="#top" class="brand" data-testid="brand-logo">
-        <img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/mlzub68f_ChatGPT%20Image%2016%20sept%202026%2C%2002_02_35.webp" alt="OPORTUNIIA" class="brand-logo-img">
+        <img src="/oportuniia-logo.png" alt="OPORTUNIIA" class="brand-logo-img">
       </a>
       <nav class="menu" data-testid="main-nav">
         <div class="navitem"><a href="#producto">Oportunidades</a></div>
@@ -720,7 +731,6 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
 <!-- ================= OPORTUNIDADES ================= -->
 <section class="sec" id="producto" data-testid="producto">
   <div class="prod-hero">
-    <div class="prod-bg"><img src="https://images.pexels.com/photos/17881999/pexels-photo-17881999.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=900&w=1600" alt=""></div>
     <div class="wrap">
       <div class="sec-head">
         <div class="reveal">
@@ -729,20 +739,21 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
         </div>
         <div class="side reveal d1">Tres formas de entrar en una operación. Mostramos lo necesario para entenderla; el detalle completo se facilita con acceso profesional.</div>
       </div>
-      <div class="segwrap reveal d1" id="acuerdos">
-        <div class="seg" data-testid="mode-indicator">
-          <button class="segbtn on" data-mode="rec" data-testid="seg-recuperacion">Ver desde Recuperación</button>
-          <button class="segbtn" data-mode="acu" data-testid="seg-acuerdos">Ver desde Acuerdos</button>
-        </div>
-      </div>
     </div>
   </div>
   <div class="wrap">
+    <div class="modeswitch reveal d1" id="acuerdos" data-testid="mode-switch">
+      <div class="ms-pill" data-testid="mode-indicator">
+        <button class="ms-btn on" data-mode="rec" data-testid="seg-recuperacion">Ver desde Recuperación</button>
+        <button class="ms-btn" data-mode="acu" data-testid="seg-acuerdos">Ver desde Acuerdos</button>
+      </div>
+      <p class="ms-hint">La misma operación, dos lógicas. Pulsa para cambiar de lectura.</p>
+    </div>
     <div class="deal-grid">
       <!-- NPL -->
       <div class="deal reveal d1" data-testid="deal-npl">
         <div class="deal-media">
-          <img src="https://images.unsplash.com/photo-1786507242784-167f2ec6af27?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Edificio de viviendas" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1755441067629-8755d974a90b?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Edificio de viviendas" loading="lazy">
           <span class="deal-tag">NPL</span>
           <span class="deal-loc"><i data-lucide="map-pin"></i>Sevilla</span>
         </div>
@@ -762,7 +773,7 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
       <!-- CDR · CESIÓN DE REMATE -->
       <div class="deal reveal d2" data-testid="deal-cdr">
         <div class="deal-media">
-          <img src="https://images.unsplash.com/photo-1655710647244-bb501a3b9aa5?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Apartamentos turísticos" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1663293761246-56a9b0693052?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Apartamentos turísticos" loading="lazy">
           <span class="deal-tag">CDR</span>
           <span class="deal-loc"><i data-lucide="map-pin"></i>Alicante</span>
         </div>
@@ -782,7 +793,7 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
       <!-- REO · ACTIVO ADJUDICADO -->
       <div class="deal reveal d3" data-testid="deal-reo">
         <div class="deal-media">
-          <img src="https://images.pexels.com/photos/36006588/pexels-photo-36006588.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Nave logística" loading="lazy">
+          <img src="https://images.unsplash.com/photo-1758789667762-56175fe4601c?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Nave logística" loading="lazy">
           <span class="deal-tag">REO</span>
           <span class="deal-loc"><i data-lucide="map-pin"></i>Zaragoza</span>
         </div>
@@ -800,8 +811,7 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
         </div>
       </div>
     </div>
-    <p class="deal-note reveal d2">ROI, plazos y ubicaciones <b>demostrativos</b> a efectos de maqueta · valor de compra bajo acceso · se sustituirán por operaciones reales.</p>
-    <p class="diff-line reveal d2"><b>Una misma oportunidad. Dos maneras de abordarla.</b> Recuperación: se ejecuta la estrategia de recuperación por la vía correspondiente. Acuerdo: se busca una resolución pactada cuando tiene sentido.</p>
+    <p class="deal-note reveal d2" style="margin-top:30px;font-size:11px;opacity:.6">* Datos demostrativos.</p>
   </div>
 </section>
 
@@ -958,7 +968,7 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
     <div class="foot-grid">
       <div class="foot-brand">
         <div class="b"><span class="wordmark" style="color:#F6F8FA;font-weight:600;font-size:20px;letter-spacing:.16em">OPORTUNIIA</span></div>
-        <p><b style="color:#F6F8FA;font-weight:500">Humanizamos la deuda.</b><br>La misma oportunidad, dos maneras de abordarla.</p>
+        <p><b style="color:#F6F8FA;font-weight:500">Humanizamos la deuda.</b></p>
       </div>
       <div class="foot-col">
         <h4>OPORTUNIIA</h4>
@@ -1013,7 +1023,7 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
   mmenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mmenu.classList.remove('open');document.body.style.overflow=''}));
 
   // ===== RECUPERACIÓN ↔ ACUERDO (segmentado, misma sección · mutación in-place) =====
-  const segbtns=document.querySelectorAll('.segbtn');
+  const segbtns=document.querySelectorAll('.ms-btn');
   const swapEls=document.querySelectorAll('#producto [data-rec]');
   function setMode(on){
     document.body.classList.toggle('acuerdos',on);
