@@ -79,7 +79,7 @@ header.sc{background:color-mix(in srgb,var(--bg) 78%,transparent);
   backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:84px}
 .brand{display:flex;align-items:center;gap:13px;flex:0 0 auto}
-.brand-logo-img{height:40px;width:auto;display:block}
+.brand-logo-img{height:70px;width:auto;display:block;object-fit:contain}
 .brand .mark{width:30px;height:30px;color:var(--brand);flex:0 0 auto;display:grid;place-items:center;
   transition:transform .5s var(--ease),color var(--deep) var(--ease)}
 .brand:hover .mark{transform:rotate(90deg)}
@@ -668,7 +668,7 @@ body.acuerdos #producto .ms-btn.on{background:var(--brand);color:#fff;box-shadow
   <div class="wrap">
     <div class="nav">
       <a href="#top" class="brand" data-testid="brand-logo">
-        <img src="/oportuniia-logo.png" alt="OPORTUNIIA" class="brand-logo-img">
+        <img src="/oportuniia-logo.webp" alt="OPORTUNIIA" class="brand-logo-img">
       </a>
       <nav class="menu" data-testid="main-nav">
         <div class="navitem"><a href="#producto">Oportunidades</a></div>

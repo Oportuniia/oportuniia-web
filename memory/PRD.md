@@ -62,6 +62,11 @@ Cambios mínimos (resto FREEZE):
 
 Estado V12: PASS. Bloqueado hasta que el usuario aporte assets oficiales de logo transparentes.
 
+## Estado — LOGO FINAL FIX V13 (implementado, 2026-06)
+- HEADER LOGO sustituido por el asset oficial transparente aportado por el usuario: `logo web.webp` (RGBA real, horizontal). Copiado byte a byte a `/app/frontend/public/oportuniia-logo.webp` (SIN procesar: sin flood-fill, sin quitar blancos, sin caja/fondo). CSS: height 70px, object-fit:contain, proporción preservada. Sin caja/halo/agujero. Integración limpia en header claro (desktop + móvil).
+- SCOPE = header logo únicamente. ROI FREEZE, Grupo sin tocar, resto sin cambios.
+Estado V13: PASS — header logo cerrado visualmente. (SVG maestro futuro será 1:1 sin bloquear.)
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
