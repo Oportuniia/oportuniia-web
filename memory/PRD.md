@@ -50,6 +50,18 @@ Corrección de MODELO del switch (cambio conceptual clave):
 
 Estado V11: PASS — READY FOR HUMAN REVIEW. Pendiente del usuario: PNG/SVG transparente oficial del logo para el final.
 
+## Estado — AJUSTE V12 · LOGOS + ROI (implementado, 2026-06)
+Cambios mínimos (resto FREEZE):
+1. ROI demo actualizados (todos ≥22%, una operación extraordinaria al 45%):
+   - RECUPERACIÓN: Sevilla 27,5% / Alicante 34,0% / Zaragoza 45,0%.
+   - ACUERDOS: Marbella 24,5% / Valencia 29,0% / Bilbao 37,5%.
+   - "* Datos demostrativos" presente. Layout sin cambios (misma altura/alineación).
+2. Logos: NO recreados.
+   - HEADER LOGO = PROVISIONAL (PNG transparente derivado del asset oficial JPG). OFFICIAL ASSET REQUIRED = YES.
+   - GRUPO (OPORTUNIIA/LIVING/ROBOTICS) = renders 3D sobre fondo oscuro que se integran con la sección (tratamiento aprobado). Son mockups, no logos vectoriales oficiales transparentes → ASSET REQUIRED = YES (provisional) para cada uno. Enlaces: OPORTUNIIA→oportuniia.com, LIVING slot preparado, ROBOTICS sin enlace (Próximamente).
+
+Estado V12: PASS. Bloqueado hasta que el usuario aporte assets oficiales de logo transparentes.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
