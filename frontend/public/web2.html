@@ -32,22 +32,7 @@
 }
 /* ===== SECOND MODE — UNIVERSO ACUERDOS (radical / inmersivo) ===== */
 body.acuerdos{
-  --bg:#070B0E;
-  --bg2:#0B1116;
-  --surface:#0F171D;
-  --panel:#111C23;
-  --ink:#EFF6F8;
-  --ink2:#A9C2CE;
-  --faint:#5E7784;
-  --brand:#2E9AC6;
-  --brand-2:#57C6E4;
-  --brand-tint:rgba(46,154,198,.12);
-  --brand-line:rgba(46,154,198,.42);
-  --line:rgba(255,255,255,.10);
-  --line-2:rgba(255,255,255,.05);
-  --shadow:0 40px 90px -34px rgba(0,0,0,.8);
-  --shadow-sm:0 20px 50px -24px rgba(0,0,0,.75);
-  --grup-bg:#0A0F13;
+  /* La inversión de tema (dark->light) se aplica SOLO a la sección Oportunidades (bloque V11). El resto del sitio no cambia. */
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -64,14 +49,13 @@ body::before{
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.035'/%3E%3C/svg%3E");
   mix-blend-mode:multiply;
 }
-body.acuerdos::before{mix-blend-mode:screen;opacity:.35}
+/* grano invariable entre modos */
 /* atmósfera segundo modo */
 .atmos{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0;
   transition:opacity var(--deep) var(--ease);
   background:
     radial-gradient(1100px 620px at 78% -8%, rgba(46,154,198,.22), transparent 60%),
     radial-gradient(900px 700px at 8% 105%, rgba(46,154,198,.14), transparent 62%);}
-body.acuerdos .atmos{opacity:1}
 ::selection{background:var(--brand);color:#fff}
 a{color:inherit;text-decoration:none}
 img{display:block;max-width:100%}
@@ -95,7 +79,7 @@ header.sc{background:color-mix(in srgb,var(--bg) 78%,transparent);
   backdrop-filter:blur(22px) saturate(140%);border-bottom:1px solid var(--line)}
 .nav{display:flex;align-items:center;justify-content:space-between;height:84px}
 .brand{display:flex;align-items:center;gap:13px;flex:0 0 auto}
-.brand-logo-img{height:46px;width:auto;display:block}
+.brand-logo-img{height:40px;width:auto;display:block}
 .brand .mark{width:30px;height:30px;color:var(--brand);flex:0 0 auto;display:grid;place-items:center;
   transition:transform .5s var(--ease),color var(--deep) var(--ease)}
 .brand:hover .mark{transform:rotate(90deg)}
@@ -598,18 +582,39 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
 #producto .fact .fk{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);transition:color .5s,letter-spacing .5s}
 #producto .fact .fv{font-size:14px;font-weight:600;color:#fff;text-align:right;transition:font-size .5s var(--ease),color .5s var(--ease)}
 
-/* ACUERDOS transform — misma operación, otra lectura */
-body.acuerdos #producto .deal-media{height:128px;filter:grayscale(.5) brightness(.62) contrast(1.02)}
-body.acuerdos #producto .deal-media::after{background:linear-gradient(180deg,rgba(7,15,22,.28),rgba(7,15,22,.86))}
-body.acuerdos #producto .deal-tag{font-size:16px;left:18px;bottom:14px;text-shadow:0 1px 10px rgba(0,0,0,.6)}
-body.acuerdos #producto .deal-roi{margin-top:22px}
-body.acuerdos #producto .deal-roi .roi-v{font-size:66px}
-body.acuerdos #producto .fact-occ{order:-1;flex-direction:column;align-items:flex-start;gap:7px;
-  background:linear-gradient(135deg,rgba(46,154,198,.22),rgba(46,154,198,.05));
-  border:1px solid var(--brand-line);border-radius:12px;padding:16px 18px;margin-bottom:10px}
-body.acuerdos #producto .fact-occ .fk{color:var(--brand-2);letter-spacing:.2em}
-body.acuerdos #producto .fact-occ .fv{font-size:29px;color:#fff;text-align:left;line-height:1}
-body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
+/* ===== V11 · DOS CATÁLOGOS DISTINTOS + INVERSIÓN DARK→LIGHT ===== */
+.deal-grid.grid-acu{display:none}
+body.acuerdos .deal-grid.grid-rec{display:none}
+body.acuerdos .deal-grid.grid-acu{display:grid;animation:acuIn .55s var(--ease) both}
+@keyframes acuIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* neutralizar los filtros del modelo anterior: fotos a color y protagonistas en ambos modos */
+body.acuerdos #producto .deal-media{height:256px;filter:none}
+body.acuerdos #producto .deal-media img{filter:none}
+body.acuerdos #producto .deal-media::after{background:linear-gradient(180deg,rgba(10,22,34,.34),transparent 40%)}
+body.acuerdos #producto .deal-tag{left:16px;top:14px;bottom:auto;font-size:14px;text-shadow:none}
+
+/* INVERSIÓN A TEMA CLARO — exclusiva de la sección Oportunidades */
+body.acuerdos #producto{background:#EEF3F6;--surface:#FFFFFF;--ink2:#4A6475;--faint:#7D95A3;--line:rgba(12,29,40,.10);--line-2:rgba(12,29,40,.08)}
+body.acuerdos #producto .sec-head h2{color:#0C1D28}
+body.acuerdos #producto .sec-head h2 .dot{color:var(--brand)}
+body.acuerdos #producto .sec-head .side{color:#4A6475}
+body.acuerdos #producto .deal{background:#FFFFFF;border-color:rgba(12,29,40,.09);box-shadow:0 34px 72px -44px rgba(12,29,40,.42)}
+body.acuerdos #producto .deal h3{color:#0C1D28}
+body.acuerdos #producto .deal-buy{color:#4A6475;border-bottom-color:rgba(12,29,40,.08)}
+body.acuerdos #producto .deal-buy .mask{color:var(--brand)}
+body.acuerdos #producto .deal-cat{color:var(--brand)}
+body.acuerdos #producto .deal-roi .roi-v{color:#1C5E80}
+body.acuerdos #producto .deal-roi .roi-k{color:#6B8494}
+body.acuerdos #producto .fact{border-bottom-color:rgba(12,29,40,.08)}
+body.acuerdos #producto .fact .fk{color:#8298A6}
+body.acuerdos #producto .fact .fv{color:#0C1D28}
+body.acuerdos #producto .deal-go{color:var(--brand)}
+
+/* switch adaptado al tema claro cuando está en modo Acuerdos */
+body.acuerdos #producto .ms-pill{background:rgba(12,29,40,.05);border-color:rgba(46,154,198,.4)}
+body.acuerdos #producto .ms-btn{color:#4A6475}
+body.acuerdos #producto .ms-btn.on{background:var(--brand);color:#fff;box-shadow:0 18px 42px -18px rgba(46,154,198,.6)}
 
 /* SWITCH RECUPERACIÓN / ACUERDOS — pieza protagonista sobre las operaciones */
 .modeswitch{max-width:720px;margin:0 auto 42px;text-align:center}
@@ -747,9 +752,8 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
         <button class="ms-btn on" data-mode="rec" data-testid="seg-recuperacion">Ver desde Recuperación</button>
         <button class="ms-btn" data-mode="acu" data-testid="seg-acuerdos">Ver desde Acuerdos</button>
       </div>
-      <p class="ms-hint">La misma operación, dos lógicas. Pulsa para cambiar de lectura.</p>
     </div>
-    <div class="deal-grid">
+    <div class="deal-grid grid-rec">
       <!-- NPL -->
       <div class="deal reveal d1" data-testid="deal-npl">
         <div class="deal-media">
@@ -806,6 +810,68 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
             <div class="fact fact-time"><span class="fk">Plazo estimado</span><span class="fv" data-rec="16 meses" data-acu="9 meses">16 meses</span></div>
             <div class="fact fact-occ"><span class="fk" data-rec="Estado" data-acu="Ocupación">Estado</span><span class="fv" data-rec="Disponible" data-acu="Libre">Disponible</span></div>
             <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Venta directa" data-acu="Venta pactada">Venta directa</span></div>
+          </div>
+          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="deal-grid grid-acu">
+      <!-- REO · VIVIENDA CON ACUERDO -->
+      <div class="deal" data-testid="deal-acu-reo">
+        <div class="deal-media">
+          <img src="https://images.pexels.com/photos/8134745/pexels-photo-8134745.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Vivienda unifamiliar con piscina" loading="lazy">
+          <span class="deal-tag">REO</span>
+          <span class="deal-loc"><i data-lucide="map-pin"></i>Marbella</span>
+        </div>
+        <div class="deal-body">
+          <div class="deal-cat">Residencial · Activo adjudicado</div>
+          <h3>Vivienda unifamiliar con piscina</h3>
+          <div class="deal-buy"><span class="bk"><i data-lucide="pencil"></i>Valor de compra</span><span class="mask">•••••• €</span></div>
+          <div class="deal-roi"><span class="roi-k">ROI</span><span class="roi-v">12,8%</span></div>
+          <div class="deal-facts">
+            <div class="fact fact-time"><span class="fk">Plazo estimado</span><span class="fv">10 meses</span></div>
+            <div class="fact fact-occ"><span class="fk">Ocupación</span><span class="fv">Libre</span></div>
+            <div class="fact fact-deal"><span class="fk">Acuerdo</span><span class="fv">Venta pactada</span></div>
+          </div>
+          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+        </div>
+      </div>
+      <!-- CDR · LOCAL CON ACUERDO -->
+      <div class="deal" data-testid="deal-acu-cdr">
+        <div class="deal-media">
+          <img src="https://images.pexels.com/photos/8649799/pexels-photo-8649799.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940" alt="Local comercial" loading="lazy">
+          <span class="deal-tag">CDR</span>
+          <span class="deal-loc"><i data-lucide="map-pin"></i>Valencia</span>
+        </div>
+        <div class="deal-body">
+          <div class="deal-cat">Comercial · Cesión de remate</div>
+          <h3>Local comercial a pie de calle</h3>
+          <div class="deal-buy"><span class="bk"><i data-lucide="pencil"></i>Valor de compra</span><span class="mask">•••••• €</span></div>
+          <div class="deal-roi"><span class="roi-k">ROI</span><span class="roi-v">16,4%</span></div>
+          <div class="deal-facts">
+            <div class="fact fact-time"><span class="fk">Plazo estimado</span><span class="fv">14 meses</span></div>
+            <div class="fact fact-occ"><span class="fk">Ocupación</span><span class="fv">Arrendado</span></div>
+            <div class="fact fact-deal"><span class="fk">Acuerdo</span><span class="fv">Entrega pactada</span></div>
+          </div>
+          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+        </div>
+      </div>
+      <!-- NPL · ADOSADOS CON ACUERDO -->
+      <div class="deal" data-testid="deal-acu-npl">
+        <div class="deal-media">
+          <img src="https://images.unsplash.com/photo-1771350957359-9788d786e80e?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Viviendas adosadas" loading="lazy">
+          <span class="deal-tag">NPL</span>
+          <span class="deal-loc"><i data-lucide="map-pin"></i>Bilbao</span>
+        </div>
+        <div class="deal-body">
+          <div class="deal-cat">Residencial · Garantía hipotecaria</div>
+          <h3>Viviendas adosadas</h3>
+          <div class="deal-buy"><span class="bk"><i data-lucide="pencil"></i>Valor de compra</span><span class="mask">•••••• €</span></div>
+          <div class="deal-roi"><span class="roi-k">ROI</span><span class="roi-v">9,9%</span></div>
+          <div class="deal-facts">
+            <div class="fact fact-time"><span class="fk">Plazo estimado</span><span class="fv">7 meses</span></div>
+            <div class="fact fact-occ"><span class="fk">Ocupación</span><span class="fv">Ocupada</span></div>
+            <div class="fact fact-deal"><span class="fk">Acuerdo</span><span class="fv">Dación pactada</span></div>
           </div>
           <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
@@ -922,7 +988,7 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
           <li><span class="ob">B</span><span><b>Compra + acompañamiento jurídico</b> — adquieres la oportunidad y nuestro equipo jurídico te acompaña durante el proceso.</span></li>
           <li><span class="ob">C</span><span><b>Gestión integral</b> — nos ocupamos de todo: tú aportas la inversión y recoges el resultado.</span></li>
         </ul>
-        <a href="#producto" class="ecta" data-testid="entry-inversor-cta">Ver oportunidades <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <a href="#acceso" class="ecta" data-testid="entry-inversor-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
       <div class="entry reveal d2" data-testid="entry-colaborador">
         <span class="ei"><i data-lucide="handshake"></i></span>
@@ -934,7 +1000,7 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
           <li><span class="ob">B</span><span><b>Tú mantienes a tu cliente</b> — nos incorporamos donde aportamos valor y tú mantienes íntegramente tu relación comercial.</span></li>
         </ul>
         <p class="opts-note">Si a ti te va mejor, a nosotros también. La colaboración tiene que sumar.</p>
-        <a href="#" class="ecta" data-testid="entry-colaborador-cta">Hablemos <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <a href="#acceso" class="ecta" data-testid="entry-colaborador-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
       <div class="entry reveal d3" data-testid="entry-suscriptor">
         <span class="ei"><i data-lucide="key-round"></i></span>
@@ -1022,13 +1088,11 @@ body.acuerdos #producto .fact-deal .fv{color:var(--brand-2)}
   burger.addEventListener('click',()=>{mmenu.classList.toggle('open');document.body.style.overflow=mmenu.classList.contains('open')?'hidden':''});
   mmenu.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{mmenu.classList.remove('open');document.body.style.overflow=''}));
 
-  // ===== RECUPERACIÓN ↔ ACUERDO (segmentado, misma sección · mutación in-place) =====
+  // ===== SWITCH · RECUPERACIÓN / ACUERDOS (dos catálogos distintos + inversión de tema) =====
   const segbtns=document.querySelectorAll('.ms-btn');
-  const swapEls=document.querySelectorAll('#producto [data-rec]');
   function setMode(on){
     document.body.classList.toggle('acuerdos',on);
     segbtns.forEach(b=>b.classList.toggle('on',(b.dataset.mode==='acu')===on));
-    swapEls.forEach(el=>{el.textContent=on?el.dataset.acu:el.dataset.rec});
   }
   segbtns.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode==='acu')));
 </script>
