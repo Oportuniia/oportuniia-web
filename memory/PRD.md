@@ -26,7 +26,8 @@ ESPAÑOL. Responder siempre en español.
 - VR05 — base sólida; brief llegó cortado en §9.
 - VR05.1 — base válida; errores de producto/terminología.
 - VR05.2 — base funcional; se autoriza rebuild profundo.
-- VR06 (Creative Rebuild) — ENTREGADO, pendiente de aprobación. Archivo: `/app/frontend/public/web2.html`.
+- VR06 (Creative Rebuild) — base.
+- VR06.2 (Creative Rebuild V2) — ENTREGADO, pendiente aprobación. Bloque Oportunidades oscuro/inmersivo (imagen de fondo, switch segmentado Recuperación↔Acuerdo, cards con categoría + ROI grande cian con decimales + Plazo + Estado/Ocupación, CTA "Ver operación"). Copys nuevos: Grupo (OPORTUNIIA "Transformamos deuda en oportunidades", ROBOTICS "Optimizamos recursos…"), Inversor A/B/C (Compra directa · +acompañamiento jurídico · Gestión integral, CTA "Ver oportunidades"), Colaborador A/B (Compartimos el resultado · Tú mantienes a tu cliente → "La colaboración tiene que sumar." · CTA "Hablemos"), Suscriptor (código · "Entrar con mi código"). Toggle main/alt con !important (fix especificidad). Archivo: `/app/frontend/public/web2.html`.
 
 ### VR06 — Creative Rebuild (Dirección Master)
 - Logo NUEVO aprobado en header (asset mlzub68f webp, horizontal, mayor presencia).
