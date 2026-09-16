@@ -67,6 +67,19 @@ Estado V12: PASS. Bloqueado hasta que el usuario aporte assets oficiales de logo
 - SCOPE = header logo únicamente. ROI FREEZE, Grupo sin tocar, resto sin cambios.
 Estado V13: PASS — header logo cerrado visualmente. (SVG maestro futuro será 1:1 sin bloquear.)
 
+## Estado — V11 FASE 1 · TAXONOMÍA + UNIVERSOS (implementado, 2026-06)
+Sobre `web2.html` (base aprobada), sin rediseño:
+- TAXONOMÍA: tipologías = NPL / CDR / REO únicamente. "Acuerdos" NO es tipología (0 referencias como 4º tipo).
+- INTERFACES/UNIVERSOS: renombrado definitivo del selector a "Ejecuciones Judiciales" ↔ "Universo Acuerdos" (eliminado "Recuperación": 0 referencias, incl. comentarios). data-mode = judicial/acuerdos; JS/CSS actualizados. Dos catálogos distintos (dark↔light) se mantienen; cada operación sigue siendo NPL/CDR/REO.
+- Bloque explicativo ANTES del selector: "Dos formas de entrar. Una diferencia importante." con definición de cada universo (copy aprobado en la orden). Tematizado dark (judicial) y light (acuerdos).
+- PROPUESTA DE VALOR Universo Acuerdos (visible solo en modo acuerdos): "Más control. Menos incertidumbre." + variables (Capital/inversión, Tiempo estimado, Resultado previsto, ROI, Situación del activo, Estructura del acuerdo).
+- PLACEHOLDER VIP: nota "Universo Acuerdos formará parte de la Suscripción VIP · próximamente" + CTA Solicitar acceso. SIN precio, SIN pago (PAYMENT NOT IMPLEMENTED, PRICING NOT DEFINED).
+- ROI FREEZE y logo FREEZE respetados.
+
+PENDIENTE (fases siguientes de V11): arquitectura multipágina real (rutas, catálogo `/oportunidades`, ficha `/oportunidades/[slug]`, cómo-funciona, grupo, contacto, solicitar-acceso, área-privada), data model backend, filtros, integración GoHighLevel (URLs PENDING), SEO por página. Requiere OK de arquitectura + inputs humanos.
+
+Estado V11-Fase1: PASS.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
