@@ -150,6 +150,16 @@ FREEZE respetado: geometría Judiciales↔Acuerdos intacta (no tocada; DIFF=0px)
 Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba.
 Estado V51: IMPLEMENTED, TECHNICAL QA PASS, HUMAN VISUAL APPROVAL PENDING.
 
+## Estado — HOME · V52 (correcciones puntuales Rafa, 2026-06)
+Solo web2.html + regeneración 3 emblemas locales:
+1. Tecnología (sección oscura): al hacer hover una tarjeta pasa a clara (#F4F1E9) e invierte tipografía a tono oscuro (h3 #0A1622, p #3A5262, nº/icono petrol). Regla `#tecnologia .tcap:hover` alta especificidad. Estado oscuro por defecto legible (texto blanco). Sin blanco-sobre-blanco.
+2. Acceso profesional: los 3 CTA (Darse de alta / Agenda una videollamada / Entrar con mi código) ahora IDÉNTICOS PRIMARY (fondo #1F6588 sólido, texto blanco, mismo alto/ancho/sombra/hover). `.entry .ecta` base = primary sólido.
+3. Escudos Grupo: regenerados normalizando por CUERPO del escudo (aislando silueta vs flare/glow con filtrado de columnas altas), altura común 560px, centrados en canvas común 620×720. Render: los 3 logos 327×379, top 494 → misma escala aparente, mismo centro, misma baseline. `.gcard .logo` aspect 31/36 + object-fit:contain. Escudo intacto (0 px alterados, sin recorte del escudo, sin IA). Fondo transparente.
+4. PRÓXIMAMENTE (Robotics): badge overlay top-right, no afecta el centrado del escudo.
+5. Grupo→footer: separador limpio (línea 1px a ancho editorial 1160px) en #grupo::after (glow anterior eliminado). Footer bg = #1F6588; sistema tipográfico invertido a blanco/alto contraste (h4 .78, links .82, hover blanco+subrayado, bottom .72). Grupo permanece oscuro.
+FREEZE: Judiciales↔Acuerdos (164/164), cards, info Acuerdos, calendario, funds, filosofía, nav, taxonomía — no tocados. Móvil 390px sin overflow.
+Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba. Estado V52: IMPLEMENTED, TECHNICAL QA PASS, HUMAN VISUAL APPROVAL PENDING.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
