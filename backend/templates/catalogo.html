@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+{% block title %}Oportunidades · NPL, CDR y REO | OPORTUNIIA{% endblock %}
+{% block meta_desc %}Explora oportunidades de inversión en deuda e inmuebles: NPL, CDR y REO. Filtra por universo, tipo, ubicación, activo y precio.{% endblock %}
+{% block canonical %}{{ base_url }}/oportunidades{% endblock %}
+{% block body_testid %}catalogo-page{% endblock %}
+{% block nav_opp %}active{% endblock %}
+
+{% block styles %}
+.cat-hero{background:var(--dark);color:#fff;padding:clamp(48px,7vw,84px) 0 clamp(30px,4vw,46px)}
+.cat-hero .eyebrow{color:var(--cyan-2)}.cat-hero .eyebrow::before{background:var(--cyan-2)}
+.cat-hero h1{font-size:clamp(34px,5vw,64px);font-weight:600;letter-spacing:-.035em;line-height:1;margin-top:18px}
+.cat-hero h1 .dot{color:var(--cyan-2)}
+.cat-hero p{margin-top:16px;max-width:560px;font-size:15.5px;color:#B9CDD8;font-weight:300}
+/* universe switch */
+.uni-switch{display:inline-grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:30px;background:rgba(255,255,255,.06);border:1px solid rgba(46,154,198,.4);border-radius:14px;padding:7px}
+.uni-switch a{padding:15px 26px;border-radius:9px;font-size:14.5px;font-weight:600;color:#AFC4D2;text-align:center;transition:.3s}
+.uni-switch a.on{background:#1F6588;color:#fff;box-shadow:0 16px 40px -18px rgba(31,101,136,.9)}
+.uni-switch a:not(.on):hover{color:#fff}
+/* filter bar */
+.filters{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);padding:clamp(18px,2vw,26px);margin-top:-34px;position:relative;z-index:5}
+.fbar{display:grid;grid-template-columns:repeat(5,1fr) auto;gap:12px;align-items:end}
+.fld{display:flex;flex-direction:column;gap:7px}
+.fld label{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.fld select,.fld input{padding:12px 13px;border:1px solid var(--line);border-radius:9px;background:var(--bg);font-size:13.5px;color:var(--ink);width:100%}
+.fld select:focus,.fld input:focus{outline:none;border-color:var(--brand)}
+.price-2{display:flex;gap:8px}
+.price-2 input{width:100%}
+.fbtns{display:flex;gap:8px}
+.fapply{background:var(--brand);color:#fff;padding:12px 20px;border-radius:9px;font-size:13.5px;font-weight:600;white-space:nowrap;box-shadow:0 12px 30px -14px rgba(31,101,136,.6);transition:.3s}
+.fapply:hover{background:var(--brand-2);transform:translateY(-1px)}
+.fclear{padding:12px 16px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;color:var(--ink2)}
+.fclear:hover{border-color:var(--brand);color:var(--brand)}
+.fmore-row{display:flex;justify-content:space-between;align-items:center;margin-top:14px;flex-wrap:wrap;gap:12px}
+.fmore-btn{font-size:13px;color:var(--brand);font-weight:600;display:inline-flex;align-items:center;gap:7px}
+.save-search{font-size:13px;color:var(--ink2);display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);padding:9px 14px;border-radius:8px}
+.save-search:hover{border-color:var(--brand);color:var(--brand)}
+.fadv{display:none;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line-2)}
+.fadv.open{display:grid}
+/* toolbar */
+.toolbar{display:flex;justify-content:space-between;align-items:center;margin:34px 0 22px;gap:16px;flex-wrap:wrap}
+.rescount{font-size:14px;color:var(--ink2)}.rescount b{color:var(--ink);font-weight:600}
+.sortsel{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink2)}
+.sortsel select{padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:13px}
+/* grid + cards */
+.opp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.opp{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .45s var(--ease),box-shadow .45s var(--ease),border-color .45s;display:flex;flex-direction:column}
+.opp:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:var(--brand-line)}
+.opp-media{position:relative;aspect-ratio:16/10;overflow:hidden;background:#0B1A28}
+.opp-media img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
+.opp:hover .opp-media img{transform:scale(1.06)}
+.opp-badge{position:absolute;left:14px;top:13px;font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:rgba(10,22,34,.62);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);padding:6px 12px;border-radius:8px}
+.opp-loc{position:absolute;right:14px;top:14px;font-size:11.5px;color:#fff;display:inline-flex;align-items:center;gap:5px;text-shadow:0 1px 8px rgba(0,0,0,.6)}
+.opp-loc i{width:13px;height:13px}
+.opp-fav{position:absolute;right:12px;bottom:12px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(255,255,255,.92);color:var(--ink2);box-shadow:0 8px 24px -10px rgba(0,0,0,.5);transition:.25s}
+.opp-fav:hover{color:var(--brand);transform:scale(1.08)}
+.opp-fav.on{color:#E0455E}
+.opp-fav i{width:18px;height:18px}
+.opp-body{padding:20px 20px 18px;display:flex;flex-direction:column;flex:1}
+.opp-cat{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--brand);font-weight:600}
+.opp h3{font-size:18px;font-weight:600;color:var(--ink);margin-top:7px;letter-spacing:-.01em}
+.opp-meta{font-size:12.5px;color:var(--faint);margin-top:6px;display:flex;gap:10px;flex-wrap:wrap}
+.opp-roi{display:flex;align-items:flex-end;gap:9px;margin-top:16px}
+.opp-roi .k{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);padding-bottom:6px}
+.opp-roi .v{font-size:34px;font-weight:700;color:var(--brand);line-height:.9;letter-spacing:-.02em}
+.opp-facts{margin-top:14px;border-top:1px solid var(--line-2);padding-top:8px}
+.opp-facts .r{display:flex;justify-content:space-between;padding:7px 0;font-size:12.5px;border-bottom:1px solid var(--line-2)}
+.opp-facts .r:last-child{border-bottom:none}
+.opp-facts .k{color:var(--ink2);font-weight:300}.opp-facts .v{color:var(--ink);font-weight:500}
+.opp-foot{margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.opp-cmp{font-size:12px;color:var(--ink2);display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.opp-cmp input{width:15px;height:15px;accent-color:var(--brand)}
+.opp-go{font-size:13px;font-weight:600;color:var(--brand);display:inline-flex;align-items:center;gap:6px;transition:gap .3s}
+.opp:hover .opp-go{gap:10px}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--ink2)}
+/* VIP locked */
+.vip-lock{margin-top:40px;position:relative;overflow:hidden;border-radius:20px;border:1px solid rgba(46,154,198,.4);background:linear-gradient(120deg,#0A1622,#0C2130 55%,#0B2C3D);color:#EAF3F8;padding:clamp(40px,6vw,84px) clamp(28px,5vw,80px);text-align:center}
+.vip-lock::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(700px 360px at 82% -10%,rgba(87,198,228,.2),transparent 62%)}
+.vip-lock .vl-in{position:relative;z-index:2;max-width:640px;margin:0 auto}
+.vip-lock .vk{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan-2);background:rgba(87,198,228,.12);padding:7px 14px;border-radius:20px}
+.vip-lock h2{margin-top:20px;font-size:clamp(30px,4.4vw,52px);font-weight:600;color:#fff;letter-spacing:-.03em;line-height:1.04}
+.vip-lock p{margin:16px auto 0;font-size:15.5px;color:#B9CDD8;font-weight:300}
+.vip-plans{display:flex;gap:14px;justify-content:center;margin-top:26px;flex-wrap:wrap}
+.vip-plan{border:1px solid rgba(46,154,198,.4);border-radius:12px;padding:16px 26px;min-width:150px}
+.vip-plan .pk{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan-2);font-weight:600}
+.vip-plan .pv{font-size:14px;color:#EAF3F8;margin-top:6px}
+.vip-plan .pp{font-size:11.5px;color:#6E8695;margin-top:4px}
+.vip-cta{margin-top:28px;display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700;padding:17px 36px;border-radius:10px;background:var(--cyan);color:#fff;box-shadow:0 20px 46px -18px rgba(46,154,198,.9);transition:.3s}
+.vip-cta:hover{background:var(--cyan-2);transform:translateY(-2px)}
+.vip-fine{margin-top:14px;font-size:11.5px;color:#6E8695}
+/* compare bar + modal */
+.cmp-bar{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140%);z-index:120;display:flex;align-items:center;gap:16px;background:var(--dark);color:#fff;border:1px solid rgba(46,154,198,.4);border-radius:14px;padding:14px 20px;box-shadow:0 30px 70px -30px rgba(0,0,0,.6);transition:transform .4s var(--ease)}
+.cmp-bar.show{transform:translateX(-50%) translateY(0)}
+.cmp-bar b{color:var(--cyan-2)}
+.cmp-open{background:var(--brand);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;font-weight:600}
+.cmp-clear{font-size:12.5px;color:#B9CDD8}
+.cmp-modal{position:fixed;inset:0;z-index:200;background:rgba(6,12,18,.7);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:40px 16px;overflow:auto}
+.cmp-modal.show{display:flex}
+.cmp-panel{background:var(--surface);border-radius:16px;max-width:1000px;width:100%;padding:28px;box-shadow:var(--shadow)}
+.cmp-panel h3{font-size:22px;font-weight:600;margin-bottom:18px}
+.cmp-table{width:100%;border-collapse:collapse;font-size:13px}
+.cmp-table th,.cmp-table td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+.cmp-table th{color:var(--faint);font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;width:170px}
+.cmp-table td{color:var(--ink);font-weight:500}
+.cmp-close{margin-top:18px;background:var(--brand);color:#fff;padding:11px 22px;border-radius:8px;font-size:13.5px;font-weight:600}
+.toast{position:fixed;bottom:24px;right:24px;z-index:300;background:var(--dark);color:#fff;padding:14px 20px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow);opacity:0;transform:translateY(16px);transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+@media(max-width:1100px){.fbar{grid-template-columns:repeat(3,1fr)}.opp-grid{grid-template-columns:repeat(2,1fr)}.fadv{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){.fbar{grid-template-columns:1fr 1fr}.fbtns{grid-column:1/-1}.opp-grid{grid-template-columns:1fr}.uni-switch{display:grid;width:100%}.fadv{grid-template-columns:1fr}}
+{% endblock %}
+
+{% block content %}
+<section class="cat-hero" data-testid="catalogo-hero">
+  <div class="wrap">
+    <div class="eyebrow">Oportunidades</div>
+    <h1>NPL, CDR y REO<span class="dot">.</span></h1>
+    <p>Tres formas de entrar en una operación. Filtra por universo, tipo, ubicación, activo y nivel de inversión.</p>
+    <div class="uni-switch" data-testid="universe-switch">
+      <a href="/oportunidades?universo=judicial" class="{{ 'on' if universe=='judicial' else '' }}" data-testid="uni-judicial">Ejecuciones Judiciales</a>
+      <a href="/oportunidades?universo=acuerdos" class="{{ 'on' if universe=='acuerdos' else '' }}" data-testid="uni-acuerdos">Universo Acuerdos</a>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <form class="filters" method="get" action="/oportunidades" id="filterForm" data-testid="filter-form">
+    <input type="hidden" name="universo" value="{{ universe }}">
+    <div class="fbar">
+      <div class="fld">
+        <label>Producto</label>
+        <select name="tipo" data-testid="filter-product">
+          <option value="">NPL · CDR · REO</option>
+          {% for p in products %}<option value="{{ p.code }}" {{ 'selected' if filters.tipo==p.code }}>{{ p.code }} — {{ p.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fld">
+        <label>Comunidad</label>
+        <select name="ccaa" id="selCcaa" data-testid="filter-ccaa">
+          <option value="">Todas</option>
+          {% for code,c in geo.items() %}<option value="{{ code }}" {{ 'selected' if filters.ccaa==code }}>{{ c.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fld">
+        <label>Provincia</label>
+        <select name="provincia" id="selProv" data-testid="filter-provincia"><option value="">Todas</option></select>
+      </div>
+      <div class="fld">
+        <label>Municipio</label>
+        <select name="municipio" id="selMun" data-testid="filter-municipio"><option value="">Todos</option></select>
+      </div>
+      <div class="fld">
+        <label>Tipo de activo</label>
+        <select name="activo" data-testid="filter-asset">
+          <option value="">Todos</option>
+          {% for a in asset_types %}<option value="{{ a.code }}" {{ 'selected' if filters.activo==a.code }}>{{ a.name }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="fbtns">
+        <button type="submit" class="fapply" data-testid="filter-apply">Aplicar</button>
+        <a href="/oportunidades?universo={{ universe }}" class="fclear" data-testid="filter-clear">Limpiar</a>
+      </div>
+    </div>
+    <div class="fadv" id="fadv" data-testid="filter-advanced">
+      <div class="fld"><label>Inversión mín. (€)</label><input type="number" name="precio_min" value="{{ filters.precio_min or '' }}" placeholder="0" data-testid="filter-price-min"></div>
+      <div class="fld"><label>Inversión máx. (€)</label><input type="number" name="precio_max" value="{{ filters.precio_max or '' }}" placeholder="Sin límite" data-testid="filter-price-max"></div>
+      <div class="fld"><label>Superficie mín. (m²)</label><input type="number" name="sup_min" value="{{ filters.sup_min or '' }}" placeholder="Próximamente"></div>
+      <div class="fld"><label>Situación</label><input type="text" placeholder="Próximamente" disabled></div>
+    </div>
+    <div class="fmore-row">
+      <button type="button" class="fmore-btn" id="moreBtn" data-testid="filter-more"><i data-lucide="sliders-horizontal" style="width:15px;height:15px"></i> Más filtros</button>
+      <button type="button" class="save-search" id="saveSearch" data-testid="save-search"><i data-lucide="bookmark" style="width:15px;height:15px"></i> Guardar búsqueda <span class="demo-flag">demo</span></button>
+    </div>
+  </form>
+
+  {% if universe == 'acuerdos' and not vip_active %}
+  <div class="vip-lock" data-testid="vip-locked">
+    <div class="vl-in">
+      <span class="vk"><i data-lucide="sparkles" style="width:14px;height:14px"></i> Universo Acuerdos · Suscripción VIP</span>
+      <h2>Más control. Menos incertidumbre.</h2>
+      <p>El Universo Acuerdos reúne operaciones con una salida previamente estructurada: sabes desde el principio cuánto necesitas, qué plazo manejamos y cuál es el resultado previsto. Es un entorno reservado, sujeto a suscripción VIP activa.</p>
+      <div class="vip-plans">
+        <div class="vip-plan"><div class="pk">Mensual</div><div class="pv">Suscripción VIP</div><div class="pp">Precio · próximamente</div></div>
+        <div class="vip-plan"><div class="pk">Anual</div><div class="pv">Suscripción VIP</div><div class="pp">Precio · próximamente</div></div>
+      </div>
+      <a href="/#acceso" class="vip-cta" data-testid="vip-activate">Activar VIP <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
+      <p class="vip-fine">Acceso sujeto a validación profesional y a entitlement VIP activo. El inventario de Acuerdos no se entrega sin autorización.</p>
+    </div>
+  </div>
+  {% else %}
+  <div class="toolbar">
+    <div class="rescount" data-testid="result-count"><b>{{ total }}</b> {{ 'oportunidad' if total==1 else 'oportunidades' }}{% if universe=='acuerdos' %} · Universo Acuerdos{% else %} · Ejecuciones Judiciales{% endif %}</div>
+    <div class="sortsel">
+      <label for="selOrden">Ordenar por</label>
+      <select id="selOrden" data-testid="sort-select">
+        {% for s in sort_options %}<option value="{{ s.code }}" {{ 'selected' if filters.orden==s.code }}>{{ s.name }}</option>{% endfor %}
+      </select>
+    </div>
+  </div>
+  <div class="opp-grid" data-testid="opportunity-grid">
+    {% for o in opps %}
+    <article class="opp" data-testid="opp-card" data-slug="{{ o.slug }}">
+      <div class="opp-media">
+        <img src="{{ o.image }}" alt="{{ o.title }}" loading="lazy">
+        <span class="opp-badge">{{ o.product }}</span>
+        <span class="opp-loc"><i data-lucide="map-pin"></i>{{ o.municipio_name }}</span>
+        <button class="opp-fav {{ 'on' if o.slug in fav_slugs else '' }}" data-fav="{{ o.slug }}" aria-label="Favorito" data-testid="fav-{{ o.slug }}"><i data-lucide="heart"></i></button>
+      </div>
+      <div class="opp-body">
+        <div class="opp-cat">{{ o.category }}</div>
+        <h3>{{ o.title }}</h3>
+        <div class="opp-meta"><span>{{ o.asset_name }}</span><span>·</span><span>{{ o.provincia_name }}</span><span>·</span><span>{{ o.price_label }}</span></div>
+        <div class="opp-roi"><span class="k">ROI</span><span class="v">{{ o.roi }}</span></div>
+        <div class="opp-facts">
+          <div class="r"><span class="k">Plazo estimado</span><span class="v">{{ o.timeframe }} meses</span></div>
+          <div class="r"><span class="k">Situación</span><span class="v">{{ o.situation }}</span></div>
+        </div>
+        <div class="opp-foot">
+          <label class="opp-cmp"><input type="checkbox" data-cmp="{{ o.slug }}" data-testid="cmp-{{ o.slug }}"> Comparar</label>
+          <a href="/oportunidades/{{ o.slug }}" class="opp-go" data-testid="go-{{ o.slug }}">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+        </div>
+      </div>
+    </article>
+    {% else %}
+    <div class="empty" data-testid="empty-state">No hay oportunidades que coincidan con tu búsqueda. Prueba a ampliar los filtros.</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</div>
+
+<!-- compare bar + modal -->
+<div class="cmp-bar" id="cmpBar"><span>Comparar <b id="cmpCount">0</b> operaciones</span><button class="cmp-open" id="cmpOpen">Comparar</button><button class="cmp-clear" id="cmpClearBtn">Vaciar</button></div>
+<div class="cmp-modal" id="cmpModal"><div class="cmp-panel"><h3>Comparar operaciones</h3><div id="cmpBody"></div><button class="cmp-close" id="cmpClose">Cerrar</button></div></div>
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const GEO = {{ geo_json|safe }};
+const CUR = {ccaa:"{{ filters.ccaa or '' }}", prov:"{{ filters.provincia or '' }}", mun:"{{ filters.municipio or '' }}"};
+const selC=document.getElementById('selCcaa'), selP=document.getElementById('selProv'), selM=document.getElementById('selMun');
+function fillProv(){selP.innerHTML='<option value="">Todas</option>';selM.innerHTML='<option value="">Todos</option>';const c=selC.value;if(c&&GEO[c]){for(const[code,p]of Object.entries(GEO[c].provincias)){const o=document.createElement('option');o.value=code;o.textContent=p.name;if(code===CUR.prov)o.selected=true;selP.appendChild(o);}}fillMun();}
+function fillMun(){selM.innerHTML='<option value="">Todos</option>';const c=selC.value,pr=selP.value;if(c&&pr&&GEO[c]&&GEO[c].provincias[pr]){for(const[code,name]of Object.entries(GEO[c].provincias[pr].municipios)){const o=document.createElement('option');o.value=code;o.textContent=name;if(code===CUR.mun)o.selected=true;selM.appendChild(o);}}}
+selC.addEventListener('change',()=>{CUR.prov='';CUR.mun='';fillProv();});
+selP.addEventListener('change',()=>{CUR.mun='';fillMun();});
+fillProv();
+
+// sort -> reload with orden param
+document.getElementById('selOrden')?.addEventListener('change',function(){const u=new URL(location.href);u.searchParams.set('orden',this.value);location.href=u.toString();});
+
+// more filters
+document.getElementById('moreBtn').addEventListener('click',()=>document.getElementById('fadv').classList.toggle('open'));
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+
+// favorites (cookie session + backend demo)
+document.querySelectorAll('[data-fav]').forEach(b=>b.addEventListener('click',async()=>{
+  const slug=b.getAttribute('data-fav');
+  try{const r=await fetch('/api/favorites/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug})});
+    const d=await r.json();b.classList.toggle('on',d.favorited);toast(d.favorited?'Añadido a favoritos (demo)':'Quitado de favoritos');
+  }catch(e){toast('No se pudo actualizar el favorito');}
+}));
+
+// save search (PREPARED / demo)
+document.getElementById('saveSearch').addEventListener('click',async()=>{
+  const params=new URLSearchParams(new FormData(document.getElementById('filterForm'))).toString();
+  try{await fetch('/api/saved-searches',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:params})});}catch(e){}
+  toast('Búsqueda guardada (demo) · disponible en Mi OPORTUNIIA');
+});
+
+// compare (client selection + backend data)
+let cmp=JSON.parse(localStorage.getItem('opp_compare')||'[]');
+const cmpBar=document.getElementById('cmpBar'),cmpCount=document.getElementById('cmpCount');
+function syncCmp(){cmpCount.textContent=cmp.length;cmpBar.classList.toggle('show',cmp.length>0);document.querySelectorAll('[data-cmp]').forEach(c=>c.checked=cmp.includes(c.getAttribute('data-cmp')));localStorage.setItem('opp_compare',JSON.stringify(cmp));}
+document.querySelectorAll('[data-cmp]').forEach(c=>c.addEventListener('change',()=>{const s=c.getAttribute('data-cmp');if(c.checked){if(cmp.length>=3){c.checked=false;toast('Puedes comparar hasta 3 operaciones');return;}if(!cmp.includes(s))cmp.push(s);}else{cmp=cmp.filter(x=>x!==s);}syncCmp();}));
+document.getElementById('cmpClearBtn').addEventListener('click',()=>{cmp=[];syncCmp();});
+document.getElementById('cmpOpen').addEventListener('click',async()=>{
+  if(!cmp.length)return;
+  const r=await fetch('/api/opportunities/compare?ids='+cmp.join(','));const d=await r.json();
+  const rows=[['Universo','universe_label'],['Producto','product'],['Ubicación','loc'],['Tipo de activo','asset_name'],['Inversión','price_label'],['Plazo estimado','timeframe_label'],['Situación','situation'],['Ocupación','occupancy'],['Estrategia','strategy'],['ROI','roi']];
+  let html='<table class="cmp-table"><thead><tr><th></th>'+d.items.map(i=>'<td><b>'+i.title+'</b></td>').join('')+'</tr></thead><tbody>';
+  rows.forEach(([lab,key])=>{html+='<tr><th>'+lab+'</th>'+d.items.map(i=>'<td>'+(i[key]||'—')+'</td>').join('')+'</tr>';});
+  html+='</tbody></table>';
+  document.getElementById('cmpBody').innerHTML=html;document.getElementById('cmpModal').classList.add('show');
+});
+document.getElementById('cmpClose').addEventListener('click',()=>document.getElementById('cmpModal').classList.remove('show'));
+syncCmp();
+lucide.createIcons();
+</script>
+{% endblock %}

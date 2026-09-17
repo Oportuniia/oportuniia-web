@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+{% block title %}{{ o.title }} · {{ o.product }} en {{ o.municipio_name }} | OPORTUNIIA{% endblock %}
+{% block meta_desc %}{{ o.summary }}{% endblock %}
+{% block canonical %}{{ base_url }}/oportunidades/{{ o.slug }}{% endblock %}
+{% block body_testid %}detalle-page{% endblock %}
+{% block nav_opp %}active{% endblock %}
+
+{% block styles %}
+.crumbs{padding:22px 0 0;font-size:12.5px;color:var(--faint)}
+.crumbs a{color:var(--ink2)}.crumbs a:hover{color:var(--brand)}
+.det-hero{background:var(--dark);color:#fff;padding:26px 0 clamp(30px,4vw,50px);position:relative;overflow:hidden}
+.det-hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 480px at 88% -12%,rgba(46,154,198,.18),transparent 60%)}
+.det-hero .wrap{position:relative;z-index:2}
+.det-tags{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.det-tag{font-size:11.5px;font-weight:600;letter-spacing:.08em;padding:6px 13px;border-radius:20px;background:rgba(46,154,198,.16);color:var(--cyan-2);border:1px solid rgba(46,154,198,.4)}
+.det-tag.uni{background:rgba(255,255,255,.06);color:#EAF3F8;border-color:rgba(255,255,255,.18)}
+.det-hero h1{font-size:clamp(30px,4.4vw,56px);font-weight:600;letter-spacing:-.03em;line-height:1.02}
+.det-hero .loc{margin-top:12px;font-size:14.5px;color:#B9CDD8;display:inline-flex;align-items:center;gap:8px}
+.det-hero .loc i{width:16px;height:16px;color:var(--cyan-2)}
+.det-layout{display:grid;grid-template-columns:1.5fr .9fr;gap:clamp(24px,3vw,48px);margin-top:32px;align-items:start}
+.det-media{border-radius:16px;overflow:hidden;box-shadow:var(--shadow);aspect-ratio:16/9;background:#0B1A28}
+.det-media img{width:100%;height:100%;object-fit:cover}
+.det-section{margin-top:30px}
+.det-section h2{font-size:20px;font-weight:600;letter-spacing:-.01em;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.det-section h2 i{width:19px;height:19px;color:var(--brand)}
+.det-section p{color:var(--ink2);font-weight:300;line-height:1.75}
+.det-vars{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:6px}
+.dv{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--surface)}
+.dv .k{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);font-weight:600}
+.dv .v{font-size:17px;font-weight:600;color:var(--ink);margin-top:6px}
+.det-timeline{list-style:none;margin-top:6px;border-left:2px solid var(--brand-line);padding-left:22px}
+.det-timeline li{position:relative;padding:0 0 20px}
+.det-timeline li::before{content:"";position:absolute;left:-27px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--brand)}
+.det-timeline .tt{font-size:14.5px;font-weight:600;color:var(--ink)}
+.det-timeline .tx{font-size:13px;color:var(--ink2);font-weight:300;margin-top:2px}
+.doclist{list-style:none;margin-top:6px;display:flex;flex-direction:column;gap:8px}
+.doclist li{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--ink2);padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+.doclist li i{width:16px;height:16px;color:var(--faint)}
+.doclist .st{margin-left:auto;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);padding:3px 9px;border-radius:20px}
+/* sticky action panel */
+.act-panel{position:sticky;top:96px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);padding:24px}
+.act-roi{display:flex;align-items:flex-end;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line-2)}
+.act-roi .k{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink2);padding-bottom:7px}
+.act-roi .v{font-size:44px;font-weight:700;color:var(--brand);line-height:.9;letter-spacing:-.02em}
+.act-rows{margin:14px 0}
+.act-rows .r{display:flex;justify-content:space-between;padding:9px 0;font-size:13.5px;border-bottom:1px solid var(--line-2)}
+.act-rows .r:last-child{border-bottom:none}
+.act-rows .k{color:var(--ink2);font-weight:300}.act-rows .v{color:var(--ink);font-weight:500}
+.act-buy{filter:blur(4px);opacity:.7;user-select:none}
+.act-ctas{display:flex;flex-direction:column;gap:10px;margin-top:16px}
+.act-ctas .primary{background:var(--brand);color:#fff;padding:16px;border-radius:10px;font-size:14.5px;font-weight:600;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 16px 34px -16px rgba(31,101,136,.7);transition:.3s}
+.act-ctas .primary:hover{background:var(--brand-2);transform:translateY(-2px)}
+.act-ctas .secondary{background:var(--brand-tint);color:var(--brand);border:1px solid var(--brand-line);padding:15px;border-radius:10px;font-size:14px;font-weight:600;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:9px;transition:.3s}
+.act-ctas .secondary:hover{background:var(--brand);color:#fff}
+.act-mini{display:flex;gap:10px;margin-top:14px}
+.act-mini button{flex:1;border:1px solid var(--line);border-radius:9px;padding:11px;font-size:12.5px;color:var(--ink2);display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.25s}
+.act-mini button:hover{border-color:var(--brand);color:var(--brand)}
+.act-mini button.on{color:#E0455E;border-color:#E0455E}
+.act-mini i{width:15px;height:15px}
+.interest{margin-top:14px;font-size:12.5px;color:var(--ink2);background:var(--brand-tint);border:1px solid var(--brand-line);border-radius:10px;padding:11px 13px;display:flex;align-items:center;gap:9px}
+.interest i{width:15px;height:15px;color:var(--brand)}
+.act-fine{margin-top:14px;font-size:11px;color:var(--faint);line-height:1.5}
+/* demo modal */
+.op-modal{position:fixed;inset:0;z-index:200;background:rgba(6,12,18,.72);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
+.op-modal.show{display:flex}
+.op-panel{background:var(--surface);border-radius:16px;max-width:520px;width:100%;padding:32px;box-shadow:var(--shadow);text-align:center}
+.op-panel .oi{width:62px;height:62px;border-radius:50%;background:var(--brand-tint);color:var(--brand);display:grid;place-items:center;margin:0 auto 18px}
+.op-panel .oi i{width:28px;height:28px}
+.op-panel h3{font-size:22px;font-weight:600}
+.op-panel .flag{display:inline-block;margin:10px 0;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:#B87A00;background:rgba(217,164,6,.14);padding:5px 12px;border-radius:20px}
+.op-panel p{font-size:14px;color:var(--ink2);font-weight:300;line-height:1.7;margin-top:8px}
+.op-flow{margin:18px 0;font-size:12px;color:var(--brand);font-weight:600;letter-spacing:.02em}
+.op-close{margin-top:12px;background:var(--brand);color:#fff;padding:13px 26px;border-radius:9px;font-size:14px;font-weight:600}
+.toast{position:fixed;bottom:24px;right:24px;z-index:300;background:var(--dark);color:#fff;padding:14px 20px;border-radius:10px;font-size:13.5px;box-shadow:var(--shadow);opacity:0;transform:translateY(16px);transition:.3s;pointer-events:none}
+.toast.show{opacity:1;transform:none}
+@media(max-width:960px){.det-layout{grid-template-columns:1fr}.act-panel{position:static}}
+{% endblock %}
+
+{% block content %}
+<div class="det-hero" data-testid="detalle-hero">
+  <div class="wrap">
+    <div class="crumbs"><a href="/oportunidades">Oportunidades</a> · <a href="/oportunidades?universo={{ o.universe }}">{{ 'Universo Acuerdos' if o.universe=='acuerdos' else 'Ejecuciones Judiciales' }}</a> · <span>{{ o.title }}</span></div>
+    <div style="margin-top:16px" class="det-tags">
+      <span class="det-tag">{{ o.product }} — {{ o.product_name }}</span>
+      <span class="det-tag uni">{{ 'Universo Acuerdos' if o.universe=='acuerdos' else 'Ejecuciones Judiciales' }}</span>
+      <span class="det-tag uni">{{ o.asset_name }}</span>
+    </div>
+    <h1>{{ o.title }}</h1>
+    <div class="loc"><i data-lucide="map-pin"></i>{{ o.municipio_name }}, {{ o.provincia_name }} · {{ o.ccaa_name }}</div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="det-layout">
+    <!-- LEFT · presentation -->
+    <div>
+      <div class="det-media"><img src="{{ o.image }}" alt="{{ o.title }}"></div>
+
+      <div class="det-section" data-testid="sec-resumen">
+        <h2><i data-lucide="file-text"></i> Resumen ejecutivo</h2>
+        <p>{{ o.summary }} La presentación completa de la operación, con documentación y escenarios, se facilita con acceso profesional.</p>
+      </div>
+
+      <div class="det-section">
+        <h2><i data-lucide="building-2"></i> El activo</h2>
+        <div class="det-vars">
+          <div class="dv"><div class="k">Tipo de activo</div><div class="v">{{ o.asset_name }}</div></div>
+          <div class="dv"><div class="k">Categoría</div><div class="v">{{ o.category }}</div></div>
+          {% if o.surface %}<div class="dv"><div class="k">Superficie</div><div class="v">{{ o.surface }} m²</div></div>{% endif %}
+          {% if o.bedrooms %}<div class="dv"><div class="k">Habitaciones</div><div class="v">{{ o.bedrooms }}</div></div>{% endif %}
+        </div>
+      </div>
+
+      <div class="det-section">
+        <h2><i data-lucide="scale"></i> Situación y estructura</h2>
+        <div class="det-vars">
+          <div class="dv"><div class="k">Situación</div><div class="v">{{ o.situation }}</div></div>
+          <div class="dv"><div class="k">Ocupación</div><div class="v">{{ o.occupancy }}</div></div>
+          <div class="dv"><div class="k">Estrategia</div><div class="v">{{ o.strategy }}</div></div>
+          <div class="dv"><div class="k">Plazo estimado</div><div class="v">{{ o.timeframe }} meses</div></div>
+        </div>
+      </div>
+
+      <div class="det-section">
+        <h2><i data-lucide="milestone"></i> Recorrido de la operación</h2>
+        <ul class="det-timeline">
+          <li><div class="tt">Análisis</div><div class="tx">Estudio de la operación, del activo y de su situación.</div></li>
+          <li><div class="tt">Estructuración</div><div class="tx">Forma jurídica y financiera de la operación.</div></li>
+          <li><div class="tt">Definición de la vía</div><div class="tx">{{ o.strategy }} según el recorrido de la operación.</div></li>
+          <li><div class="tt">Resultado</div><div class="tx">Cierre y acompañamiento hasta el resultado previsto.</div></li>
+        </ul>
+      </div>
+
+      <div class="det-section" data-testid="sec-documentacion">
+        <h2><i data-lucide="folder"></i> Documentación</h2>
+        <ul class="doclist">
+          <li><i data-lucide="file"></i> Nota simple / información registral <span class="st">Con acceso</span></li>
+          <li><i data-lucide="file"></i> Informe de situación jurídica <span class="st">Con acceso</span></li>
+          <li><i data-lucide="file"></i> Dossier económico de la operación <span class="st">Con acceso</span></li>
+        </ul>
+        <p style="margin-top:12px;font-size:12.5px;color:var(--faint)">La documentación completa y su intercambio (aportación de documentos por tu parte y entrega por parte de OPORTUNIIA) se gestionará desde Mi OPORTUNIIA una vez iniciada la operación. <span class="demo-flag">próximamente</span></p>
+      </div>
+    </div>
+
+    <!-- RIGHT · action panel -->
+    <aside>
+      <div class="act-panel" data-testid="action-panel">
+        <div class="act-roi"><span class="k">ROI</span><span class="v">{{ o.roi }}</span></div>
+        <div class="act-rows">
+          <div class="r"><span class="k">Inversión estimada</span><span class="v">{{ o.price_label }}</span></div>
+          <div class="r"><span class="k">Valor de compra</span><span class="v act-buy">•••••• €</span></div>
+          <div class="r"><span class="k">Plazo estimado</span><span class="v">{{ o.timeframe }} meses</span></div>
+          <div class="r"><span class="k">Situación</span><span class="v">{{ o.situation }}</span></div>
+        </div>
+        <div class="act-ctas">
+          <button class="primary" data-action="reservar" data-testid="cta-reservar">Reservar operación <i data-lucide="bookmark-check" style="width:16px;height:16px"></i></button>
+          <button class="secondary" data-action="comprar" data-testid="cta-comprar">Comprar <i data-lucide="badge-euro" style="width:16px;height:16px"></i></button>
+        </div>
+        <div class="act-mini">
+          <button id="detFav" data-fav="{{ o.slug }}" data-testid="det-fav"><i data-lucide="heart"></i> Favorito</button>
+          <button id="detCmp" data-testid="det-compare"><i data-lucide="git-compare"></i> Comparar</button>
+        </div>
+        {% if interest %}
+        <div class="interest" data-testid="interest-signal"><i data-lucide="users"></i> {{ interest }}</div>
+        {% endif %}
+        <p class="act-fine">Reservar y Comprar son acciones distintas. En esta fase la interacción es <b>DEMO / no transaccional</b>: no genera reserva ni compra reales, ni pago, ni compromiso. Queda conectada a tu futura Mi OPORTUNIIA (actor · operación · documentación).</p>
+      </div>
+    </aside>
+  </div>
+</div>
+
+<div class="op-modal" id="opModal" data-testid="op-demo-modal">
+  <div class="op-panel">
+    <div class="oi"><i data-lucide="check" id="opIcon"></i></div>
+    <h3 id="opTitle">Solicitud registrada</h3>
+    <span class="flag">Demo · no transaccional</span>
+    <p id="opText"></p>
+    <div class="op-flow">Actor · Oportunidad · Operación · Mi OPORTUNIIA · Documentación</div>
+    <button class="op-close" id="opClose">Entendido</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const SLUG="{{ o.slug }}", TITLE="{{ o.title }}";
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2600);}
+// favorite state on load
+(async()=>{try{const r=await fetch('/api/favorites');const d=await r.json();if(d.slugs&&d.slugs.includes(SLUG))document.getElementById('detFav').classList.add('on');}catch(e){}})();
+document.getElementById('detFav').addEventListener('click',async function(){
+  try{const r=await fetch('/api/favorites/toggle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug:SLUG})});const d=await r.json();this.classList.toggle('on',d.favorited);toast(d.favorited?'Añadido a favoritos (demo)':'Quitado de favoritos');}catch(e){toast('No se pudo actualizar');}
+});
+document.getElementById('detCmp').addEventListener('click',()=>{let c=JSON.parse(localStorage.getItem('opp_compare')||'[]');if(!c.includes(SLUG)){if(c.length>=3){toast('Puedes comparar hasta 3 operaciones');return;}c.push(SLUG);localStorage.setItem('opp_compare',JSON.stringify(c));}toast('Añadida a comparar · ve a Oportunidades');});
+// reserve / buy DEMO
+document.querySelectorAll('[data-action]').forEach(b=>b.addEventListener('click',async()=>{
+  const action=b.getAttribute('data-action');
+  try{await fetch('/api/operations/intent',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({slug:SLUG,action})});}catch(e){}
+  const isRes=action==='reservar';
+  document.getElementById('opTitle').textContent=isRes?'Reserva iniciada (demo)':'Compra iniciada (demo)';
+  document.getElementById('opText').innerHTML=isRes
+    ? 'Has iniciado la <b>reserva</b> de «'+TITLE+'». En producción, aquí se aplicarían las condiciones, documentación y plazos del contrato correspondiente. Ahora es una demostración: <b>no se ha creado ninguna reserva real</b>.'
+    : 'Has iniciado la <b>compra</b> de «'+TITLE+'». En producción, aquí se activaría el flujo de compra con validación y contrato aplicables. Ahora es una demostración: <b>no se ha creado ninguna compra ni cobro reales</b>.';
+  document.getElementById('opModal').classList.add('show');
+}));
+document.getElementById('opClose').addEventListener('click',()=>document.getElementById('opModal').classList.remove('show'));
+lucide.createIcons();
+</script>
+{% endblock %}

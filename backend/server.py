@@ -1,16 +1,21 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request, Response
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
+import json
+import secrets
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
 from wp_precheck import run_precheck, run_capability_discovery, run_item_read, run_bridge_read, _get_env, _normalize_base
+import catalog_data as cat
 
 
 ROOT_DIR = Path(__file__).parent
@@ -143,8 +148,292 @@ async def wp_precheck_bridge(authorize: str = ""):
     return {"executed": True, **report}
 
 
+# ── OPORTUNIIA · FASE 2 · OPPORTUNITY ENGINE ─────────────────────────────────
+# Todos los datos de catálogo son DEMO. Sin identidad paralela, sin pagos,
+# sin reservas/compras reales, sin envíos. Favoritos = sesión anónima (cookie).
+
+SID_COOKIE = "opp_sid"
+
+
+def _get_sid(request: Request) -> Optional[str]:
+    return request.cookies.get(SID_COOKIE)
+
+
+def _ensure_sid(request: Request, response: Response) -> str:
+    sid = request.cookies.get(SID_COOKIE)
+    if not sid:
+        sid = secrets.token_urlsafe(16)
+        response.set_cookie(SID_COOKIE, sid, max_age=60 * 60 * 24 * 180,
+                            httponly=True, samesite="lax")
+    return sid
+
+
+def _public_base(request: Request) -> str:
+    proto = request.headers.get("x-forwarded-proto", request.url.scheme)
+    host = request.headers.get("x-forwarded-host") or request.headers.get("host") or request.url.netloc
+    return f"{proto}://{host}".rstrip("/")
+
+
+async def _vip_active(request: Request) -> bool:
+    # Entitlement VIP se valida SIEMPRE en servidor. En esta fase no hay pago
+    # ni identidad soberana → entitlement INACTIVO. El inventario ACUERDOS no se
+    # entrega sin autorización.
+    return False
+
+
+# ---- Modelos (contratos) ----
+class FavoriteToggle(BaseModel):
+    slug: str
+
+class SavedSearchIn(BaseModel):
+    query: str
+
+class OperationIntentIn(BaseModel):
+    slug: str
+    action: str  # "reservar" | "comprar"
+
+
+# ==== APIs FUNCIONALES ====
+@api_router.get("/locations/ccaa")
+async def loc_ccaa():
+    return [{"code": k, "name": v["name"]} for k, v in cat.GEO.items()]
+
+@api_router.get("/locations/provincias")
+async def loc_provincias(ccaa: str = ""):
+    c = cat.GEO.get(ccaa)
+    if not c:
+        return []
+    return [{"code": k, "name": v["name"]} for k, v in c["provincias"].items()]
+
+@api_router.get("/locations/municipios")
+async def loc_municipios(ccaa: str = "", provincia: str = ""):
+    try:
+        muns = cat.GEO[ccaa]["provincias"][provincia]["municipios"]
+    except KeyError:
+        return []
+    return [{"code": k, "name": v} for k, v in muns.items()]
+
+
+@api_router.get("/opportunities")
+async def api_opportunities(request: Request, universo: str = "judicial", tipo: str = "",
+                            ccaa: str = "", provincia: str = "", municipio: str = "",
+                            activo: str = "", precio_min: Optional[int] = None,
+                            precio_max: Optional[int] = None, orden: str = "recientes"):
+    if universo == "acuerdos" and not await _vip_active(request):
+        return {"universe": "acuerdos", "locked": True, "items": [], "total": 0,
+                "message": "Inventario Acuerdos reservado a suscripción VIP activa."}
+    items = cat.filter_opportunities(universe=universo, product=tipo or None,
+                                     ccaa=ccaa or None, provincia=provincia or None,
+                                     municipio=municipio or None, asset_type=activo or None,
+                                     price_min=precio_min, price_max=precio_max, order=orden)
+    return {"universe": universo, "locked": False, "items": items, "total": len(items)}
+
+
+@api_router.get("/opportunities/compare")
+async def api_compare(request: Request, ids: str = ""):
+    vip = await _vip_active(request)
+    out = []
+    for slug in [s for s in ids.split(",") if s][:3]:
+        o = cat.get_by_slug(slug)
+        if not o:
+            continue
+        if o["universe"] == "acuerdos" and not vip:
+            continue  # no exponer inventario protegido
+        out.append({
+            "slug": o["slug"], "title": o["title"], "product": o["product"],
+            "universe_label": "Universo Acuerdos" if o["universe"] == "acuerdos" else "Ejecuciones Judiciales",
+            "loc": f"{o['municipio_name']}, {o['provincia_name']}",
+            "asset_name": o["asset_name"], "price_label": o["price_label"],
+            "timeframe_label": f"{o['timeframe']} meses", "situation": o["situation"],
+            "occupancy": o["occupancy"], "strategy": o["strategy"], "roi": o["roi"],
+        })
+    return {"items": out}
+
+
+@api_router.get("/favorites")
+async def get_favorites(request: Request):
+    sid = _get_sid(request)
+    if not sid:
+        return {"slugs": []}
+    doc = await db.demo_favorites.find_one({"session_id": sid}, {"_id": 0, "slugs": 1})
+    return {"slugs": (doc or {}).get("slugs", [])}
+
+
+@api_router.post("/favorites/toggle")
+async def toggle_favorite(payload: FavoriteToggle, request: Request, response: Response):
+    sid = _ensure_sid(request, response)
+    if not cat.get_by_slug(payload.slug):
+        return JSONResponse({"error": "unknown slug"}, status_code=404)
+    doc = await db.demo_favorites.find_one({"session_id": sid})
+    slugs = (doc or {}).get("slugs", [])
+    if payload.slug in slugs:
+        slugs = [s for s in slugs if s != payload.slug]
+        favorited = False
+    else:
+        slugs = slugs + [payload.slug]
+        favorited = True
+    await db.demo_favorites.update_one({"session_id": sid},
+        {"$set": {"slugs": slugs, "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
+    return {"favorited": favorited, "count": len(slugs)}
+
+
+@api_router.post("/saved-searches")
+async def save_search(payload: SavedSearchIn, request: Request, response: Response):
+    # PREPARED / demo: se guarda un registro de sesión no autoritativo.
+    # El contrato final asocia la búsqueda a actor_id en Mi OPORTUNIIA.
+    sid = _ensure_sid(request, response)
+    await db.demo_saved_searches.insert_one({
+        "session_id": sid, "query": payload.query,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"status": "prepared", "stored": "demo",
+            "note": "Contrato listo para actor_id · notificaciones futuras opt-in."}
+
+
+@api_router.post("/operations/intent")
+async def operation_intent(payload: OperationIntentIn, request: Request, response: Response):
+    # DEMO / NO TRANSACCIONAL. No crea reserva/compra reales, ni cobro, ni contrato.
+    sid = _ensure_sid(request, response)
+    if payload.action not in ("reservar", "comprar"):
+        return JSONResponse({"error": "invalid action"}, status_code=400)
+    if not cat.get_by_slug(payload.slug):
+        return JSONResponse({"error": "unknown slug"}, status_code=404)
+    await db.demo_operation_intents.insert_one({
+        "session_id": sid, "slug": payload.slug, "action": payload.action,
+        "state": "DEMO", "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    return {"status": "demo", "action": payload.action, "transactional": False,
+            "future_flow": ["actor_id", "opportunity", "operation", "mi_oportuniia", "documentation"],
+            "note": "Interacción DEMO. Reservar y Comprar son acciones distintas; reglas contractuales no definidas en esta fase."}
+
+
+async def _interest_signal(slug: str) -> Optional[str]:
+    # Señal de interés VERAZ y agregada (privacy-safe). 0 evidencia = 0 mensaje.
+    count = await db.demo_favorites.count_documents({"slugs": slug})
+    THRESHOLD = 3
+    if count >= THRESHOLD:
+        return f"{count} inversores han guardado esta operación"
+    return None
+
+
+# ==== APIs PREPARED (contratos, sin acciones reales) ====
+@api_router.get("/readiness")
+async def readiness():
+    return {
+        "phase": "2-opportunity-engine",
+        "implemented": ["catalogue", "filters", "location_cascade", "url_state", "sorting",
+                        "cards", "detail", "favorites_demo", "compare", "vip_locked",
+                        "reserve_buy_demo_cta"],
+        "prepared_contract_only": {
+            "saved_searches": {"model": ["actor_id", "query", "created_at"], "notifications": "future/opt-in"},
+            "match_engine": {"signal_sources": ["explicit_preferences", "saved_searches", "favorites",
+                             "behavioral_history", "transactional_history"],
+                             "signal_strength": ["weak", "medium", "strong", "high_intent"],
+                             "explainable": True, "fake_score": False},
+            "para_ti": "future",
+            "new_since_last_visit": "future",
+            "interest_signals": {"aggregate_only": True, "privacy_safe": True, "fake_urgency": False},
+            "notifications": {"email": "future/not-active", "whatsapp": "future/not-active",
+                              "telegram": "future/not-active", "provider_selected": False, "consent_required": True},
+            "operations_history": "future",
+            "documentation_exchange": {"directions": ["actor->oportuniia", "oportuniia->actor"],
+                                        "deadline_model": "prepared/no-hardcoded-rule", "upload": "not-implemented"},
+            "mi_oportuniia": "compatible/not-fully-implemented",
+            "presentacion_output": {"pdf_ejecutivo": "compatible", "pdf_completo": "compatible",
+                                    "ficha_web": "compatible", "reportaje": "compatible", "real_integration": False},
+            "vip_entitlement": {"product": "OPORTUNIIA_VIP", "status": ["ACTIVE", "INACTIVE", "EXPIRED"],
+                                "billing_period": ["MONTHLY", "ANNUAL"], "real_price": False,
+                                "payment_provider": None, "real_payment": False, "global_role": False},
+            "identity": "integration-point-only (sovereign actor_id)",
+        },
+        "no_real": ["payment", "reservation", "purchase", "identity", "notification_send", "invented_contract_rules"],
+    }
+
+@api_router.get("/match/preview")
+async def match_preview(request: Request):
+    # PREPARED: explicable, sin score inventado. Cruza señales -> matches (futuro).
+    return {"status": "prepared", "explainable": True, "fake_score": False,
+            "sources": ["explicit_preferences", "saved_searches", "favorites",
+                        "behavioral_history", "transactional_history"],
+            "para_ti": []}
+
+@api_router.get("/interest-signals/{slug}")
+async def interest_signal(slug: str):
+    if not cat.get_by_slug(slug):
+        return JSONResponse({"error": "unknown slug"}, status_code=404)
+    sig = await _interest_signal(slug)
+    return {"slug": slug, "signal": sig, "aggregate_only": True, "fake": False}
+
+
 # Include the router in the main app
 app.include_router(api_router)
+
+# ── SSR (Jinja2) · páginas públicas servidas por el backend a través del proxy CRA ──
+TEMPLATES_DIR = ROOT_DIR / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+HOME_HTML = Path("/app/frontend/public/web2.html")
+
+
+@app.get("/", response_class=HTMLResponse)
+async def home():
+    # HOME V54 (freeze). Servida tal cual desde el archivo aprobado.
+    return HTMLResponse(HOME_HTML.read_text(encoding="utf-8"))
+
+
+@app.get("/oportunidades", response_class=HTMLResponse)
+async def oportunidades(request: Request, universo: str = "judicial", tipo: str = "",
+                        ccaa: str = "", provincia: str = "", municipio: str = "",
+                        activo: str = "", precio_min: Optional[int] = None,
+                        precio_max: Optional[int] = None, orden: str = "recientes"):
+    if universo not in ("judicial", "acuerdos"):
+        universo = "judicial"
+    vip = await _vip_active(request)
+    opps = []
+    total = 0
+    if not (universo == "acuerdos" and not vip):
+        opps = cat.filter_opportunities(universe=universo, product=tipo or None,
+                                        ccaa=ccaa or None, provincia=provincia or None,
+                                        municipio=municipio or None, asset_type=activo or None,
+                                        price_min=precio_min, price_max=precio_max, order=orden)
+        total = len(opps)
+    sid = _get_sid(request)
+    fav_slugs = []
+    if sid:
+        doc = await db.demo_favorites.find_one({"session_id": sid}, {"_id": 0, "slugs": 1})
+        fav_slugs = (doc or {}).get("slugs", [])
+    ctx = {
+        "request": request, "base_url": _public_base(request),
+        "universe": universo, "vip_active": vip, "opps": opps, "total": total,
+        "products": cat.PRODUCTS, "asset_types": cat.ASSET_TYPES, "sort_options": cat.SORT_OPTIONS,
+        "geo": cat.GEO, "geo_json": json.dumps(cat.GEO, ensure_ascii=False), "fav_slugs": fav_slugs,
+        "filters": {"tipo": tipo, "ccaa": ccaa, "provincia": provincia, "municipio": municipio,
+                    "activo": activo, "precio_min": precio_min, "precio_max": precio_max,
+                    "orden": orden, "sup_min": None},
+    }
+    resp = templates.TemplateResponse("catalogo.html", ctx)
+    _ensure_sid(request, resp)
+    return resp
+
+
+@app.get("/oportunidades/{slug}", response_class=HTMLResponse)
+async def oportunidad_detalle(request: Request, slug: str):
+    o = cat.get_by_slug(slug)
+    if not o:
+        return HTMLResponse(
+            "<div style='font-family:Poppins,sans-serif;padding:80px;text-align:center'>"
+            "<h1 style='font-size:40px'>404</h1><p>Operación no encontrada. "
+            "<a href='/oportunidades' style='color:#1F6588'>Volver a Oportunidades</a></p></div>",
+            status_code=404)
+    if o["universe"] == "acuerdos" and not await _vip_active(request):
+        # Inventario protegido no se entrega sin entitlement → llevar al gate VIP.
+        return RedirectResponse("/oportunidades?universo=acuerdos", status_code=302)
+    interest = await _interest_signal(slug)
+    resp = templates.TemplateResponse("detalle.html", {
+        "request": request, "base_url": _public_base(request), "o": o, "interest": interest,
+    })
+    _ensure_sid(request, resp)
+    return resp
+
 
 app.add_middleware(
     CORSMiddleware,

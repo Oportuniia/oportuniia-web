@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{% block title %}OPORTUNIIA{% endblock %}</title>
+<meta name="description" content="{% block meta_desc %}Oportunidades de inversión en deuda e inmuebles: NPL, CDR y REO.{% endblock %}" />
+<link rel="canonical" href="{% block canonical %}{{ base_url }}{% endblock %}" />
+<meta property="og:site_name" content="OPORTUNIIA" />
+<meta property="og:title" content="{{ self.title() }}" />
+<meta property="og:description" content="{{ self.meta_desc() }}" />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{
+  --bg:#FCFBF8;--bg2:#F4F3EE;--surface:#FFFFFF;--ink:#0B1A28;--ink2:#38495B;--faint:#8A98A6;
+  --brand:#1F6588;--brand-2:#2C7CA6;--brand-tint:rgba(31,101,136,.08);--brand-line:rgba(31,101,136,.22);
+  --line:rgba(11,26,40,.10);--line-2:rgba(11,26,40,.06);
+  --dark:#0A1622;--dark-2:#0F2130;--cyan:#2E9AC6;--cyan-2:#57C6E4;
+  --shadow:0 30px 70px -34px rgba(11,26,40,.28);--shadow-sm:0 14px 40px -22px rgba(11,26,40,.30);
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,select{font-family:inherit}
+.wrap{max-width:1520px;margin:0 auto;padding:0 clamp(22px,5vw,88px);position:relative}
+.eyebrow{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--brand);font-weight:600;display:inline-flex;align-items:center;gap:14px}
+.eyebrow::before{content:"";width:34px;height:1px;background:currentColor;opacity:.55}
+
+/* header */
+header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:76px}
+.brand-logo-img{height:60px;width:auto;object-fit:contain}
+.menu{display:flex;align-items:center;gap:34px}
+.menu a{font-size:13.5px;color:var(--ink2);font-weight:400;transition:color .25s}
+.menu a:hover,.menu a.active{color:var(--ink)}
+.menu a.active{font-weight:600;color:var(--brand)}
+.actions{display:flex;align-items:center;gap:20px}
+.ghost{font-size:13.5px;color:var(--ink2)}
+.btn{display:inline-flex;align-items:center;gap:8px;font-size:13.5px;font-weight:500;padding:12px 22px;border-radius:3px;background:var(--brand);color:#fff;box-shadow:0 12px 30px -14px rgba(31,101,136,.6);transition:transform .3s var(--ease),background-color .3s}
+.btn:hover{transform:translateY(-2px);background:var(--brand-2)}
+.burger{display:none;width:42px;height:42px;place-items:center}
+.burger span,.burger span::before,.burger span::after{content:"";display:block;width:22px;height:1.6px;background:var(--ink);position:relative;transition:.3s}
+.burger span::before{position:absolute;top:-7px}.burger span::after{position:absolute;top:7px}
+
+/* footer */
+footer{background:#1F6588;color:rgba(255,255,255,.85);padding:60px 0 34px;margin-top:80px;border-top:1px solid rgba(255,255,255,.22)}
+.foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap}
+.foot-brand .wm{font-size:20px;font-weight:600;letter-spacing:.16em;color:#fff}
+.foot-brand p{margin-top:12px;font-size:13.5px;color:rgba(255,255,255,.9)}
+.foot-col h4{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.78);margin-bottom:16px}
+.foot-col a,.foot-col span{display:block;font-size:13.5px;color:rgba(255,255,255,.82);margin-bottom:12px}
+.foot-col a:hover{color:#fff;text-decoration:underline}
+.foot-bottom{margin-top:44px;padding-top:22px;border-top:1px solid rgba(255,255,255,.2);font-size:12px;color:rgba(255,255,255,.72);display:flex;justify-content:space-between;flex-wrap:wrap;gap:14px}
+
+.demo-flag{display:inline-block;font-size:10.5px;letter-spacing:.06em;padding:3px 10px;border-radius:20px;background:var(--brand-tint);color:var(--brand);font-weight:600}
+
+@media(max-width:900px){
+  .menu,.actions .ghost{display:none}
+  .burger{display:grid}
+}
+{% block styles %}{% endblock %}
+</style>
+</head>
+<body data-testid="{% block body_testid %}page{% endblock %}">
+<header>
+  <div class="wrap">
+    <div class="nav">
+      <a href="/" class="brand" data-testid="brand-logo"><img src="/oportuniia-logo.webp" alt="OPORTUNIIA" class="brand-logo-img"></a>
+      <nav class="menu" data-testid="main-nav">
+        <a href="/oportunidades" class="{% block nav_opp %}{% endblock %}" data-testid="nav-oportunidades">Oportunidades</a>
+        <a href="/#flow">Cómo funciona</a>
+        <a href="/#quienes">Nuestra filosofía</a>
+        <a href="/#grupo">Grupo OPORTUNIIA</a>
+        <a href="/#footer">Contacto</a>
+      </nav>
+      <div class="actions">
+        <a href="/#acceso" class="ghost" data-testid="nav-private">Área privada</a>
+        <a href="/#acceso" class="btn" data-testid="nav-register">Solicitar acceso <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <button class="burger" onclick="location.href='/oportunidades'" aria-label="Menú"><span></span></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+{% block content %}{% endblock %}
+
+<footer id="footer" data-testid="footer">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="wm">OPORTUNIIA</div>
+        <p>Humanizamos la deuda.</p>
+      </div>
+      <div class="foot-col">
+        <h4>OPORTUNIIA</h4>
+        <a href="/oportunidades">Oportunidades</a>
+        <a href="/#flow">Cómo funciona</a>
+        <a href="/#quienes">Nuestra filosofía</a>
+        <a href="/#acceso">Acceso profesional</a>
+      </div>
+      <div class="foot-col">
+        <h4>Legal</h4>
+        <a href="/#">Aviso legal</a>
+        <a href="/#">Privacidad</a>
+        <a href="/#">Cookies</a>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 OPORTUNIIA. Todos los derechos reservados.</span>
+      <span>Datos de catálogo demostrativos · no representan operaciones reales.</span>
+    </div>
+  </div>
+</footer>
+<script>lucide.createIcons();</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>
