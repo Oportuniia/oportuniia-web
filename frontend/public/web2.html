@@ -473,11 +473,14 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 /* V11 · Grupo reducido (último bloque editorial, discreto y premium) */
 .grupo.sec{padding-top:clamp(54px,6.5vw,84px);padding-bottom:clamp(54px,6.5vw,84px)}
 .grupo h2{font-size:clamp(24px,3.2vw,38px)}
-.grupo-grid{gap:30px;margin:46px auto 0;max-width:1040px}
-.gcard .logo{aspect-ratio:31/36;border-radius:0;overflow:visible}
-.gcard .meta{padding-top:22px;gap:8px}
-.gcard .meta .t{font-size:19px;letter-spacing:.08em}
-.gcard .meta .s{font-size:14px;line-height:1.55;margin-top:2px;max-width:260px}
+.grupo-grid{gap:26px;margin:34px auto 0;max-width:940px}
+.gcard .logo{aspect-ratio:31/36;max-width:148px;margin:0 auto;border-radius:0;overflow:visible}
+.gcard .logo img{transition:transform .45s var(--ease)}
+.gcard:hover{transform:none}
+.gcard:hover .logo img{transform:scale(1.15)}
+.gcard .meta{padding-top:16px;gap:7px}
+.gcard .meta .t{font-size:18px;letter-spacing:.08em}
+.gcard .meta .s{font-size:14.5px;line-height:1.5;margin-top:2px;max-width:250px}
 
 /* ============ ACCESO — ¿CÓMO VAS A ENTRAR? ============ */
 .access{position:relative;overflow:hidden}
@@ -802,6 +805,46 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
 .cal-embed::-webkit-scrollbar{width:6px}
 .cal-embed::-webkit-scrollbar-thumb{background:#d1d1d1;border-radius:10px}
 @media(max-width:640px){.cal-embed{height:560px}}
+
+/* ===== V53 · calendario más compacto ===== */
+.agenda-block{grid-template-columns:.8fr 1fr}
+.agenda-block .cal-embed{height:540px;max-width:640px;margin-left:auto}
+@media(max-width:820px){.agenda-block .cal-embed{height:540px;max-width:none}}
+
+/* ===== V53 · tarjetas acceso: blanco limpio + alineación (CTA al fondo) ===== */
+.entry{display:flex;flex-direction:column}
+.entry.feat{background:#fff}
+.entry .ecta{margin-top:auto}
+.entry .ebody{margin-bottom:28px}
+
+/* ===== V53 · diferenciación Filosofía / Cómo trabajamos ===== */
+#quienes{background:linear-gradient(180deg,#E6EFF4,#EDF4F7)}
+#quienes .q-title,#quienes .q-body p{color:#0C1D28}
+#flow{background:var(--bg2)}
+
+/* ===== V53 · VIP CTA (Suscripción VIP) ===== */
+.vip-cta-mod{display:none}
+body.acuerdos .vip-cta-mod{display:block;position:relative;overflow:hidden;
+  max-width:760px;margin:clamp(28px,3.2vw,44px) auto 0;padding:clamp(30px,3.4vw,48px);
+  border-radius:18px;border:1px solid var(--brand-line);text-align:center;
+  background:linear-gradient(135deg,#0C2130 0%,#0A1622 60%,#0B2C3D 120%);color:#EAF3F8}
+.vip-cta-mod .vip-k{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.22em;
+  text-transform:uppercase;color:#57C6E4;background:rgba(87,198,228,.12);padding:7px 14px;border-radius:20px}
+.vip-cta-mod h3{margin-top:18px;font-size:clamp(24px,2.8vw,34px);font-weight:600;color:#fff;letter-spacing:-.02em;line-height:1.1}
+.vip-cta-mod p{margin:14px auto 0;max-width:520px;font-size:14.5px;color:#B9CDD8;font-weight:300;line-height:1.7}
+.vip-cta-mod .vip-btn{margin-top:26px;display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700;
+  padding:17px 34px;border-radius:10px;background:#2E9AC6;color:#fff;letter-spacing:.01em;
+  box-shadow:0 0 0 0 rgba(87,198,228,.55);animation:vipPulse 2.8s var(--ease) infinite;
+  transition:transform .3s var(--ease),background-color .3s}
+.vip-cta-mod .vip-btn:hover{background:#57C6E4;transform:translateY(-2px);animation:none}
+.vip-cta-mod .vip-btn i{transition:transform .3s var(--ease)}
+.vip-cta-mod .vip-btn:hover i{transform:translateX(4px)}
+.vip-cta-mod .vip-fine{margin-top:14px;font-size:11.5px;color:#6E8695}
+@keyframes vipPulse{0%{box-shadow:0 0 0 0 rgba(87,198,228,.5)}70%{box-shadow:0 0 0 16px rgba(87,198,228,0)}100%{box-shadow:0 0 0 0 rgba(87,198,228,0)}}
+@media(prefers-reduced-motion:reduce){.vip-cta-mod .vip-btn{animation:none}}
+/* VIP secundario en tarjeta suscriptor */
+.vip-mini{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink2)}
+.vip-mini a{color:var(--brand);font-weight:600}
 </style>
 </head>
 <body data-testid="v03-body">
@@ -1064,7 +1107,13 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
       </ul>
     </div>
     </div>
-    <p class="vip-note" data-testid="vip-note">Universo Acuerdos formará parte de la <b>Suscripción VIP</b> de OPORTUNIIA · próximamente. <a href="#acceso" data-testid="vip-cta">Solicitar acceso →</a></p>
+    <div class="vip-cta-mod" data-testid="vip-cta-module">
+      <span class="vip-k"><i data-lucide="sparkles" style="width:14px;height:14px"></i> Suscripción VIP · Próximamente</span>
+      <h3>Accede al Universo Acuerdos.</h3>
+      <p>Operaciones estructuradas con mayor visibilidad sobre capital, plazo y resultado previsto.</p>
+      <a href="#acceso" class="vip-btn" data-testid="vip-cta">Solicitar acceso VIP <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
+      <p class="vip-fine">Acceso sujeto a validación profesional.</p>
+    </div>
     <p class="deal-note reveal d2" style="margin-top:30px;font-size:11px;opacity:.6">* Datos demostrativos.</p>
   </div>
 </section>
@@ -1169,6 +1218,7 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
         <h3>Suscriptor</h3>
         <p>Ya formas parte de OPORTUNIIA. Accede con tu código a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p>
         <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Entrar con mi código <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <p class="vip-mini" data-testid="vip-cta-secondary">¿Aún sin acceso? <a href="#acceso">Solicitar acceso VIP →</a></p>
       </div>
     </div>
     <div class="agenda-block reveal d2" id="agenda" data-testid="agenda-videollamada">
@@ -1229,13 +1279,13 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
       </div>
     </div>
     <div class="grupo-grid">
-      <a href="https://oportuniia.com" target="_blank" rel="noopener" class="gcard reveal d1" data-testid="grupo-oportuniia">
-        <div class="logo"><img src="/grupo/oportuniia.webp" alt="OPORTUNIIA" loading="lazy"></div>
-        <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Humanizamos la deuda.</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
-      </a>
-      <a href="#" class="gcard reveal d2" data-testid="grupo-living">
+      <a href="#" class="gcard reveal d1" data-testid="grupo-living">
         <div class="logo"><img src="/grupo/living.webp" alt="LIVING EXPERIENCE" loading="lazy"></div>
         <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La compra de Obra Nueva se convierte en experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
+      </a>
+      <a href="https://oportuniia.com" target="_blank" rel="noopener" class="gcard reveal d2" data-testid="grupo-oportuniia">
+        <div class="logo"><img src="/grupo/oportuniia.webp" alt="OPORTUNIIA" loading="lazy"></div>
+        <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Humanizamos la deuda.</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
       <div class="gcard soon reveal d3" data-testid="grupo-robotics">
         <span class="gsoon">Próximamente</span>
@@ -1313,18 +1363,8 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
     segbtns.forEach(b=>b.classList.toggle('on',(b.dataset.mode==='acuerdos')===on));
   }
   segbtns.forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode==='acuerdos')));
-  // Primera visita: demostración sutil (Judiciales -> Acuerdos -> Judiciales) una sola vez al entrar en vista
-  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-    const sw=document.getElementById('acuerdos'); let done=false;
-    if(sw){
-      const io=new IntersectionObserver((es)=>{es.forEach(e=>{
-        if(e.isIntersecting&&!done){done=true;
-          setTimeout(()=>{setMode(true);setTimeout(()=>setMode(false),1400);},650);
-          io.disconnect();}
-      })},{threshold:.55});
-      io.observe(sw);
-    }
-  }
+  // Estado inicial SIEMPRE Ejecuciones Judiciales. Sin demo/auto-switch: el cambio de universo es solo manual (click).
+  setMode(false);
 </script>
 <script src="https://link.msgsndr.com/js/form_embed.js" type="text/javascript"></script>
 </body>
