@@ -127,6 +127,19 @@ b) GRUPO OPORTUNIIA — assets ORIGINALES del CDN restaurados (sin reprocesar; l
 Verificado por screenshot + medición offsetTop. FREEZE total en resto. Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba.
 Estado V11-Definitiva: PASS (técnico).
 
+## Estado — HOME · ITERACIÓN CONSOLIDADA POST-ORACLE (2026-06)
+Scope autorizado ejecutado (solo web2.html + 3 assets derivados locales):
+1. FREEZE geometría Judiciales↔Acuerdos: medido offsetTop → JUDICIAL=164px, ACUERDOS=164px, DIFF=0px. acuIn opacity-only.
+2. Bloque info Acuerdos ("Más control…" + 6 variables) reinsertado DEBAJO de las tarjetas (infoTop>gridTop), panel secundario integrado (tinte brand, no caja blanca gigante). No empuja selector/cards.
+3. Ritmo vertical: `.sec` padding reducido clamp(60,7.5vw,116). 4. Alternancia light/dark: #tecnologia ahora petrol/oscuro; #quienes en bg2 (variación tonal).
+5. Calendario REAL LeadConnector embebido (widget A7XNkrehcriifyMZe98E) en #agenda vía iframe + form_embed.js; muestra disponibilidad directa. 6. AUDIT: evento "30 min" pero descripción dice "15 minutos" → INCONSISTENTE (corregir en GoHighLevel, no bloquea).
+7. Audiencia videollamada reenfocada (inversores/colaboradores/contactos; no principal para fondos).
+8-10. Fondos&Servicers rediseñado: "Su cartera. Clara, ordenada y bajo control." + panel dashboard DEMO/abstracto (KPIs con "—", barras demo, sin métricas reales) + CTA "Acceder con código" (no videollamada). Sin arquitectura de identidad/auth (CTA demo).
+11. Nav: "Quiénes somos" → "Nuestra filosofía" (nav desktop, móvil, footer). 12. Sección filosofía reescrita (principio, no About genérico).
+13-15. ESCUDOS (Oracle root cause): assets ORIGINALES CDN preservados intactos; creados 3 derivados LOCALES `/app/frontend/public/grupo/*.png` recortando SOLO la banda del texto quemado (source 1254×1254 → derived 1254×626, escudo 100% completo, 0 px de escudo eliminados, sin IA/redibujo). CSS: `object-fit:contain` + `object-position:center` (SIN cover, SIN object-position hack), contenedor `aspect 7/4`. Escudos completos, centrados, aire equilibrado, misma escala.
+Mobile 390px: sin overflow horizontal. Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba.
+Estado: IMPLEMENTED, TECHNICAL QA PASS, HUMAN VISUAL APPROVAL PENDING.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).

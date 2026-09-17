@@ -458,8 +458,7 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
   transition:transform .55s var(--ease);text-align:center}
 .gcard:hover{transform:translateY(-5px)}
 .gcard .logo{aspect-ratio:1/1;display:grid;place-items:center;overflow:hidden;background:transparent}
-.gcard .logo img{width:100%;height:100%;object-fit:cover;object-position:center 26%;transition:transform 1.2s var(--ease)}
-.gcard[data-testid="grupo-robotics"] .logo img{object-position:center 23%}
+.gcard .logo img{width:100%;height:100%;object-fit:contain;object-position:center;transition:transform 1.2s var(--ease)}
 .gcard:hover .logo img{transform:scale(1.06)}
 .gcard .meta{padding:12px 16px 0;display:flex;flex-direction:column;align-items:center;gap:5px}
 .gcard .meta .t{font-size:15px;font-weight:600;letter-spacing:.09em;color:#F6F8FA;display:block}
@@ -475,7 +474,7 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 .grupo.sec{padding-top:clamp(54px,6.5vw,84px);padding-bottom:clamp(54px,6.5vw,84px)}
 .grupo h2{font-size:clamp(24px,3.2vw,38px)}
 .grupo-grid{gap:16px;margin:32px auto 0;max-width:840px}
-.gcard .logo{aspect-ratio:1.95/1;border-radius:12px}
+.gcard .logo{aspect-ratio:7/4;border-radius:12px}
 .gcard .meta{padding-top:10px}
 .gcard .meta .t{font-size:13px}
 .gcard .meta .s{font-size:11px}
@@ -554,7 +553,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   .flow-grid{grid-template-columns:1fr 1fr;gap:44px 26px}
   .flow-grid::before{display:none}
   .grupo-grid{grid-template-columns:1fr;max-width:420px;margin-left:auto;margin-right:auto}
-  .gcard .logo{aspect-ratio:1.95/1}
+  .gcard .logo{aspect-ratio:7/4}
   .entry-grid{grid-template-columns:1fr}
   .sec-head{grid-template-columns:1fr;gap:24px}
 }
@@ -570,7 +569,7 @@ footer{background:var(--grup-bg);color:#C4D2DC;padding:88px 0 40px;position:rela
   .strip .row{gap:36px;font-size:13px}
   .deal-tag{font-size:32px}
   .grupo-grid{max-width:340px}
-  .gcard .logo{aspect-ratio:1.95/1}
+  .gcard .logo{aspect-ratio:7/4}
 }
 /* ============ V9 REFINEMENTS ============ */
 /* desktop-only forced line breaks */
@@ -706,8 +705,11 @@ body.acuerdos #producto .uni-card p{color:#4A6475}
 body.acuerdos #producto .uni-card.uni-hi{background:linear-gradient(150deg,rgba(46,154,198,.12),rgba(46,154,198,.03))}
 body.acuerdos #producto .uni-tag{color:#0C1D28;background:rgba(46,154,198,.16);border-color:rgba(46,154,198,.4)}
 
-/* value proposition — RETIRADO del layout (conservado en HTML para fase posterior). No ocupa espacio. */
-.acu-value{display:none !important}
+/* value proposition — AHORA debajo de las tarjetas de Acuerdos (secundario, integrado, no panel gigante flotante) */
+.acu-value{display:none}
+body.acuerdos #producto .acu-value{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,3vw,44px);align-items:center;
+  margin:clamp(28px,3.4vw,44px) 0 0;padding:clamp(24px,2.8vw,38px);border-radius:16px;
+  background:linear-gradient(135deg,rgba(46,154,198,.10),rgba(46,154,198,.02));border:1px solid rgba(46,154,198,.28)}
 .acu-value .av-l h4{font-size:clamp(20px,2.2vw,26px);font-weight:600;color:#0C1D28;letter-spacing:-.02em}
 .acu-value .av-l p{margin-top:12px;font-size:14.5px;line-height:1.7;color:#4A6475;font-weight:300}
 .acu-value .av-vars{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -721,6 +723,64 @@ body.acuerdos .vip-note b{color:#0C1D28;font-weight:600}
 body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
 
 @media(max-width:820px){.uni-grid{grid-template-columns:1fr}body.acuerdos #producto .acu-value{grid-template-columns:1fr}.types-explain{grid-template-columns:1fr}}
+
+/* ===== POST-OPORTUNIDADES · RITMO VERTICAL + ALTERNANCIA LIGHT/DARK ===== */
+.sec{padding:clamp(60px,7.5vw,116px) 0}
+/* Filosofía: bloque de principio, no caja corporativa genérica */
+#quienes{background:var(--bg2)}
+#quienes .q-title{font-size:clamp(28px,3.6vw,50px)}
+.q-close{margin-top:24px;font-size:clamp(17px,1.8vw,21px);color:var(--brand);font-weight:500;line-height:1.5;
+  padding-top:22px;border-top:1px solid var(--brand-line)}
+/* Tecnología: sección petrol/oscura para romper la monotonía clara */
+#tecnologia{--bg:#0A1622;--surface:#0F2130;--ink:#EAF3F8;--ink2:#9DB4C2;--faint:#5E7787;
+  --line:rgba(255,255,255,.10);--line-2:rgba(255,255,255,.05);
+  --brand:#2E9AC6;--brand-2:#57C6E4;--brand-tint:rgba(46,154,198,.14);--brand-line:rgba(46,154,198,.4);
+  background:#0A1622}
+#tecnologia h2,#tecnologia h3{color:#fff}
+#tecnologia .ecolite-left p{color:#C6D6E0}
+
+/* ===== FONDOS & SERVICERS · identidad dashboard (fondo petrol + demo abstracto) ===== */
+.funds-pro{position:relative;overflow:hidden;max-width:1080px;margin:clamp(40px,5vw,72px) auto 0;
+  border-radius:20px;border:1px solid rgba(46,154,198,.35);
+  background:linear-gradient(135deg,#0C1E2C 0%,#0A1622 60%,#0B2C3D 120%);
+  padding:clamp(34px,4vw,60px);color:#EAF3F8}
+.funds-pro::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background:
+   radial-gradient(600px 300px at 85% -10%,rgba(46,154,198,.28),transparent 60%),
+   repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 64px);}
+.funds-pro .fp-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4vw,56px);align-items:center}
+.funds-pro .eyebrow{color:#57C6E4}
+.funds-pro .eyebrow::before{background:#57C6E4}
+.funds-pro h3{font-size:clamp(26px,3vw,40px);font-weight:600;color:#fff;letter-spacing:-.025em;line-height:1.08;margin-top:16px}
+.funds-pro .fp-lead{margin-top:16px;font-size:15px;color:#9DB4C2;font-weight:300;line-height:1.7;max-width:440px}
+.funds-pro .fp-cta{margin-top:26px;display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600;
+  padding:15px 26px;border-radius:8px;background:#2E9AC6;color:#fff;
+  box-shadow:0 18px 42px -18px rgba(46,154,198,.8);transition:transform .3s var(--ease),background-color .3s}
+.funds-pro .fp-cta:hover{transform:translateY(-2px);background:#57C6E4}
+.funds-pro .fp-note{margin-top:14px;font-size:11.5px;color:#5E7787}
+/* panel dashboard DEMO/abstracto */
+.fp-dash{position:relative;z-index:2;border:1px solid rgba(255,255,255,.12);border-radius:14px;
+  background:rgba(10,22,34,.55);backdrop-filter:blur(8px);padding:22px}
+.fp-dash .fp-dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.fp-dash .fp-dh .t{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#8FB6C8;font-weight:600}
+.fp-dash .fp-dh .demo{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:#0A1622;background:#57C6E4;padding:4px 9px;border-radius:20px;font-weight:700}
+.fp-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
+.fp-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 12px}
+.fp-kpi .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#5E7787}
+.fp-kpi .v{font-size:22px;font-weight:700;color:#57C6E4;letter-spacing:-.02em;margin-top:6px}
+.fp-bars{display:flex;flex-direction:column;gap:12px}
+.fp-bar .bl{display:flex;justify-content:space-between;font-size:11.5px;color:#9DB4C2;margin-bottom:6px}
+.fp-bar .bt{height:8px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
+.fp-bar .bf{height:100%;border-radius:6px;background:linear-gradient(90deg,#2E9AC6,#57C6E4)}
+@media(max-width:820px){.funds-pro .fp-grid{grid-template-columns:1fr}}
+
+/* ===== CALENDARIO REAL (LeadConnector) ===== */
+.cal-embed{width:100%;max-width:760px;margin:22px auto 0;height:640px;overflow:hidden;overflow-y:auto;
+  border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-sm);background:#fff;-webkit-overflow-scrolling:touch}
+.cal-embed iframe{width:100%;height:1100px;border:none;display:block}
+.cal-embed::-webkit-scrollbar{width:6px}
+.cal-embed::-webkit-scrollbar-thumb{background:#d1d1d1;border-radius:10px}
+@media(max-width:640px){.cal-embed{height:560px}}
 </style>
 </head>
 <body data-testid="v03-body">
@@ -736,7 +796,7 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
       <nav class="menu" data-testid="main-nav">
         <div class="navitem"><a href="#producto">Oportunidades</a></div>
         <div class="navitem"><a href="#flow">Cómo funciona</a></div>
-        <div class="navitem"><a href="#quienes">Quiénes somos</a></div>
+        <div class="navitem"><a href="#quienes">Nuestra filosofía</a></div>
         <div class="navitem"><a href="#grupo">Grupo OPORTUNIIA</a></div>
         <div class="navitem"><a href="#footer">Contacto</a></div>
       </nav>
@@ -753,7 +813,7 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
 <div class="mmenu" id="mmenu" data-testid="mobile-menu">
   <a href="#producto">Oportunidades</a>
   <a href="#flow">Cómo funciona</a>
-  <a href="#quienes">Quiénes somos</a>
+  <a href="#quienes">Nuestra filosofía</a>
   <a href="#grupo">Grupo OPORTUNIIA</a>
   <a href="#footer">Contacto</a>
   <a href="#acceso" class="btn">Solicitar acceso</a>
@@ -849,15 +909,6 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
       </div>
     </div>
     <div class="acu-surface" data-testid="acu-surface">
-    <div class="acu-value" data-testid="acu-value">
-      <div class="av-l">
-        <h4>Más control. Menos incertidumbre.</h4>
-        <p>En Universo Acuerdos partimos de operaciones estructuradas: sabes qué capital necesitas, qué plazo manejamos y cuál es el resultado económico previsto.</p>
-      </div>
-      <ul class="av-vars">
-        <li>Capital / inversión</li><li>Tiempo estimado</li><li>Resultado previsto</li><li>ROI</li><li>Situación del activo</li><li>Estructura del acuerdo</li>
-      </ul>
-    </div>
     <div class="deal-grid grid-rec">
       <!-- NPL -->
       <div class="deal reveal d1" data-testid="deal-npl">
@@ -982,6 +1033,15 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
         </div>
       </div>
     </div>
+    <div class="acu-value" data-testid="acu-value">
+      <div class="av-l">
+        <h4>Más control. Menos incertidumbre.</h4>
+        <p>En Universo Acuerdos partimos de operaciones estructuradas: sabes qué capital necesitas, qué plazo manejamos y cuál es el resultado económico previsto.</p>
+      </div>
+      <ul class="av-vars">
+        <li>Capital / inversión</li><li>Tiempo estimado</li><li>Resultado previsto</li><li>ROI</li><li>Situación del activo</li><li>Estructura del acuerdo</li>
+      </ul>
+    </div>
     </div>
     <p class="vip-note" data-testid="vip-note">Universo Acuerdos formará parte de la <b>Suscripción VIP</b> de OPORTUNIIA · próximamente. <a href="#acceso" data-testid="vip-cta">Solicitar acceso →</a></p>
     <p class="deal-note reveal d2" style="margin-top:30px;font-size:11px;opacity:.6">* Datos demostrativos.</p>
@@ -993,13 +1053,13 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
   <div class="wrap">
     <div class="q-grid">
       <div class="reveal">
-        <div class="eyebrow" style="margin-bottom:24px">Quiénes somos</div>
-        <h2 class="q-title">Detrás de cada operación hay personas, patrimonio y decisiones.</h2>
+        <div class="eyebrow" style="margin-bottom:24px">Nuestra filosofía</div>
+        <h2 class="q-title">Detrás de cada deuda hay una solución que merece ser explorada.</h2>
       </div>
       <div class="q-body reveal d1">
-        <p>Trabajamos con deuda, pero nunca la miramos solo como un número. OPORTUNIIA nace de años trabajando operaciones complejas y de una idea sencilla: <b>entenderlas mejor para resolverlas mejor</b>.</p>
-        <p>Por eso analizamos cada caso desde todas sus posibilidades, no desde una única salida. Eso es, para nosotros, <b>humanizar la deuda</b>.</p>
-        <a href="#acceso" class="q-link" data-testid="quienes-link">Trabaja con OPORTUNIIA <i data-lucide="arrow-up-right"></i></a>
+        <p>Antes de asumir que el recorrido debe ser judicial, buscamos entender la operación, las circunstancias y las alternativas posibles. Siempre que existe una vía razonable de acuerdo, <b>trabajamos para impulsarla</b>.</p>
+        <p>Porque resolver antes, reducir incertidumbre y encontrar un punto de encuentro puede generar más valor para todas las partes.</p>
+        <p class="q-close"><b>Humanizar la deuda también es intentar resolverla de otra manera.</b></p>
       </div>
     </div>
   </div>
@@ -1093,16 +1153,35 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
     <div class="agenda-block reveal d2" id="agenda" data-testid="agenda-videollamada" style="max-width:1000px;margin:30px auto 0;padding:clamp(30px,3.5vw,52px);border-radius:18px;background:linear-gradient(135deg,var(--brand-tint),var(--surface));border:1px solid var(--brand-line);text-align:center">
       <div class="eyebrow" style="justify-content:center;margin-bottom:16px">¿Hablamos?</div>
       <h3 style="font-size:clamp(26px,3vw,40px);font-weight:600;color:var(--ink);letter-spacing:-.03em;line-height:1.08">Agenda una videollamada</h3>
-      <p style="margin:14px auto 24px;max-width:560px;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7">Elige el día y la hora que mejor te venga. Para inversores, colaboradores, fondos y servicers.</p>
-      <a href="#" class="btn" data-testid="agenda-cta" aria-disabled="true">Ver disponibilidad <i data-lucide="calendar" style="width:16px;height:16px"></i></a>
-      <p style="margin-top:14px;font-size:11.5px;color:var(--faint)">Calendario en preparación · disponibilidad próximamente</p>
+      <p style="margin:14px auto 6px;max-width:560px;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7">Elige directamente el día y la hora en el calendario. Para inversores, colaboradores y contactos profesionales.</p>
+      <div class="cal-embed" data-testid="agenda-calendar">
+        <iframe src="https://api.leadconnectorhq.com/widget/booking/A7XNkrehcriifyMZe98E" scrolling="no" title="Reserva de videollamada OPORTUNIIA"></iframe>
+      </div>
     </div>
     <p class="access-foot reveal d2">Inversores y colaboradores, sujetos a verificación profesional. Suscriptores, acceso con código.</p>
-    <div class="funds-band reveal" data-testid="funds-servicers" style="max-width:1000px;margin:44px auto 0;padding:clamp(26px,3vw,40px);border:1px solid var(--brand-line);border-radius:16px;background:linear-gradient(135deg,var(--brand-tint),var(--surface));text-align:center">
-      <div class="eyebrow" style="justify-content:center;margin-bottom:14px">Para fondos y servicers</div>
-      <h3 style="font-size:clamp(22px,2.4vw,30px);font-weight:600;color:var(--ink);letter-spacing:-.02em">¿Gestionas una cartera?</h3>
-      <p style="margin:14px auto 22px;max-width:640px;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7">Un entorno para seguir la evolución de las operaciones, ventas y resultados de la cartera gestionada. Trabajamos también directamente con origen de cartera.</p>
-      <a href="#agenda" class="btn" data-testid="funds-cta">Agenda una videollamada <i data-lucide="arrow-up-right" style="width:16px;height:16px"></i></a>
+    <div class="funds-pro reveal" data-testid="funds-servicers">
+      <div class="fp-grid">
+        <div class="fp-copy">
+          <div class="eyebrow">Para fondos y servicers</div>
+          <h3>Su cartera. Clara, ordenada y bajo control.</h3>
+          <p class="fp-lead">Consulte la evolución de sus operaciones, ventas, descartes y resultados desde un único entorno.</p>
+          <a href="#" class="fp-cta" data-testid="funds-cta">Acceder con código <i data-lucide="lock" style="width:16px;height:16px"></i></a>
+          <p class="fp-note">Acceso reservado a fondos y servicers autorizados.</p>
+        </div>
+        <div class="fp-dash" aria-hidden="true">
+          <div class="fp-dh"><span class="t">Cartera · visión general</span><span class="demo">Demo</span></div>
+          <div class="fp-kpis">
+            <div class="fp-kpi"><span class="k">Operaciones</span><span class="v">—</span></div>
+            <div class="fp-kpi"><span class="k">En curso</span><span class="v">—</span></div>
+            <div class="fp-kpi"><span class="k">Cerradas</span><span class="v">—</span></div>
+          </div>
+          <div class="fp-bars">
+            <div class="fp-bar"><div class="bl"><span>Trabajadas</span><span>demo</span></div><div class="bt"><div class="bf" style="width:72%"></div></div></div>
+            <div class="fp-bar"><div class="bl"><span>Vendidas</span><span>demo</span></div><div class="bt"><div class="bf" style="width:48%"></div></div></div>
+            <div class="fp-bar"><div class="bl"><span>Descartadas</span><span>demo</span></div><div class="bt"><div class="bf" style="width:21%"></div></div></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -1118,16 +1197,16 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
     </div>
     <div class="grupo-grid">
       <a href="https://oportuniia.com" target="_blank" rel="noopener" class="gcard reveal d1" data-testid="grupo-oportuniia">
-        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/jjknh2bb_OPORTUNIIA.png" alt="OPORTUNIIA" loading="lazy"></div>
+        <div class="logo"><img src="/grupo/oportuniia.png" alt="OPORTUNIIA" loading="lazy"></div>
         <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Humanizamos la deuda.</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
       <a href="#" class="gcard reveal d2" data-testid="grupo-living">
-        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6f5o2w4o_LIVING.png" alt="LIVING EXPERIENCE" loading="lazy"></div>
+        <div class="logo"><img src="/grupo/living.png" alt="LIVING EXPERIENCE" loading="lazy"></div>
         <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La compra de Obra Nueva se convierte en experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
       <div class="gcard soon reveal d3" data-testid="grupo-robotics">
         <span class="gsoon">Próximamente</span>
-        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6tt8feid_ROBOTICS.png" alt="ROBOTICS" loading="lazy"></div>
+        <div class="logo"><img src="/grupo/robotics.png" alt="ROBOTICS" loading="lazy"></div>
         <div class="meta"><span><span class="t">ROBOTICS</span><span class="s">Optimizamos recursos para que las personas lleguen más lejos</span></span><span class="go"><i data-lucide="clock"></i></span></div>
       </div>
     </div>
@@ -1146,7 +1225,7 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
         <h4>OPORTUNIIA</h4>
         <a href="#producto">Oportunidades</a>
         <a href="#flow">Cómo funciona</a>
-        <a href="#quienes">Quiénes somos</a>
+        <a href="#quienes">Nuestra filosofía</a>
         <a href="#tecnologia">Tecnología</a>
         <a href="#acceso">Acceso profesional</a>
       </div>
@@ -1214,5 +1293,6 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
     }
   }
 </script>
+<script src="https://link.msgsndr.com/js/form_embed.js" type="text/javascript"></script>
 </body>
 </html>
