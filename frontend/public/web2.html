@@ -845,6 +845,150 @@ body.acuerdos .vip-cta-mod{display:block;position:relative;overflow:hidden;
 /* VIP secundario en tarjeta suscriptor */
 .vip-mini{margin-top:16px;padding-top:16px;border-top:1px solid var(--line);font-size:12.5px;color:var(--ink2)}
 .vip-mini a{color:var(--brand);font-weight:600}
+
+/* =================================================================
+   V54 · CORRECCIÓN VISUAL CONSOLIDADA RAFA + ALBA
+   (overrides finales; ritmo OSCURO↔CLARO, fuera degradados pastel)
+   ================================================================= */
+
+/* ---- 5 · HERO OSCURO OPORTUNIIA + animación elegante ---- */
+.hero{
+  --bg:#0A1622;--surface:#0F2130;--ink:#EAF3F8;--ink2:#9DB4C2;--faint:#5E7787;
+  --line:rgba(255,255,255,.12);--line-2:rgba(255,255,255,.06);
+  --brand:#1F6588;--brand-2:#2E9AC6;--brand-tint:rgba(46,154,198,.14);--brand-line:rgba(46,154,198,.4);
+  background:#0A1622;color:var(--ink)}
+.hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(1200px 640px at 82% -14%,rgba(46,154,198,.20),transparent 60%),
+    radial-gradient(900px 640px at -6% 112%,rgba(31,101,136,.16),transparent 62%)}
+.hero .wrap{position:relative;z-index:2}
+.hero h1{color:#fff}
+.hero h1 em{color:#57C6E4}
+.hero-lead{color:#B9CDD8}
+.hero .strip{border-color:rgba(255,255,255,.12)}
+.hero .strip .row{color:#9DB4C2}
+.hero .strip .row b{color:#fff}
+/* animación de entrada: lead + CTA + strip fade-up escalonado (0 CLS) */
+.hero-lead,.hero-cta{opacity:0;transform:translateY(22px);
+  transition:opacity .9s var(--ease),transform .9s var(--ease)}
+.hero.in .hero-lead{opacity:1;transform:none;transition-delay:.34s}
+.hero.in .hero-cta{opacity:1;transform:none;transition-delay:.46s}
+.hero .strip{opacity:0;transition:opacity 1s var(--ease)}
+.hero.in .strip{opacity:1;transition-delay:.62s}
+@media(prefers-reduced-motion:reduce){
+  .hero h1 .l span{transform:none!important;transition:none!important}
+  .hero-lead,.hero-cta,.hero .strip{opacity:1!important;transform:none!important;transition:none!important}}
+
+/* HEADER legible sobre HERO oscuro (estado top / no-scroll) */
+header:not(.sc) .brand-logo-img{filter:brightness(0) invert(1);transition:filter .4s var(--ease)}
+header:not(.sc) .navitem>a,header:not(.sc) .actions .ghost{color:rgba(255,255,255,.82)}
+header:not(.sc) .navitem>a:hover,header:not(.sc) .actions .ghost:hover{color:#fff}
+header:not(.sc) .burger span,
+header:not(.sc) .burger span::before,
+header:not(.sc) .burger span::after{background:#fff}
+header.sc .brand-logo-img{filter:none;transition:filter .4s var(--ease)}
+
+/* ---- 6A · SELECTOR: activo = bloque OPORTUNIIA sólido · uni-hi sin pastel ---- */
+.modeswitch .ms-btn.on{background:#1F6588;color:#fff;box-shadow:0 16px 40px -18px rgba(31,101,136,.9)}
+body.acuerdos #producto .ms-btn.on{background:#1F6588;color:#fff}
+.uni-card.uni-hi,
+body.acuerdos #producto .uni-card.uni-hi{background:#0B2C3D;border-color:rgba(46,154,198,.5)}
+.uni-card.uni-hi .uni-k,
+body.acuerdos #producto .uni-card.uni-hi .uni-k{color:#57C6E4}
+.uni-card.uni-hi p,
+body.acuerdos #producto .uni-card.uni-hi p{color:#D3E3EC}
+.uni-card.uni-hi .uni-tag,
+body.acuerdos #producto .uni-card.uni-hi .uni-tag{color:#fff;background:rgba(46,154,198,.3);border-color:rgba(46,154,198,.5)}
+
+/* ---- 6B · "Más control. Menos incertidumbre." = bloque OSCURO sólido ---- */
+body.acuerdos #producto .acu-value{background:#0A1622;border:1px solid rgba(46,154,198,.4)}
+.acu-value .av-l h4,body.acuerdos #producto .acu-value .av-l h4{color:#fff}
+.acu-value .av-l p,body.acuerdos #producto .acu-value .av-l p{color:#B9CDD8}
+.acu-value .av-vars li,body.acuerdos #producto .acu-value .av-vars li{
+  background:rgba(255,255,255,.06);border:1px solid rgba(46,154,198,.28);color:#EAF3F8}
+.acu-value .av-vars li::before,body.acuerdos #producto .acu-value .av-vars li::before{background:#57C6E4}
+
+/* ---- 7 · FILOSOFÍA (petrol oscuro) vs CÓMO TRABAJAMOS (claro) · alto contraste ---- */
+#quienes{background:#0F3A52;position:relative}
+#quienes::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,#57C6E4,rgba(87,198,228,0))}
+#quienes .eyebrow{color:#57C6E4}
+#quienes .eyebrow::before{background:#57C6E4}
+#quienes .q-title,#quienes .q-body p{color:#C6D6E0}
+#quienes .q-title{color:#fff}
+#quienes .q-body p b{color:#fff}
+#quienes .q-close{color:#8FD6EC;border-top-color:rgba(46,154,198,.4)}
+#flow{background:#F4F1E9}
+
+/* ---- 8 · AGENDA VIDEOLLAMADA = bloque OSCURO OPORTUNIIA ---- */
+.agenda-block{background:#0A1622;border:1px solid rgba(46,154,198,.4)}
+.agenda-block .ab-copy .eyebrow{color:#57C6E4}
+.agenda-block .ab-copy .eyebrow::before{background:#57C6E4}
+.agenda-block .ab-copy h3{color:#fff}
+.agenda-block .ab-copy p{color:#B9CDD8}
+.ab-benes li{color:#EAF3F8}
+.ab-benes li i{color:#57C6E4}
+
+/* ---- 3 · TARJETAS PROFESIONALES · aire vertical + CTA alineados al fondo ---- */
+.entry .opts,.entry .feats{flex:0 0 auto;margin-bottom:26px}
+.entry p{margin-bottom:6px}
+.entry .ecta{margin-top:auto}
+
+/* ---- 1 · VIP CTA · BANNER a todo el ancho editorial ---- */
+body.acuerdos .vip-cta-mod{
+  position:relative;overflow:hidden;max-width:none;width:100%;
+  margin:clamp(30px,3.6vw,52px) 0 0;
+  padding:clamp(38px,4.4vw,64px) clamp(32px,5vw,88px);
+  display:grid;grid-template-columns:1.5fr auto;gap:clamp(28px,4vw,68px);align-items:center;text-align:left;
+  background:linear-gradient(120deg,#0A1622 0%,#0C2130 50%,#0B2C3D 118%)}
+.vip-cta-mod::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(620px 320px at 90% -10%,rgba(87,198,228,.18),transparent 62%)}
+.vip-cta-mod .vip-main{position:relative;z-index:2}
+.vip-cta-mod h3{margin-top:16px;font-size:clamp(28px,3.4vw,46px)}
+.vip-cta-mod p{margin:14px 0 0;max-width:640px}
+.vip-cta-mod .vip-side{position:relative;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:10px}
+.vip-cta-mod .vip-side .vip-btn{margin-top:0}
+.vip-cta-mod .vip-side .vip-fine{margin-top:2px}
+@media(max-width:820px){
+  body.acuerdos .vip-cta-mod{grid-template-columns:1fr;gap:26px}
+  .vip-cta-mod .vip-side{align-items:stretch}
+  .vip-cta-mod .vip-side .vip-btn{justify-content:center}}
+
+/* ---- 4 · FONDOS & SERVICERS · compacto + dashboard realista ---- */
+.funds-pro{min-height:auto;display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(30px,4vw,60px);
+  align-items:center;padding:clamp(32px,3.8vw,54px)}
+.funds-pro .fp-inner{max-width:none;position:relative;z-index:3}
+.funds-pro .fp-bg{opacity:.45}
+.funds-pro .fp-bg::after{background:linear-gradient(120deg,rgba(10,22,34,.9) 0%,rgba(10,22,34,.55) 60%,rgba(10,22,34,.2) 100%)}
+.fp-dash{position:relative;z-index:3;background:rgba(9,20,30,.74);border:1px solid rgba(46,154,198,.32);
+  border-radius:16px;padding:clamp(18px,1.6vw,24px);backdrop-filter:blur(8px);
+  box-shadow:0 34px 74px -42px rgba(0,0,0,.75)}
+.fpd-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.fpd-title{font-size:13px;font-weight:600;color:#EAF3F8;letter-spacing:.02em}
+.fpd-live{display:inline-flex;align-items:center;gap:7px;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#8FD6EC}
+.fpd-live .p{width:7px;height:7px;border-radius:50%;background:#57C6E4;box-shadow:0 0 0 3px rgba(87,198,228,.22)}
+.fpd-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.fpd-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:12px 13px}
+.fpd-kpi .k{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:#7E97A6}
+.fpd-kpi .v{font-size:21px;font-weight:700;color:#fff;margin-top:5px;letter-spacing:-.02em}
+.fpd-kpi .v small{font-size:11px;color:#8FD6EC;font-weight:600;margin-left:3px}
+.fpd-chart{display:flex;align-items:flex-end;gap:6px;height:86px;padding:8px 2px 0;
+  border-top:1px solid rgba(255,255,255,.07);border-bottom:1px solid rgba(255,255,255,.07)}
+.fpd-chart .bar{flex:1;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#57C6E4,#1F6588);
+  transition:transform .4s var(--ease);transform-origin:bottom}
+.fp-dash:hover .fpd-chart .bar{transform:scaleY(1.06)}
+.fpd-rows{margin-top:14px}
+.fpd-row{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;
+  padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:12px}
+.fpd-row:last-child{border-bottom:none}
+.fpd-row .rc{font-weight:700;color:#57C6E4;letter-spacing:.06em;font-size:11.5px}
+.fpd-row .rn{color:#B9CDD8;font-weight:300}
+.fpd-row .rs{font-size:10px;letter-spacing:.05em;text-transform:uppercase;padding:4px 9px;border-radius:20px;font-weight:600}
+.fpd-row .rs.ok{background:rgba(87,198,228,.14);color:#8FD6EC}
+.fpd-row .rs.wait{background:rgba(255,255,255,.08);color:#AFC4D2}
+.fpd-cap{margin-top:12px;font-size:10.5px;color:#5E7787;letter-spacing:.02em}
+@media(max-width:900px){.funds-pro{grid-template-columns:1fr;gap:28px}}
+
 </style>
 </head>
 <body data-testid="v03-body">
@@ -1108,11 +1252,15 @@ body.acuerdos .vip-cta-mod{display:block;position:relative;overflow:hidden;
     </div>
     </div>
     <div class="vip-cta-mod" data-testid="vip-cta-module">
-      <span class="vip-k"><i data-lucide="sparkles" style="width:14px;height:14px"></i> Suscripción VIP · Próximamente</span>
-      <h3>Accede al Universo Acuerdos.</h3>
-      <p>Operaciones estructuradas con mayor visibilidad sobre capital, plazo y resultado previsto.</p>
-      <a href="#acceso" class="vip-btn" data-testid="vip-cta">Solicitar acceso VIP <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
-      <p class="vip-fine">Acceso sujeto a validación profesional.</p>
+      <div class="vip-main">
+        <span class="vip-k"><i data-lucide="sparkles" style="width:14px;height:14px"></i> Suscripción VIP · Próximamente</span>
+        <h3>Accede al Universo Acuerdos.</h3>
+        <p>Operaciones estructuradas con mayor visibilidad sobre capital, plazo y resultado previsto. Un acceso reservado, pensado para inversores y profesionales que quieren entrar antes.</p>
+      </div>
+      <div class="vip-side">
+        <a href="#acceso" class="vip-btn" data-testid="vip-cta">Solicitar acceso VIP <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
+        <p class="vip-fine">Acceso sujeto a validación profesional.</p>
+      </div>
     </div>
     <p class="deal-note reveal d2" style="margin-top:30px;font-size:11px;opacity:.6">* Datos demostrativos.</p>
   </div>
@@ -1218,7 +1366,6 @@ body.acuerdos .vip-cta-mod{display:block;position:relative;overflow:hidden;
         <h3>Suscriptor</h3>
         <p>Ya formas parte de OPORTUNIIA. Accede con tu código a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p>
         <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Entrar con mi código <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
-        <p class="vip-mini" data-testid="vip-cta-secondary">¿Aún sin acceso? <a href="#acceso">Solicitar acceso VIP →</a></p>
       </div>
     </div>
     <div class="agenda-block reveal d2" id="agenda" data-testid="agenda-videollamada">
@@ -1239,23 +1386,13 @@ body.acuerdos .vip-cta-mod{display:block;position:relative;overflow:hidden;
     <p class="access-foot reveal d2">Inversores y colaboradores, sujetos a verificación profesional. Suscriptores, acceso con código.</p>
     <div class="funds-pro reveal" data-testid="funds-servicers">
       <div class="fp-bg" aria-hidden="true">
-        <svg viewBox="0 0 1200 400" preserveAspectRatio="xMaxYMid slice">
+        <svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
           <defs>
-            <linearGradient id="fpArea" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0" stop-color="#57C6E4" stop-opacity=".34"/>
-              <stop offset="1" stop-color="#57C6E4" stop-opacity="0"/>
-            </linearGradient>
             <pattern id="fpGrid" width="60" height="60" patternUnits="userSpaceOnUse">
               <path d="M60 0H0V60" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
             </pattern>
           </defs>
           <rect x="0" y="0" width="1200" height="400" fill="url(#fpGrid)"/>
-          <path d="M0 300 L120 285 L240 300 L360 250 L480 265 L600 200 L720 215 L840 150 L960 175 L1080 110 L1200 130 L1200 400 L0 400 Z" fill="url(#fpArea)"/>
-          <path d="M0 300 L120 285 L240 300 L360 250 L480 265 L600 200 L720 215 L840 150 L960 175 L1080 110 L1200 130" fill="none" stroke="#57C6E4" stroke-width="2.5" stroke-opacity=".85"/>
-          <path d="M0 340 L150 335 L300 342 L450 320 L600 328 L750 300 L900 312 L1050 285 L1200 296" fill="none" stroke="#2E9AC6" stroke-width="1.6" stroke-opacity=".5" stroke-dasharray="4 7"/>
-          <g fill="#57C6E4">
-            <circle cx="600" cy="200" r="4"/><circle cx="840" cy="150" r="4"/><circle cx="1080" cy="110" r="4.5"/>
-          </g>
         </svg>
       </div>
       <div class="fp-inner">
@@ -1263,7 +1400,36 @@ body.acuerdos .vip-cta-mod{display:block;position:relative;overflow:hidden;
         <h3>Su cartera. Clara, ordenada y bajo control.</h3>
         <p class="fp-lead">Consulte la evolución de sus operaciones, ventas, descartes y resultados desde un único entorno.</p>
         <a href="#" class="fp-cta" data-testid="funds-cta">Acceder con código <i data-lucide="lock" style="width:16px;height:16px"></i></a>
-        <p class="fp-note">Acceso reservado a fondos y servicers autorizados.<span class="fp-demo">Representación demostrativa</span></p>
+        <p class="fp-note">Acceso reservado a fondos y servicers autorizados.</p>
+      </div>
+      <div class="fp-dash" aria-hidden="true" data-testid="funds-dashboard">
+        <div class="fpd-head">
+          <span class="fpd-title">Panel de cartera</span>
+          <span class="fpd-live"><span class="p"></span> En vivo</span>
+        </div>
+        <div class="fpd-kpis">
+          <div class="fpd-kpi"><div class="k">En cartera</div><div class="v">128</div></div>
+          <div class="fpd-kpi"><div class="k">En análisis</div><div class="v">34</div></div>
+          <div class="fpd-kpi"><div class="k">Acuerdos</div><div class="v">46</div></div>
+        </div>
+        <div class="fpd-chart">
+          <span class="bar" style="height:38%"></span>
+          <span class="bar" style="height:52%"></span>
+          <span class="bar" style="height:44%"></span>
+          <span class="bar" style="height:66%"></span>
+          <span class="bar" style="height:58%"></span>
+          <span class="bar" style="height:78%"></span>
+          <span class="bar" style="height:70%"></span>
+          <span class="bar" style="height:88%"></span>
+          <span class="bar" style="height:82%"></span>
+          <span class="bar" style="height:100%"></span>
+        </div>
+        <div class="fpd-rows">
+          <div class="fpd-row"><span class="rc">OP-1042</span><span class="rn">Residencial · garantía hipotecaria</span><span class="rs ok">En curso</span></div>
+          <div class="fpd-row"><span class="rc">OP-1039</span><span class="rn">Comercial · cesión de remate</span><span class="rs ok">Acuerdo</span></div>
+          <div class="fpd-row"><span class="rc">OP-1028</span><span class="rn">Industrial · activo adjudicado</span><span class="rs wait">En revisión</span></div>
+        </div>
+        <p class="fpd-cap">Vista ilustrativa de la interfaz · datos no reales.</p>
       </div>
     </div>
   </div>

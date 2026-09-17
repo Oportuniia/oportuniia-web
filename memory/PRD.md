@@ -171,6 +171,21 @@ Solo web2.html. Verificado por testing_agent (iteration_1.json, 100% PASS):
 FREEZE: taxonomía, Judiciales↔Acuerdos, info Acuerdos, funds, footer #1F6588, calendario URL, nav — intactos. Móvil 390px sin overflow.
 Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba. Estado V53: IMPLEMENTED, TECHNICAL QA PASS (testing_agent 100%), HUMAN VISUAL APPROVAL PENDING.
 
+## Estado — HOME · V54 (corrección visual consolidada Rafa + Alba, 2026-06)
+Solo web2.html (CSS bloque V54 + reestructura HTML VIP/Fondos). Verificado por screenshots + medición programática:
+1. HERO OSCURO: fondo petrol #0A1622 (ref. #producto), texto blanco, "deuda." cyan #57C6E4, halo radial sutil. Animación de entrada escalonada (h1 reveal + lead/CTA/strip fade-up con delays; respeta prefers-reduced-motion; 0 CLS). Header legible sobre hero oscuro: en estado top (no-scroll) logo a blanco (filter brightness(0) invert(1)), nav/ghost/burger blancos; al hacer scroll (.sc) vuelve a logo original + nav oscuro.
+2. CTA VIP = BANNER a todo el ancho editorial (max-width:none, grid 1.5fr/auto, texto izq + CTA dcha), petrol sólido con halo cyan, botón con pulso sutil. Copy intacto.
+3. Target VIP corregido: eliminado "¿Aún sin acceso? Solicitar acceso VIP →" de tarjeta Suscriptor (queda solo "Entrar con mi código"). Sin VIP en Colaborador.
+4. Tarjetas profesionales: aire vertical garantizado (opts flex:0 + margin-bottom:26px, ecta margin-top:auto) → Colaborador ya no pega el texto al botón; 3 CTA alineados en la misma línea inferior, fondos blancos, mismo top.
+5. Fondos & Servicers: eliminado "Representación demostrativa". Sección compacta (min-height auto) en 2 columnas: copy+CTA izq | dashboard realista dcha (Panel de cartera, EN VIVO, KPIs 128/34/46, gráfico de barras, filas de operaciones con estados, caption "Vista ilustrativa de la interfaz · datos no reales"). Sin ROI/€/claims reales.
+6A. Selector: activo = bloque OPORTUNIIA sólido #1F6588 texto blanco (fuera cyan). uni-card destacada (uni-hi) = bloque oscuro sólido #0B2C3D (fuera degradado pastel), ambos modos.
+6B. "Más control. Menos incertidumbre." (acu-value) = bloque OSCURO sólido #0A1622, textos blancos, chips con acento cyan. Copy intacto.
+7. Diferenciación FILOSOFÍA vs CÓMO TRABAJAMOS (alto contraste, pensado para daltonismo Rafa): #quienes (Filosofía) = petrol oscuro sólido #0F3A52 + divisor cyan superior, texto blanco; #flow (Cómo trabajamos) = claro cálido #F4F1E9. Diferencia inequívoca al hacer scroll.
+8. AGENDA VIDEOLLAMADA = bloque OSCURO OPORTUNIIA #0A1622, "¿HABLAMOS?" en cyan, iconos cyan, calendario LeadConnector intacto (misma URL/widget, compacto V53).
+9. Ritmo global oscuro↔claro reforzado; fuera degradados pastel azulados en zonas autorizadas.
+QA: AUTO_SWITCH tras 22s (load+scroll+idle, sin clics) = 0/False. GEOMETRÍA surface→card judicial=0px, acuerdos=0px → DIFF=0px exacto. Móvil 390px sin overflow horizontal. Taxonomía/URLs/GHL/footer #1F6588/Grupo/nav/multipágina intactos.
+MULTIPAGE STARTED = NO. Estado V54: IMPLEMENTED, TECHNICAL QA PASS, HUMAN VISUAL APPROVAL PENDING (Rafa/Alba). NO FINAL / NO CLOSED.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
