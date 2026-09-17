@@ -112,6 +112,14 @@ Estado V11-HOME Closure: PASS.
 FREEZE respetado (ROI, logo header, arquitectura, resto copy). Multipágica Fase 2 NO iniciada. Pendiente HUMAN REVIEW Rafa/Alba.
 Estado V11-HOME Visual Correction: PASS (técnico).
 
+## Estado — V11 · FINAL HOME VISUAL RECTIFICATION (rev. humana Rafa, 2026-06)
+Rev. humana marcó 2 de 3 en FAIL/PARTIAL. Reejecutado sólo a) y b) (selector CONGELADO/PASS):
+a) Universo Acuerdos = UNA sola superficie continua real: nuevo wrapper `.acu-surface` (1 borde + 1 sombra + fondo blanco, radius 20, overflow hidden) que envuelve cabecera de valor + catálogo. Cabecera sin caja propia (transparente, solo hairline divider inferior); `.grid-acu` sin borde/sombra/fondo propios (padding interno). Eliminada la percepción de "panel flotante + catálogo debajo". En modo judicial el wrapper es invisible (bg transparente, 0 borde, sin sombra) → grid-rec intacto.
+b) Grupo OPORTUNIIA: descubierto que los PNG originales del CDN traían el NOMBRE de marca "quemado" (texto blanco filas ~800-951) además del `.meta` HTML → doble etiqueta al subir el escudo. Solución: assets reprocesados a ESCUDO-SOLO (borrado del texto quemado preservando el degradado/glow) + subida sutil (aire superior 12%), escudo completo sin recorte ni deformación, mismo tamaño y alineación en las 3 marcas. Servidos localmente en `/app/frontend/public/grupo/{oportuniia,living,robotics}.webp` (originales CDN intactos). Copy: OPORTUNIIA "Humanizamos la deuda.", LIVING "La compra de Obra Nueva se convierte en experiencia.", ROBOTICS sin cambios.
+Verificado por screenshot: desktop Acuerdos (superficie única), desktop Judicial (sin caja blanca), Grupo (etiqueta única, escudos elevados), transición Judiciales↔Acuerdos OK.
+FREEZE respetado (selector, ROI, fotos, copy, estructura, header logo, taxonomías). Multipágina NO iniciada. Pendiente HUMAN VISUAL REVIEW Rafa/Alba.
+Estado V11-FINAL Rectification: PASS (técnico).
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
