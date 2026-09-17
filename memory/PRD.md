@@ -186,6 +186,33 @@ Solo web2.html (CSS bloque V54 + reestructura HTML VIP/Fondos). Verificado por s
 QA: AUTO_SWITCH tras 22s (load+scroll+idle, sin clics) = 0/False. GEOMETRÍA surface→card judicial=0px, acuerdos=0px → DIFF=0px exacto. Móvil 390px sin overflow horizontal. Taxonomía/URLs/GHL/footer #1F6588/Grupo/nav/multipágina intactos.
 MULTIPAGE STARTED = NO. Estado V54: IMPLEMENTED, TECHNICAL QA PASS, HUMAN VISUAL APPROVAL PENDING (Rafa/Alba). NO FINAL / NO CLOSED.
 
+## Estado — FASE 2 · OPPORTUNITY ENGINE (implementado, 2026-06)
+Multipágina SSR sobre HOME V54 (aprobada/freeze). Verificado por testing_agent (iteration_2.json: backend 27/27 = 100%, frontend 100%).
+
+**Arquitectura de servido:** Backend FastAPI + Jinja2 + MongoDB renderiza SSR; el frontend CRA (`frontend/src/setupProxy.js`) reenvía `/`, `/oportunidades*` y `/api*` a `http://localhost:8001` (changeOrigin:false → Host público para canonical). URLs limpias reales con SEO. Assets de `/public` (logo, /grupo) y hot-reload siguen servidos por CRA.
+
+**Rutas:** `/` = HOME V54 (servida desde web2.html, freeze; nav "Oportunidades" + CTA "Ver oportunidades" cableados a /oportunidades). `/oportunidades` = catálogo/buscador SSR. `/oportunidades/{slug}` = detalle estilo presentación.
+
+**Implementado FUNCIONAL:**
+- Catálogo Judiciales↔Acuerdos, selector manual (default Judiciales), 0 auto-switch.
+- Filtros: producto NPL/CDR/REO, ubicación en cascada CCAA→provincia→municipio (JS + `/api/locations/*`), tipo de activo, inversión mín/máx, "Más filtros", Aplicar/Limpiar. Estado en URL (shareable). Orden neutro (recientes/precio/plazo).
+- Tarjetas (imagen, badge producto, ubicación, activo, inversión, ROI, plazo, situación, favorito, comparar, Ver operación → detalle).
+- Detalle: resumen ejecutivo, activo, situación/estructura, recorrido, documentación (placeholder), panel de acción sticky con ROI/inversión/valor compra (blur)/plazo, CTAs Reservar y Comprar (acciones DISTINTAS), Favorito, Comparar, señal de interés veraz.
+- Favoritos DEMO: cookie `opp_sid` + MongoDB (`demo_favorites`), no autoritativo.
+- Comparar: selección cliente (hasta 3) + `/api/opportunities/compare` (excluye inventario acuerdos protegido), modal de campos objetivos.
+- VIP locked: `_vip_active()` server-side = INACTIVE en esta fase → Universo Acuerdos SIEMPRE bloqueado (pantalla de conversión VIP mensual/anual sin precios; inventario NO entregado; detalle acuerdos → 302 al gate).
+- CTA Reservar/Comprar: DEMO/no transaccional (`/api/operations/intent` → status demo, transactional false; modal etiquetado DEMO; conectado a futuro flujo actor_id→operación→Mi OPORTUNIIA→documentación).
+
+**PREPARED (contratos, sin acciones reales):** búsquedas guardadas (`/api/saved-searches`→prepared), match/afinidad (`/api/match/preview`, explicable, sin score inventado), señales de interés (`/api/interest-signals/{slug}`, agregado veraz, umbral 3, sin urgencia falsa), notificaciones email/WhatsApp/Telegram (futuras, no activas, sin proveedor), operación/histórico, documentación (2 direcciones, sin deadline hardcodeado, sin upload), Mi OPORTUNIIA, PRESENTACIÓN outputs, VIP entitlement (OPORTUNIIA_VIP, ACTIVE/INACTIVE/EXPIRED, MONTHLY/ANNUAL, sin precio/proveedor/pago real), identidad (solo punto de integración actor_id). Ver `/api/readiness`.
+
+**NO implementado (por diseño):** pagos reales, proveedor de pago, precios VIP, checkout/webhooks, identidad soberana/paralela, Mi OPORTUNIIA completo, CRM, reserva/compra reales, cobros, reglas contractuales/deadlines inventados, upload de documentos, envíos, algoritmo match opaco, %afinidad inventado, actividad/urgencia/viewers falsos, dashboard Fondos real, página Tecnología, integración real PRESENTACIÓN, deploy producción/DNS.
+
+**Dataset:** DEMO. Judiciales (10, catálogo público): Sevilla/Alicante/Zaragoza + Madrid/Barcelona/Málaga/Murcia/Alcalá/Torrevieja/Hospitalet. Acuerdos (3, protegido): Marbella/Valencia/Bilbao. `backend/catalog_data.py`.
+
+**QA:** HOME V54 preservada; AUTO UNIVERSE SWITCH=0; geometría intacta; catálogo 200 (10 cards judicial); filtros+cascada+URL+orden OK; favoritos/comparar OK; detalle 200 / acuerdos 302 / inexistente 404; APIs OK; móvil 390px sin overflow. Bug 422 (precio vacío) corregido con `_to_int_or_none`.
+
+MULTIPAGE STARTED = SÍ. Estado Fase 2: IMPLEMENTED, TECHNICAL QA PASS (testing_agent 100%). HUMAN REVIEW PENDING Rafa/Alba. NO FINAL / NO CLOSED / NO Fase 3.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).

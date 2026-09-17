@@ -1,0 +1,32 @@
+{
+  "summary": "Fase 2 · Opportunity Engine testing. Backend: 27/27 pytest passing (opportunities catalog + judicial/acuerdos universes, VIP locked behavior, locations cascade CCAA→provincia→municipio, favorites via cookie session, compare API excluding acuerdos, operations/intent DEMO reservar+comprar, saved-searches prepared, interest-signals truthful, readiness). SSR pages: HOME V54 serves 'Humanizamos la deuda' with main-nav & hero-cta cabled to /oportunidades; /oportunidades default judicial with 10 opp-card; acuerdos → vip-locked, 0 cards; detalle judicial 200 with action-panel/cta-reservar/cta-comprar; detalle acuerdos → 302 redirect; unknown slug → 404. Frontend UI verified via Playwright: HOME auto-switch of universe = 0 (body class stayed empty after 12s idle+scroll); CTA + nav navigate to /oportunidades; universe switch judicial↔acuerdos works; filter product REO applies (5 cards, URL persists ?tipo=REO); sort persists (?orden=precio-asc); cascade geo populates provincias & municipios; filter-clear/filter-more visible; favorites toggle in list (heart class 'on') and detail (det-fav toggles); Compare bar + modal with fields Universo/Producto/Ubicación/Inversión/Plazo/Situación/Ocupación/Estrategia/ROI; Reservar + Comprar CTAs open op-demo-modal clearly labelled DEMO / no transaccional. Mobile 390px: no horizontal overflow on /oportunidades. Fixed one critical 422 bug in filter form submission.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is 494 lines and still tolerable but bordering the split threshold. Consider splitting Opportunity Engine routes (SSR pages + api_router endpoints) into a dedicated module (routes_opportunities.py) as more features are added.",
+    "MongoDB write for demo_saved_searches and demo_operation_intents has no unique constraint per session; will grow unbounded. Add TTL index or per-session cap before opening to real traffic.",
+    "GET /api/opportunities exposes precio_min/precio_max but the SSR filter form previously sent empty strings which crashed FastAPI Optional[int] parsing (422). Fixed by accepting Optional[str] and coercing via _to_int_or_none. Same pattern was proactively applied to /oportunidades to prevent same class of bug for empty precio_min/precio_max/sup_min.",
+    "detalle acuerdos redirect returns 302 (not 301) which is fine for gating, but /oportunidades/no-existe returns 404 with inline HTML — consider using the base template for a consistent 404 page.",
+    "interest-signals threshold is hardcoded (3). Move to config/env for tuning."
+  ],
+  "updated_files": [
+    "/app/backend/server.py",
+    "/app/backend/tests/backend_test.py"
+  ],
+  "success_rate": {"backend": "100%", "frontend": "100%"},
+  "test_credentials": "None. Anonymous cookie session (opp_sid).",
+  "seed_data_creation": "None. Test writes ephemeral demo_favorites / demo_operation_intents / demo_saved_searches docs per anonymous session; no cleanup needed as they carry generated session ids.",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "Fase 2 Opportunity Engine is fully wired end-to-end. All product invariants verified: (1) HOME auto-switch universo = 0 (only manual via selector). (2) Universo Acuerdos always locked in this phase (VIP inactive → 0 inventory in API + vip-locked screen in SSR + redirect on detalle). (3) Reservar and Comprar are separate DEMO actions returning transactional=false. (4) Interest signals aggregate-only, no urgency/viewers/fake favorites — signal is null below THRESHOLD=3. Backend test file: /app/backend/tests/backend_test.py (27 tests, class-organized, cookie-session fixture inline). If Fase 3 adds real payment/identity flows, update _vip_active() and re-run acuerdos tests which currently assert locked=True.",
+  "rca of the issue": "Bug found: submitting the catalog filter form (with 'Aplicar') generated URL query params 'precio_min=' and 'precio_max=' (empty strings). FastAPI could not coerce empty string to Optional[int] and returned HTTP 422 for the SSR /oportunidades endpoint, resulting in an error page with 0 cards and no sort/filter-clear/filter-more controls. Reproduction: GET /oportunidades?tipo=REO&precio_min=&precio_max= → 422. Mitigation applied: changed the /oportunidades and /api/opportunities handlers to accept precio_min/precio_max/sup_min as Optional[str] and coerce via a shared _to_int_or_none() helper that treats '' and non-numeric as None. Verified fix by re-running backend suite (27/27 pass) and Playwright REO filter flow (5 cards + URL persists)."
+}

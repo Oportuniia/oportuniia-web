@@ -155,6 +155,15 @@ async def wp_precheck_bridge(authorize: str = ""):
 SID_COOKIE = "opp_sid"
 
 
+def _to_int_or_none(v):
+    if v is None or v == "":
+        return None
+    try:
+        return int(v)
+    except (ValueError, TypeError):
+        return None
+
+
 def _get_sid(request: Request) -> Optional[str]:
     return request.cookies.get(SID_COOKIE)
 
@@ -217,15 +226,17 @@ async def loc_municipios(ccaa: str = "", provincia: str = ""):
 @api_router.get("/opportunities")
 async def api_opportunities(request: Request, universo: str = "judicial", tipo: str = "",
                             ccaa: str = "", provincia: str = "", municipio: str = "",
-                            activo: str = "", precio_min: Optional[int] = None,
-                            precio_max: Optional[int] = None, orden: str = "recientes"):
+                            activo: str = "", precio_min: Optional[str] = None,
+                            precio_max: Optional[str] = None, orden: str = "recientes"):
+    pmin = _to_int_or_none(precio_min)
+    pmax = _to_int_or_none(precio_max)
     if universo == "acuerdos" and not await _vip_active(request):
         return {"universe": "acuerdos", "locked": True, "items": [], "total": 0,
                 "message": "Inventario Acuerdos reservado a suscripción VIP activa."}
     items = cat.filter_opportunities(universe=universo, product=tipo or None,
                                      ccaa=ccaa or None, provincia=provincia or None,
                                      municipio=municipio or None, asset_type=activo or None,
-                                     price_min=precio_min, price_max=precio_max, order=orden)
+                                     price_min=pmin, price_max=pmax, order=orden)
     return {"universe": universo, "locked": False, "items": items, "total": len(items)}
 
 
@@ -383,8 +394,11 @@ async def home():
 @app.get("/oportunidades", response_class=HTMLResponse)
 async def oportunidades(request: Request, universo: str = "judicial", tipo: str = "",
                         ccaa: str = "", provincia: str = "", municipio: str = "",
-                        activo: str = "", precio_min: Optional[int] = None,
-                        precio_max: Optional[int] = None, orden: str = "recientes"):
+                        activo: str = "", precio_min: Optional[str] = None,
+                        precio_max: Optional[str] = None, orden: str = "recientes",
+                        sup_min: Optional[str] = None):
+    precio_min = _to_int_or_none(precio_min)
+    precio_max = _to_int_or_none(precio_max)
     if universo not in ("judicial", "acuerdos"):
         universo = "judicial"
     vip = await _vip_active(request)
