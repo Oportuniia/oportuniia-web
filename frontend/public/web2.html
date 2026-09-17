@@ -690,8 +690,8 @@ body.acuerdos #producto .uni-tag{color:#0C1D28;background:rgba(46,154,198,.16);b
 
 /* value proposition — visible solo en Universo Acuerdos (tema claro) */
 .acu-value{display:none}
-body.acuerdos .acu-value{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,3vw,48px);align-items:center;
-  max-width:1000px;margin:0 auto 36px;padding:clamp(24px,3vw,40px);border-radius:16px;
+body.acuerdos #producto .acu-value{display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(24px,3vw,48px);align-items:center;
+  max-width:1000px;margin:0 auto 60px;padding:clamp(24px,3vw,40px);border-radius:16px;
   background:#fff;border:1px solid rgba(12,29,40,.09);box-shadow:0 30px 66px -44px rgba(12,29,40,.4);animation:acuIn .5s var(--ease) both}
 .acu-value .av-l h4{font-size:clamp(20px,2.2vw,26px);font-weight:600;color:#0C1D28;letter-spacing:-.02em}
 .acu-value .av-l p{margin-top:12px;font-size:14.5px;line-height:1.7;color:#4A6475;font-weight:300}
@@ -995,12 +995,12 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
         <div class="eyebrow" style="margin-bottom:26px">Cómo trabajamos</div>
         <h2>Una forma de trabajar.<br class="d-break"> Cada operación, una estrategia.</h2>
       </div>
-      <div class="side reveal d1">Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
+      <div class="side reveal d1">Gracias a nuestra tecnología automatizamos parte del análisis de cada operación y agilizamos su estudio. Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
     </div>
     <div class="flow-grid">
       <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
       <div class="step reveal d2"><div class="dot"></div><div class="n">02</div><h3>Estructuramos</h3><p>Le damos forma jurídica y financiera a la operación.</p></div>
-      <div class="step reveal d3"><div class="dot"></div><div class="n">03</div><h3>Definimos la mejor vía</h3><p>Decidimos si conviene invertir, recuperar o llegar a un acuerdo.</p></div>
+      <div class="step reveal d3"><div class="dot"></div><div class="n">03</div><h3>Definimos la mejor vía</h3><p>Decidimos si conviene invertir, ejecutar por vía judicial o llegar a un acuerdo.</p></div>
       <div class="step reveal d4"><div class="dot"></div><div class="n">04</div><h3>Presentamos</h3><p>Te la mostramos clara, con todo lo que necesitas para decidir.</p></div>
       <div class="step reveal d5"><div class="dot"></div><div class="n">05</div><h3>Ejecutamos</h3><p>Cerramos y acompañamos hasta el resultado.</p></div>
     </div>
@@ -1014,10 +1014,11 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
       <div class="ecolite-left">
         <div class="eyebrow" style="margin-bottom:22px">Tecnología propia</div>
         <h2>Tecnología que nos ayuda a tomar mejores decisiones.</h2>
-        <p>Hemos desarrollado herramientas propias para analizar, estructurar y presentar cada operación con más información, más criterio y más agilidad. La tecnología está al servicio de la operación, no al revés.</p>
+        <p>Hemos desarrollado herramientas propias para analizar, estructurar y presentar cada operación con más información, más criterio y más agilidad.</p>
+        <p style="margin-top:18px;font-size:15px;font-weight:600;color:var(--ink);letter-spacing:.01em">La tecnología al servicio de la operación.</p>
       </div>
       <div class="ecolite-right">
-        <a href="#tech-capacidades" class="ecolink" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-down-right"></i></a>
+        <a href="/tecnologia" class="ecolink" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-up-right"></i></a>
       </div>
     </div>
     <div class="tech-caps" id="tech-capacidades" data-testid="tech-capacidades">
@@ -1045,7 +1046,7 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
       </a>
       <a href="#" class="gcard reveal d2" data-testid="grupo-living">
         <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6f5o2w4o_LIVING.png" alt="LIVING EXPERIENCE" loading="lazy"></div>
-        <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La vivienda empieza cuando alguien la imagina</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
+        <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La compra de Obra Nueva se convierte en experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
       <div class="gcard soon reveal d3" data-testid="grupo-robotics">
         <span class="gsoon">Próximamente</span>
@@ -1071,11 +1072,11 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
         <span class="ei"><i data-lucide="trending-up"></i></span>
         <div class="en">Para invertir</div>
         <h3>Inversor</h3>
-        <p>Tú eliges hasta dónde quieres llegar. Nosotros hacemos el resto que necesites.</p>
+        <p>Elige cómo quieres participar en cada oportunidad.</p>
         <ul class="opts">
-          <li><span class="ob">A</span><span><b>Compra directa</b> — adquieres la oportunidad y continúas por tu cuenta.</span></li>
-          <li><span class="ob">B</span><span><b>Compra + acompañamiento jurídico</b> — adquieres la oportunidad y nuestro equipo jurídico te acompaña durante el proceso.</span></li>
-          <li><span class="ob">C</span><span><b>Gestión integral</b> — nos ocupamos de todo: tú aportas la inversión y recoges el resultado.</span></li>
+          <li><span class="ob">A</span><span><b>Compra directa</b> — adquieres la oportunidad y continúas la operación por tu cuenta.</span></li>
+          <li><span class="ob">B</span><span><b>Compra + acompañamiento jurídico</b> — adquieres la oportunidad y puedes contar con acompañamiento jurídico durante el proceso.</span></li>
+          <li><span class="ob">C</span><span><b>Gestión integral</b> — aportas la inversión y la operación se gestiona integralmente hasta su resultado.</span></li>
         </ul>
         <a href="#acceso" class="ecta" data-testid="entry-inversor-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
@@ -1083,13 +1084,12 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
         <span class="ei"><i data-lucide="handshake"></i></span>
         <div class="en">Para colaborar</div>
         <h3>Colaborador</h3>
-        <p>Tú aportas la oportunidad. Nosotros ponemos estructura, capacidad y ejecución para hacerla crecer.</p>
+        <p>Encuentra la oportunidad adecuada para tu cliente y elige cómo quieres estructurar la operación.</p>
         <ul class="opts">
-          <li><span class="ob">A</span><span><b>Compartimos el resultado</b> — trabajamos juntos la operación y participamos del resultado.</span></li>
-          <li><span class="ob">B</span><span><b>Tú mantienes a tu cliente</b> — nos incorporamos donde aportamos valor y tú mantienes íntegramente tu relación comercial.</span></li>
+          <li><span class="ob">A</span><span><b>Resultado compartido</b> — la operación se trabaja conjuntamente y la participación económica se estructura según las condiciones aplicables.</span></li>
+          <li><span class="ob">B</span><span><b>Mantienes a tu cliente</b> — conservas íntegramente tu relación comercial y OPORTUNIIA participa en la estructura y ejecución de la operación según corresponda.</span></li>
         </ul>
-        <p class="opts-note">Si a ti te va mejor, a nosotros también. La colaboración tiene que sumar.</p>
-        <a href="#acceso" class="ecta" data-testid="entry-colaborador-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <a href="#agenda" class="ecta" data-testid="entry-colaborador-cta">Agenda una videollamada <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
       <div class="entry reveal d3" data-testid="entry-suscriptor">
         <span class="ei"><i data-lucide="key-round"></i></span>
@@ -1099,21 +1099,20 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
         <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Entrar con mi código <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
     </div>
-    <div class="tailor reveal d2" data-testid="tailor">
-      <div class="tailor-l">
-        <div class="eyebrow" style="margin-bottom:18px">Oportunidades a tu medida</div>
-        <h3>Dinos qué buscas.<br class="d-break"> Nosotros acotamos el terreno.</h3>
-        <p>Con tu cuenta podrás definir qué tipo de oportunidades te interesan. Nosotros ajustamos lo que te mostramos a tus criterios. Cualquier modalidad, cualquier ubicación.</p>
-        <p class="tailor-note">Definición de criterios prevista para cuentas verificadas · próximamente.</p>
-      </div>
-      <div class="tailor-r">
-        <span class="tcrit-h">Criterios que podrás combinar</span>
-        <div class="tcrit">
-          <span>NPL</span><span>CDR</span><span>REO</span><span>Tipo de activo</span><span>Importe</span><span>Ubicación</span><span>Situación</span><span>Estrategia</span>
-        </div>
-      </div>
+    <div class="agenda-block reveal d2" id="agenda" data-testid="agenda-videollamada" style="max-width:1000px;margin:30px auto 0;padding:clamp(30px,3.5vw,52px);border-radius:18px;background:linear-gradient(135deg,var(--brand-tint),var(--surface));border:1px solid var(--brand-line);text-align:center">
+      <div class="eyebrow" style="justify-content:center;margin-bottom:16px">¿Hablamos?</div>
+      <h3 style="font-size:clamp(26px,3vw,40px);font-weight:600;color:var(--ink);letter-spacing:-.03em;line-height:1.08">Agenda una videollamada</h3>
+      <p style="margin:14px auto 24px;max-width:560px;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7">Elige el día y la hora que mejor te venga. Para inversores, colaboradores, fondos y servicers.</p>
+      <a href="#" class="btn" data-testid="agenda-cta" aria-disabled="true">Ver disponibilidad <i data-lucide="calendar" style="width:16px;height:16px"></i></a>
+      <p style="margin-top:14px;font-size:11.5px;color:var(--faint)">Calendario en preparación · disponibilidad próximamente</p>
     </div>
     <p class="access-foot reveal d2">Inversores y colaboradores, sujetos a verificación profesional. Suscriptores, acceso con código.</p>
+    <div class="funds-band reveal" data-testid="funds-servicers" style="max-width:1000px;margin:44px auto 0;padding:clamp(26px,3vw,40px);border:1px solid var(--brand-line);border-radius:16px;background:linear-gradient(135deg,var(--brand-tint),var(--surface));text-align:center">
+      <div class="eyebrow" style="justify-content:center;margin-bottom:14px">Para fondos y servicers</div>
+      <h3 style="font-size:clamp(22px,2.4vw,30px);font-weight:600;color:var(--ink);letter-spacing:-.02em">¿Gestionas una cartera?</h3>
+      <p style="margin:14px auto 22px;max-width:640px;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7">Un entorno para seguir la evolución de las operaciones, ventas y resultados de la cartera gestionada. Trabajamos también directamente con origen de cartera.</p>
+      <a href="#agenda" class="btn" data-testid="funds-cta">Agenda una videollamada <i data-lucide="arrow-up-right" style="width:16px;height:16px"></i></a>
+    </div>
   </div>
 </section>
 

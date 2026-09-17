@@ -86,6 +86,17 @@ Estado V11-Fase1: PASS.
 - HOME ya cubre: qué es/ofrece OPORTUNIIA, NPL/CDR/REO, diferencia Ejecuciones Judiciales vs Universo Acuerdos, valor diferencial de Acuerdos, perfiles (Inversor/Colaborador/Suscriptor), siguiente paso (CTAs). Sin GHL URLs, sin pago VIP, sin multipágina, sin rediseño.
 Estado V11-Cierre HOME: PASS.
 
+## Estado — V11 · MASTER UX/IA · ITEM A (HOME) implementado (2026-06)
+- Universo Acuerdos: +espacio bajo el bloque de valor antes del catálogo (margin 60px).
+- Grupo: copy LIVING = "La compra de Obra Nueva se convierte en experiencia." (reduce tamaño + mover a último bloque = PENDIENTE, no ejecutado por riesgo de reordenar DOM).
+- Inversor: intro "Elige cómo quieres participar en cada oportunidad." + A/B/C reescritas sin yoísmo.
+- Colaborador: MODELO CLIENTE CORREGIDO ("Encuentra la oportunidad adecuada para tu cliente..."); A Resultado compartido / B Mantienes a tu cliente; CTA "Agenda una videollamada" (#agenda).
+- Eliminado "Dinos qué buscas" → nuevo bloque "Agenda una videollamada" (#agenda, calendario PENDING) + banda "Fondos y servicers".
+- Cómo trabajamos: intro tecnológica añadida; paso 03 sin "recuperar".
+- Tecnología: cierre "La tecnología al servicio de la operación." (línea propia); eco-link → /tecnologia (ruta preparada, página pendiente).
+- ROI/logo FREEZE respetados. No GHL/URLs inventadas. No multipágina/catálogo/ficha/área privada (ítems B–G pendientes).
+Estado V11-ItemA: PASS.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
