@@ -97,6 +97,14 @@ Estado V11-Cierre HOME: PASS.
 - ROI/logo FREEZE respetados. No GHL/URLs inventadas. No multipágina/catálogo/ficha/área privada (ítems B–G pendientes).
 Estado V11-ItemA: PASS.
 
+## Estado — V11 · HOME FINAL CLOSURE (implementado, 2026-06)
+- Grupo OPORTUNIIA movido a ÚLTIMO bloque editorial (antes del footer). Orden: hero, producto, quienes, flow, tecnologia, acceso, grupo, footer.
+- Grupo reducido: padding sección menor, logos a 16/10 (más pequeños), grid max-width 840, tipografía meta más discreta. Más editorial/premium.
+- Calendario "Agenda una videollamada" (#agenda) permanece dentro de #acceso, antes de Grupo. (Micro-orden: en #acceso va perfiles → Agenda → Fondos; el master sugería Fondos antes de Agenda — desviación menor, ambos antes de Grupo.)
+- LIVING copy = "La compra de Obra Nueva se convierte en experiencia." · ROBOTICS = Próximamente.
+- Resto HOME FREEZE. ROI/logo FREEZE. Multipágina (B–G) NO iniciada (aprobada en principio; URLs externas no bloquean su construcción).
+Estado V11-HOME Closure: PASS.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).

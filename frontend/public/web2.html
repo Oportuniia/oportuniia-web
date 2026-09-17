@@ -470,6 +470,14 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
   padding:6px 11px;border-radius:3px;backdrop-filter:blur(6px)}
 .grupo-note{margin:34px auto 0;max-width:1080px;font-size:12.5px;color:#7E93A2;letter-spacing:.02em}
 .grupo-note b{color:#B7C6D2;font-weight:500}
+/* V11 · Grupo reducido (último bloque editorial, discreto y premium) */
+.grupo.sec{padding-top:clamp(54px,6.5vw,84px);padding-bottom:clamp(54px,6.5vw,84px)}
+.grupo h2{font-size:clamp(24px,3.2vw,38px)}
+.grupo-grid{gap:16px;margin:32px auto 0;max-width:840px}
+.gcard .logo{aspect-ratio:16/10;border-radius:12px}
+.gcard .meta{padding-top:10px}
+.gcard .meta .t{font-size:13px}
+.gcard .meta .s{font-size:11px}
 
 /* ============ ACCESO — ¿CÓMO VAS A ENTRAR? ============ */
 .access{position:relative;overflow:hidden}
@@ -1030,33 +1038,6 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
   </div>
 </section>
 
-<!-- ================= GRUPO OPORTUNIIA ================= -->
-<section class="grupo sec" id="grupo" data-testid="grupo">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="reveal">
-        <div class="eyebrow" style="margin-bottom:26px">El grupo</div>
-        <h2>Grupo OPORTUNIIA.</h2>
-      </div>
-    </div>
-    <div class="grupo-grid">
-      <a href="https://oportuniia.com" target="_blank" rel="noopener" class="gcard reveal d1" data-testid="grupo-oportuniia">
-        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/jjknh2bb_OPORTUNIIA.png" alt="OPORTUNIIA" loading="lazy"></div>
-        <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Transformamos deuda en oportunidades</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
-      </a>
-      <a href="#" class="gcard reveal d2" data-testid="grupo-living">
-        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6f5o2w4o_LIVING.png" alt="LIVING EXPERIENCE" loading="lazy"></div>
-        <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La compra de Obra Nueva se convierte en experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
-      </a>
-      <div class="gcard soon reveal d3" data-testid="grupo-robotics">
-        <span class="gsoon">Próximamente</span>
-        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6tt8feid_ROBOTICS.png" alt="ROBOTICS" loading="lazy"></div>
-        <div class="meta"><span><span class="t">ROBOTICS</span><span class="s">Optimizamos recursos para que las personas lleguen más lejos</span></span><span class="go"><i data-lucide="clock"></i></span></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ================= ACCESO — ¿CÓMO VAS A ENTRAR? ================= -->
 <section class="sec access" id="acceso" data-testid="acceso">
   <div class="wrap">
@@ -1112,6 +1093,33 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
       <h3 style="font-size:clamp(22px,2.4vw,30px);font-weight:600;color:var(--ink);letter-spacing:-.02em">¿Gestionas una cartera?</h3>
       <p style="margin:14px auto 22px;max-width:640px;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7">Un entorno para seguir la evolución de las operaciones, ventas y resultados de la cartera gestionada. Trabajamos también directamente con origen de cartera.</p>
       <a href="#agenda" class="btn" data-testid="funds-cta">Agenda una videollamada <i data-lucide="arrow-up-right" style="width:16px;height:16px"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= GRUPO OPORTUNIIA (último bloque editorial) ================= -->
+<section class="grupo sec" id="grupo" data-testid="grupo">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="reveal">
+        <div class="eyebrow" style="margin-bottom:20px">El grupo</div>
+        <h2>Grupo OPORTUNIIA.</h2>
+      </div>
+    </div>
+    <div class="grupo-grid">
+      <a href="https://oportuniia.com" target="_blank" rel="noopener" class="gcard reveal d1" data-testid="grupo-oportuniia">
+        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/jjknh2bb_OPORTUNIIA.png" alt="OPORTUNIIA" loading="lazy"></div>
+        <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Transformamos deuda en oportunidades</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
+      </a>
+      <a href="#" class="gcard reveal d2" data-testid="grupo-living">
+        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6f5o2w4o_LIVING.png" alt="LIVING EXPERIENCE" loading="lazy"></div>
+        <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La compra de Obra Nueva se convierte en experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
+      </a>
+      <div class="gcard soon reveal d3" data-testid="grupo-robotics">
+        <span class="gsoon">Próximamente</span>
+        <div class="logo"><img src="https://customer-assets-4nw71qhi.emergentagent.net/job_master-deploy-2/artifacts/6tt8feid_ROBOTICS.png" alt="ROBOTICS" loading="lazy"></div>
+        <div class="meta"><span><span class="t">ROBOTICS</span><span class="s">Optimizamos recursos para que las personas lleguen más lejos</span></span><span class="go"><i data-lucide="clock"></i></span></div>
+      </div>
     </div>
   </div>
 </section>
