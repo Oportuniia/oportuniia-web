@@ -473,11 +473,11 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
 /* V11 · Grupo reducido (último bloque editorial, discreto y premium) */
 .grupo.sec{padding-top:clamp(54px,6.5vw,84px);padding-bottom:clamp(54px,6.5vw,84px)}
 .grupo h2{font-size:clamp(24px,3.2vw,38px)}
-.grupo-grid{gap:16px;margin:32px auto 0;max-width:840px}
-.gcard .logo{aspect-ratio:7/4;border-radius:12px}
-.gcard .meta{padding-top:10px}
-.gcard .meta .t{font-size:13px}
-.gcard .meta .s{font-size:11px}
+.grupo-grid{gap:30px;margin:46px auto 0;max-width:1040px}
+.gcard .logo{aspect-ratio:3/2;border-radius:0;overflow:visible}
+.gcard .meta{padding-top:22px;gap:8px}
+.gcard .meta .t{font-size:19px;letter-spacing:.08em}
+.gcard .meta .s{font-size:14px;line-height:1.55;margin-top:2px;max-width:260px}
 
 /* ============ ACCESO — ¿CÓMO VAS A ENTRAR? ============ */
 .access{position:relative;overflow:hidden}
@@ -502,13 +502,14 @@ body.acuerdos .switch-hint b{color:var(--brand-2)}
   font-size:11px;font-weight:700;display:grid;place-items:center;flex:0 0 auto;margin-top:1px}
 .opts-note{font-size:12.5px;color:var(--ink);font-weight:500;margin-top:16px;line-height:1.55;
   padding-top:14px;border-top:1px solid var(--line)}
-.entry .ecta{margin-top:26px;display:inline-flex;align-items:center;justify-content:space-between;gap:10px;
-  font-size:13.5px;font-weight:500;color:var(--ink);padding:14px 18px;border:1px solid var(--line);
-  border-radius:6px;transition:border-color .35s,color .35s,background-color .35s}
-.entry:hover .ecta{border-color:var(--brand);color:var(--brand)}
+.entry .ecta{margin-top:28px;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  font-size:14px;font-weight:600;color:var(--brand);padding:16px 20px;border:1.5px solid var(--brand);
+  border-radius:8px;background:var(--brand-tint);
+  transition:transform .3s var(--ease),color .3s,background-color .3s,box-shadow .3s}
+.entry .ecta:hover{background:var(--brand);color:#fff;transform:translateY(-2px);box-shadow:0 16px 34px -16px rgba(31,101,136,.75)}
 .entry.feat{background:linear-gradient(180deg,var(--brand-tint),var(--surface));border-color:var(--brand-line)}
-.entry.feat .ecta{background:var(--brand);color:#fff;border-color:var(--brand)}
-.entry.feat:hover .ecta{background:var(--brand-2);color:#fff}
+.entry.feat .ecta{background:var(--brand);color:#fff;border-color:var(--brand);box-shadow:0 16px 34px -16px rgba(31,101,136,.7)}
+.entry.feat .ecta:hover{background:var(--brand-2);color:#fff}
 .access-foot{margin-top:34px;font-size:12.5px;color:var(--faint);text-align:center;letter-spacing:.02em}
 
 /* ============ FOOTER ============ */
@@ -739,40 +740,47 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
 #tecnologia h2,#tecnologia h3{color:#fff}
 #tecnologia .ecolite-left p{color:#C6D6E0}
 
-/* ===== FONDOS & SERVICERS · identidad dashboard (fondo petrol + demo abstracto) ===== */
-.funds-pro{position:relative;overflow:hidden;max-width:1080px;margin:clamp(40px,5vw,72px) auto 0;
+/* ===== FONDOS & SERVICERS · atmósfera financiera de cartera ===== */
+.funds-pro{position:relative;overflow:hidden;width:100%;margin:clamp(40px,5vw,72px) 0 0;
   border-radius:20px;border:1px solid rgba(46,154,198,.35);
-  background:linear-gradient(135deg,#0C1E2C 0%,#0A1622 60%,#0B2C3D 120%);
-  padding:clamp(34px,4vw,60px);color:#EAF3F8}
-.funds-pro::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;
-  background:
-   radial-gradient(600px 300px at 85% -10%,rgba(46,154,198,.28),transparent 60%),
-   repeating-linear-gradient(90deg,rgba(255,255,255,.04) 0 1px,transparent 1px 64px);}
-.funds-pro .fp-grid{position:relative;z-index:2;display:grid;grid-template-columns:1.05fr .95fr;gap:clamp(28px,4vw,56px);align-items:center}
-.funds-pro .eyebrow{color:#57C6E4}
-.funds-pro .eyebrow::before{background:#57C6E4}
-.funds-pro h3{font-size:clamp(26px,3vw,40px);font-weight:600;color:#fff;letter-spacing:-.025em;line-height:1.08;margin-top:16px}
-.funds-pro .fp-lead{margin-top:16px;font-size:15px;color:#9DB4C2;font-weight:300;line-height:1.7;max-width:440px}
-.funds-pro .fp-cta{margin-top:26px;display:inline-flex;align-items:center;gap:9px;font-size:14px;font-weight:600;
-  padding:15px 26px;border-radius:8px;background:#2E9AC6;color:#fff;
-  box-shadow:0 18px 42px -18px rgba(46,154,198,.8);transition:transform .3s var(--ease),background-color .3s}
+  background:linear-gradient(120deg,#0A1622 0%,#0C2130 55%,#0B2C3D 120%);
+  min-height:380px;display:flex;align-items:center;padding:clamp(36px,4.6vw,72px)}
+.funds-pro .fp-bg{position:absolute;inset:0;pointer-events:none;z-index:1}
+.funds-pro .fp-bg svg{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:.9}
+.funds-pro .fp-bg::after{content:"";position:absolute;inset:0;
+  background:radial-gradient(760px 400px at 100% 0%,rgba(46,154,198,.26),transparent 62%),
+             linear-gradient(90deg,rgba(10,22,34,.94) 0%,rgba(10,22,34,.6) 46%,rgba(10,22,34,.05) 82%)}
+.funds-pro .fp-inner{position:relative;z-index:3;max-width:560px}
+.funds-pro .eyebrow{color:#57C6E4}.funds-pro .eyebrow::before{background:#57C6E4}
+.funds-pro h3{font-size:clamp(27px,3.1vw,42px);font-weight:600;color:#fff;letter-spacing:-.03em;line-height:1.08;margin-top:16px}
+.funds-pro .fp-lead{margin-top:16px;font-size:15.5px;color:#B9CDD8;font-weight:300;line-height:1.7;max-width:460px}
+.funds-pro .fp-cta{margin-top:28px;display:inline-flex;align-items:center;gap:10px;font-size:14px;font-weight:600;
+  padding:16px 30px;border-radius:8px;background:#2E9AC6;color:#fff;
+  box-shadow:0 20px 46px -18px rgba(46,154,198,.9);transition:transform .3s var(--ease),background-color .3s}
 .funds-pro .fp-cta:hover{transform:translateY(-2px);background:#57C6E4}
-.funds-pro .fp-note{margin-top:14px;font-size:11.5px;color:#5E7787}
-/* panel dashboard DEMO/abstracto */
-.fp-dash{position:relative;z-index:2;border:1px solid rgba(255,255,255,.12);border-radius:14px;
-  background:rgba(10,22,34,.55);backdrop-filter:blur(8px);padding:22px}
-.fp-dash .fp-dh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
-.fp-dash .fp-dh .t{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:#8FB6C8;font-weight:600}
-.fp-dash .fp-dh .demo{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:#0A1622;background:#57C6E4;padding:4px 9px;border-radius:20px;font-weight:700}
-.fp-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:18px}
-.fp-kpi{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:14px 12px}
-.fp-kpi .k{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#5E7787}
-.fp-kpi .v{font-size:22px;font-weight:700;color:#57C6E4;letter-spacing:-.02em;margin-top:6px}
-.fp-bars{display:flex;flex-direction:column;gap:12px}
-.fp-bar .bl{display:flex;justify-content:space-between;font-size:11.5px;color:#9DB4C2;margin-bottom:6px}
-.fp-bar .bt{height:8px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden}
-.fp-bar .bf{height:100%;border-radius:6px;background:linear-gradient(90deg,#2E9AC6,#57C6E4)}
-@media(max-width:820px){.funds-pro .fp-grid{grid-template-columns:1fr}}
+.funds-pro .fp-note{margin-top:15px;font-size:11.5px;color:#6E8695}
+.funds-pro .fp-demo{display:inline-block;margin-left:6px;padding:2px 9px;border-radius:20px;background:rgba(87,198,228,.16);color:#8FD6EC;letter-spacing:.06em}
+@media(max-width:820px){.funds-pro{padding:clamp(30px,6vw,44px)}.funds-pro .fp-bg::after{background:radial-gradient(500px 320px at 100% 0%,rgba(46,154,198,.26),transparent 60%),linear-gradient(180deg,rgba(10,22,34,.5),rgba(10,22,34,.9))}}
+
+/* ===== VIDEOLLAMADA · composición horizontal (texto | calendario) ===== */
+.agenda-block{display:grid;grid-template-columns:.6fr 1fr;gap:clamp(30px,3.6vw,58px);align-items:center;
+  width:100%;margin:clamp(38px,4.4vw,64px) 0 0;padding:clamp(30px,3.4vw,52px);border-radius:20px;
+  background:linear-gradient(135deg,var(--brand-tint),var(--surface));border:1px solid var(--brand-line)}
+.agenda-block .ab-copy .eyebrow{margin-bottom:16px}
+.agenda-block .ab-copy h3{font-size:clamp(26px,3vw,40px);font-weight:600;color:var(--ink);letter-spacing:-.03em;line-height:1.08}
+.agenda-block .ab-copy p{margin:16px 0 0;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7;max-width:420px}
+.ab-benes{list-style:none;margin:22px 0 0;padding:0;display:flex;flex-direction:column;gap:12px}
+.ab-benes li{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--ink);font-weight:400}
+.ab-benes li i{width:16px;height:16px;color:var(--brand);flex:none}
+.agenda-block .cal-embed{margin:0;max-width:none;width:100%;height:600px}
+@media(max-width:820px){.agenda-block{grid-template-columns:1fr;gap:26px}.agenda-block .cal-embed{height:560px}}
+
+/* ===== GRUPO → FOOTER · separación con luz sutil ===== */
+#grupo{position:relative}
+#grupo::after{content:"";position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:min(680px,78%);height:1px;
+  background:linear-gradient(90deg,transparent,rgba(87,198,228,.55),transparent);
+  box-shadow:0 0 26px 3px rgba(87,198,228,.22)}
 
 /* ===== CALENDARIO REAL (LeadConnector) ===== */
 .cal-embed{width:100%;max-width:760px;margin:22px auto 0;height:640px;overflow:hidden;overflow-y:auto;
@@ -1150,37 +1158,49 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
         <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Entrar con mi código <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
     </div>
-    <div class="agenda-block reveal d2" id="agenda" data-testid="agenda-videollamada" style="max-width:1000px;margin:30px auto 0;padding:clamp(30px,3.5vw,52px);border-radius:18px;background:linear-gradient(135deg,var(--brand-tint),var(--surface));border:1px solid var(--brand-line);text-align:center">
-      <div class="eyebrow" style="justify-content:center;margin-bottom:16px">¿Hablamos?</div>
-      <h3 style="font-size:clamp(26px,3vw,40px);font-weight:600;color:var(--ink);letter-spacing:-.03em;line-height:1.08">Agenda una videollamada</h3>
-      <p style="margin:14px auto 6px;max-width:560px;font-size:15px;color:var(--ink2);font-weight:300;line-height:1.7">Elige directamente el día y la hora en el calendario. Para inversores, colaboradores y contactos profesionales.</p>
+    <div class="agenda-block reveal d2" id="agenda" data-testid="agenda-videollamada">
+      <div class="ab-copy">
+        <div class="eyebrow">¿Hablamos?</div>
+        <h3>Agenda una videollamada</h3>
+        <p>Elige directamente el día y la hora en el calendario. Para inversores, colaboradores y contactos profesionales.</p>
+        <ul class="ab-benes">
+          <li><i data-lucide="calendar-check"></i> Disponibilidad en tiempo real</li>
+          <li><i data-lucide="video"></i> Videollamada personal, sin compromiso</li>
+          <li><i data-lucide="clock"></i> Eliges el momento que mejor te venga</li>
+        </ul>
+      </div>
       <div class="cal-embed" data-testid="agenda-calendar">
         <iframe src="https://api.leadconnectorhq.com/widget/booking/A7XNkrehcriifyMZe98E" scrolling="no" title="Reserva de videollamada OPORTUNIIA"></iframe>
       </div>
     </div>
     <p class="access-foot reveal d2">Inversores y colaboradores, sujetos a verificación profesional. Suscriptores, acceso con código.</p>
     <div class="funds-pro reveal" data-testid="funds-servicers">
-      <div class="fp-grid">
-        <div class="fp-copy">
-          <div class="eyebrow">Para fondos y servicers</div>
-          <h3>Su cartera. Clara, ordenada y bajo control.</h3>
-          <p class="fp-lead">Consulte la evolución de sus operaciones, ventas, descartes y resultados desde un único entorno.</p>
-          <a href="#" class="fp-cta" data-testid="funds-cta">Acceder con código <i data-lucide="lock" style="width:16px;height:16px"></i></a>
-          <p class="fp-note">Acceso reservado a fondos y servicers autorizados.</p>
-        </div>
-        <div class="fp-dash" aria-hidden="true">
-          <div class="fp-dh"><span class="t">Cartera · visión general</span><span class="demo">Demo</span></div>
-          <div class="fp-kpis">
-            <div class="fp-kpi"><span class="k">Operaciones</span><span class="v">—</span></div>
-            <div class="fp-kpi"><span class="k">En curso</span><span class="v">—</span></div>
-            <div class="fp-kpi"><span class="k">Cerradas</span><span class="v">—</span></div>
-          </div>
-          <div class="fp-bars">
-            <div class="fp-bar"><div class="bl"><span>Trabajadas</span><span>demo</span></div><div class="bt"><div class="bf" style="width:72%"></div></div></div>
-            <div class="fp-bar"><div class="bl"><span>Vendidas</span><span>demo</span></div><div class="bt"><div class="bf" style="width:48%"></div></div></div>
-            <div class="fp-bar"><div class="bl"><span>Descartadas</span><span>demo</span></div><div class="bt"><div class="bf" style="width:21%"></div></div></div>
-          </div>
-        </div>
+      <div class="fp-bg" aria-hidden="true">
+        <svg viewBox="0 0 1200 400" preserveAspectRatio="xMaxYMid slice">
+          <defs>
+            <linearGradient id="fpArea" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#57C6E4" stop-opacity=".34"/>
+              <stop offset="1" stop-color="#57C6E4" stop-opacity="0"/>
+            </linearGradient>
+            <pattern id="fpGrid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M60 0H0V60" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
+            </pattern>
+          </defs>
+          <rect x="0" y="0" width="1200" height="400" fill="url(#fpGrid)"/>
+          <path d="M0 300 L120 285 L240 300 L360 250 L480 265 L600 200 L720 215 L840 150 L960 175 L1080 110 L1200 130 L1200 400 L0 400 Z" fill="url(#fpArea)"/>
+          <path d="M0 300 L120 285 L240 300 L360 250 L480 265 L600 200 L720 215 L840 150 L960 175 L1080 110 L1200 130" fill="none" stroke="#57C6E4" stroke-width="2.5" stroke-opacity=".85"/>
+          <path d="M0 340 L150 335 L300 342 L450 320 L600 328 L750 300 L900 312 L1050 285 L1200 296" fill="none" stroke="#2E9AC6" stroke-width="1.6" stroke-opacity=".5" stroke-dasharray="4 7"/>
+          <g fill="#57C6E4">
+            <circle cx="600" cy="200" r="4"/><circle cx="840" cy="150" r="4"/><circle cx="1080" cy="110" r="4.5"/>
+          </g>
+        </svg>
+      </div>
+      <div class="fp-inner">
+        <div class="eyebrow">Para fondos y servicers</div>
+        <h3>Su cartera. Clara, ordenada y bajo control.</h3>
+        <p class="fp-lead">Consulte la evolución de sus operaciones, ventas, descartes y resultados desde un único entorno.</p>
+        <a href="#" class="fp-cta" data-testid="funds-cta">Acceder con código <i data-lucide="lock" style="width:16px;height:16px"></i></a>
+        <p class="fp-note">Acceso reservado a fondos y servicers autorizados.<span class="fp-demo">Representación demostrativa</span></p>
       </div>
     </div>
   </div>
@@ -1197,16 +1217,16 @@ body.acuerdos .vip-note a{color:var(--brand);font-weight:600;margin-left:6px}
     </div>
     <div class="grupo-grid">
       <a href="https://oportuniia.com" target="_blank" rel="noopener" class="gcard reveal d1" data-testid="grupo-oportuniia">
-        <div class="logo"><img src="/grupo/oportuniia.png" alt="OPORTUNIIA" loading="lazy"></div>
+        <div class="logo"><img src="/grupo/oportuniia.webp" alt="OPORTUNIIA" loading="lazy"></div>
         <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Humanizamos la deuda.</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
       <a href="#" class="gcard reveal d2" data-testid="grupo-living">
-        <div class="logo"><img src="/grupo/living.png" alt="LIVING EXPERIENCE" loading="lazy"></div>
+        <div class="logo"><img src="/grupo/living.webp" alt="LIVING EXPERIENCE" loading="lazy"></div>
         <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La compra de Obra Nueva se convierte en experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
       </a>
       <div class="gcard soon reveal d3" data-testid="grupo-robotics">
         <span class="gsoon">Próximamente</span>
-        <div class="logo"><img src="/grupo/robotics.png" alt="ROBOTICS" loading="lazy"></div>
+        <div class="logo"><img src="/grupo/robotics.webp" alt="ROBOTICS" loading="lazy"></div>
         <div class="meta"><span><span class="t">ROBOTICS</span><span class="s">Optimizamos recursos para que las personas lleguen más lejos</span></span><span class="go"><i data-lucide="clock"></i></span></div>
       </div>
     </div>

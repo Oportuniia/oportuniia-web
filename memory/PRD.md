@@ -140,6 +140,16 @@ Scope autorizado ejecutado (solo web2.html + 3 assets derivados locales):
 Mobile 390px: sin overflow horizontal. Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba.
 Estado: IMPLEMENTED, TECHNICAL QA PASS, HUMAN VISUAL APPROVAL PENDING.
 
+## Estado — HOME · V51 (correcciones visuales Rafa/Alba, 2026-06)
+Scope V51 ejecutado (solo web2.html + assets derivados locales):
+1. CTA HIERARCHY global. PRIMARY (relleno petrol sólido + sombra + hover lift): Solicitar acceso, Ver oportunidades, Darse de alta, Acceder con código. SECONDARY (relleno brand-tint + borde brand, hover sólido): Agenda una videollamada, Entrar con mi código, Conocer OPORTUNIIA. TERTIARY (links con flecha): Ver operación, vip-cta, footer. `.entry .ecta` reforzado (full-width, 16px, centrado).
+2. Videollamada = composición HORIZONTAL desktop: `.agenda-block` grid .6fr/1fr (≈37.5% texto | 62.5% calendario), ancho editorial completo; móvil apila (texto→calendario). Calendario real LeadConnector (URL sin cambios) con viewport controlado 600px + scroll interno.
+3. Escudos Grupo: fondo TRANSPARENTE. Assets derivados locales `/grupo/*.webp` (RGBA) generados quitando SOLO el fondo oscuro (floodfill desde esquinas; huecos internos del escudo auto-preservados) sobre los crops sin texto; escudo 100% intacto, 0 px de escudo eliminados, sin IA/redibujo. CSS `object-fit:contain` + `object-position:center` (SIN cover/hacks), contenedor aspect 3/2, escala premium mayor. Copy Grupo aumentado (nombre 19px, statement 14px). Separador de luz sutil #grupo::after (glow cian) antes del footer.
+4. Fondos&Servicers: ancho completo (editorial), fondo de ATMÓSFERA financiera (SVG: grid + curva de área + línea analítica + puntos, sin datos reales), contenido sobre overlay legible, CTA "Acceder con código" (PRIMARY). Etiqueta "Representación demostrativa". Sin métricas inventadas.
+FREEZE respetado: geometría Judiciales↔Acuerdos intacta (no tocada; DIFF=0px), info Acuerdos AFTER cards, taxonomía, filosofía, nav. Móvil 390px sin overflow. AUDIT calendario: evento 30 min vs descripción "15 minutos" = INCONSISTENTE (corregir en GoHighLevel).
+Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba.
+Estado V51: IMPLEMENTED, TECHNICAL QA PASS, HUMAN VISUAL APPROVAL PENDING.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
