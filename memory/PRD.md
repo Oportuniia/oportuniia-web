@@ -105,6 +105,13 @@ Estado V11-ItemA: PASS.
 - Resto HOME FREEZE. ROI/logo FREEZE. Multipágina (B–G) NO iniciada (aprobada en principio; URLs externas no bloquean su construcción).
 Estado V11-HOME Closure: PASS.
 
+## Estado — V11 · HOME VISUAL CORRECTION (3 fixes, implementado 2026-06)
+1. Universo Acuerdos: panel de valor "Más control. Menos incertidumbre." ahora full-width, radio superior, unido (sin gap) al catálogo dentro de un panel claro compartido → una sola composición/interfaz. margin-bottom 0 + grid-acu con borde/fondo/rounded-bottom.
+2. Grupo: logos con object-fit:contain (escudos completos, SIN recorte); copy OPORTUNIIA = "Humanizamos la deuda." (LIVING/ROBOTICS sin cambios).
+3. Selector: cue "Explora los dos universos" + estados claros + cursor/hover; demo de primera visita (Judiciales→Acuerdos→Judiciales, una vez, IntersectionObserver, respeta prefers-reduced-motion).
+FREEZE respetado (ROI, logo header, arquitectura, resto copy). Multipágica Fase 2 NO iniciada. Pendiente HUMAN REVIEW Rafa/Alba.
+Estado V11-HOME Visual Correction: PASS (técnico).
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
