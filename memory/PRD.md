@@ -120,6 +120,13 @@ Verificado por screenshot: desktop Acuerdos (superficie única), desktop Judicia
 FREEZE respetado (selector, ROI, fotos, copy, estructura, header logo, taxonomías). Multipágina NO iniciada. Pendiente HUMAN VISUAL REVIEW Rafa/Alba.
 Estado V11-FINAL Rectification: PASS (técnico).
 
+## Estado — V11 · CORRECCIÓN VISUAL DEFINITIVA (Master + Human Gate, 2026-06)
+Rectificación tras evidencia visual. SOLO puntos a) y b). Selector CONGELADO.
+a) UNIVERSO ACUERDOS — invariante geométrica: el bloque de valor ("Más control…" + variables) se RETIRÓ del layout (no oculto con hueco; `display:none !important`, contenido conservado en HTML para fase posterior). El wrapper `.acu-surface` quedó como passthrough transparente (sin borde/sombra/fondo/padding). Ahora el selector desemboca DIRECTO en las tarjetas en AMBOS universos. Medido con offsetTop (independiente de transform): JUDICIAL selector→cards = 164px, ACUERDOS selector→cards = 164px → DIFERENCIA = 0px. Animación `acuIn` cambiada a opacity-only (sin translateY) para no mover geometría al cambiar. El cambio de universo = solo inversión de tema (dark↔light) + fade, sin desplazamiento.
+b) GRUPO OPORTUNIIA — assets ORIGINALES del CDN restaurados (sin reprocesar; los .webp reprocesados de la iteración anterior fueron eliminados). Corrección solo por CSS: `.gcard .logo` aspect 1.95/1 (uniforme en todos los breakpoints) + `object-fit:cover`. Ventana que muestra el escudo completo y oculta el NOMBRE quemado del asset vía overflow: `object-position:center 26%` (OPORTUNIIA/LIVING) y `center 23%` (ROBOTICS, cuyo nombre está más alto). Escudos completos (sin recorte del escudo), sin deformación, centrados, aire equilibrado, misma escala/alineación. Copy meta intacto (OPORTUNIIA/LIVING/ROBOTICS).
+Verificado por screenshot + medición offsetTop. FREEZE total en resto. Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba.
+Estado V11-Definitiva: PASS (técnico).
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
