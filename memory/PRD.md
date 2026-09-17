@@ -160,6 +160,17 @@ Solo web2.html + regeneración 3 emblemas locales:
 FREEZE: Judiciales↔Acuerdos (164/164), cards, info Acuerdos, calendario, funds, filosofía, nav, taxonomía — no tocados. Móvil 390px sin overflow.
 Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba. Estado V52: IMPLEMENTED, TECHNICAL QA PASS, HUMAN VISUAL APPROVAL PENDING.
 
+## Estado — HOME · V53 (correcciones consolidadas Rafa/Alba, 2026-06)
+Solo web2.html. Verificado por testing_agent (iteration_1.json, 100% PASS):
+1. P0 BUG RESUELTO: eliminado el auto-demo (IntersectionObserver que hacía setMode true→false). Estado inicial forzado a Judiciales (`setMode(false)`). testing_agent: AUTO_SWITCH_COUNT=0 en ~20s de polling (load+scroll+idle sin clicks). Cambio de universo SOLO manual. Geometría intacta (diff 0px).
+2-7. GRUPO compacto: orden LIVING | OPORTUNIIA (centro) | ROBOTICS; escudos reducidos (logo max-width 148px, render 148×172, mismos tamaño/top/baseline); hover premium scale(1.15) sin reflow; copy mayor (nombre 18px, statement 14.5px); PRÓXIMAMENTE conservado sin distorsionar. Sección ~mitad de altura.
+8. Calendario más compacto: agenda-block cols .8fr/1fr (~44/56), cal-embed max-width 640 + height 540. Widget real LeadConnector intacto (URL sin cambios).
+9-10. Tarjetas acceso: todas fondo BLANCO (quitado gradiente Inversor); `.entry` flex-column + `.ecta` margin-top:auto → tops idénticos (5613) y CTA al fondo; 3 CTA primary iguales.
+11. Diferenciación secciones: #quienes (Filosofía) con tinte petrol pálido (gradiente #E6EFF4→#EDF4F7, texto oscuro); #flow (Cómo trabajamos) off-white. Separación clara al hacer scroll.
+12-16. VIP CTA: módulo fuerte `.vip-cta-mod` tras el bloque de valor Acuerdos (solo en modo Acuerdos): "Suscripción VIP · Próximamente / Accede al Universo Acuerdos" + botón sólido con pulso sutil (respeta prefers-reduced-motion) "Solicitar acceso VIP" → #acceso (destino existente, sin URL inventada) + microcopy "Acceso sujeto a validación profesional". 2º punto: link VIP secundario en tarjeta Suscriptor. Sin precios/escasez/ROI garantizado.
+FREEZE: taxonomía, Judiciales↔Acuerdos, info Acuerdos, funds, footer #1F6588, calendario URL, nav — intactos. Móvil 390px sin overflow.
+Multipágina NO iniciada. Pendiente HUMAN VISUAL GATE Rafa/Alba. Estado V53: IMPLEMENTED, TECHNICAL QA PASS (testing_agent 100%), HUMAN VISUAL APPROVAL PENDING.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).

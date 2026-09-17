@@ -1,0 +1,31 @@
+{
+  "summary": "Frontend-only testing of /web2.html static premium page. All requested acceptance checks PASSED, including the P0 no-auto-switch bug. Auto-switch count was 0 over ~20s of polling across fresh load, idle wait, scroll, and additional idle wait without any clicks.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_results": {
+    "P0_auto_switch": {"status": "PASS", "AUTO_SWITCH_COUNT": 0, "notes": "Polled body.classList every 500ms for ~20s (10s idle + scroll into selector + another 10s idle). body.acuerdos never became true; [data-testid=seg-judiciales] kept class 'on'; [data-testid=seg-acuerdos] never gained 'on'."},
+    "manual_switch": {"status": "PASS", "notes": "Click seg-acuerdos -> body.acuerdos=true, VIP module visible, grid-acu visible. Click seg-judiciales -> body.acuerdos=false, VIP module hidden."},
+    "frozen_geometry": {"status": "PASS", "judicial_gap_px": 42, "acuerdos_gap_px": 42, "diff_px": 0, "notes": "gap between mode-switch bottom and first visible .deal top identical in both modes (0px diff, target <=2)."},
+    "grupo_section": {"status": "PASS", "order": ["grupo-living","grupo-oportuniia","grupo-robotics"], "shield_sizes": "All 3 shields 148x172 at top Y=7751 (identical)"},
+    "entry_cards": {"status": "PASS", "top_Y_all": 5613, "backgrounds": "all rgb(255,255,255), backgroundImage none (no gradient on Inversor)", "cta_style": "all rgb(31,101,136) bg + white text"},
+    "agenda_calendar": {"status": "PASS", "iframe_loaded": true, "src": "https://api.leadconnectorhq.com/widget/booking/A7XNkrehcriifyMZe98E", "layout": "2-column desktop (640px calendar width)"},
+    "vip_cta_module": {"status": "PASS", "hidden_in_judicial": true, "visible_in_acuerdos": true, "vip_cta_secondary_in_suscriptor": "present (data-testid=vip-cta-secondary at line 1221)"},
+    "horizontal_overflow": {"status": "PASS", "desktop_1600": {"scrollWidth": 1600, "innerWidth": 1600}, "mobile_390": {"scrollWidth": 390, "innerWidth": 390}}
+  },
+  "test_report_links": [],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "web2.html is a single 1371-line static file; the P0 fix (removing auto-demo IntersectionObserver, forcing setMode(false) at line 1367) is correctly implemented. Only the reveal-animation IntersectionObserver remains (line 1346) and does NOT touch mode/body class.",
+    "No accessibility labels on the segmented mode buttons (aria-pressed would help); non-blocking."
+  ],
+  "updated_files": [],
+  "success_rate": {"backend": "n/a (skipped)", "frontend": "100%"},
+  "seed_data_creation": "none",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Static HTML page at /app/frontend/public/web2.html served at {REACT_APP_BACKEND_URL}/web2.html. P0 auto-switch bug is fixed; verified with 40 polls over ~20s (AUTO_SWITCH_COUNT=0). All layout/geometry/style acceptance criteria met on desktop 1600x900 and mobile 390x844."
+}
