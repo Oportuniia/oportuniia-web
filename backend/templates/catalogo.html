@@ -265,7 +265,17 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
           <p class="fnote">Producto ≠ procedimiento ≠ fase. AEAT, Seguridad Social y notarial se incorporan en el futuro sin rehacer el buscador.</p>
         </div></div>
 
-        <div class="fgroup collapsed" data-ctx="NPL CDR REO" data-testid="facet-phase"><div class="fg-h" data-toggle>Fase del procedimiento <i data-lucide="chevron-down"></i></div><div class="fg-body" id="phaseBody">
+        <div class="fgroup collapsed" data-ctx="NPL CDR REO" data-testid="facet-phase-principal"><div class="fg-h" data-toggle>Fase principal <i data-lucide="chevron-down"></i></div><div class="fg-body">
+          {% for st in phase_principal %}
+          <label class="chk {{ 'zero' if not counts.phase_principal.get(st.code) }}">
+            <input type="checkbox" name="fase_principal" value="{{ st.code }}" {{ 'checked' if st.code in f.phases_principal }} data-testid="filter-phase-principal-{{ st.code }}">
+            <span>{{ st.name }}</span><span class="cnt">{{ counts.phase_principal.get(st.code, 0) }}</span>
+          </label>
+          {% endfor %}
+          <p class="fnote">Fase principal (grupo) + hito procesal detallado: puedes combinar ambos con el resto de filtros.</p>
+        </div></div>
+
+        <div class="fgroup collapsed" data-ctx="NPL CDR REO" data-testid="facet-phase"><div class="fg-h" data-toggle>Fase / hito procesal <i data-lucide="chevron-down"></i></div><div class="fg-body" id="phaseBody">
           {% for g in phase_groups %}
           <div class="asset-grp phase-stage">{{ g.name }}</div>
           {% for p in g['items'] %}
@@ -278,14 +288,14 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
           {% if concursal_pending %}<p class="fnote" data-testid="concursal-note">Procedimiento concursal: fases <b>pendientes de fuente soberana</b> (no se inventan). <span class="demo-flag">pendiente</span></p>{% endif %}
         </div></div>
 
-        <div class="fgroup collapsed" data-ctx="all" data-testid="facet-possession"><div class="fg-h" data-toggle>Situación posesoria <i data-lucide="chevron-down"></i></div><div class="fg-body">
+        <div class="fgroup collapsed" data-ctx="all" data-testid="facet-possession"><div class="fg-h" data-toggle>Estado ocupacional <i data-lucide="chevron-down"></i></div><div class="fg-body">
           {% for ps in possession_states %}
           <label class="chk {{ 'zero' if not counts.possession.get(ps.code) }}">
             <input type="checkbox" name="posesion" value="{{ ps.code }}" {{ 'checked' if ps.code in f.possessions }} data-testid="filter-possession-{{ ps.code }}">
             <span>{{ ps.name }}</span><span class="cnt">{{ counts.possession.get(ps.code, 0) }}</span>
           </label>
           {% endfor %}
-          <p class="fnote">La situación posesoria es una dimensión independiente de la fase judicial.</p>
+          <p class="fnote">El estado ocupacional es una dimensión independiente de la fase / hito procesal.</p>
         </div></div>
 
         <div class="fgroup collapsed ctx-npl" data-ctx="NPL" data-testid="facet-npl-debt"><div class="fg-h" data-toggle>Deuda y garantía (NPL) <i data-lucide="chevron-down"></i></div><div class="fg-body">
@@ -404,7 +414,7 @@ function applyContext(){
 }
 document.querySelectorAll('input[name=tipo]').forEach(c=>c.addEventListener('change',applyContext));
 applyContext();
-if({{ 1 if (f.procedures or f.phases or f.possessions or f.roi_min is not none or f.term_max is not none) else 0 }}){document.getElementById('fadv').classList.add('open');}
+if({{ 1 if (f.procedures or f.phases or f.phases_principal or f.possessions or f.roi_min is not none or f.term_max is not none) else 0 }}){document.getElementById('fadv').classList.add('open');}
 // mobile drawer
 const facets=document.querySelector('.facets');
 document.getElementById('mOpen').addEventListener('click',()=>facets.classList.add('open'));

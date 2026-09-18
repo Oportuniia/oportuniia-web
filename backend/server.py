@@ -226,7 +226,7 @@ async def api_opportunities(request: Request, universo: str = "judicial",
                             precio_min: Optional[str] = None, precio_max: Optional[str] = None,
                             roi_min: Optional[str] = None, plazo_max: Optional[str] = None,
                             procedimiento: List[str] = Query(default=[]), fase: List[str] = Query(default=[]),
-                            posesion: List[str] = Query(default=[]),
+                            posesion: List[str] = Query(default=[]), fase_principal: List[str] = Query(default=[]),
                             orden: str = "recientes"):
     if universo == "acuerdos" and not await _vip_active(request):
         return {"universe": "acuerdos", "locked": True, "items": [], "total": 0,
@@ -235,7 +235,8 @@ async def api_opportunities(request: Request, universo: str = "judicial",
                               provincia=provincia, municipio=municipio,
                               price_min=_to_int_or_none(precio_min), price_max=_to_int_or_none(precio_max),
                               roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max),
-                              procedures=procedimiento, phases=fase, possessions=posesion)
+                              procedures=procedimiento, phases=fase, possessions=posesion,
+                              phases_principal=fase_principal)
     items = cat.filter_opportunities(f, order=orden)
     return {"universe": universo, "locked": False, "items": items, "total": len(items),
             "counts": cat.facet_counts(f)}
@@ -405,7 +406,7 @@ async def oportunidades(request: Request, universo: str = "judicial",
                         precio_min: Optional[str] = None, precio_max: Optional[str] = None,
                         roi_min: Optional[str] = None, plazo_max: Optional[str] = None,
                         procedimiento: List[str] = Query(default=[]), fase: List[str] = Query(default=[]),
-                        posesion: List[str] = Query(default=[]),
+                        posesion: List[str] = Query(default=[]), fase_principal: List[str] = Query(default=[]),
                         orden: str = "recientes", q: str = ""):
     if universo not in ("judicial", "acuerdos"):
         universo = "judicial"
@@ -415,7 +416,8 @@ async def oportunidades(request: Request, universo: str = "judicial",
                               provincia=provincia, municipio=municipio,
                               price_min=_to_int_or_none(precio_min), price_max=_to_int_or_none(precio_max),
                               roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max),
-                              procedures=procedimiento, phases=fase, possessions=posesion)
+                              procedures=procedimiento, phases=fase, possessions=posesion,
+                              phases_principal=fase_principal)
     opps = cat.filter_opportunities(f, order=orden)
     total = len(opps)
     counts = cat.facet_counts(f)
@@ -447,10 +449,12 @@ async def oportunidades(request: Request, universo: str = "judicial",
         chips.append({"key": "plazo_max", "val": str(f["term_max"]), "label": f"Plazo ≤ {f['term_max']} m"})
     for pr in f["procedures"]:
         chips.append({"key": "procedimiento", "val": pr, "label": f"Procedimiento: {cat.procedure_name(pr)}"})
+    for st in f["phases_principal"]:
+        chips.append({"key": "fase_principal", "val": st, "label": f"Fase: {cat.phase_principal_name(st)}"})
     for ph in f["phases"]:
-        chips.append({"key": "fase", "val": ph, "label": f"Fase: {cat.phase_name(ph)}"})
+        chips.append({"key": "fase", "val": ph, "label": f"Hito: {cat.phase_name(ph)}"})
     for ps in f["possessions"]:
-        chips.append({"key": "posesion", "val": ps, "label": f"Posesión: {cat.possession_name(ps)}"})
+        chips.append({"key": "posesion", "val": ps, "label": f"Ocupación: {cat.possession_name(ps)}"})
 
     ctx = {
         "request": request, "base_url": _public_base(request),
@@ -459,7 +463,7 @@ async def oportunidades(request: Request, universo: str = "judicial",
         "products": cat.PRODUCTS, "asset_groups": cat.ASSET_GROUPS, "sort_options": cat.SORT_OPTIONS,
         "price_ranges": cat.PRICE_RANGES, "fav_slugs": fav_slugs,
         "procedure_types": cat.PROCEDURE_TYPES, "phase_groups": cat.PHASE_GROUPS,
-        "possession_states": cat.POSSESSION_STATES,
+        "phase_principal": cat.PHASE_PRINCIPAL, "possession_states": cat.POSSESSION_STATES,
         "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",
         "ccaa_list": [{"code": k, "name": v["name"]} for k, v in cat.GEO.items()],
         "provincias_cur": cat.provincias_of(ccaa) if ccaa else [],

@@ -145,9 +145,10 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
           {% if o.is_concursal %}
           <div class="dv"><div class="k">Fase</div><div class="v">Concursal · pendiente de fuente soberana</div></div>
           {% else %}
-          <div class="dv"><div class="k">Fase actual</div><div class="v">{{ o.phase_name or '—' }}</div></div>
+          <div class="dv"><div class="k">Fase principal</div><div class="v">{{ o.phase_principal_name or '—' }}</div></div>
+          <div class="dv"><div class="k">Hito procesal</div><div class="v">{{ o.phase_name or '—' }}</div></div>
           {% endif %}
-          <div class="dv"><div class="k">Situación posesoria</div><div class="v">{{ o.possession_name or '—' }}</div></div>
+          <div class="dv"><div class="k">Estado ocupacional</div><div class="v">{{ o.possession_name or '—' }}</div></div>
           <div class="dv"><div class="k">Producto</div><div class="v">{{ o.product }} · {{ o.product_name }}</div></div>
           {% if o.debt_label %}<div class="dv"><div class="k">Deuda pendiente <span class="demo-flag">demo</span></div><div class="v">{{ o.debt_label }}</div></div>{% endif %}
           {% if o.guarantee_type %}<div class="dv"><div class="k">Tipo de garantía</div><div class="v">{{ o.guarantee_type }}</div></div>{% endif %}
