@@ -46,6 +46,9 @@
 .fmore{width:100%;text-align:left;font-size:13px;color:var(--brand);font-weight:600;display:flex;align-items:center;gap:8px;padding:14px 0 0;border-top:1px solid var(--line-2);margin-top:6px}
 .fadv{display:none}.fadv.open{display:block}
 .fnote{font-size:11px;color:var(--faint);margin-top:6px;line-height:1.5}
+.phase-stage{margin-top:12px}
+.pre-tag{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--brand);background:var(--brand-tint);padding:2px 7px;border-radius:10px;margin-left:6px;font-weight:600;vertical-align:middle}
+.phase-opt.hide{display:none}
 .factions{display:flex;gap:8px;margin-top:18px;position:sticky;bottom:-20px;background:var(--surface);padding:14px 0 2px}
 .fapply{flex:1;background:var(--brand);color:#fff;padding:13px;border-radius:9px;font-size:13.5px;font-weight:600;box-shadow:0 12px 30px -14px rgba(31,101,136,.6);transition:.3s}
 .fapply:hover{background:var(--brand-2)}
@@ -245,14 +248,48 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 
       <button type="button" class="fmore" id="moreBtn" data-testid="filter-more"><i data-lucide="plus-circle" style="width:16px;height:16px"></i> Más filtros</button>
       <div class="fadv" id="fadv">
-        <div class="fgroup"><div class="fg-h">Rentabilidad y plazo</div><div class="fg-body">
+        <div class="fgroup" data-ctx="all"><div class="fg-h" data-toggle>Rentabilidad y plazo <i data-lucide="chevron-down"></i></div><div class="fg-body">
           <div class="two">
             <div class="fld"><label class="lb">ROI mínimo (%)</label><input type="number" name="roi_min" value="{{ f.roi_min if f.roi_min is not none else '' }}" placeholder="0" data-testid="filter-roi-min"></div>
             <div class="fld"><label class="lb">Plazo máx. (meses)</label><input type="number" name="plazo_max" value="{{ f.term_max if f.term_max is not none else '' }}" placeholder="Sin límite" data-testid="filter-term-max"></div>
           </div>
         </div></div>
-        <div class="fgroup"><div class="fg-h">Procedimiento · fase · posesión</div><div class="fg-body">
-          <p class="fnote">Tipo de procedimiento (incl. concursal), fase judicial, situación posesoria y variables económicas avanzadas se incorporan tras la auditoría de datos soberanos. <span class="demo-flag">próximamente</span></p>
+
+        <div class="fgroup" data-ctx="all" data-testid="facet-procedure"><div class="fg-h" data-toggle>Tipo de procedimiento <i data-lucide="chevron-down"></i></div><div class="fg-body">
+          {% for pt in procedure_types %}
+          <label class="chk {{ 'zero' if not counts.procedure.get(pt.code) }}">
+            <input type="checkbox" name="procedimiento" value="{{ pt.code }}" {{ 'checked' if pt.code in f.procedures }} data-testid="filter-procedure-{{ pt.code }}">
+            <span>{{ pt.name }}</span><span class="cnt">{{ counts.procedure.get(pt.code, 0) }}</span>
+          </label>
+          {% endfor %}
+          <p class="fnote">Producto ≠ procedimiento ≠ fase. AEAT, Seguridad Social y notarial se incorporan en el futuro sin rehacer el buscador.</p>
+        </div></div>
+
+        <div class="fgroup collapsed" data-ctx="NPL CDR REO" data-testid="facet-phase"><div class="fg-h" data-toggle>Fase del procedimiento <i data-lucide="chevron-down"></i></div><div class="fg-body" id="phaseBody">
+          {% for g in phase_groups %}
+          <div class="asset-grp phase-stage">{{ g.name }}</div>
+          {% for p in g['items'] %}
+          <label class="chk phase-opt {{ 'zero' if not counts.phase.get(p.code) }}" data-prod="{{ p.prods|join(' ') }}">
+            <input type="checkbox" name="fase" value="{{ p.code }}" {{ 'checked' if p.code in f.phases }} data-testid="filter-phase-{{ p.code }}">
+            <span>{{ p.name }}{% if p.pre_litigation %} <span class="pre-tag">preprocesal</span>{% endif %}</span><span class="cnt">{{ counts.phase.get(p.code, 0) }}</span>
+          </label>
+          {% endfor %}
+          {% endfor %}
+          {% if concursal_pending %}<p class="fnote" data-testid="concursal-note">Procedimiento concursal: fases <b>pendientes de fuente soberana</b> (no se inventan). <span class="demo-flag">pendiente</span></p>{% endif %}
+        </div></div>
+
+        <div class="fgroup collapsed" data-ctx="all" data-testid="facet-possession"><div class="fg-h" data-toggle>Situación posesoria <i data-lucide="chevron-down"></i></div><div class="fg-body">
+          {% for ps in possession_states %}
+          <label class="chk {{ 'zero' if not counts.possession.get(ps.code) }}">
+            <input type="checkbox" name="posesion" value="{{ ps.code }}" {{ 'checked' if ps.code in f.possessions }} data-testid="filter-possession-{{ ps.code }}">
+            <span>{{ ps.name }}</span><span class="cnt">{{ counts.possession.get(ps.code, 0) }}</span>
+          </label>
+          {% endfor %}
+          <p class="fnote">La situación posesoria es una dimensión independiente de la fase judicial.</p>
+        </div></div>
+
+        <div class="fgroup collapsed ctx-npl" data-ctx="NPL" data-testid="facet-npl-debt"><div class="fg-h" data-toggle>Deuda y garantía (NPL) <i data-lucide="chevron-down"></i></div><div class="fg-body">
+          <p class="fnote">Deuda pendiente, tipo y número de garantías y nº de deudores se muestran por operación cuando existen. <span class="demo-flag">datos demo</span></p>
         </div></div>
       </div>
 
@@ -345,6 +382,29 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 document.querySelectorAll('[data-toggle]').forEach(h=>h.addEventListener('click',()=>h.closest('.fgroup').classList.toggle('collapsed')));
 // more filters
 document.getElementById('moreBtn').addEventListener('click',()=>document.getElementById('fadv').classList.toggle('open'));
+// contextual filters (react to selected product)
+function applyContext(){
+  const sel=Array.from(document.querySelectorAll('input[name=tipo]:checked')).map(c=>c.value);
+  const has=sel.length>0;
+  document.querySelectorAll('#fadv .fgroup[data-ctx]').forEach(g=>{
+    const ctx=g.getAttribute('data-ctx');
+    if(ctx==='all'){g.style.display='';return;}
+    const prods=ctx.split(' ');
+    g.style.display=(!has||prods.some(p=>sel.includes(p)))?'':'none';
+  });
+  document.querySelectorAll('.phase-opt[data-prod]').forEach(o=>{
+    const prods=(o.getAttribute('data-prod')||'').split(' ').filter(Boolean);
+    o.classList.toggle('hide',has&&!prods.some(p=>sel.includes(p)));
+  });
+  document.querySelectorAll('.phase-stage').forEach(h=>{
+    let n=h.nextElementSibling,any=false;
+    while(n&&n.classList&&n.classList.contains('phase-opt')){if(!n.classList.contains('hide'))any=true;n=n.nextElementSibling;}
+    h.style.display=any?'':'none';
+  });
+}
+document.querySelectorAll('input[name=tipo]').forEach(c=>c.addEventListener('change',applyContext));
+applyContext();
+if({{ 1 if (f.procedures or f.phases or f.possessions or f.roi_min is not none or f.term_max is not none) else 0 }}){document.getElementById('fadv').classList.add('open');}
 // mobile drawer
 const facets=document.querySelector('.facets');
 document.getElementById('mOpen').addEventListener('click',()=>facets.classList.add('open'));

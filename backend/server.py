@@ -225,6 +225,8 @@ async def api_opportunities(request: Request, universo: str = "judicial",
                             ccaa: str = "", provincia: str = "", municipio: str = "",
                             precio_min: Optional[str] = None, precio_max: Optional[str] = None,
                             roi_min: Optional[str] = None, plazo_max: Optional[str] = None,
+                            procedimiento: List[str] = Query(default=[]), fase: List[str] = Query(default=[]),
+                            posesion: List[str] = Query(default=[]),
                             orden: str = "recientes"):
     if universo == "acuerdos" and not await _vip_active(request):
         return {"universe": "acuerdos", "locked": True, "items": [], "total": 0,
@@ -232,10 +234,17 @@ async def api_opportunities(request: Request, universo: str = "judicial",
     f = cat.normalize_filters(universe=universo, products=tipo, assets=activo, ccaa=ccaa,
                               provincia=provincia, municipio=municipio,
                               price_min=_to_int_or_none(precio_min), price_max=_to_int_or_none(precio_max),
-                              roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max))
+                              roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max),
+                              procedures=procedimiento, phases=fase, possessions=posesion)
     items = cat.filter_opportunities(f, order=orden)
     return {"universe": universo, "locked": False, "items": items, "total": len(items),
             "counts": cat.facet_counts(f)}
+
+
+@api_router.get("/geo/meta")
+async def geo_meta():
+    """Fuente y modelo de refresco geográfico (INE). Preparado, sin auto en producción."""
+    return cat.GEO_META
 
 
 @api_router.get("/opportunities/compare")
@@ -395,6 +404,8 @@ async def oportunidades(request: Request, universo: str = "judicial",
                         ccaa: str = "", provincia: str = "", municipio: str = "",
                         precio_min: Optional[str] = None, precio_max: Optional[str] = None,
                         roi_min: Optional[str] = None, plazo_max: Optional[str] = None,
+                        procedimiento: List[str] = Query(default=[]), fase: List[str] = Query(default=[]),
+                        posesion: List[str] = Query(default=[]),
                         orden: str = "recientes", q: str = ""):
     if universo not in ("judicial", "acuerdos"):
         universo = "judicial"
@@ -403,7 +414,8 @@ async def oportunidades(request: Request, universo: str = "judicial",
     f = cat.normalize_filters(universe=universo, products=tipo, assets=activo, ccaa=ccaa,
                               provincia=provincia, municipio=municipio,
                               price_min=_to_int_or_none(precio_min), price_max=_to_int_or_none(precio_max),
-                              roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max))
+                              roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max),
+                              procedures=procedimiento, phases=fase, possessions=posesion)
     opps = cat.filter_opportunities(f, order=orden)
     total = len(opps)
     counts = cat.facet_counts(f)
@@ -433,6 +445,12 @@ async def oportunidades(request: Request, universo: str = "judicial",
         chips.append({"key": "roi_min", "val": str(f["roi_min"]), "label": f"ROI ≥ {f['roi_min']}%"})
     if f["term_max"] is not None:
         chips.append({"key": "plazo_max", "val": str(f["term_max"]), "label": f"Plazo ≤ {f['term_max']} m"})
+    for pr in f["procedures"]:
+        chips.append({"key": "procedimiento", "val": pr, "label": f"Procedimiento: {cat.procedure_name(pr)}"})
+    for ph in f["phases"]:
+        chips.append({"key": "fase", "val": ph, "label": f"Fase: {cat.phase_name(ph)}"})
+    for ps in f["possessions"]:
+        chips.append({"key": "posesion", "val": ps, "label": f"Posesión: {cat.possession_name(ps)}"})
 
     ctx = {
         "request": request, "base_url": _public_base(request),
@@ -440,6 +458,9 @@ async def oportunidades(request: Request, universo: str = "judicial",
         "counts": counts, "chips": chips,
         "products": cat.PRODUCTS, "asset_groups": cat.ASSET_GROUPS, "sort_options": cat.SORT_OPTIONS,
         "price_ranges": cat.PRICE_RANGES, "fav_slugs": fav_slugs,
+        "procedure_types": cat.PROCEDURE_TYPES, "phase_groups": cat.PHASE_GROUPS,
+        "possession_states": cat.POSSESSION_STATES,
+        "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",
         "ccaa_list": [{"code": k, "name": v["name"]} for k, v in cat.GEO.items()],
         "provincias_cur": cat.provincias_of(ccaa) if ccaa else [],
         "municipios_cur": cat.municipios_of(ccaa, provincia) if (ccaa and provincia) else [],
@@ -465,6 +486,7 @@ async def oportunidad_detalle(request: Request, slug: str):
     resp = templates.TemplateResponse("detalle.html", {
         "request": request, "base_url": _public_base(request), "o": o,
         "interest": interest, "locked": locked, "vip_active": vip,
+        "docs": cat.documentation_for(o), "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",
     })
     _ensure_sid(request, resp)
     return resp

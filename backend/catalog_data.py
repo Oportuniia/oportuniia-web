@@ -65,6 +65,194 @@ DATE_OPTIONS = [
     {"code": "30", "name": "Últimos 30 días"},
 ]
 
+# ═══════════════════════════════════════════════════════════════════════════
+# FILTER CONTRACT v1 · ITERACIÓN 2 — Procedimiento / Fase / Posesión / Concursal
+# DIMENSIONES DISTINTAS (hard rule):
+#   PRODUCTO      = NPL | CDR | REO
+#   PROCEDIMIENTO = tipo de procedimiento
+#   FASE          = momento del procedimiento
+#   UNIVERSO      = judicial | acuerdos
+# Datos de operaciones = DEMO/fixture (no soberanos). Las fases NPL son el
+# MODELO FUNCIONAL aprobado por Rafa. La taxonomía concursal NO se inventa.
+# ═══════════════════════════════════════════════════════════════════════════
+
+# ---- Tipo de procedimiento (activos ahora) ----
+PROCEDURE_TYPES = [
+    {"code": "ejec_hipotecaria", "name": "Ejecución hipotecaria"},
+    {"code": "ejec_titulos_judiciales", "name": "Ejecución de títulos judiciales"},
+    {"code": "ejec_titulos_no_judiciales", "name": "Ejecución de títulos no judiciales"},
+    {"code": "otras_ejec_civiles", "name": "Otras ejecuciones civiles"},
+    {"code": "concursal", "name": "Procedimiento concursal", "branch": "concursal"},
+]
+# Ramas preparadas en el modelo pero NO activadas en esta iteración (extensible
+# sin rehacer el buscador). No se muestran ni se filtran todavía.
+PROCEDURE_TYPES_FUTURE = [
+    {"code": "aeat", "name": "Apremio AEAT / Hacienda"},
+    {"code": "seguridad_social", "name": "Apremio Seguridad Social"},
+    {"code": "notarial", "name": "Ejecución notarial"},
+]
+
+# ---- Fases del procedimiento de ejecución (modelo funcional Rafa · condicional) ----
+# stage = agrupación UI. prods = productos a los que aplica (filtro contextual).
+NPL_PHASES = [
+    {"code": "expediente_recibido", "name": "Expediente recibido", "stage": "preparacion", "prods": ["NPL"]},
+    {"code": "revision_documental", "name": "Recopilación / revisión de documentación", "stage": "preparacion", "prods": ["NPL"]},
+    {"code": "preprocesal", "name": "Preparación del procedimiento", "stage": "preparacion", "prods": ["NPL"], "pre_litigation": True},
+    {"code": "demanda_preparada", "name": "Demanda preparada", "stage": "preparacion", "prods": ["NPL"], "pre_litigation": True},
+    {"code": "demanda_presentada", "name": "Demanda presentada", "stage": "judicial", "prods": ["NPL"]},
+    {"code": "admision_despacho", "name": "Admisión / despacho de ejecución", "stage": "judicial", "prods": ["NPL"]},
+    {"code": "requerimiento", "name": "Requerimiento / notificación", "stage": "judicial", "prods": ["NPL"]},
+    {"code": "embargo", "name": "Embargo", "stage": "judicial", "prods": ["NPL"], "conditional": True},
+    {"code": "tasacion", "name": "Tasación / valoración para subasta", "stage": "subasta", "prods": ["NPL"], "conditional": True},
+    {"code": "solicitud_subasta", "name": "Solicitud de subasta", "stage": "subasta", "prods": ["NPL"]},
+    {"code": "subasta_convocada", "name": "Subasta convocada", "stage": "subasta", "prods": ["NPL"]},
+    {"code": "subasta_en_curso", "name": "Subasta abierta / en curso", "stage": "subasta", "prods": ["NPL"]},
+    {"code": "subasta_celebrada", "name": "Subasta celebrada", "stage": "subasta", "prods": ["NPL", "CDR"]},
+    {"code": "adjudicacion", "name": "Adjudicación", "stage": "adjudicacion", "prods": ["NPL", "CDR", "REO"]},
+    {"code": "decreto_adjudicacion", "name": "Decreto de adjudicación", "stage": "adjudicacion", "prods": ["NPL", "CDR", "REO"]},
+    {"code": "cesion_remate", "name": "Cesión de remate", "stage": "adjudicacion", "prods": ["NPL", "CDR"], "conditional": True},
+    {"code": "inscripcion", "name": "Inscripción / trámites posteriores", "stage": "posesion", "prods": ["NPL", "CDR", "REO"], "conditional": True},
+    {"code": "posesion", "name": "Posesión", "stage": "posesion", "prods": ["NPL", "CDR", "REO"]},
+    {"code": "lanzamiento", "name": "Lanzamiento", "stage": "posesion", "prods": ["NPL", "CDR", "REO"], "conditional": True},
+    {"code": "finalizado", "name": "Procedimiento finalizado", "stage": "cierre", "prods": ["NPL", "CDR", "REO"]},
+]
+PHASE_STAGES = [
+    ("preparacion", "Preparación del procedimiento"),
+    ("judicial", "Fase judicial"),
+    ("subasta", "Subasta"),
+    ("adjudicacion", "Adjudicación"),
+    ("posesion", "Posesión"),
+    ("cierre", "Cierre"),
+]
+PHASE_GROUPS = [
+    {"stage": code, "name": name,
+     "items": [p for p in NPL_PHASES if p["stage"] == code]}
+    for code, name in PHASE_STAGES
+]
+_PHASE_ORDER = {p["code"]: i for i, p in enumerate(NPL_PHASES)}
+
+# ---- Rama concursal · SUBTAXONOMY ADAPTER ----
+# La taxonomía concursal definitiva NO se inventa: queda pendiente de fuente
+# soberana. La rama existe en el modelo y en la UI; sus fases se resolverán
+# mediante este adapter cuando exista la fuente.
+CONCURSAL_PHASE_TAXONOMY = "PENDING_SOVEREIGN_SOURCE"
+
+
+def concursal_phases():
+    """SUBTAXONOMY ADAPTER. Devuelve [] hasta que la fuente soberana defina las fases."""
+    return []
+
+
+# ---- Situación posesoria (dimensión independiente de la fase) ----
+POSSESSION_STATES = [
+    {"code": "libre", "name": "Libre"},
+    {"code": "ocupado", "name": "Ocupado"},
+    {"code": "arrendado", "name": "Arrendado"},
+    {"code": "deudor_posesion", "name": "Propietario/deudor en posesión"},
+    {"code": "tercero_posesion", "name": "Tercero en posesión"},
+    {"code": "ocupacion_sin_titulo", "name": "Ocupación sin título"},
+    {"code": "pendiente_verificar", "name": "Pendiente de verificar"},
+]
+
+# ---- Filtros contextuales por producto (peso/énfasis en UI) ----
+CONTEXT_FILTERS = {
+    "NPL": ["procedure", "phase", "possession", "npl_debt"],
+    "CDR": ["procedure", "phase", "possession"],
+    "REO": ["procedure", "possession"],
+}
+
+_PROC_NAME = {p["code"]: p["name"] for p in PROCEDURE_TYPES}
+_PHASE_NAME = {p["code"]: p["name"] for p in NPL_PHASES}
+_POSS_NAME = {p["code"]: p["name"] for p in POSSESSION_STATES}
+
+# ---- Geografía · modelo de refresco INE (preparado, NO auto en producción) ----
+GEO_META = {
+    "source": "INE",
+    "authority": "Instituto Nacional de Estadística — relación oficial de municipios",
+    "reference_date": "2024-01-01",
+    "dataset_origin": "codeforspain (mirror de INE) · a sustituir por fichero de autoridad INE directo",
+    "last_sync": "2026-06-01",
+    "counts": {"ccaa": 19, "provincias": 52, "municipios": 8132},
+    "refresh_model": {
+        "annual_full_refresh": "Relación oficial INE a 1 de enero (altas, bajas, renombrados). Manual y autorizado.",
+        "in_year_delta_check": "Comprobación de altas / bajas / cambios de denominación / correcciones oficiales. Manual y autorizado.",
+        "auto_activation": False,
+        "note": "Mecanismo documentado y preparado. No se activan automatizaciones externas en producción todavía.",
+    },
+}
+
+
+def procedure_name(code):
+    return _PROC_NAME.get(code, code)
+
+
+def phase_name(code):
+    return _PHASE_NAME.get(code, code)
+
+
+def possession_name(code):
+    return _POSS_NAME.get(code, code)
+
+
+def _phase_ge(phase, target):
+    """True si la fase de la operación ha alcanzado (o superado) `target`."""
+    if not phase:
+        return False
+    return _PHASE_ORDER.get(phase, -1) >= _PHASE_ORDER.get(target, 10 ** 9)
+
+
+def documentation_for(o):
+    """Modelo de documentación CONTEXTUAL (producto + procedimiento + fase).
+    DEMO/aislado. Documentos SENSIBLES = protegidos (autorización server-side)."""
+    prod = o.get("product")
+    proc = o.get("procedure")
+    phase = o.get("phase")
+
+    def doc(name, kind, target=None, access="protected"):
+        status = "Disponible" if (target is None or _phase_ge(phase, target)) else "Prevista"
+        return {"name": name, "kind": kind, "status": status, "access": access}
+
+    groups = [{"group": "Información registral", "items": [
+        doc("Nota simple / información registral", "Registral"),
+        doc("Certificación de dominio y cargas", "Registral"),
+    ]}]
+
+    if prod == "NPL" and proc != "concursal":
+        groups.append({"group": "Documentación judicial", "items": [
+            doc("Informe de situación jurídica", "Jurídico"),
+            doc("Título / contrato de préstamo", "Deuda"),
+            doc("Demanda de ejecución", "Judicial", "demanda_presentada"),
+            doc("Auto de despacho de ejecución", "Judicial", "admision_despacho"),
+            doc("Diligencia de embargo", "Judicial", "embargo"),
+            doc("Tasación para subasta", "Subasta", "tasacion"),
+            doc("Decreto de adjudicación", "Adjudicación", "decreto_adjudicacion"),
+        ]})
+    if prod == "CDR":
+        groups.append({"group": "Remate, adjudicación y cesión", "items": [
+            doc("Acta / resultado de subasta", "Subasta", "subasta_celebrada"),
+            doc("Decreto de adjudicación", "Adjudicación", "decreto_adjudicacion"),
+            doc("Documentación de cesión de remate", "Cesión", "cesion_remate"),
+            doc("Situación posesoria y entrega", "Posesión", "posesion"),
+        ]})
+    if prod == "REO":
+        groups.append({"group": "Documentación del activo", "items": [
+            doc("Escritura / título de propiedad", "Inmobiliario"),
+            doc("Certificado energético", "Inmobiliario"),
+            doc("Cédula de habitabilidad / ITE", "Inmobiliario"),
+            doc("Situación posesoria del activo", "Posesión"),
+            doc("Dossier de comercialización", "Comercial"),
+        ]})
+    if proc == "concursal":
+        groups.append({"group": "Documentación concursal", "items": [
+            {"name": "Documentación del procedimiento concursal",
+             "kind": "Concursal", "status": "Pendiente de fuente soberana", "access": "protected"},
+        ], "pending_source": True})
+
+    groups.append({"group": "Dossier económico", "items": [
+        doc("Dossier económico de la operación", "Económico"),
+    ]})
+    return groups
+
 
 def product_name(code):
     return _PROD_NAME.get(code, code)
@@ -211,8 +399,38 @@ OPPORTUNITIES = [
      "summary": "Conjunto de adosados con dación pactada. Salida estructurada de plazo corto."},
 ]
 
+# ---- Metadatos ITERACIÓN 2 por operación (DEMO/fixture · procedimiento/fase/posesión) ----
+_POSS_FROM_OCC = {"Libre": "libre", "Ocupada": "ocupado", "Ocupado": "ocupado",
+                  "Arrendado": "arrendado", "Parcialmente ocupado": "ocupado"}
+_OP_META = {
+    "sevilla-npl-edificio-viviendas": {"procedure": "ejec_hipotecaria", "phase": "subasta_convocada", "possession": "ocupado",
+                                        "debt_pending": 815000, "guarantee_type": "Hipotecaria", "num_debtors": 1, "num_guarantees": 1},
+    "alicante-cdr-apartamentos-turisticos": {"procedure": "ejec_hipotecaria", "phase": "cesion_remate", "possession": "ocupado"},
+    "zaragoza-reo-nave-logistica": {"procedure": "ejec_hipotecaria", "phase": "finalizado", "possession": "libre"},
+    "madrid-npl-piso-centrico": {"procedure": "concursal", "phase": None, "possession": "ocupado",
+                                 "debt_pending": 340000, "guarantee_type": "Hipotecaria", "num_debtors": 2, "num_guarantees": 1},
+    "barcelona-reo-local-comercial": {"procedure": "ejec_hipotecaria", "phase": "finalizado", "possession": "arrendado"},
+    "malaga-cdr-chalet-parcela": {"procedure": "ejec_hipotecaria", "phase": "subasta_celebrada", "possession": "libre"},
+    "murcia-reo-terreno-urbanizable": {"procedure": "otras_ejec_civiles", "phase": "finalizado", "possession": "libre"},
+    "madrid-reo-garaje-plazas": {"procedure": "ejec_hipotecaria", "phase": "finalizado", "possession": "libre"},
+    "alicante-reo-piso-costa": {"procedure": "ejec_hipotecaria", "phase": "finalizado", "possession": "libre"},
+    "barcelona-npl-vivienda-unifamiliar": {"procedure": "ejec_hipotecaria", "phase": "embargo", "possession": "ocupado",
+                                           "debt_pending": 275000, "guarantee_type": "Hipotecaria", "num_debtors": 1, "num_guarantees": 1},
+    "marbella-reo-villa-piscina": {"procedure": "ejec_hipotecaria", "phase": "finalizado", "possession": "libre"},
+    "valencia-cdr-local-calle": {"procedure": "ejec_hipotecaria", "phase": "cesion_remate", "possession": "arrendado"},
+    "bilbao-npl-adosados": {"procedure": "concursal", "phase": None, "possession": "ocupado",
+                            "debt_pending": 620000, "guarantee_type": "Hipotecaria", "num_debtors": 3, "num_guarantees": 2},
+}
+
 for _o in OPPORTUNITIES:
     _o["roi_num"] = _roi_num(_o["roi"])
+    _meta = _OP_META.get(_o["slug"], {})
+    _o["procedure"] = _meta.get("procedure")
+    _o["phase"] = _meta.get("phase")
+    _o["possession"] = _meta.get("possession") or _POSS_FROM_OCC.get(_o.get("occupancy"), "pendiente_verificar")
+    for _k in ("debt_pending", "guarantee_type", "num_debtors", "num_guarantees"):
+        if _k in _meta:
+            _o[_k] = _meta[_k]
 
 _BY_SLUG = {o["slug"]: o for o in OPPORTUNITIES}
 
@@ -225,6 +443,12 @@ def enrich(o):
     d["provincia_name"] = geo_label("provincia", o["ccaa"], o["provincia"])
     d["municipio_name"] = geo_label("municipio", o["ccaa"], o["provincia"], o["municipio"])
     d["price_label"] = f"{o['price']:,.0f} €".replace(",", ".") if o.get("price") else "—"
+    d["procedure_name"] = procedure_name(o["procedure"]) if o.get("procedure") else None
+    d["phase_name"] = phase_name(o["phase"]) if o.get("phase") else None
+    d["possession_name"] = possession_name(o["possession"]) if o.get("possession") else None
+    d["is_concursal"] = o.get("procedure") == "concursal"
+    if o.get("debt_pending"):
+        d["debt_label"] = f"{o['debt_pending']:,.0f} €".replace(",", ".")
     return d
 
 
@@ -264,18 +488,27 @@ def _match(o, f, skip=None):
         return False
     if skip != "term" and f.get("term_max") is not None and o["timeframe"] > f["term_max"]:
         return False
+    if skip != "procedure" and f.get("procedures") and o.get("procedure") not in f["procedures"]:
+        return False
+    if skip != "phase" and f.get("phases") and o.get("phase") not in f["phases"]:
+        return False
+    if skip != "possession" and f.get("possessions") and o.get("possession") not in f["possessions"]:
+        return False
     return True
 
 
 def normalize_filters(universe="judicial", products=None, assets=None, ccaa=None,
                       provincia=None, municipio=None, price_min=None, price_max=None,
-                      roi_min=None, term_max=None):
+                      roi_min=None, term_max=None, procedures=None, phases=None,
+                      possessions=None):
     return {
         "universe": universe if universe in ("judicial", "acuerdos") else "judicial",
         "products": _as_list(products), "assets": _as_list(assets),
         "ccaa": ccaa or None, "provincia": provincia or None, "municipio": municipio or None,
         "price_min": price_min, "price_max": price_max,
         "roi_min": roi_min, "term_max": term_max,
+        "procedures": _as_list(procedures), "phases": _as_list(phases),
+        "possessions": _as_list(possessions),
     }
 
 
@@ -310,4 +543,13 @@ def facet_counts(f):
         n = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="ccaa") and o["ccaa"] == c)
         if n:
             counts["ccaa"][c] = n
+    counts["procedure"] = {}
+    for pt in PROCEDURE_TYPES:
+        counts["procedure"][pt["code"]] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="procedure") and o.get("procedure") == pt["code"])
+    counts["phase"] = {}
+    for ph in NPL_PHASES:
+        counts["phase"][ph["code"]] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="phase") and o.get("phase") == ph["code"])
+    counts["possession"] = {}
+    for ps in POSSESSION_STATES:
+        counts["possession"][ps["code"]] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="possession") and o.get("possession") == ps["code"])
     return counts

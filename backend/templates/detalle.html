@@ -59,6 +59,11 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .doclist li{display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--ink2);padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
 .doclist li i{width:16px;height:16px;color:var(--faint)}
 .doclist .st{margin-left:auto;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);border:1px solid var(--line);padding:3px 9px;border-radius:20px}
+.doc-group{margin-top:16px}
+.doc-gh{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);font-weight:600;margin-bottom:8px}
+.doc-kind{margin-left:auto;font-size:10.5px;color:var(--faint)}
+.doclist li .st{margin-left:12px}
+.doclist .st.st-prev{color:var(--brand);border-color:var(--brand-line);background:var(--brand-tint)}
 /* sticky action panel */
 .act-panel{position:sticky;top:96px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);padding:24px}
 .act-roi{display:flex;align-items:flex-end;gap:10px;padding-bottom:16px;border-bottom:1px solid var(--line-2)}
@@ -133,6 +138,22 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
         </div>
       </div>
 
+      <div class="det-section" data-testid="sec-procedimiento">
+        <h2><i data-lucide="gavel"></i> Procedimiento y fase</h2>
+        <div class="det-vars">
+          <div class="dv"><div class="k">Tipo de procedimiento</div><div class="v">{{ o.procedure_name or '—' }}</div></div>
+          {% if o.is_concursal %}
+          <div class="dv"><div class="k">Fase</div><div class="v">Concursal · pendiente de fuente soberana</div></div>
+          {% else %}
+          <div class="dv"><div class="k">Fase actual</div><div class="v">{{ o.phase_name or '—' }}</div></div>
+          {% endif %}
+          <div class="dv"><div class="k">Situación posesoria</div><div class="v">{{ o.possession_name or '—' }}</div></div>
+          <div class="dv"><div class="k">Producto</div><div class="v">{{ o.product }} · {{ o.product_name }}</div></div>
+          {% if o.debt_label %}<div class="dv"><div class="k">Deuda pendiente <span class="demo-flag">demo</span></div><div class="v">{{ o.debt_label }}</div></div>{% endif %}
+          {% if o.guarantee_type %}<div class="dv"><div class="k">Tipo de garantía</div><div class="v">{{ o.guarantee_type }}</div></div>{% endif %}
+        </div>
+      </div>
+
       <div class="det-section">
         <h2><i data-lucide="scale"></i> Situación y estructura</h2>
         <div class="det-vars">
@@ -155,12 +176,23 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 
       <div class="det-section" data-testid="sec-documentacion">
         <h2><i data-lucide="folder"></i> Documentación</h2>
-        <ul class="doclist">
-          <li><i data-lucide="file"></i> Nota simple / información registral <span class="st">Con acceso</span></li>
-          <li><i data-lucide="file"></i> Informe de situación jurídica <span class="st">Con acceso</span></li>
-          <li><i data-lucide="file"></i> Dossier económico de la operación <span class="st">Con acceso</span></li>
-        </ul>
-        <p style="margin-top:12px;font-size:12.5px;color:var(--faint)">La documentación completa y su intercambio (aportación de documentos por tu parte y entrega por parte de OPORTUNIIA) se gestionará desde Mi OPORTUNIIA una vez iniciada la operación. <span class="demo-flag">próximamente</span></p>
+        <p style="font-size:12.5px;color:var(--ink2);font-weight:300;margin-bottom:6px">Documentación contextual según producto, procedimiento y fase. El contenido protegido requiere autorización (no se entrega por bloqueo visual). <span class="demo-flag">datos demo</span></p>
+        {% for g in docs %}
+        <div class="doc-group" data-testid="doc-group">
+          <div class="doc-gh">{{ g.group }}{% if g.pending_source %} <span class="demo-flag">pendiente fuente soberana</span>{% endif %}</div>
+          <ul class="doclist">
+            {% for d in g['items'] %}
+            <li data-testid="doc-item">
+              <i data-lucide="{{ 'lock' if d.access=='protected' else 'file' }}"></i>
+              <span>{{ d.name }}</span>
+              <span class="doc-kind">{{ d.kind }}</span>
+              <span class="st {{ 'st-prev' if d.status != 'Disponible' }}">{{ d.status }}</span>
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+        {% endfor %}
+        <p style="margin-top:12px;font-size:12.5px;color:var(--faint)">El intercambio de documentación (tu aportación y la entrega por parte de OPORTUNIIA) se gestionará desde Mi OPORTUNIIA una vez iniciada la operación. <span class="demo-flag">próximamente</span></p>
       </div>
     </div>
 
