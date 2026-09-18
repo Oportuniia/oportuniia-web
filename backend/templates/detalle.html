@@ -22,8 +22,10 @@
 .det-lock .vk{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#57C6E4;background:rgba(87,198,228,.12);padding:7px 14px;border-radius:20px}
 .det-lock h2{margin-top:18px;font-size:clamp(26px,3.4vw,40px);font-weight:600;color:#fff;letter-spacing:-.02em;line-height:1.06}
 .det-lock p{margin:14px auto 0;font-size:14.5px;color:#B9CDD8;font-weight:300}
-.det-lock .vip-cta{margin-top:24px;display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700;padding:16px 34px;border-radius:10px;background:#2E9AC6;color:#fff;box-shadow:0 20px 46px -18px rgba(46,154,198,.9);transition:.3s}
-.det-lock .vip-cta:hover{background:#57C6E4;transform:translateY(-2px)}
+.det-lock .vip-cta{margin-top:24px;display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:320px;font-size:16px;font-weight:700;padding:20px 34px;border-radius:12px;background:#2E9AC6;color:#fff;box-shadow:0 20px 46px -16px rgba(46,154,198,.9);transition:transform .35s var(--ease),background-color .3s;animation:vipPulse 2.6s var(--ease) infinite}
+.det-lock .vip-cta:hover{background:#57C6E4;transform:scale(1.05);animation-play-state:paused}
+@keyframes vipPulse{0%,100%{box-shadow:0 20px 46px -16px rgba(46,154,198,.85),0 0 0 0 rgba(87,198,228,.55)}50%{box-shadow:0 20px 46px -16px rgba(46,154,198,.85),0 0 0 15px rgba(87,198,228,0)}}
+@media(prefers-reduced-motion:reduce){.det-lock .vip-cta{animation:none}}
 .det-lock .vip-fine{margin-top:14px;font-size:11.5px;color:#6E8695}
 .det-hero h1{font-size:clamp(30px,4.4vw,56px);font-weight:600;letter-spacing:-.03em;line-height:1.02}
 .det-hero .loc{margin-top:12px;font-size:14.5px;color:var(--ink2);display:inline-flex;align-items:center;gap:8px}

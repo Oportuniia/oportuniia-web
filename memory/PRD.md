@@ -223,6 +223,7 @@ Feedback Rafa: los universos no cambiaban de atmósfera completa (Judicial queda
 Verificado por screenshots (los 5 estados A–G del pedido) + comprobación server-side de body class/locked. HOME V54 y logo = FREEZE (sin tocar). Estado: IMPLEMENTED, HUMAN PREVIEW PENDING Rafa/Alba. STOP.
 
 ## Backlog (bloqueado hasta aprobación visual)
+- (2026-06) Micro-iteración modal VIP: "Activar VIP" reubicado ARRIBA como acción principal (ancho ~340px equivalente al bloque de planes, pulse suave tipo anillo 2.6s, hover scale 1.05); Mensual/Anual debajo como secundarios con hover scale. Aplicado en catálogo (`.vip-lock`) y ficha (`.det-lock`). Sin cambios en título/copy/fondo/granular/lógica. Respeta prefers-reduced-motion.
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).
 - P2: QA responsive dentro de Elementor tras escritura.

@@ -86,13 +86,16 @@
 .vip-lock .vk{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--cyan-2);background:rgba(87,198,228,.12);padding:7px 14px;border-radius:20px}
 .vip-lock h2{margin-top:20px;font-size:clamp(30px,4.4vw,52px);font-weight:600;color:#fff;letter-spacing:-.03em;line-height:1.04}
 .vip-lock p{margin:16px auto 0;font-size:15.5px;color:#B9CDD8;font-weight:300}
-.vip-plans{display:flex;gap:14px;justify-content:center;margin-top:26px;flex-wrap:wrap}
-.vip-plan{border:1px solid rgba(46,154,198,.4);border-radius:12px;padding:16px 26px;min-width:150px}
+.vip-plans{display:flex;gap:14px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.vip-plan{border:1px solid rgba(46,154,198,.4);border-radius:12px;padding:16px 26px;min-width:150px;transition:transform .3s var(--ease),border-color .3s,background-color .3s;cursor:pointer}
+.vip-plan:hover{transform:scale(1.05);border-color:var(--cyan-2);background:rgba(87,198,228,.08)}
 .vip-plan .pk{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--cyan-2);font-weight:600}
 .vip-plan .pv{font-size:14px;color:#EAF3F8;margin-top:6px}
 .vip-plan .pp{font-size:11.5px;color:#6E8695;margin-top:4px}
-.vip-cta{margin-top:28px;display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700;padding:17px 36px;border-radius:10px;background:var(--cyan);color:#fff;box-shadow:0 20px 46px -18px rgba(46,154,198,.9);transition:.3s}
-.vip-cta:hover{background:var(--cyan-2);transform:translateY(-2px)}
+.vip-cta{margin-top:24px;display:inline-flex;align-items:center;justify-content:center;gap:10px;width:100%;max-width:340px;font-size:16px;font-weight:700;padding:20px 36px;border-radius:12px;background:var(--cyan);color:#fff;box-shadow:0 20px 46px -16px rgba(46,154,198,.9);transition:transform .35s var(--ease),background-color .3s;animation:vipPulse 2.6s var(--ease) infinite}
+.vip-cta:hover{background:var(--cyan-2);transform:scale(1.05);animation-play-state:paused}
+@keyframes vipPulse{0%,100%{box-shadow:0 20px 46px -16px rgba(46,154,198,.85),0 0 0 0 rgba(87,198,228,.55)}50%{box-shadow:0 20px 46px -16px rgba(46,154,198,.85),0 0 0 15px rgba(87,198,228,0)}}
+@media(prefers-reduced-motion:reduce){.vip-cta{animation:none}}
 .vip-fine{margin-top:14px;font-size:11.5px;color:#6E8695}
 /* compare bar + modal */
 .cmp-bar{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(140%);z-index:120;display:flex;align-items:center;gap:16px;background:var(--dark);color:#fff;border:1px solid rgba(46,154,198,.4);border-radius:14px;padding:14px 20px;box-shadow:0 30px 70px -30px rgba(0,0,0,.6);transition:transform .4s var(--ease)}
@@ -222,11 +225,11 @@
       <span class="vk"><i data-lucide="sparkles" style="width:14px;height:14px"></i> Universo Acuerdos · Suscripción VIP</span>
       <h2>Más control. Menos incertidumbre.</h2>
       <p>El Universo Acuerdos reúne operaciones con una salida previamente estructurada: sabes desde el principio cuánto necesitas, qué plazo manejamos y cuál es el resultado previsto. Es un entorno reservado, sujeto a suscripción VIP activa.</p>
+      <a href="/#acceso" class="vip-cta" data-testid="vip-activate">Activar VIP <i data-lucide="arrow-right" style="width:18px;height:18px"></i></a>
       <div class="vip-plans">
         <div class="vip-plan"><div class="pk">Mensual</div><div class="pv">Suscripción VIP</div><div class="pp">Precio · próximamente</div></div>
         <div class="vip-plan"><div class="pk">Anual</div><div class="pv">Suscripción VIP</div><div class="pp">Precio · próximamente</div></div>
       </div>
-      <a href="/#acceso" class="vip-cta" data-testid="vip-activate">Activar VIP <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
       <p class="vip-fine">Acceso sujeto a validación profesional y a entitlement VIP activo. El inventario de Acuerdos no se entrega sin autorización.</p>
     </div></div>
   </div>
