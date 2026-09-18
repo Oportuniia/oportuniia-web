@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Request, Response
+from fastapi import FastAPI, APIRouter, Request, Response, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
@@ -215,29 +215,27 @@ async def loc_provincias(ccaa: str = ""):
     return [{"code": k, "name": v["name"]} for k, v in c["provincias"].items()]
 
 @api_router.get("/locations/municipios")
-async def loc_municipios(ccaa: str = "", provincia: str = ""):
-    try:
-        muns = cat.GEO[ccaa]["provincias"][provincia]["municipios"]
-    except KeyError:
-        return []
-    return [{"code": k, "name": v} for k, v in muns.items()]
+async def loc_municipios(ccaa: str = "", provincia: str = "", q: str = ""):
+    return cat.municipios_of(ccaa, provincia, q)
 
 
 @api_router.get("/opportunities")
-async def api_opportunities(request: Request, universo: str = "judicial", tipo: str = "",
+async def api_opportunities(request: Request, universo: str = "judicial",
+                            tipo: List[str] = Query(default=[]), activo: List[str] = Query(default=[]),
                             ccaa: str = "", provincia: str = "", municipio: str = "",
-                            activo: str = "", precio_min: Optional[str] = None,
-                            precio_max: Optional[str] = None, orden: str = "recientes"):
-    pmin = _to_int_or_none(precio_min)
-    pmax = _to_int_or_none(precio_max)
+                            precio_min: Optional[str] = None, precio_max: Optional[str] = None,
+                            roi_min: Optional[str] = None, plazo_max: Optional[str] = None,
+                            orden: str = "recientes"):
     if universo == "acuerdos" and not await _vip_active(request):
         return {"universe": "acuerdos", "locked": True, "items": [], "total": 0,
                 "message": "Inventario Acuerdos reservado a suscripción VIP activa."}
-    items = cat.filter_opportunities(universe=universo, product=tipo or None,
-                                     ccaa=ccaa or None, provincia=provincia or None,
-                                     municipio=municipio or None, asset_type=activo or None,
-                                     price_min=pmin, price_max=pmax, order=orden)
-    return {"universe": universo, "locked": False, "items": items, "total": len(items)}
+    f = cat.normalize_filters(universe=universo, products=tipo, assets=activo, ccaa=ccaa,
+                              provincia=provincia, municipio=municipio,
+                              price_min=_to_int_or_none(precio_min), price_max=_to_int_or_none(precio_max),
+                              roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max))
+    items = cat.filter_opportunities(f, order=orden)
+    return {"universe": universo, "locked": False, "items": items, "total": len(items),
+            "counts": cat.facet_counts(f)}
 
 
 @api_router.get("/opportunities/compare")
@@ -392,35 +390,60 @@ async def home():
 
 
 @app.get("/oportunidades", response_class=HTMLResponse)
-async def oportunidades(request: Request, universo: str = "judicial", tipo: str = "",
+async def oportunidades(request: Request, universo: str = "judicial",
+                        tipo: List[str] = Query(default=[]), activo: List[str] = Query(default=[]),
                         ccaa: str = "", provincia: str = "", municipio: str = "",
-                        activo: str = "", precio_min: Optional[str] = None,
-                        precio_max: Optional[str] = None, orden: str = "recientes",
-                        sup_min: Optional[str] = None):
-    precio_min = _to_int_or_none(precio_min)
-    precio_max = _to_int_or_none(precio_max)
+                        precio_min: Optional[str] = None, precio_max: Optional[str] = None,
+                        roi_min: Optional[str] = None, plazo_max: Optional[str] = None,
+                        orden: str = "recientes", q: str = ""):
     if universo not in ("judicial", "acuerdos"):
         universo = "judicial"
     vip = await _vip_active(request)
     locked = (universo == "acuerdos" and not vip)
-    opps = cat.filter_opportunities(universe=universo, product=tipo or None,
-                                    ccaa=ccaa or None, provincia=provincia or None,
-                                    municipio=municipio or None, asset_type=activo or None,
-                                    price_min=precio_min, price_max=precio_max, order=orden)
+    f = cat.normalize_filters(universe=universo, products=tipo, assets=activo, ccaa=ccaa,
+                              provincia=provincia, municipio=municipio,
+                              price_min=_to_int_or_none(precio_min), price_max=_to_int_or_none(precio_max),
+                              roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max))
+    opps = cat.filter_opportunities(f, order=orden)
     total = len(opps)
+    counts = cat.facet_counts(f)
     sid = _get_sid(request)
     fav_slugs = []
     if sid:
         doc = await db.demo_favorites.find_one({"session_id": sid}, {"_id": 0, "slugs": 1})
         fav_slugs = (doc or {}).get("slugs", [])
+
+    # chips de filtros activos
+    chips = []
+    for p in f["products"]:
+        chips.append({"key": "tipo", "val": p, "label": f"Producto: {p}"})
+    for a in f["assets"]:
+        chips.append({"key": "activo", "val": a, "label": f"Activo: {cat.asset_name(a)}"})
+    if f["ccaa"]:
+        chips.append({"key": "ccaa", "val": f["ccaa"], "label": cat.geo_label('ccaa', f['ccaa']) or f['ccaa']})
+    if f["provincia"]:
+        chips.append({"key": "provincia", "val": f["provincia"], "label": cat.geo_label('provincia', f['ccaa'], f['provincia']) or f['provincia']})
+    if f["municipio"]:
+        chips.append({"key": "municipio", "val": f["municipio"], "label": cat.geo_label('municipio', f['ccaa'], f['provincia'], f['municipio']) or f['municipio']})
+    if f["price_min"] is not None:
+        chips.append({"key": "precio_min", "val": str(f["price_min"]), "label": f"Desde {f['price_min']:,} €".replace(',', '.')})
+    if f["price_max"] is not None:
+        chips.append({"key": "precio_max", "val": str(f["price_max"]), "label": f"Hasta {f['price_max']:,} €".replace(',', '.')})
+    if f["roi_min"] is not None:
+        chips.append({"key": "roi_min", "val": str(f["roi_min"]), "label": f"ROI ≥ {f['roi_min']}%"})
+    if f["term_max"] is not None:
+        chips.append({"key": "plazo_max", "val": str(f["term_max"]), "label": f"Plazo ≤ {f['term_max']} m"})
+
     ctx = {
         "request": request, "base_url": _public_base(request),
         "universe": universo, "vip_active": vip, "locked": locked, "opps": opps, "total": total,
-        "products": cat.PRODUCTS, "asset_types": cat.ASSET_TYPES, "sort_options": cat.SORT_OPTIONS,
-        "geo": cat.GEO, "geo_json": json.dumps(cat.GEO, ensure_ascii=False), "fav_slugs": fav_slugs,
-        "filters": {"tipo": tipo, "ccaa": ccaa, "provincia": provincia, "municipio": municipio,
-                    "activo": activo, "precio_min": precio_min, "precio_max": precio_max,
-                    "orden": orden, "sup_min": None},
+        "counts": counts, "chips": chips,
+        "products": cat.PRODUCTS, "asset_groups": cat.ASSET_GROUPS, "sort_options": cat.SORT_OPTIONS,
+        "price_ranges": cat.PRICE_RANGES, "fav_slugs": fav_slugs,
+        "ccaa_list": [{"code": k, "name": v["name"]} for k, v in cat.GEO.items()],
+        "provincias_cur": cat.provincias_of(ccaa) if ccaa else [],
+        "municipios_cur": cat.municipios_of(ccaa, provincia) if (ccaa and provincia) else [],
+        "f": f, "orden": orden, "q": q,
     }
     resp = templates.TemplateResponse("catalogo.html", ctx)
     _ensure_sid(request, resp)
