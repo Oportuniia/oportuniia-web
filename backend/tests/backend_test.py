@@ -33,11 +33,11 @@ class TestSSRPages:
         assert 'data-testid="uni-acuerdos"' in r.text
 
     def test_catalog_ssr_acuerdos_locked(self):
+        # ITER2: acuerdos catalog now renders 3 blurred/locked acuerdos cards behind premium-modal (WHITE theme)
         r = requests.get(f"{BASE_URL}/oportunidades?universo=acuerdos", timeout=30)
         assert r.status_code == 200
-        assert 'data-testid="vip-locked"' in r.text
-        cards = re.findall(r'data-testid="opp-card"', r.text)
-        assert len(cards) == 0
+        assert 'theme-acuerdos' in r.text
+        assert 'data-testid="premium-modal"' in r.text or 'data-testid="vip-locked"' in r.text
 
     def test_detalle_judicial_ok(self):
         r = requests.get(f"{BASE_URL}/oportunidades/sevilla-npl-edificio-viviendas", timeout=30)
@@ -46,11 +46,13 @@ class TestSSRPages:
         assert 'data-testid="cta-reservar"' in r.text
         assert 'data-testid="cta-comprar"' in r.text
 
-    def test_detalle_acuerdos_redirects(self):
+    def test_detalle_acuerdos_locked_with_premium_modal(self):
+        # ITER2: acuerdos detail now renders WHITE theme + premium-modal (no redirect)
         r = requests.get(f"{BASE_URL}/oportunidades/marbella-reo-villa-piscina",
                          timeout=30, allow_redirects=False)
-        assert r.status_code in (302, 307)
-        assert "universo=acuerdos" in r.headers.get("location", "")
+        assert r.status_code == 200
+        assert 'theme-acuerdos' in r.text
+        assert 'data-testid="premium-modal"' in r.text
 
     def test_detalle_404(self):
         r = requests.get(f"{BASE_URL}/oportunidades/no-existe-xxx", timeout=30)

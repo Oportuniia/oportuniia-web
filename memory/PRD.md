@@ -237,6 +237,20 @@ Verificado: multiselect, filtros ccaa/precio, chips, counts (NPL3/CDR2/REO5), ca
 ## Salud
 - Roto: ninguno. Mock: ROI/plazos/ubicaciones/valor de compra son DEMO (se sustituirán por operaciones reales 1:1).
 
+## Estado — FILTER CONTRACT v1 · ITERACIÓN 2 (2026-06)
+Procedimientos + Fases + Concursal + Posesión + Documentación. Testing agent 51/51 PASS, 0 bugs funcionales.
+- **DIMENSIONES (hard rule)**: PRODUCTO(NPL/CDR/REO) ≠ PROCEDIMIENTO ≠ FASE ≠ UNIVERSO.
+- **Tipo de procedimiento** (facet real, multiselect+counts+chips+URL): Ejecución hipotecaria, Ej. títulos judiciales, Ej. títulos no judiciales, Otras ejec. civiles, Procedimiento concursal. AEAT/SS/Notarial preparados en modelo (`PROCEDURE_TYPES_FUTURE`) pero NO activados — extensible sin rehacer el buscador.
+- **Fase del procedimiento** (facet real, agrupada por stage): 20 fases modelo Rafa (incl. preprocesal `preparacion`), condicionales, `prods` por fase para contextual. `_phase_ge()` para estados de documentación.
+- **Concursal**: rama real en modelo+UI, asociable a operaciones DEMO. `CONCURSAL_PHASE_TAXONOMY="PENDING_SOVEREIGN_SOURCE"`, `concursal_phases()→[]` (adapter). NO se inventan fases. Nota "pendiente de fuente soberana" en UI.
+- **Situación posesoria** (facet real independiente de fase): 7 estados, multiselect+counts+chips.
+- **Contextual por producto** (JS `applyContext`): NPL profundo (procedure/phase/possession + Deuda y garantía demo), CDR reducido, REO mínimo; opciones de fase se filtran por `data-prod`.
+- **Documentación** (`documentation_for`): grupos contextuales por producto+procedimiento+fase, estado Disponible/Prevista según fase alcanzada, acceso `protected` (autorización server-side, no blur). Concursal → grupo pendiente. UI en ficha (`sec-procedimiento` + doc-groups).
+- **Geo INE** (`GEO_META` + `GET /api/geo/meta`): source=INE, refresh anual (1 enero) + delta intra-anual, `auto_activation=false` (documentado, no auto en prod).
+- Backend: `/oportunidades` y `/api/opportunities` aceptan `procedimiento`/`fase`/`posesion` (List). Fixtures: metadatos vía `_OP_META` por slug. Counts esperados judicial (10): procedure{ejec_hipotecaria:8,otras:1,concursal:1}, phase{finalizado:5,embargo:1,subasta_convocada:1,subasta_celebrada:1,cesion_remate:1}, possession{libre:5,ocupado:4,arrendado:1}.
+- Preservado: Judicial DARK, Acuerdos WHITE, Experiencia Premium modal, 0 VIP público. Tests: `/app/backend/tests/test_filter_contract_v1.py` (+backend_test.py) 51/51.
+- Estado: IMPLEMENTED, HUMAN REVIEW PENDING. STOP (no avanzar a Iteración 3; AEAT/SS/Notarial y guardar-búsqueda real siguen en backlog).
+
 ## Estado — EXPERIENCIA PREMIUM · Modal real + nomenclatura (2026-06)
 Micro-iteración UX + normalización de nomenclatura (aprobada por usuario, respuestas 1a/2a).
 - NOMENCLATURA: toda la copy pública "VIP" → "EXPERIENCIA PREMIUM". CTA oficial "ACTIVAR PREMIUM". Badge "Universo Acuerdos · Experiencia Premium". Planes "Mensual/Anual · Premium". Copy legal "acceso Premium activo" (sin "entitlement"). Aplicado en `catalogo.html`, `detalle.html`, HOME `web2.html` (SOLO copy visible del banner, geometría/visual FROZEN) y mensaje API `server.py`. PUBLIC VIP OCCURRENCES = 0 (restos "vip" solo en clases CSS, data-testid, keyframes, comentarios y código interno `vip_active` — preservados, §18). Autorización server-side (`_vip_active`) SIN cambios.

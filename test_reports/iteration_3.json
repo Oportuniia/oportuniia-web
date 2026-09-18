@@ -1,0 +1,29 @@
+{
+  "summary": "FILTER CONTRACT v1 · ITERACIÓN 2 fully verified. Added /app/backend/tests/test_filter_contract_v1.py (24 tests) covering procedure/phase/possession API facets + faceted counts + multiselect + contradictory combos, /api/geo/meta (INE, refresh_model.auto_activation=false), SSR catalog facet panels + DARK theme + active chips + Limpiar todos, SSR detail sec-procedimiento + doc-groups/items + DARK theme, concursal detail marked pendiente de fuente soberana, acuerdos detail WHITE theme + closable premium-modal, and regression on geo cascade + favorites + compare + no public 'VIP' text. Also updated pre-existing backend_test.py (2 stale tests) to match the new spec where /oportunidades?universo=acuerdos and /oportunidades/{acuerdos-slug} now render WHITE theme + premium-modal instead of vip-locked/302 redirect. Final: pytest 51/51 pass. Playwright verified: theme-judicial on catalog, all 4 facet panels present (facet-procedure/phase/possession/npl-debt), facet-npl-debt hidden when NPL not selected, concursal filter → 1 card + Procedimiento chip visible, acuerdos detail body has theme-acuerdos + visible premium-modal, judicial detail has sec-procedimiento + 3 doc-groups + 10 doc-items, concursal detail contains 'Concursal' + 'pendiente'. All product invariants verified: PRODUCTO != PROCEDIMIENTO != FASE != UNIVERSO; Ejecuciones Judiciales DARK, Universo Acuerdos WHITE, no public 'VIP' word (only 'Activar Premium'/'Experiencia Premium'), all catalogue data DEMO.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_filter_contract_v1.py",
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/iter3_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is 512 lines and starting to mix concerns (WordPress precheck endpoints + Opportunity Engine APIs + SSR routes). Recommend extracting routes_opportunities.py and routes_wp_precheck.py for maintainability before Fase 3.",
+    "catalog_data.py facet_counts() iterates the full OPPORTUNITIES list 4 times × (products+assets+geo+procedures+phases+possessions) per request. Currently cheap (13 items) but will become O(N * M) hot when catalogue grows; consider precomputing per-facet buckets or caching.",
+    "documentation_for() is a pure function of (product, procedure, phase) → cacheable via functools.lru_cache keyed on those three fields.",
+    "In detalle.html the 'Documentación concursal' group is present in HTML but appears collapsed by default — Playwright innerText missed it. Not a bug but consider expanding the pending-source doc-group by default so users immediately see the transparency notice.",
+    "The regression check 'no public VIP text' has to strip <style>/<script> because there's still a CSS comment '/* granular lock (non-VIP acuerdos deep-link) */' inside base.html/detalle.html — internal only, but recommend renaming comments to 'non-Premium' to keep the codebase aligned with public terminology."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_filter_contract_v1.py",
+    "/app/backend/tests/backend_test.py"
+  ],
+  "success_rate": {"backend": "100% (51/51)", "frontend": "100%"},
+  "test_credentials": "None (anonymous opp_sid cookie)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "FILTER CONTRACT v1 is stable. Expected fixture counts on unfiltered judicial (10 items): procedure {ejec_hipotecaria:8, otras_ejec_civiles:1, concursal:1}; phase {finalizado:5, embargo:1, subasta_convocada:1, subasta_celebrada:1, cesion_remate:1}; possession {libre:5, ocupado:4, arrendado:1}. Concursal branch is intentionally PENDING_SOVEREIGN_SOURCE — concursal_phases() returns []. Acuerdos catalogue has 3 items but is always locked (theme-acuerdos + premium-modal). Backend tests: /app/backend/tests/test_filter_contract_v1.py + backend_test.py (51 tests total, class-organized). Two backend_test.py tests were updated because the acuerdos gating behavior changed from 302/0-cards to WHITE-theme + premium-modal in this iteration.",
+  "rca of the issue": "No functional bugs found. Only stale-test alignments and internal-comment cleanup recommendations."
+}
