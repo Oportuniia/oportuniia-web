@@ -1,0 +1,30 @@
+{
+  "summary": "FILTER CONTRACT v1 · ITERACIÓN 2 CORRECCIÓN fully verified. Updated /app/backend/tests/test_filter_contract_v1.py to the new 41-hito taxonomy (9 stage groups) + Estado ocupacional rename + Fase principal facet + new chip prefixes (Fase:/Hito:/Ocupación:). Added tests covering: (A) rename of public 'Situación posesoria' → 'Estado ocupacional' with only ≤1 occurrence of 'situación posesoria' in visible text (inside hito name 'Incidente sobre ocupantes / situación posesoria'); (B) presence of all 41 hito checkboxes (filter-phase-<code>) in 9 stage headers; (C) new facet-phase-principal with 9 stages; (D) 7 possession states incl. deudor_posesion / tercero_posesion / ocupacion_sin_titulo / pendiente_verificar; (E) combined multi-dim filter tipo=NPL&procedimiento=ejec_hipotecaria&fase_principal=embargo_cargas&posesion=ocupado → 1 item (barcelona-npl-vivienda-unifamiliar); (F) counts unfiltered judicial: phase 41 keys with expected nonzero {embargo_traba:1, subasta_convocada:1, subasta_con_postores:1, decreto_adjudicacion:1, inscripcion_adjudicacion:5}; phase_principal 9 keys with {embargo_cargas:1, prep_subasta:1, subasta:1, remate:1, registro:5}; possession {libre:5, ocupado:4, arrendado:1}; (G) detail /oportunidades/barcelona-npl-vivienda-unifamiliar shows labels 'Fase principal' + 'Hito procesal' + 'Estado ocupacional' with DARK theme + 'Ocupado' value; (H) concursal detail madrid-npl-piso-centrico marked pendiente + no NPL hito active; (I) acuerdos detail marbella-reo-villa-piscina keeps WHITE theme + premium-modal; (J) regression preserved: geo cascade, favorites, compare, no public 'VIP' text. Also Playwright UI check on the multi-dim URL confirms: 'ESTADO OCUPACIONAL' header, 4 correctly-prefixed chips (Producto/Procedimiento/Fase/Ocupación), 'Limpiar todos' link, exactly 1 result card = Vivienda unifamiliar (Hospitalet, Barcelona), DARK theme. FINAL: pytest 57/57 pass (30 in test_filter_contract_v1.py + 27 in backend_test.py).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_filter_contract_v1.py",
+    "/app/backend/tests/backend_test.py",
+    "/app/test_reports/pytest/iter4_full.xml",
+    "/app/test_reports/pytest/iter4_results.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "server.py is 512+ lines mixing WordPress precheck + Opportunity APIs + SSR routes; extract routes_opportunities.py + routes_wp_precheck.py before Fase 3.",
+    "catalog_data.py facet_counts() now iterates OPPORTUNITIES (products+assets+geo+procedures+41 phases+9 phase_principal+7 possessions) times skip-per-facet on every request. Complexity grew from previous iteration. Still cheap at 13 items but becoming O(N·M); cache/precompute per-facet buckets before catalogue scale-up.",
+    "In catalogo.html the 3 large facet panels (fase principal, fase/hito, estado ocupacional, npl-debt) default to `collapsed`; consider expanding at least Fase principal / Estado ocupacional by default so users discover the taxonomy without an extra click.",
+    "documentation_for() is pure over (product, procedure, phase) → still a candidate for functools.lru_cache.",
+    "In catalogo.html: `<div class=\"fgroup collapsed\" data-testid=\"facet-phase-principal\">` — same 'collapsed' default applies. Same UX note as above.",
+    "Confirm the header text 'ESTADO OCUPACIONAL' (currently rendered uppercase via CSS `.fg-h`) matches the design system's title-case convention used by the request wording 'Estado ocupacional' — mostly cosmetic (source HTML says 'Estado ocupacional', CSS uppercases it)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_filter_contract_v1.py"
+  ],
+  "success_rate": {"backend": "100% (57/57)", "frontend": "100%"},
+  "test_credentials": "None (anonymous opp_sid cookie; _vip_active always False)",
+  "seed_data_creation": "None",
+  "retest_needed": false,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "FILTER CONTRACT v1 CORRECCIÓN is stable. Taxonomy is now 41 NPL hitos across 9 stages + separate Fase principal dimension + Estado ocupacional facet (7 codes). Expected fixture counts on unfiltered judicial (10 items): procedure {ejec_hipotecaria:8, otras_ejec_civiles:1, concursal:1}; phase nonzero {embargo_traba:1, subasta_convocada:1, subasta_con_postores:1, decreto_adjudicacion:1, inscripcion_adjudicacion:5}; phase_principal {embargo_cargas:1, prep_subasta:1, subasta:1, remate:1, registro:5}; possession {libre:5, ocupado:4, arrendado:1}. Chip prefixes: Producto:/Procedimiento:/Fase: (phase_principal)/Hito: (fase)/Ocupación: (posesion). facet-phase-principal + facet-phase both present; facet-npl-debt only for NPL. Concursal branch stays PENDING_SOVEREIGN_SOURCE (concursal_phases() returns []). Backend tests: /app/backend/tests/test_filter_contract_v1.py (30 tests) + backend_test.py (27 tests) = 57 total, class-organized, pytest-xdist parallel-safe.",
+  "rca of the issue": "N/A — no functional bugs found. The previous iteration's stale phase codes (embargo, finalizado, subasta_celebrada, cesion_remate) were removed and tests aligned to the new 41-hito codes (embargo_traba, inscripcion_adjudicacion, subasta_con_postores, decreto_adjudicacion). Estado ocupacional facet rename verified end-to-end; 'Situación posesoria' correctly restricted to its single legal use inside the hito 'Incidente sobre ocupantes / situación posesoria'."
+}
