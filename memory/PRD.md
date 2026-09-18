@@ -236,3 +236,9 @@ Verificado: multiselect, filtros ccaa/precio, chips, counts (NPL3/CDR2/REO5), ca
 
 ## Salud
 - Roto: ninguno. Mock: ROI/plazos/ubicaciones/valor de compra son DEMO (se sustituirán por operaciones reales 1:1).
+
+## Estado — EXPERIENCIA PREMIUM · Modal real + nomenclatura (2026-06)
+Micro-iteración UX + normalización de nomenclatura (aprobada por usuario, respuestas 1a/2a).
+- NOMENCLATURA: toda la copy pública "VIP" → "EXPERIENCIA PREMIUM". CTA oficial "ACTIVAR PREMIUM". Badge "Universo Acuerdos · Experiencia Premium". Planes "Mensual/Anual · Premium". Copy legal "acceso Premium activo" (sin "entitlement"). Aplicado en `catalogo.html`, `detalle.html`, HOME `web2.html` (SOLO copy visible del banner, geometría/visual FROZEN) y mensaje API `server.py`. PUBLIC VIP OCCURRENCES = 0 (restos "vip" solo en clases CSS, data-testid, keyframes, comentarios y código interno `vip_active` — preservados, §18). Autorización server-side (`_vip_active`) SIN cambios.
+- MODAL REAL: la caja de bloqueo Acuerdos convertida en popup fixed centrado H/V (z-index 400), overlay con granular/blur preservado, body scroll lock (position:fixed + restauración de scrollY al cerrar), cierre por X / ESC / click en overlay, focus trap + focus restore, aria-modal/labelledby, prefers-reduced-motion. Aplicado en catálogo y ficha (mismo patrón). En ficha, cerrar el modal NO desbloquea contenido (ficha sigue blanca + granular + protegida). En catálogo, click en zona bloqueada reabre el modal.
+- Verificado (screenshot + curl): centrado desktop, open on load, X/ESC/overlay cierran, body pos fixed↔static, reopen por grid, contenido NO desbloqueado al cerrar, HOME solo copy. Estado: IMPLEMENTED, HUMAN REVIEW PENDING. STOP (no avanzar a Filter Contract v1 · Iteración 2).

@@ -228,7 +228,7 @@ async def api_opportunities(request: Request, universo: str = "judicial",
                             orden: str = "recientes"):
     if universo == "acuerdos" and not await _vip_active(request):
         return {"universe": "acuerdos", "locked": True, "items": [], "total": 0,
-                "message": "Inventario Acuerdos reservado a suscripción VIP activa."}
+                "message": "Inventario Acuerdos reservado a Experiencia Premium activa."}
     f = cat.normalize_filters(universe=universo, products=tipo, assets=activo, ccaa=ccaa,
                               provincia=provincia, municipio=municipio,
                               price_min=_to_int_or_none(precio_min), price_max=_to_int_or_none(precio_max),
