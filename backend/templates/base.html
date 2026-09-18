@@ -21,8 +21,33 @@
   --line:rgba(11,26,40,.10);--line-2:rgba(11,26,40,.06);
   --dark:#0A1622;--dark-2:#0F2130;--cyan:#2E9AC6;--cyan-2:#57C6E4;
   --shadow:0 30px 70px -34px rgba(11,26,40,.28);--shadow-sm:0 14px 40px -22px rgba(11,26,40,.30);
+  --hero-bg:#F4F1E9;--header-bg:color-mix(in srgb,#FCFBF8 82%,transparent);
   --ease:cubic-bezier(.22,.61,.36,1);
 }
+/* ===== UNIVERSO OSCURO · EJECUCIONES JUDICIALES (dark UI completo) ===== */
+body.theme-judicial{
+  --bg:#0A1622;--bg2:#0F2130;--surface:#0F2130;--ink:#EAF3F8;--ink2:#9DB4C2;--faint:#6E8695;
+  --brand:#2E9AC6;--brand-2:#57C6E4;--brand-tint:rgba(46,154,198,.14);--brand-line:rgba(46,154,198,.4);
+  --line:rgba(255,255,255,.12);--line-2:rgba(255,255,255,.06);
+  --shadow:0 30px 70px -34px rgba(0,0,0,.6);--shadow-sm:0 16px 44px -24px rgba(0,0,0,.55);
+  --hero-bg:linear-gradient(160deg,#0A1622,#0C2233);
+  --header-bg:rgba(10,22,34,.82);
+}
+/* ===== UNIVERSO BLANCO · UNIVERSO ACUERDOS (white/clear UI completo) ===== */
+body.theme-acuerdos{
+  --bg:#FCFBF8;--bg2:#F4F3EE;--surface:#FFFFFF;--ink:#0B1A28;--ink2:#38495B;--faint:#8A98A6;
+  --brand:#1F6588;--brand-2:#2C7CA6;--brand-tint:rgba(31,101,136,.08);--brand-line:rgba(31,101,136,.22);
+  --line:rgba(11,26,40,.10);--line-2:rgba(11,26,40,.06);
+  --shadow:0 30px 70px -34px rgba(11,26,40,.28);--shadow-sm:0 14px 40px -22px rgba(11,26,40,.30);
+  --hero-bg:#F4F1E9;--header-bg:color-mix(in srgb,#FCFBF8 82%,transparent);
+}
+/* transición premium al entrar en el universo (fade de carga) */
+body.theme-judicial,body.theme-acuerdos{animation:uniIn .5s var(--ease) both;
+  transition:background-color .5s var(--ease),color .5s var(--ease)}
+@keyframes uniIn{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){body{animation:none!important}}
+/* logo blanco cuando el universo es oscuro */
+body.theme-judicial .brand-logo-img{filter:brightness(0) invert(1)}
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{font-family:'Poppins',sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.6;overflow-x:hidden}
@@ -35,7 +60,7 @@ input,select{font-family:inherit}
 .eyebrow::before{content:"";width:34px;height:1px;background:currentColor;opacity:.55}
 
 /* header */
-header{position:sticky;top:0;z-index:100;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid var(--line);transition:background-color .5s var(--ease),border-color .5s}
 .nav{display:flex;align-items:center;justify-content:space-between;height:76px}
 .brand-logo-img{height:60px;width:auto;object-fit:contain}
 .menu{display:flex;align-items:center;gap:34px}
@@ -69,7 +94,7 @@ footer{background:#1F6588;color:rgba(255,255,255,.85);padding:60px 0 34px;margin
 {% block styles %}{% endblock %}
 </style>
 </head>
-<body data-testid="{% block body_testid %}page{% endblock %}">
+<body class="{% block body_class %}theme-acuerdos{% endblock %}" data-testid="{% block body_testid %}page{% endblock %}">
 <header>
   <div class="wrap">
     <div class="nav">

@@ -4,18 +4,25 @@
 {% block canonical %}{{ base_url }}/oportunidades{% endblock %}
 {% block body_testid %}catalogo-page{% endblock %}
 {% block nav_opp %}active{% endblock %}
+{% block body_class %}theme-{{ 'acuerdos' if universe=='acuerdos' else 'judicial' }}{% endblock %}
 
 {% block styles %}
-.cat-hero{background:var(--dark);color:#fff;padding:clamp(48px,7vw,84px) 0 clamp(30px,4vw,46px)}
-.cat-hero .eyebrow{color:var(--cyan-2)}.cat-hero .eyebrow::before{background:var(--cyan-2)}
-.cat-hero h1{font-size:clamp(34px,5vw,64px);font-weight:600;letter-spacing:-.035em;line-height:1;margin-top:18px}
-.cat-hero h1 .dot{color:var(--cyan-2)}
-.cat-hero p{margin-top:16px;max-width:560px;font-size:15.5px;color:#B9CDD8;font-weight:300}
+.cat-hero{background:var(--hero-bg);color:var(--ink);padding:clamp(48px,7vw,84px) 0 clamp(30px,4vw,46px)}
+.cat-hero .eyebrow{color:var(--brand)}.cat-hero .eyebrow::before{background:var(--brand)}
+.cat-hero h1{font-size:clamp(34px,5vw,64px);font-weight:600;letter-spacing:-.035em;line-height:1;margin-top:18px;color:var(--ink)}
+.cat-hero h1 .dot{color:var(--brand-2)}
+.cat-hero p{margin-top:16px;max-width:560px;font-size:15.5px;color:var(--ink2);font-weight:300}
 /* universe switch */
-.uni-switch{display:inline-grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:30px;background:rgba(255,255,255,.06);border:1px solid rgba(46,154,198,.4);border-radius:14px;padding:7px}
-.uni-switch a{padding:15px 26px;border-radius:9px;font-size:14.5px;font-weight:600;color:#AFC4D2;text-align:center;transition:.3s}
-.uni-switch a.on{background:#1F6588;color:#fff;box-shadow:0 16px 40px -18px rgba(31,101,136,.9)}
-.uni-switch a:not(.on):hover{color:#fff}
+.uni-switch{display:inline-grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:30px;background:var(--brand-tint);border:1px solid var(--brand-line);border-radius:14px;padding:7px}
+.uni-switch a{padding:15px 26px;border-radius:9px;font-size:14.5px;font-weight:600;color:var(--ink2);text-align:center;transition:.3s}
+.uni-switch a.on{background:var(--brand);color:#fff;box-shadow:0 16px 40px -18px rgba(31,101,136,.4)}
+.uni-switch a:not(.on):hover{color:var(--ink)}
+/* granular lock (non-VIP acuerdos) */
+.locked-zone{position:relative}
+.granular{filter:blur(8px) saturate(.75) brightness(1.02);pointer-events:none;user-select:none}
+.vip-overlay{position:absolute;inset:-10px;z-index:20;display:grid;place-items:start center;padding-top:40px;
+  background:radial-gradient(1200px 600px at 50% 0%,rgba(252,251,248,.55),rgba(252,251,248,.82));backdrop-filter:blur(3px)}
+.vip-overlay .vip-lock{max-width:720px;width:100%;margin:0}
 /* filter bar */
 .filters{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-sm);padding:clamp(18px,2vw,26px);margin-top:-34px;position:relative;z-index:5}
 .fbar{display:grid;grid-template-columns:repeat(5,1fr) auto;gap:12px;align-items:end}
@@ -171,21 +178,6 @@
     </div>
   </form>
 
-  {% if universe == 'acuerdos' and not vip_active %}
-  <div class="vip-lock" data-testid="vip-locked">
-    <div class="vl-in">
-      <span class="vk"><i data-lucide="sparkles" style="width:14px;height:14px"></i> Universo Acuerdos · Suscripción VIP</span>
-      <h2>Más control. Menos incertidumbre.</h2>
-      <p>El Universo Acuerdos reúne operaciones con una salida previamente estructurada: sabes desde el principio cuánto necesitas, qué plazo manejamos y cuál es el resultado previsto. Es un entorno reservado, sujeto a suscripción VIP activa.</p>
-      <div class="vip-plans">
-        <div class="vip-plan"><div class="pk">Mensual</div><div class="pv">Suscripción VIP</div><div class="pp">Precio · próximamente</div></div>
-        <div class="vip-plan"><div class="pk">Anual</div><div class="pv">Suscripción VIP</div><div class="pp">Precio · próximamente</div></div>
-      </div>
-      <a href="/#acceso" class="vip-cta" data-testid="vip-activate">Activar VIP <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
-      <p class="vip-fine">Acceso sujeto a validación profesional y a entitlement VIP activo. El inventario de Acuerdos no se entrega sin autorización.</p>
-    </div>
-  </div>
-  {% else %}
   <div class="toolbar">
     <div class="rescount" data-testid="result-count"><b>{{ total }}</b> {{ 'oportunidad' if total==1 else 'oportunidades' }}{% if universe=='acuerdos' %} · Universo Acuerdos{% else %} · Ejecuciones Judiciales{% endif %}</div>
     <div class="sortsel">
@@ -195,7 +187,8 @@
       </select>
     </div>
   </div>
-  <div class="opp-grid" data-testid="opportunity-grid">
+  <div class="{{ 'locked-zone' if locked else '' }}"{% if locked %} data-testid="vip-locked"{% endif %}>
+  <div class="opp-grid {{ 'granular' if locked else '' }}" data-testid="opportunity-grid"{% if locked %} aria-hidden="true"{% endif %}>
     {% for o in opps %}
     <article class="opp" data-testid="opp-card" data-slug="{{ o.slug }}">
       <div class="opp-media">
@@ -223,7 +216,22 @@
     <div class="empty" data-testid="empty-state">No hay oportunidades que coincidan con tu búsqueda. Prueba a ampliar los filtros.</div>
     {% endfor %}
   </div>
+  {% if locked %}
+  <div class="vip-overlay">
+    <div class="vip-lock"><div class="vl-in">
+      <span class="vk"><i data-lucide="sparkles" style="width:14px;height:14px"></i> Universo Acuerdos · Suscripción VIP</span>
+      <h2>Más control. Menos incertidumbre.</h2>
+      <p>El Universo Acuerdos reúne operaciones con una salida previamente estructurada: sabes desde el principio cuánto necesitas, qué plazo manejamos y cuál es el resultado previsto. Es un entorno reservado, sujeto a suscripción VIP activa.</p>
+      <div class="vip-plans">
+        <div class="vip-plan"><div class="pk">Mensual</div><div class="pv">Suscripción VIP</div><div class="pp">Precio · próximamente</div></div>
+        <div class="vip-plan"><div class="pk">Anual</div><div class="pv">Suscripción VIP</div><div class="pp">Precio · próximamente</div></div>
+      </div>
+      <a href="/#acceso" class="vip-cta" data-testid="vip-activate">Activar VIP <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
+      <p class="vip-fine">Acceso sujeto a validación profesional y a entitlement VIP activo. El inventario de Acuerdos no se entrega sin autorización.</p>
+    </div></div>
+  </div>
   {% endif %}
+  </div>
 </div>
 
 <!-- compare bar + modal -->

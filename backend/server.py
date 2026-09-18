@@ -402,14 +402,12 @@ async def oportunidades(request: Request, universo: str = "judicial", tipo: str 
     if universo not in ("judicial", "acuerdos"):
         universo = "judicial"
     vip = await _vip_active(request)
-    opps = []
-    total = 0
-    if not (universo == "acuerdos" and not vip):
-        opps = cat.filter_opportunities(universe=universo, product=tipo or None,
-                                        ccaa=ccaa or None, provincia=provincia or None,
-                                        municipio=municipio or None, asset_type=activo or None,
-                                        price_min=precio_min, price_max=precio_max, order=orden)
-        total = len(opps)
+    locked = (universo == "acuerdos" and not vip)
+    opps = cat.filter_opportunities(universe=universo, product=tipo or None,
+                                    ccaa=ccaa or None, provincia=provincia or None,
+                                    municipio=municipio or None, asset_type=activo or None,
+                                    price_min=precio_min, price_max=precio_max, order=orden)
+    total = len(opps)
     sid = _get_sid(request)
     fav_slugs = []
     if sid:
@@ -417,7 +415,7 @@ async def oportunidades(request: Request, universo: str = "judicial", tipo: str 
         fav_slugs = (doc or {}).get("slugs", [])
     ctx = {
         "request": request, "base_url": _public_base(request),
-        "universe": universo, "vip_active": vip, "opps": opps, "total": total,
+        "universe": universo, "vip_active": vip, "locked": locked, "opps": opps, "total": total,
         "products": cat.PRODUCTS, "asset_types": cat.ASSET_TYPES, "sort_options": cat.SORT_OPTIONS,
         "geo": cat.GEO, "geo_json": json.dumps(cat.GEO, ensure_ascii=False), "fav_slugs": fav_slugs,
         "filters": {"tipo": tipo, "ccaa": ccaa, "provincia": provincia, "municipio": municipio,
@@ -438,12 +436,12 @@ async def oportunidad_detalle(request: Request, slug: str):
             "<h1 style='font-size:40px'>404</h1><p>Operación no encontrada. "
             "<a href='/oportunidades' style='color:#1F6588'>Volver a Oportunidades</a></p></div>",
             status_code=404)
-    if o["universe"] == "acuerdos" and not await _vip_active(request):
-        # Inventario protegido no se entrega sin entitlement → llevar al gate VIP.
-        return RedirectResponse("/oportunidades?universo=acuerdos", status_code=302)
+    vip = await _vip_active(request)
+    locked = (o["universe"] == "acuerdos" and not vip)
     interest = await _interest_signal(slug)
     resp = templates.TemplateResponse("detalle.html", {
-        "request": request, "base_url": _public_base(request), "o": o, "interest": interest,
+        "request": request, "base_url": _public_base(request), "o": o,
+        "interest": interest, "locked": locked, "vip_active": vip,
     })
     _ensure_sid(request, resp)
     return resp

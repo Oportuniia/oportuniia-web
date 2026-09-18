@@ -213,6 +213,15 @@ Multipágina SSR sobre HOME V54 (aprobada/freeze). Verificado por testing_agent 
 
 MULTIPAGE STARTED = SÍ. Estado Fase 2: IMPLEMENTED, TECHNICAL QA PASS (testing_agent 100%). HUMAN REVIEW PENDING Rafa/Alba. NO FINAL / NO CLOSED / NO Fase 3.
 
+## Estado — FASE 2 · CORRECCIÓN VISUAL UNIVERSOS (persistencia cromática, 2026-06)
+Feedback Rafa: los universos no cambiaban de atmósfera completa (Judicial quedaba claro; Acuerdos mostraba bloque oscuro dentro de claro; ficha judicial = cabecera oscura + cuerpo blanco). CORREGIDO con sistema de temas por universo en `base.html` (body.theme-judicial / body.theme-acuerdos con set completo de tokens CSS + transición fade + logo blanco en oscuro):
+- **EJECUCIONES JUDICIALES = OSCURO COMPLETO** (catálogo + ficha): header, hero, filtros, buscador, cards, toolbar, panel económico, ROI, CTAs, secciones, footer contextual — todo dark (#0A1622). La foto del activo conserva su color.
+- **UNIVERSO ACUERDOS = BLANCO COMPLETO** (catálogo + ficha): toda la interfaz clara.
+- **Persistencia:** la ficha hereda el tema del universo de la operación (deep-link incluido); no vuelve a interfaz neutra.
+- **NON-VIP Acuerdos** (catálogo y ficha, deep-link): se renderiza la estructura BLANCA con contenido DEMO + capa granular (blur/obscuration) + popup VIP existente (mensual/anual, "Activar VIP" → /#acceso). Antes redirigía (302); ahora la ficha acuerdos devuelve 200 bloqueada in-place. `_vip_active()` sigue server-side = INACTIVE (entitlement no expone datos vía API; el blur es solo experiencia visual, no seguridad; en prototipo se usa contenido DEMO).
+- **VIP activo** (futuro): mismo código muestra Acuerdos blanco + contenido visible sin granular/popup.
+Verificado por screenshots (los 5 estados A–G del pedido) + comprobación server-side de body class/locked. HOME V54 y logo = FREEZE (sin tocar). Estado: IMPLEMENTED, HUMAN PREVIEW PENDING Rafa/Alba. STOP.
+
 ## Backlog (bloqueado hasta aprobación visual)
 - P1: Portar diseño a Elementor JSON (`_elementor_data`) HOME 2.0 (ID 1630) y HEADER 2.0 (ID 1641).
 - P1: Ejecutar Write Bridge (solo tras autorización explícita).

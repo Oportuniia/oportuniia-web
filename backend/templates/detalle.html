@@ -4,18 +4,29 @@
 {% block canonical %}{{ base_url }}/oportunidades/{{ o.slug }}{% endblock %}
 {% block body_testid %}detalle-page{% endblock %}
 {% block nav_opp %}active{% endblock %}
+{% block body_class %}theme-{{ 'acuerdos' if o.universe=='acuerdos' else 'judicial' }}{% endblock %}
 
 {% block styles %}
 .crumbs{padding:22px 0 0;font-size:12.5px;color:var(--faint)}
 .crumbs a{color:var(--ink2)}.crumbs a:hover{color:var(--brand)}
-.det-hero{background:var(--dark);color:#fff;padding:26px 0 clamp(30px,4vw,50px);position:relative;overflow:hidden}
-.det-hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 480px at 88% -12%,rgba(46,154,198,.18),transparent 60%)}
+.det-hero{background:var(--hero-bg);color:var(--ink);padding:26px 0 clamp(30px,4vw,50px);position:relative;overflow:hidden}
+.det-hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(900px 480px at 88% -12%,rgba(46,154,198,.14),transparent 60%)}
 .det-hero .wrap{position:relative;z-index:2}
 .det-tags{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
-.det-tag{font-size:11.5px;font-weight:600;letter-spacing:.08em;padding:6px 13px;border-radius:20px;background:rgba(46,154,198,.16);color:var(--cyan-2);border:1px solid rgba(46,154,198,.4)}
-.det-tag.uni{background:rgba(255,255,255,.06);color:#EAF3F8;border-color:rgba(255,255,255,.18)}
+.det-tag{font-size:11.5px;font-weight:600;letter-spacing:.08em;padding:6px 13px;border-radius:20px;background:var(--brand-tint);color:var(--brand);border:1px solid var(--brand-line)}
+.det-tag.uni{background:var(--surface);color:var(--ink2);border-color:var(--line)}
+/* granular lock (non-VIP acuerdos deep-link) */
+.det-layout.granular{filter:blur(9px) saturate(.75);pointer-events:none;user-select:none}
+.det-lock{position:fixed;inset:0;z-index:150;display:grid;place-items:center;padding:24px;background:radial-gradient(1000px 620px at 50% 15%,rgba(252,251,248,.6),rgba(252,251,248,.88));backdrop-filter:blur(3px)}
+.det-lock .dl-card{max-width:560px;width:100%;text-align:center;border-radius:20px;padding:clamp(30px,4vw,52px);color:#EAF3F8;position:relative;overflow:hidden;background:linear-gradient(120deg,#0A1622,#0C2130 55%,#0B2C3D);border:1px solid rgba(46,154,198,.4);box-shadow:0 40px 90px -40px rgba(0,0,0,.6)}
+.det-lock .vk{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#57C6E4;background:rgba(87,198,228,.12);padding:7px 14px;border-radius:20px}
+.det-lock h2{margin-top:18px;font-size:clamp(26px,3.4vw,40px);font-weight:600;color:#fff;letter-spacing:-.02em;line-height:1.06}
+.det-lock p{margin:14px auto 0;font-size:14.5px;color:#B9CDD8;font-weight:300}
+.det-lock .vip-cta{margin-top:24px;display:inline-flex;align-items:center;gap:10px;font-size:14.5px;font-weight:700;padding:16px 34px;border-radius:10px;background:#2E9AC6;color:#fff;box-shadow:0 20px 46px -18px rgba(46,154,198,.9);transition:.3s}
+.det-lock .vip-cta:hover{background:#57C6E4;transform:translateY(-2px)}
+.det-lock .vip-fine{margin-top:14px;font-size:11.5px;color:#6E8695}
 .det-hero h1{font-size:clamp(30px,4.4vw,56px);font-weight:600;letter-spacing:-.03em;line-height:1.02}
-.det-hero .loc{margin-top:12px;font-size:14.5px;color:#B9CDD8;display:inline-flex;align-items:center;gap:8px}
+.det-hero .loc{margin-top:12px;font-size:14.5px;color:var(--ink2);display:inline-flex;align-items:center;gap:8px}
 .det-hero .loc i{width:16px;height:16px;color:var(--cyan-2)}
 .det-layout{display:grid;grid-template-columns:1.5fr .9fr;gap:clamp(24px,3vw,48px);margin-top:32px;align-items:start}
 .det-media{border-radius:16px;overflow:hidden;box-shadow:var(--shadow);aspect-ratio:16/9;background:#0B1A28}
@@ -91,7 +102,7 @@
 </div>
 
 <div class="wrap">
-  <div class="det-layout">
+  <div class="det-layout{{ ' granular' if locked else '' }}">
     <!-- LEFT · presentation -->
     <div>
       <div class="det-media"><img src="{{ o.image }}" alt="{{ o.title }}"></div>
@@ -180,6 +191,17 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
+{% if locked %}
+<div class="det-lock" data-testid="vip-locked">
+  <div class="dl-card">
+    <span class="vk"><i data-lucide="sparkles" style="width:14px;height:14px"></i> Universo Acuerdos · Suscripción VIP</span>
+    <h2>Más control. Menos incertidumbre.</h2>
+    <p>Esta operación pertenece al Universo Acuerdos, un entorno reservado a suscripción VIP activa. Activa VIP para ver la operación completa.</p>
+    <a href="/#acceso" class="vip-cta" data-testid="vip-activate">Activar VIP <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
+    <p class="vip-fine">Acceso sujeto a validación profesional. El contenido protegido no se entrega sin autorización.</p>
+  </div>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block extra_js %}
