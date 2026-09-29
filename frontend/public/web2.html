@@ -1013,6 +1013,38 @@ body.acuerdos .vip-cta-mod{
 @media(max-width:900px){.q-human{grid-template-columns:1fr}.q-photo{min-height:340px}.q-photo img{min-height:340px}.flow-map>span{font-size:9px}}
 @media(max-width:640px){.flow-map{display:none}.universe-cta{align-items:stretch}.universe-cta .btn{width:100%;justify-content:center}}
 
+
+/* ===== V56 · CAMINO INTEGRADO + FILOSOFÍA HUMANA ===== */
+.flow-map{display:none!important}
+.flow-thread{margin:10px 0 4px;padding:0 2px;background:transparent;border:0;overflow:visible}
+.flow-thread svg{display:block;width:100%;height:112px;overflow:visible}
+.flow-thread path{fill:none;stroke-linecap:round}
+.flow-thread .flow-base{stroke:rgba(31,101,136,.16);stroke-width:10}
+.flow-thread .flow-run{stroke:url(#flowg2);stroke-width:3.2;stroke-dasharray:16 18;animation:flowAdvance 9s linear infinite}
+.flow-thread .flow-flash{stroke:#DDF7FF;stroke-width:4;stroke-dasharray:3 120;filter:url(#glow2);animation:flowFlash 4.2s linear infinite}
+.flow-thread .flow-nodes circle{fill:#F4F1E9;stroke:#1F6588;stroke-width:4}
+@keyframes flowAdvance{to{stroke-dashoffset:-136}}
+@keyframes flowFlash{0%{stroke-dashoffset:0;opacity:0}.08{opacity:1}70%{opacity:1}100%{stroke-dashoffset:-720;opacity:0}}
+.q-human{grid-template-columns:minmax(0,.92fr) minmax(380px,1.08fr)}
+.q-photo{min-height:470px;border:0;border-radius:22px;box-shadow:none;background:transparent;isolation:isolate}
+.q-photo img{min-height:470px;object-fit:cover;object-position:center 48%;filter:saturate(.9) contrast(.98) brightness(.96)}
+.q-photo::before{content:"";position:absolute;z-index:2;inset:0;background:
+  linear-gradient(90deg,#0F3A52 0%,rgba(15,58,82,.78) 7%,rgba(15,58,82,.34) 18%,transparent 34%),
+  linear-gradient(180deg,transparent 58%,rgba(15,58,82,.18) 72%,#0F3A52 100%);pointer-events:none}
+.q-photo::after{content:"";position:absolute;z-index:1;inset:-1px;
+  background:linear-gradient(90deg,#0F3A52 0%,transparent 24%,transparent 80%,rgba(15,58,82,.12) 100%);pointer-events:none}
+.q-photo figcaption{z-index:3;left:clamp(24px,4vw,52px);right:28px;bottom:24px;max-width:680px;color:#F4FAFD;text-shadow:0 2px 20px rgba(0,0,0,.45)}
+@media(max-width:900px){
+  .q-photo{min-height:370px;margin-top:8px}
+  .q-photo img{min-height:370px}
+  .q-photo::before{background:linear-gradient(180deg,transparent 56%,#0F3A52 100%)}
+}
+@media(max-width:640px){
+  .flow-thread{margin:8px 0 0}
+  .flow-thread svg{height:74px}
+}
+@media(prefers-reduced-motion:reduce){.flow-thread .flow-run,.flow-thread .flow-flash{animation:none}}
+
 </style>
 </head>
 <body data-testid="v03-body">
@@ -1308,7 +1340,7 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
       <figure class="q-photo reveal d1" aria-label="Conversación profesional cercana">
-        <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1400&q=82" alt="Profesionales conversando de forma cercana" loading="lazy">
+        <img src="https://images.pexels.com/photos/7642030/pexels-photo-7642030.jpeg?auto=compress&cs=tinysrgb&w=1600" alt="Familia conversando de forma cercana con una profesional" loading="lazy">
         <figcaption>Escuchar, entender y buscar una salida razonable antes de convertir una operación en un conflicto.</figcaption>
       </figure>
     </div>
@@ -1325,16 +1357,19 @@ body.acuerdos .vip-cta-mod{
       </div>
       <div class="side reveal d1">Gracias a nuestra tecnología automatizamos parte del análisis de cada operación y agilizamos su estudio. Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
     </div>
-    <div class="flow-map reveal" aria-hidden="true">
-      <svg viewBox="0 0 1100 170" role="img">
-        <defs><linearGradient id="flowg" x1="0" x2="1"><stop offset="0" stop-color="#1F6588"/><stop offset="1" stop-color="#57C6E4"/></linearGradient></defs>
-        <path d="M55 84 H230 C270 84 270 38 315 38 H470 C515 38 515 132 565 132 H735 C780 132 780 70 825 70 H1045" fill="none" stroke="rgba(31,101,136,.24)" stroke-width="12" stroke-linecap="round"/>
-        <path d="M55 84 H230 C270 84 270 38 315 38 H470 C515 38 515 132 565 132 H735 C780 132 780 70 825 70 H1045" fill="none" stroke="url(#flowg)" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 12" class="flow-line"/>
+    <div class="flow-thread reveal" aria-hidden="true">
+      <svg viewBox="0 0 1100 112" role="img" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="flowg2" x1="0" x2="1"><stop offset="0" stop-color="#1F6588"/><stop offset=".55" stop-color="#2E9AC6"/><stop offset="1" stop-color="#57C6E4"/></linearGradient>
+          <filter id="glow2"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path class="flow-base" d="M48 62 H228 C270 62 270 24 315 24 H470 C515 24 515 88 565 88 H735 C780 88 780 50 825 50 H1052"/>
+        <path class="flow-run" d="M48 62 H228 C270 62 270 24 315 24 H470 C515 24 515 88 565 88 H735 C780 88 780 50 825 50 H1052"/>
+        <path class="flow-flash" d="M48 62 H228 C270 62 270 24 315 24 H470 C515 24 515 88 565 88 H735 C780 88 780 50 825 50 H1052"/>
         <g class="flow-nodes">
-          <circle cx="55" cy="84" r="12"/><circle cx="315" cy="38" r="12"/><circle cx="565" cy="132" r="12"/><circle cx="825" cy="70" r="12"/><circle cx="1045" cy="70" r="12"/>
+          <circle cx="48" cy="62" r="8"/><circle cx="315" cy="24" r="8"/><circle cx="565" cy="88" r="8"/><circle cx="825" cy="50" r="8"/><circle cx="1052" cy="50" r="8"/>
         </g>
       </svg>
-      <span>Análisis</span><span>Estructura</span><span>Decisión</span><span>Presentación</span><span>Ejecución</span>
     </div>
     <div class="flow-grid">
       <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
