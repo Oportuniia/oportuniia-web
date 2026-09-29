@@ -17,6 +17,7 @@ from datetime import datetime, timezone
 from wp_precheck import run_precheck, run_capability_discovery, run_item_read, run_bridge_read, _get_env, _normalize_base
 import catalog_data as cat
 from presentation_ingress import register_routes as register_presentation_routes
+from presentation_publish import register_publish_routes as register_presentation_publish_routes
 
 
 ROOT_DIR = Path(__file__).parent
@@ -191,6 +192,14 @@ async def _vip_active(request: Request) -> bool:
     return False
 
 
+async def _published_catalog_items() -> list[dict]:
+    docs = await db.presentation_web_published.find(
+        {"publication_state": "PUBLISHED"},
+        {"_id": 0, "item": 1},
+    ).to_list(1000)
+    return [d["item"] for d in docs if isinstance(d.get("item"), dict)]
+
+
 # ---- Modelos (contratos) ----
 class FavoriteToggle(BaseModel):
     slug: str
@@ -238,9 +247,10 @@ async def api_opportunities(request: Request, universo: str = "judicial",
                               roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max),
                               procedures=procedimiento, phases=fase, possessions=posesion,
                               phases_principal=fase_principal)
-    items = cat.filter_opportunities(f, order=orden)
+    published = await _published_catalog_items()
+    items = cat.filter_opportunities(f, order=orden, extra=published)
     return {"universe": universo, "locked": False, "items": items, "total": len(items),
-            "counts": cat.facet_counts(f)}
+            "counts": cat.facet_counts(f, extra=published)}
 
 
 @api_router.get("/geo/meta")
@@ -252,9 +262,10 @@ async def geo_meta():
 @api_router.get("/opportunities/compare")
 async def api_compare(request: Request, ids: str = ""):
     vip = await _vip_active(request)
+    published = await _published_catalog_items()
     out = []
     for slug in [s for s in ids.split(",") if s][:3]:
-        o = cat.get_by_slug(slug)
+        o = cat.get_by_slug(slug, extra=published)
         if not o:
             continue
         if o["universe"] == "acuerdos" and not vip:
@@ -282,7 +293,8 @@ async def get_favorites(request: Request):
 @api_router.post("/favorites/toggle")
 async def toggle_favorite(payload: FavoriteToggle, request: Request, response: Response):
     sid = _ensure_sid(request, response)
-    if not cat.get_by_slug(payload.slug):
+    published = await _published_catalog_items()
+    if not cat.get_by_slug(payload.slug, extra=published):
         return JSONResponse({"error": "unknown slug"}, status_code=404)
     doc = await db.demo_favorites.find_one({"session_id": sid})
     slugs = (doc or {}).get("slugs", [])
@@ -316,7 +328,8 @@ async def operation_intent(payload: OperationIntentIn, request: Request, respons
     sid = _ensure_sid(request, response)
     if payload.action not in ("reservar", "comprar"):
         return JSONResponse({"error": "invalid action"}, status_code=400)
-    if not cat.get_by_slug(payload.slug):
+    published = await _published_catalog_items()
+    if not cat.get_by_slug(payload.slug, extra=published):
         return JSONResponse({"error": "unknown slug"}, status_code=404)
     await db.demo_operation_intents.insert_one({
         "session_id": sid, "slug": payload.slug, "action": payload.action,
@@ -359,8 +372,11 @@ async def readiness():
             "documentation_exchange": {"directions": ["actor->oportuniia", "oportuniia->actor"],
                                         "deadline_model": "prepared/no-hardcoded-rule", "upload": "not-implemented"},
             "mi_oportuniia": "compatible/not-fully-implemented",
-            "presentacion_output": {"pdf_ejecutivo": "compatible", "pdf_completo": "compatible",
-                                    "ficha_web": "compatible", "reportaje": "compatible", "real_integration": False},
+            "presentacion_output": {"contract": "PRESENTATION_WEB_PUBLICATION_v1",
+                                    "draft_ingress": True, "controlled_publish": True,
+                                    "pdf_ejecutivo": "compatible", "pdf_completo": "compatible",
+                                    "ficha_web": "integrated", "reportaje": "compatible",
+                                    "real_transport": "pending_orchestration"},
             "vip_entitlement": {"product": "OPORTUNIIA_VIP", "status": ["ACTIVE", "INACTIVE", "EXPIRED"],
                                 "billing_period": ["MONTHLY", "ANNUAL"], "real_price": False,
                                 "payment_provider": None, "real_payment": False, "global_role": False},
@@ -379,14 +395,16 @@ async def match_preview(request: Request):
 
 @api_router.get("/interest-signals/{slug}")
 async def interest_signal(slug: str):
-    if not cat.get_by_slug(slug):
+    published = await _published_catalog_items()
+    if not cat.get_by_slug(slug, extra=published):
         return JSONResponse({"error": "unknown slug"}, status_code=404)
     sig = await _interest_signal(slug)
     return {"slug": slug, "signal": sig, "aggregate_only": True, "fake": False}
 
 
-# Register sovereign PRESENTACIÓN → WEB M2M ingress on the same API router.
+# Register sovereign PRESENTACIÓN → WEB M2M ingress/publication routes.
 register_presentation_routes(api_router, db)
+register_presentation_publish_routes(api_router, db)
 
 # Include the router in the main app
 app.include_router(api_router)
@@ -422,9 +440,10 @@ async def oportunidades(request: Request, universo: str = "judicial",
                               roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max),
                               procedures=procedimiento, phases=fase, possessions=posesion,
                               phases_principal=fase_principal)
-    opps = cat.filter_opportunities(f, order=orden)
+    published = await _published_catalog_items()
+    opps = cat.filter_opportunities(f, order=orden, extra=published)
     total = len(opps)
-    counts = cat.facet_counts(f)
+    counts = cat.facet_counts(f, extra=published)
     sid = _get_sid(request)
     fav_slugs = []
     if sid:
@@ -481,7 +500,8 @@ async def oportunidades(request: Request, universo: str = "judicial",
 
 @app.get("/oportunidades/{slug}", response_class=HTMLResponse)
 async def oportunidad_detalle(request: Request, slug: str):
-    o = cat.get_by_slug(slug)
+    published = await _published_catalog_items()
+    o = cat.get_by_slug(slug, extra=published)
     if not o:
         return HTMLResponse(
             "<div style='font-family:Poppins,sans-serif;padding:80px;text-align:center'>"

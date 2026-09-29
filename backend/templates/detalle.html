@@ -40,6 +40,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 .det-hero .loc{margin-top:12px;font-size:14.5px;color:var(--ink2);display:inline-flex;align-items:center;gap:8px}
 .det-hero .loc i{width:16px;height:16px;color:var(--cyan-2)}
 .det-layout{display:grid;grid-template-columns:1.5fr .9fr;gap:clamp(24px,3vw,48px);margin-top:32px;align-items:start}
+.det-media-placeholder{width:100%;min-height:380px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#071b2e,#0d6b9f);color:#fff;font-weight:700;letter-spacing:.18em;font-size:16px}
 .det-media{border-radius:16px;overflow:hidden;box-shadow:var(--shadow);aspect-ratio:16/9;background:#0B1A28}
 .det-media img{width:100%;height:100%;object-fit:cover}
 .det-section{margin-top:30px}
@@ -121,7 +122,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
   <div class="det-layout{{ ' granular' if locked else '' }}"{% if locked %} data-testid="vip-locked"{% endif %}>
     <!-- LEFT · presentation -->
     <div>
-      <div class="det-media"><img src="{{ o.image }}" alt="{{ o.title }}"></div>
+      <div class="det-media">{% if o.image %}<img src="{{ o.image }}" alt="{{ o.title }}">{% else %}<div class="det-media-placeholder" aria-label="Imagen pendiente de activo aprobado">OPORTUNIIA</div>{% endif %}</div>
 
       <div class="det-section" data-testid="sec-resumen">
         <h2><i data-lucide="file-text"></i> Resumen ejecutivo</h2>

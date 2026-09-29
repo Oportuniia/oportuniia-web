@@ -68,6 +68,7 @@
 .opp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px}
 .opp{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .45s var(--ease),box-shadow .45s,border-color .45s;display:flex;flex-direction:column}
 .opp:hover{transform:translateY(-6px);box-shadow:var(--shadow);border-color:var(--brand-line)}
+.opp-media-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#071b2e,#0d6b9f);color:#fff;font-weight:700;letter-spacing:.16em;font-size:13px}
 .opp-media{position:relative;aspect-ratio:16/10;overflow:hidden;background:#0B1A28}
 .opp-media img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--ease)}
 .opp:hover .opp-media img{transform:scale(1.06)}
@@ -333,7 +334,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
           {% for o in opps %}
           <article class="opp" data-testid="opp-card" data-slug="{{ o.slug }}">
             <div class="opp-media">
-              <img src="{{ o.image }}" alt="{{ o.title }}" loading="lazy">
+              {% if o.image %}<img src="{{ o.image }}" alt="{{ o.title }}" loading="lazy">{% else %}<div class="opp-media-placeholder" aria-label="Imagen pendiente de activo aprobado">OPORTUNIIA</div>{% endif %}
               <span class="opp-badge">{{ o.product }}</span>
               <span class="opp-loc"><i data-lucide="map-pin"></i>{{ o.municipio_name }}</span>
               <button class="opp-fav {{ 'on' if o.slug in fav_slugs else '' }}" data-fav="{{ o.slug }}" aria-label="Favorito" data-testid="fav-{{ o.slug }}"><i data-lucide="heart"></i></button>
