@@ -14,7 +14,7 @@ services:
       - key: DB_NAME
         value: oportuniia_web
       - key: CORS_ORIGINS
-        sync: false
+        value: https://oportuniia-web.vercel.app
       - key: PRESENTATION_WEB_BASE_URL
         value: https://oportuniia-presentacion.onrender.com
       - key: WEB_PRESENTATION_M2M_KEY
