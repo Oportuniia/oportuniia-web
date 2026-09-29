@@ -1060,6 +1060,34 @@ body.acuerdos .vip-cta-mod{
 }
 @media(prefers-reduced-motion:reduce){.flow-thread .flow-run,.flow-thread .flow-flash{animation:none}}
 
+
+/* ===== V57 · FLOW UNIFICADO + FILOSOFÍA COMPACTA ===== */
+#flow{scroll-margin-top:92px}
+.flow-grid{margin-top:0}
+.flow-grid::before{display:none}
+.step{padding:18px 26px 0;text-align:left}
+.step .dot{display:none!important}
+.flow-thread{margin:10px 0 -2px}
+.flow-thread svg{height:92px}
+.flow-thread .flow-base{stroke:rgba(31,101,136,.14);stroke-width:9}
+.flow-thread .flow-run{stroke-width:3.2;stroke-dasharray:15 18}
+.flow-thread .flow-flash{stroke-width:4;stroke-dasharray:3 105}
+.flow-thread .flow-nodes circle{fill:#F4F1E9;stroke:#1F6588;stroke-width:4}
+.q-human{align-items:center}
+.q-photo{min-height:0;height:380px;border-radius:20px}
+.q-photo img{min-height:0;height:100%;object-fit:cover;object-position:center 52%;filter:saturate(.92) contrast(.99) brightness(.98)}
+/* la profesional a la izquierda queda limpia; el fundido se va al lado contrario */
+.q-photo::before{z-index:2;background:
+  linear-gradient(270deg,#0F3A52 0%,rgba(15,58,82,.65) 6%,rgba(15,58,82,.22) 15%,transparent 30%),
+  linear-gradient(180deg,transparent 72%,rgba(15,58,82,.10) 84%,#0F3A52 100%)}
+.q-photo::after{z-index:1;background:linear-gradient(90deg,transparent 0%,transparent 76%,rgba(15,58,82,.10) 100%)}
+.q-photo figcaption{left:28px;right:34%;bottom:20px;font-size:12.5px}
+@media(max-width:900px){
+  .q-photo{height:330px}
+  .q-photo::before{background:linear-gradient(180deg,transparent 66%,#0F3A52 100%)}
+  .q-photo figcaption{right:28px}
+}
+
 </style>
 </head>
 <body data-testid="v03-body">
@@ -1074,7 +1102,7 @@ body.acuerdos .vip-cta-mod{
       </a>
       <nav class="menu" data-testid="main-nav">
         <div class="navitem"><a href="#quienes">Nuestra filosofía</a></div>
-        <div class="navitem"><a href="#producto">Cómo funciona</a></div>
+        <div class="navitem"><a href="#flow">Cómo funciona</a></div>
         <div class="navitem"><a href="/oportunidades">Oportunidades</a></div>
         <div class="navitem"><a href="#grupo">Grupo OPORTUNIIA</a></div>
         <div class="navitem"><a href="#footer">Contacto</a></div>
@@ -1091,7 +1119,7 @@ body.acuerdos .vip-cta-mod{
 <!-- mobile menu -->
 <div class="mmenu" id="mmenu" data-testid="mobile-menu">
   <a href="#quienes">Nuestra filosofía</a>
-  <a href="#producto">Cómo funciona</a>
+  <a href="#flow">Cómo funciona</a>
   <a href="/oportunidades">Oportunidades</a>
   <a href="#grupo">Grupo OPORTUNIIA</a>
   <a href="#footer">Contacto</a>
@@ -1373,25 +1401,25 @@ body.acuerdos .vip-cta-mod{
       <div class="side reveal d1">Gracias a nuestra tecnología automatizamos parte del análisis de cada operación y agilizamos su estudio. Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
     </div>
     <div class="flow-thread reveal" aria-hidden="true">
-      <svg viewBox="0 0 1100 112" role="img" preserveAspectRatio="none">
+      <svg viewBox="0 0 1000 104" role="img" preserveAspectRatio="none">
         <defs>
           <linearGradient id="flowg2" x1="0" x2="1"><stop offset="0" stop-color="#1F6588"/><stop offset=".55" stop-color="#2E9AC6"/><stop offset="1" stop-color="#57C6E4"/></linearGradient>
           <filter id="glow2"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
         </defs>
-        <path class="flow-base" d="M48 62 H228 C270 62 270 24 315 24 H470 C515 24 515 88 565 88 H735 C780 88 780 50 825 50 H1052"/>
-        <path class="flow-run" d="M48 62 H228 C270 62 270 24 315 24 H470 C515 24 515 88 565 88 H735 C780 88 780 50 825 50 H1052"/>
-        <path class="flow-flash" d="M48 62 H228 C270 62 270 24 315 24 H470 C515 24 515 88 565 88 H735 C780 88 780 50 825 50 H1052"/>
+        <path class="flow-base" d="M100 60 C160 60 240 60 300 34 S440 34 500 68 S640 68 700 42 S840 42 900 58"/>
+        <path class="flow-run" d="M100 60 C160 60 240 60 300 34 S440 34 500 68 S640 68 700 42 S840 42 900 58"/>
+        <path class="flow-flash" d="M100 60 C160 60 240 60 300 34 S440 34 500 68 S640 68 700 42 S840 42 900 58"/>
         <g class="flow-nodes">
-          <circle cx="48" cy="62" r="8"/><circle cx="315" cy="24" r="8"/><circle cx="565" cy="88" r="8"/><circle cx="825" cy="50" r="8"/><circle cx="1052" cy="50" r="8"/>
+          <circle cx="100" cy="60" r="9"/><circle cx="300" cy="34" r="9"/><circle cx="500" cy="68" r="9"/><circle cx="700" cy="42" r="9"/><circle cx="900" cy="58" r="9"/>
         </g>
       </svg>
     </div>
     <div class="flow-grid">
-      <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
-      <div class="step reveal d2"><div class="dot"></div><div class="n">02</div><h3>Estructuramos</h3><p>Le damos forma jurídica y financiera a la operación.</p></div>
-      <div class="step reveal d3"><div class="dot"></div><div class="n">03</div><h3>Definimos la mejor vía</h3><p>Decidimos si conviene invertir, ejecutar por vía judicial o llegar a un acuerdo.</p></div>
-      <div class="step reveal d4"><div class="dot"></div><div class="n">04</div><h3>Presentamos</h3><p>Te la mostramos clara, con todo lo que necesitas para decidir.</p></div>
-      <div class="step reveal d5"><div class="dot"></div><div class="n">05</div><h3>Ejecutamos</h3><p>Cerramos y acompañamos hasta el resultado.</p></div>
+      <div class="step reveal d1"><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
+      <div class="step reveal d2"><div class="n">02</div><h3>Estructuramos</h3><p>Le damos forma jurídica y financiera a la operación.</p></div>
+      <div class="step reveal d3"><div class="n">03</div><h3>Definimos la mejor vía</h3><p>Decidimos si conviene invertir, ejecutar por vía judicial o llegar a un acuerdo.</p></div>
+      <div class="step reveal d4"><div class="n">04</div><h3>Presentamos</h3><p>Te la mostramos clara, con todo lo que necesitas para decidir.</p></div>
+      <div class="step reveal d5"><div class="n">05</div><h3>Ejecutamos</h3><p>Cerramos y acompañamos hasta el resultado.</p></div>
     </div>
   </div>
 </section>
@@ -1566,7 +1594,7 @@ body.acuerdos .vip-cta-mod{
       <div class="foot-col">
         <h4>OPORTUNIIA</h4>
         <a href="#quienes">Nuestra filosofía</a>
-        <a href="#producto">Cómo funciona</a>
+        <a href="#flow">Cómo funciona</a>
         <a href="/oportunidades">Oportunidades</a>
         <a href="/tecnologia">Tecnología</a>
         <a href="#acceso">Acceso profesional</a>
