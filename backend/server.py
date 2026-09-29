@@ -51,6 +51,23 @@ class StatusCheckCreate(BaseModel):
 async def root():
     return {"message": "Hello World"}
 
+
+@api_router.get("/health")
+async def health():
+    """Healthcheck productivo: proceso + Mongo Atlas."""
+    try:
+        await db.command("ping")
+    except Exception:
+        return JSONResponse(
+            {"status": "degraded", "mongo": "unavailable"},
+            status_code=503,
+        )
+    return {
+        "status": "ok",
+        "mongo": "ok",
+        "presentation_contract": "PRESENTATION_WEB_PUBLICATION_v1",
+    }
+
 @api_router.post("/status", response_model=StatusCheck)
 async def create_status_check(input: StatusCheckCreate):
     status_dict = input.model_dump()
@@ -412,7 +429,7 @@ app.include_router(api_router)
 # ── SSR (Jinja2) · páginas públicas servidas por el backend a través del proxy CRA ──
 TEMPLATES_DIR = ROOT_DIR / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
-HOME_HTML = Path("/app/frontend/public/web2.html")
+HOME_HTML = ROOT_DIR.parent / "frontend" / "public" / "web2.html"
 
 
 @app.get("/", response_class=HTMLResponse)
