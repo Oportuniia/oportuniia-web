@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo.errors import ConfigurationError, OperationFailure, ServerSelectionTimeoutError
 import os
 import json
 import secrets
@@ -57,7 +58,26 @@ async def health():
     """Healthcheck productivo: proceso + Mongo Atlas."""
     try:
         await db.command("ping")
-    except Exception:
+    except OperationFailure:
+        logging.error("mongo health ping failed: auth")
+        return JSONResponse(
+            {"status": "degraded", "mongo": "auth_failed"},
+            status_code=503,
+        )
+    except ConfigurationError:
+        logging.error("mongo health ping failed: configuration")
+        return JSONResponse(
+            {"status": "degraded", "mongo": "configuration_error"},
+            status_code=503,
+        )
+    except ServerSelectionTimeoutError:
+        logging.error("mongo health ping failed: network_or_dns")
+        return JSONResponse(
+            {"status": "degraded", "mongo": "network_or_dns"},
+            status_code=503,
+        )
+    except Exception as exc:
+        logging.error("mongo health ping failed: %s", type(exc).__name__)
         return JSONResponse(
             {"status": "degraded", "mongo": "unavailable"},
             status_code=503,
