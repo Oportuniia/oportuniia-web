@@ -5,9 +5,14 @@ on:
     branches: [main]
     paths:
       - "backend/presentation_ingress.py"
+      - "backend/presentation_publish.py"
+      - "backend/catalog_data.py"
       - "backend/server.py"
+      - "backend/templates/catalogo.html"
+      - "backend/templates/detalle.html"
       - "backend/.env.example"
       - "tests/test_presentation_ingress.py"
+      - "tests/test_presentation_publish.py"
       - ".github/workflows/web-presentation-consumer.yml"
 
 jobs:
@@ -21,4 +26,4 @@ jobs:
       - name: Install focused dependencies
         run: pip install fastapi==0.110.1 pydantic motor requests pytest pytest-asyncio
       - name: Run PRESENTACIÓN → WEB consumer tests
-        run: pytest -q tests/test_presentation_ingress.py
+        run: pytest -q tests/test_presentation_ingress.py tests/test_presentation_publish.py
