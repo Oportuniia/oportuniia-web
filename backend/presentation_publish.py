@@ -14,6 +14,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request
 
 from presentation_ingress import _require_ingest_auth, validate_payload
+import catalog_data as cat
 
 
 def _slugify(value: Any) -> str:
@@ -39,6 +40,34 @@ def _first(mapping: dict[str, Any], *keys: str) -> Any:
         if value not in (None, "", [], {}):
             return value
     return None
+
+
+def _geo_codes(ccaa_name: str, province_name: str, municipality_name: str) -> tuple[str, str, str]:
+    ccaa_code = None
+    province_code = None
+    municipality_code = None
+    target_ccaa = _slugify(ccaa_name)
+    target_province = _slugify(province_name)
+    target_municipality = _slugify(municipality_name)
+
+    for code, data in cat.GEO.items():
+        if _slugify(data.get("name")) == target_ccaa:
+            ccaa_code = code
+            for pcode, pdata in (data.get("provincias") or {}).items():
+                if _slugify(pdata.get("name")) == target_province:
+                    province_code = pcode
+                    for mcode, mname in (pdata.get("municipios") or {}).items():
+                        if _slugify(mname) == target_municipality:
+                            municipality_code = mcode
+                            break
+                    break
+            break
+
+    return (
+        ccaa_code or target_ccaa,
+        province_code or target_province,
+        municipality_code or target_municipality,
+    )
 
 
 def materialize_catalog_item(payload: dict[str, Any]) -> dict[str, Any]:
@@ -93,6 +122,9 @@ def materialize_catalog_item(payload: dict[str, Any]) -> dict[str, Any]:
     internal_id = str(payload["internal_id"])
     suffix = hashlib.sha256(internal_id.encode("utf-8")).hexdigest()[:8]
     slug = _slugify(f"{municipality_name}-{product}-{title}-{suffix}")
+    ccaa_code, province_code, municipality_code = _geo_codes(
+        str(ccaa_name), str(province_name), str(municipality_name)
+    )
 
     family = asset.get("family")
     category = " · ".join(str(x) for x in (family, asset_type) if x) or str(asset_type)
@@ -117,9 +149,9 @@ def materialize_catalog_item(payload: dict[str, Any]) -> dict[str, Any]:
         "title": title,
         "asset_type": str(asset_type),
         "category": category,
-        "ccaa": _slugify(ccaa_name),
-        "provincia": _slugify(province_name),
-        "municipio": _slugify(municipality_name),
+        "ccaa": ccaa_code,
+        "provincia": province_code,
+        "municipio": municipality_code,
         "ccaa_name": ccaa_name,
         "provincia_name": province_name,
         "municipio_name": municipality_name,
