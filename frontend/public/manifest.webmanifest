@@ -1,0 +1,17 @@
+{
+  "name": "OPORTUNIIA",
+  "short_name": "OPORTUNIIA",
+  "description": "Oportunidades de inversión en deuda e inmuebles.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0B1A28",
+  "theme_color": "#0B1A28",
+  "icons": [
+    {
+      "src": "/oportuniia-logo.png?v=20260929-web1",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
