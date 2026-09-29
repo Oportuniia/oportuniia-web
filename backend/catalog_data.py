@@ -501,9 +501,10 @@ def enrich(o):
     d = dict(o)
     d["product_name"] = product_name(o["product"])
     d["asset_name"] = asset_name(o["asset_type"])
-    d["ccaa_name"] = geo_label("ccaa", o["ccaa"])
-    d["provincia_name"] = geo_label("provincia", o["ccaa"], o["provincia"])
-    d["municipio_name"] = geo_label("municipio", o["ccaa"], o["provincia"], o["municipio"])
+    # Datos dinámicos de PRESENTACIÓN pueden traer nombres soberanos ya resueltos.
+    d["ccaa_name"] = o.get("ccaa_name") or geo_label("ccaa", o["ccaa"])
+    d["provincia_name"] = o.get("provincia_name") or geo_label("provincia", o["ccaa"], o["provincia"])
+    d["municipio_name"] = o.get("municipio_name") or geo_label("municipio", o["ccaa"], o["provincia"], o["municipio"])
     d["price_label"] = f"{o['price']:,.0f} €".replace(",", ".") if o.get("price") else "—"
     d["procedure_name"] = procedure_name(o["procedure"]) if o.get("procedure") else None
     d["phase_name"] = phase_name(o["phase"]) if o.get("phase") else None
@@ -515,8 +516,16 @@ def enrich(o):
     return d
 
 
-def get_by_slug(slug):
-    o = _BY_SLUG.get(slug)
+def _all_opportunities(extra=None):
+    merged = {o["slug"]: o for o in OPPORTUNITIES}
+    for item in extra or []:
+        if isinstance(item, dict) and item.get("slug"):
+            merged[item["slug"]] = item
+    return list(merged.values())
+
+
+def get_by_slug(slug, extra=None):
+    o = next((x for x in _all_opportunities(extra) if x.get("slug") == slug), None)
     return enrich(o) if o else None
 
 
@@ -578,8 +587,9 @@ def normalize_filters(universe="judicial", products=None, assets=None, ccaa=None
     }
 
 
-def filter_opportunities(f, order="recientes"):
-    res = [o for o in OPPORTUNITIES if _match(o, f)]
+def filter_opportunities(f, order="recientes", extra=None):
+    items = _all_opportunities(extra)
+    res = [o for o in items if _match(o, f)]
     if order == "roi-desc":
         res.sort(key=lambda o: o["roi_num"], reverse=True)
     elif order == "roi-asc":
@@ -595,30 +605,32 @@ def filter_opportunities(f, order="recientes"):
     return [enrich(o) for o in res]
 
 
-def facet_counts(f):
+def facet_counts(f, extra=None):
     """Counts per option for current filtered set (excluding the facet's own selection)."""
+    items = _all_opportunities(extra)
     counts = {"universe": {}, "product": {}, "asset": {}, "ccaa": {}}
     for u in ("judicial", "acuerdos"):
         fu = dict(f, universe=u)
-        counts["universe"][u] = sum(1 for o in OPPORTUNITIES if _match(o, fu, skip="universe") and o["universe"] == u)
+        counts["universe"][u] = sum(1 for o in items if _match(o, fu, skip="universe") and o["universe"] == u)
     for p in PRODUCTS:
-        counts["product"][p["code"]] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="product") and o["product"] == p["code"])
+        counts["product"][p["code"]] = sum(1 for o in items if _match(o, f, skip="product") and o["product"] == p["code"])
     for a in ASSET_TYPES:
-        counts["asset"][a["code"]] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="asset") and o["asset_type"] == a["code"])
-    for c in GEO:
-        n = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="ccaa") and o["ccaa"] == c)
+        counts["asset"][a["code"]] = sum(1 for o in items if _match(o, f, skip="asset") and o["asset_type"] == a["code"])
+    ccaa_codes = set(GEO) | {str(o.get("ccaa")) for o in items if o.get("ccaa")}
+    for c in ccaa_codes:
+        n = sum(1 for o in items if _match(o, f, skip="ccaa") and o["ccaa"] == c)
         if n:
             counts["ccaa"][c] = n
     counts["procedure"] = {}
     for pt in PROCEDURE_TYPES:
-        counts["procedure"][pt["code"]] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="procedure") and o.get("procedure") == pt["code"])
+        counts["procedure"][pt["code"]] = sum(1 for o in items if _match(o, f, skip="procedure") and o.get("procedure") == pt["code"])
     counts["phase"] = {}
     for ph in NPL_PHASES:
-        counts["phase"][ph["code"]] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="phase") and o.get("phase") == ph["code"])
+        counts["phase"][ph["code"]] = sum(1 for o in items if _match(o, f, skip="phase") and o.get("phase") == ph["code"])
     counts["phase_principal"] = {}
     for st, _n in PHASE_STAGES:
-        counts["phase_principal"][st] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="phase_principal") and _PHASE_STAGE.get(o.get("phase")) == st)
+        counts["phase_principal"][st] = sum(1 for o in items if _match(o, f, skip="phase_principal") and _PHASE_STAGE.get(o.get("phase")) == st)
     counts["possession"] = {}
     for ps in POSSESSION_STATES:
-        counts["possession"][ps["code"]] = sum(1 for o in OPPORTUNITIES if _match(o, f, skip="possession") and o.get("possession") == ps["code"])
+        counts["possession"][ps["code"]] = sum(1 for o in items if _match(o, f, skip="possession") and o.get("possession") == ps["code"])
     return counts
