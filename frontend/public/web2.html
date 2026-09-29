@@ -989,6 +989,30 @@ body.acuerdos .vip-cta-mod{
 .fpd-cap{margin-top:12px;font-size:10.5px;color:#5E7787;letter-spacing:.02em}
 @media(max-width:900px){.funds-pro{grid-template-columns:1fr;gap:28px}}
 
+
+/* ===== V55 · CIERRE VISUAL + UX ===== */
+.universe-cta{display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;margin:0 auto 30px;text-align:center}
+.universe-cta span{font-size:12px;color:var(--faint);max-width:460px}
+.universe-go{background:#1F6588}
+.q-human{display:grid;grid-template-columns:minmax(0,.9fr) minmax(360px,1.1fr);gap:clamp(38px,6vw,88px);align-items:center}
+.q-human .q-body{margin-top:28px}
+.q-photo{position:relative;border-radius:18px;overflow:hidden;min-height:430px;border:1px solid rgba(87,198,228,.24);box-shadow:0 30px 80px -44px rgba(0,0,0,.62)}
+.q-photo img{width:100%;height:100%;min-height:430px;object-fit:cover;filter:saturate(.84) contrast(1.02)}
+.q-photo::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 54%,rgba(7,25,36,.86))}
+.q-photo figcaption{position:absolute;z-index:2;left:26px;right:26px;bottom:24px;color:#EAF3F8;font-size:13px;line-height:1.6}
+.flow-map{position:relative;margin:-10px 0 42px;padding:18px 22px 8px;border:1px solid var(--line);border-radius:14px;background:#fff}
+.flow-map svg{width:100%;height:auto;display:block}
+.flow-map .flow-line{animation:flowDash 8s linear infinite}
+.flow-map .flow-nodes circle{fill:#fff;stroke:#1F6588;stroke-width:4}
+.flow-map>span{display:inline-block;width:19.4%;text-align:center;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:#6B7D8C;transform:translateY(-4px)}
+@keyframes flowDash{to{stroke-dashoffset:-88}}
+.tech-landing-btn{min-width:260px;justify-content:center;border-radius:6px;padding:16px 28px;background:#1F6588}
+#tecnologia .tech-landing-btn:hover{background:#2E9AC6}
+#footer{background:linear-gradient(180deg,#0A0D11 0%,#0A1622 58%,#102B3C 100%);border-top:1px solid rgba(87,198,228,.18)}
+#footer .foot-brand p{max-width:320px}
+@media(max-width:900px){.q-human{grid-template-columns:1fr}.q-photo{min-height:340px}.q-photo img{min-height:340px}.flow-map>span{font-size:9px}}
+@media(max-width:640px){.flow-map{display:none}.universe-cta{align-items:stretch}.universe-cta .btn{width:100%;justify-content:center}}
+
 </style>
 </head>
 <body data-testid="v03-body">
@@ -1002,9 +1026,9 @@ body.acuerdos .vip-cta-mod{
         <img src="/oportuniia-logo.webp" alt="OPORTUNIIA" class="brand-logo-img">
       </a>
       <nav class="menu" data-testid="main-nav">
-        <div class="navitem"><a href="/oportunidades">Oportunidades</a></div>
-        <div class="navitem"><a href="#flow">Cómo funciona</a></div>
         <div class="navitem"><a href="#quienes">Nuestra filosofía</a></div>
+        <div class="navitem"><a href="#producto">Cómo funciona</a></div>
+        <div class="navitem"><a href="/oportunidades">Oportunidades</a></div>
         <div class="navitem"><a href="#grupo">Grupo OPORTUNIIA</a></div>
         <div class="navitem"><a href="#footer">Contacto</a></div>
       </nav>
@@ -1019,9 +1043,9 @@ body.acuerdos .vip-cta-mod{
 
 <!-- mobile menu -->
 <div class="mmenu" id="mmenu" data-testid="mobile-menu">
-  <a href="/oportunidades">Oportunidades</a>
-  <a href="#flow">Cómo funciona</a>
   <a href="#quienes">Nuestra filosofía</a>
+  <a href="#producto">Cómo funciona</a>
+  <a href="/oportunidades">Oportunidades</a>
   <a href="#grupo">Grupo OPORTUNIIA</a>
   <a href="#footer">Contacto</a>
   <a href="#acceso" class="btn">Solicitar acceso</a>
@@ -1108,6 +1132,10 @@ body.acuerdos .vip-cta-mod{
           <span class="uni-tag">Más claridad · más control · menos incertidumbre</span>
         </div>
       </div>
+    </div>
+    <div class="universe-cta reveal d1" data-testid="universe-cta">
+      <a href="/oportunidades" class="btn universe-go">Explorar oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
+      <span>Consulta el catálogo completo y filtra por producto, fase, ubicación y estado.</span>
     </div>
     <div class="modeswitch reveal d1" id="acuerdos" data-testid="mode-switch">
       <span class="ms-cue" data-testid="ms-cue">Explora los dos universos</span>
@@ -1269,16 +1297,20 @@ body.acuerdos .vip-cta-mod{
 <!-- ================= QUIÉNES SOMOS ================= -->
 <section class="sec quienes" id="quienes" data-testid="quienes">
   <div class="wrap">
-    <div class="q-grid">
+    <div class="q-grid q-human">
       <div class="reveal">
         <div class="eyebrow" style="margin-bottom:24px">Nuestra filosofía</div>
         <h2 class="q-title">Detrás de cada deuda hay una solución que merece ser explorada.</h2>
+        <div class="q-body">
+          <p>Antes de asumir que el recorrido debe ser judicial, buscamos entender la operación, las circunstancias y las alternativas posibles. Siempre que existe una vía razonable de acuerdo, <b>trabajamos para impulsarla</b>.</p>
+          <p>Porque resolver antes, reducir incertidumbre y encontrar un punto de encuentro puede generar más valor para todas las partes.</p>
+          <p class="q-close"><b>Humanizar la deuda también es intentar resolverla de otra manera.</b></p>
+        </div>
       </div>
-      <div class="q-body reveal d1">
-        <p>Antes de asumir que el recorrido debe ser judicial, buscamos entender la operación, las circunstancias y las alternativas posibles. Siempre que existe una vía razonable de acuerdo, <b>trabajamos para impulsarla</b>.</p>
-        <p>Porque resolver antes, reducir incertidumbre y encontrar un punto de encuentro puede generar más valor para todas las partes.</p>
-        <p class="q-close"><b>Humanizar la deuda también es intentar resolverla de otra manera.</b></p>
-      </div>
+      <figure class="q-photo reveal d1" aria-label="Conversación profesional cercana">
+        <img src="https://images.unsplash.com/photo-1551836022-d5d88e9218df?auto=format&fit=crop&w=1400&q=82" alt="Profesionales conversando de forma cercana" loading="lazy">
+        <figcaption>Escuchar, entender y buscar una salida razonable antes de convertir una operación en un conflicto.</figcaption>
+      </figure>
     </div>
   </div>
 </section>
@@ -1292,6 +1324,17 @@ body.acuerdos .vip-cta-mod{
         <h2>Una forma de trabajar.<br class="d-break"> Cada operación, una estrategia.</h2>
       </div>
       <div class="side reveal d1">Gracias a nuestra tecnología automatizamos parte del análisis de cada operación y agilizamos su estudio. Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
+    </div>
+    <div class="flow-map reveal" aria-hidden="true">
+      <svg viewBox="0 0 1100 170" role="img">
+        <defs><linearGradient id="flowg" x1="0" x2="1"><stop offset="0" stop-color="#1F6588"/><stop offset="1" stop-color="#57C6E4"/></linearGradient></defs>
+        <path d="M55 84 H230 C270 84 270 38 315 38 H470 C515 38 515 132 565 132 H735 C780 132 780 70 825 70 H1045" fill="none" stroke="rgba(31,101,136,.24)" stroke-width="12" stroke-linecap="round"/>
+        <path d="M55 84 H230 C270 84 270 38 315 38 H470 C515 38 515 132 565 132 H735 C780 132 780 70 825 70 H1045" fill="none" stroke="url(#flowg)" stroke-width="3" stroke-linecap="round" stroke-dasharray="10 12" class="flow-line"/>
+        <g class="flow-nodes">
+          <circle cx="55" cy="84" r="12"/><circle cx="315" cy="38" r="12"/><circle cx="565" cy="132" r="12"/><circle cx="825" cy="70" r="12"/><circle cx="1045" cy="70" r="12"/>
+        </g>
+      </svg>
+      <span>Análisis</span><span>Estructura</span><span>Decisión</span><span>Presentación</span><span>Ejecución</span>
     </div>
     <div class="flow-grid">
       <div class="step reveal d1"><div class="dot"></div><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
@@ -1314,7 +1357,7 @@ body.acuerdos .vip-cta-mod{
         <p style="margin-top:18px;font-size:15px;font-weight:600;color:var(--ink);letter-spacing:.01em">La tecnología al servicio de la operación.</p>
       </div>
       <div class="ecolite-right">
-        <a href="/tecnologia" class="ecolink" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-up-right"></i></a>
+        <a href="/tecnologia" class="btn tech-landing-btn" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-up-right" style="width:16px;height:16px"></i></a>
       </div>
     </div>
     <div class="tech-caps" id="tech-capacidades" data-testid="tech-capacidades">
@@ -1472,10 +1515,10 @@ body.acuerdos .vip-cta-mod{
       </div>
       <div class="foot-col">
         <h4>OPORTUNIIA</h4>
-        <a href="/oportunidades">Oportunidades</a>
-        <a href="#flow">Cómo funciona</a>
         <a href="#quienes">Nuestra filosofía</a>
-        <a href="#tecnologia">Tecnología</a>
+        <a href="#producto">Cómo funciona</a>
+        <a href="/oportunidades">Oportunidades</a>
+        <a href="/tecnologia">Tecnología</a>
         <a href="#acceso">Acceso profesional</a>
       </div>
       <div class="foot-col">
