@@ -1,0 +1,16 @@
+{
+  "name": "OPORTUNIIA",
+  "short_name": "OPORTUNIIA",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#061A2B",
+  "theme_color": "#061A2B",
+  "icons": [
+    {
+      "src": "/brand/official-mark.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
