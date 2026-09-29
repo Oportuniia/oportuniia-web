@@ -19,6 +19,7 @@ from wp_precheck import run_precheck, run_capability_discovery, run_item_read, r
 import catalog_data as cat
 from presentation_ingress import register_routes as register_presentation_routes
 from presentation_publish import register_publish_routes as register_presentation_publish_routes
+from presentation_e2e import run_presentation_e2e_if_enabled
 
 
 ROOT_DIR = Path(__file__).parent
@@ -31,6 +32,15 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+
+
+@app.on_event("startup")
+async def _runtime_presentation_e2e_startup():
+    """Run isolated PRESENTACIÓN → WEB E2E in background when explicitly enabled."""
+    if (os.environ.get("WEB_PRESENTATION_E2E") or "").strip() != "1":
+        return
+    import asyncio
+    asyncio.create_task(run_presentation_e2e_if_enabled(db))
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
