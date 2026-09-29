@@ -16,6 +16,7 @@ from datetime import datetime, timezone
 
 from wp_precheck import run_precheck, run_capability_discovery, run_item_read, run_bridge_read, _get_env, _normalize_base
 import catalog_data as cat
+from presentation_ingress import register_routes as register_presentation_routes
 
 
 ROOT_DIR = Path(__file__).parent
@@ -383,6 +384,9 @@ async def interest_signal(slug: str):
     sig = await _interest_signal(slug)
     return {"slug": slug, "signal": sig, "aggregate_only": True, "fake": False}
 
+
+# Register sovereign PRESENTACIÓN → WEB M2M ingress on the same API router.
+register_presentation_routes(api_router, db)
 
 # Include the router in the main app
 app.include_router(api_router)
