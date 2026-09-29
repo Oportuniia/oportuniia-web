@@ -149,3 +149,19 @@ async def test_publish_and_withdraw_are_explicit_state_changes():
     withdrawn = await pub.withdraw_publication(db, p["internal_id"])
     assert withdrawn["state"] == "WITHDRAWN"
     assert db.presentation_web_published.docs[p["internal_id"]]["publication_state"] == "WITHDRAWN"
+
+
+def test_materialized_item_participates_in_existing_catalog_filters():
+    import catalog_data as cat
+    item = pub.materialize_catalog_item(_payload())
+    f = cat.normalize_filters(
+        universe="judicial",
+        products=["NPL"],
+        price_min=190000,
+        roi_min=50,
+        term_max=10,
+    )
+    items = cat.filter_opportunities(f, order="recientes", extra=[item])
+    assert any(x["slug"] == item["slug"] for x in items)
+    counts = cat.facet_counts(f, extra=[item])
+    assert counts["product"]["NPL"] >= 1
