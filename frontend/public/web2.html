@@ -1099,6 +1099,40 @@ body.acuerdos .vip-cta-mod{
 .ms-obvious{position:relative;gap:7px;padding:7px;border:1px solid rgba(87,198,228,.45);box-shadow:0 12px 40px -24px rgba(87,198,228,.9);transition:.3s;cursor:pointer}.ms-obvious:hover{transform:scale(1.035);border-color:#57C6E4;box-shadow:0 18px 48px -20px rgba(87,198,228,1)}.ms-toggle{width:54px;height:28px;border-radius:40px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);position:relative;flex:0 0 auto;pointer-events:none}.ms-knob{width:20px;height:20px;position:absolute;left:4px;top:3px;border-radius:50%;background:#57C6E4;box-shadow:0 0 16px rgba(87,198,228,.9);transition:transform .35s var(--ease)}body.acuerdos .ms-knob{transform:translateX(25px)}.ms-btn{cursor:pointer!important;transition:transform .25s,background .25s,color .25s!important}.ms-btn:hover{transform:scale(1.08);color:#fff!important;background:rgba(87,198,228,.18)!important}.ms-help{display:block;margin-top:12px;text-align:center;font-size:11px;letter-spacing:.08em;color:#89A7B8}
 @media(max-width:1180px){.menu{gap:14px}.navitem>a{font-size:11.5px}}@media(max-width:900px){.hs-grid{grid-template-columns:1fr}.access-home-card{align-items:flex-start;flex-direction:column}.flow-premium{grid-template-columns:1fr;gap:24px}.flow-premium .step{padding-left:62px;min-height:84px}.flow-premium .dot{position:absolute;left:0;top:0}.flow-premium .connector{left:21px;right:auto;top:44px;width:2px;height:60px;background:linear-gradient(var(--brand),#57C6E4)}.flow-premium .connector::after{right:-4px;top:auto;bottom:6px;transform:rotate(135deg)}}
 
+
+/* ===== V59 · ACCESO RESTAURADO + PREMIUM + SELECTOR DE UNIVERSOS ===== */
+.ms-obvious{display:inline-flex!important;flex-direction:row!important;align-items:center!important;gap:6px!important;padding:6px!important;border-radius:999px!important;white-space:nowrap}
+.ms-obvious .ms-btn{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-width:220px!important;padding:14px 24px!important;border-radius:999px!important}
+.ms-obvious .ms-btn:not(.on):hover{transform:scale(1.055)!important;background:rgba(87,198,228,.24)!important;box-shadow:0 10px 28px -14px rgba(87,198,228,.95)!important;color:#fff!important}
+.ms-obvious .ms-btn.on:hover{transform:scale(1.025)!important}
+.ms-toggle,.ms-knob{display:none!important}
+.ms-help{margin-top:10px}
+.access{background:var(--bg)}
+.entry-grid{align-items:stretch}
+.entry{min-height:100%}
+.entry .ecta{margin-top:auto}
+.premium-home{margin-top:54px;padding:clamp(30px,4vw,54px);border-radius:20px;background:linear-gradient(135deg,#0A1622 0%,#0C2130 58%,#0B2C3D 100%);border:1px solid rgba(87,198,228,.3);color:#EAF3F8;box-shadow:0 34px 80px -44px rgba(10,22,34,.8)}
+.premium-k{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:rgba(87,198,228,.11);color:#7AD0E9;font-size:10.5px;font-weight:700;letter-spacing:.18em}
+.premium-k svg{width:14px;height:14px}
+.premium-copy h3{font-size:clamp(27px,3.2vw,44px);line-height:1.08;margin-top:18px;color:#fff;max-width:900px}
+.premium-copy p{margin-top:15px;color:#A9C0CC;max-width:760px;font-size:15px}
+.premium-benefits{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:32px}
+.premium-benefits>div{padding:19px 17px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);border-radius:12px;display:flex;gap:12px;align-items:flex-start}
+.premium-benefits svg{width:18px;height:18px;flex:0 0 auto;color:#57C6E4;margin-top:2px}
+.premium-benefits b{display:block;color:#fff;font-size:12.5px}
+.premium-benefits small{display:block;margin-top:7px;color:#8FA9B7;font-size:10.8px;line-height:1.55}
+.premium-action{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:28px}
+.premium-btn{display:inline-flex;align-items:center;gap:9px;padding:15px 24px;border-radius:7px;background:#2E9AC6;color:#fff;font-size:12.5px;font-weight:700;letter-spacing:.08em;transition:.3s}
+.premium-btn:hover{transform:translateY(-2px);background:#57C6E4}
+.premium-btn svg{width:16px;height:16px}
+.premium-action p{font-size:10.5px;color:#6E8795}
+.register-cta{margin-top:26px;padding:28px 32px;border:1px solid var(--line);border-radius:16px;background:linear-gradient(135deg,var(--surface),var(--brand-tint));display:flex;align-items:center;justify-content:space-between;gap:28px}
+.register-k{font-size:10px;letter-spacing:.22em;color:var(--brand);font-weight:700}
+.register-cta h3{font-size:clamp(24px,3vw,36px);margin-top:7px}
+.register-cta p{font-size:13px;color:var(--ink2);margin-top:8px;max-width:720px}
+@media(max-width:1100px){.premium-benefits{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:760px){.ms-obvious{width:100%;display:grid!important;grid-template-columns:1fr 1fr!important}.ms-obvious .ms-btn{min-width:0!important;padding:12px 10px!important;font-size:11px!important}.premium-benefits{grid-template-columns:1fr}.register-cta{align-items:flex-start;flex-direction:column}}
+
 </style>
 </head>
 <body data-testid="v03-body">
@@ -1228,10 +1262,9 @@ body.acuerdos .vip-cta-mod{
       <span class="ms-cue" data-testid="ms-cue">Explora los dos universos</span>
       <div class="ms-pill ms-obvious" data-testid="mode-indicator">
         <button class="ms-btn on" data-mode="judicial" data-testid="seg-judiciales">Ejecuciones Judiciales</button>
-        <span class="ms-toggle" aria-hidden="true"><span class="ms-knob"></span></span>
         <button class="ms-btn" data-mode="acuerdos" data-testid="seg-acuerdos">Universo Acuerdos</button>
       </div>
-      <span class="ms-help">Pasa el cursor y cambia de universo</span>
+      <span class="ms-help">Selecciona el universo que quieres explorar</span>
     </div>
     <div class="acu-surface" data-testid="acu-surface">
     <div class="deal-grid grid-rec">
@@ -1450,17 +1483,82 @@ body.acuerdos .vip-cta-mod{
   </div>
 </section>
 
-<!-- ================= LOGIN / REGISTRO · HOME ================= -->
-<section class="sec access-home" id="acceso" data-testid="acceso">
+<!-- ================= ACCESO PROFESIONAL · TRES FORMAS ================= -->
+<section class="sec access" id="acceso" data-testid="acceso">
   <div class="wrap">
-    <div class="access-home-card reveal">
-      <div>
-        <div class="eyebrow" style="margin-bottom:20px">Acceso profesional</div>
-        <h2>Un único punto de entrada.</h2>
-        <p>Si ya formas parte de OPORTUNIIA, inicia tu acceso. Si todavía no estás registrado, solicita el alta desde el mismo espacio.</p>
+    <div class="sec-head">
+      <div class="reveal">
+        <div class="eyebrow" style="margin-bottom:26px">Acceso profesional</div>
+        <h2>Elige cómo quieres trabajar<br class="d-break"> con OPORTUNIIA.</h2>
       </div>
-      <a href="/acceso" class="btn">Login / Registro <i data-lucide="log-in" style="width:16px;height:16px"></i></a>
+      <div class="side reveal d1">Inversor, colaborador o suscriptor. Tres formas distintas de relacionarte con OPORTUNIIA.</div>
     </div>
+
+    <div class="entry-grid">
+      <div class="entry feat reveal d1" data-testid="entry-inversor">
+        <span class="ei"><i data-lucide="trending-up"></i></span>
+        <div class="en">Para invertir</div>
+        <h3>Inversor</h3>
+        <p>Elige cómo quieres participar en cada oportunidad.</p>
+        <ul class="opts">
+          <li><span class="ob">A</span><span><b>Compra directa</b> — adquieres la oportunidad y continúas la operación por tu cuenta.</span></li>
+          <li><span class="ob">B</span><span><b>Compra + acompañamiento jurídico</b> — adquieres la oportunidad y puedes contar con acompañamiento jurídico durante el proceso.</span></li>
+          <li><span class="ob">C</span><span><b>Gestión integral</b> — aportas la inversión y la operación se gestiona integralmente hasta su resultado.</span></li>
+        </ul>
+        <a href="/acceso" class="ecta" data-testid="entry-inversor-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+      </div>
+
+      <div class="entry reveal d2" data-testid="entry-colaborador">
+        <span class="ei"><i data-lucide="handshake"></i></span>
+        <div class="en">Para colaborar</div>
+        <h3>Colaborador</h3>
+        <p>Encuentra la oportunidad adecuada para tu cliente y elige cómo quieres estructurar la operación.</p>
+        <ul class="opts">
+          <li><span class="ob">A</span><span><b>Resultado compartido</b> — la operación se trabaja conjuntamente y la participación económica se estructura según las condiciones aplicables.</span></li>
+          <li><span class="ob">B</span><span><b>Mantienes a tu cliente</b> — conservas íntegramente tu relación comercial y OPORTUNIIA participa en la estructura y ejecución según corresponda.</span></li>
+        </ul>
+        <a href="/contacto" class="ecta" data-testid="entry-colaborador-cta">Quiero colaborar <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+      </div>
+
+      <div class="entry reveal d3" data-testid="entry-suscriptor">
+        <span class="ei"><i data-lucide="key-round"></i></span>
+        <div class="en">Ya formas parte</div>
+        <h3>Suscriptor</h3>
+        <p>Ya formas parte de OPORTUNIIA. Accede a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p>
+        <div class="opts-note">Tu acceso puede incluir oportunidades, documentación y servicios disponibles para tu perfil.</div>
+        <a href="/acceso" class="ecta" data-testid="entry-suscriptor-cta">Entrar <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+      </div>
+    </div>
+
+    <section class="premium-home reveal d2" data-testid="premium-home">
+      <div class="premium-copy">
+        <span class="premium-k"><i data-lucide="sparkles"></i> EXPERIENCIA PREMIUM</span>
+        <h3>Más acceso. Más profundidad. Más capacidad para pedir lo que necesitas.</h3>
+        <p>Premium está pensado para inversores que quieren trabajar con OPORTUNIIA de una forma más activa y personalizada.</p>
+      </div>
+      <div class="premium-benefits">
+        <div><i data-lucide="layers-3"></i><span><b>Universo Acuerdos</b><small>Acceso al universo de operaciones estructuradas disponible para perfiles Premium autorizados.</small></span></div>
+        <div><i data-lucide="scan-search"></i><span><b>Perímetros personalizados</b><small>Define zonas, tipologías, productos y criterios para trabajar sobre un perímetro propio.</small></span></div>
+        <div><i data-lucide="sliders-horizontal"></i><span><b>Screening avanzado</b><small>Filtra y acota oportunidades con mayor profundidad según tus preferencias.</small></span></div>
+        <div><i data-lucide="message-square-plus"></i><span><b>Peticiones a la carta</b><small>Solicita profundización, documentación o análisis adicional sobre oportunidades existentes cuando esté disponible y autorizado.</small></span></div>
+        <div><i data-lucide="file-search"></i><span><b>Más documentación</b><small>Acceso a contenidos ampliados y reportajes disponibles para tu perfil y para cada operación.</small></span></div>
+      </div>
+      <div class="premium-action">
+        <a href="/acceso" class="premium-btn">ACTIVAR PREMIUM <i data-lucide="arrow-right"></i></a>
+        <p>Acceso sujeto a validación profesional y disponibilidad del servicio.</p>
+      </div>
+    </section>
+
+    <div class="register-cta reveal d3">
+      <div>
+        <span class="register-k">OPORTUNIIA</span>
+        <h3>Regístrate. Descubre cómo quieres participar.</h3>
+        <p>Accede a oportunidades, define tu perfil y empieza a construir tu propia forma de trabajar con OPORTUNIIA.</p>
+      </div>
+      <a href="/acceso" class="btn">Login / Registro <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
+    </div>
+
+    <p class="access-foot reveal d3">Inversores y colaboradores, sujetos a verificación profesional.</p>
   </div>
 </section>
 
