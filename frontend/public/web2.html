@@ -1088,6 +1088,17 @@ body.acuerdos .vip-cta-mod{
   .q-photo figcaption{right:28px}
 }
 
+
+/* ===== V58 · ARQUITECTURA MULTIPÁGINA + HOME RESUMEN ===== */
+.menu{gap:22px}.navitem>a{font-size:12.4px}.actions{gap:12px}.actions .btn{padding:11px 18px;white-space:nowrap}
+.home-more{display:flex;justify-content:center;margin-top:34px}
+.home-servicers{padding:70px 0;background:#0A1622;color:#eef6fa;border-top:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}
+.hs-grid{display:grid;grid-template-columns:1fr auto;gap:50px;align-items:center}.hs-grid h2{font-size:clamp(30px,4vw,52px);line-height:1.06;letter-spacing:-.03em;max-width:860px}.hs-grid p{color:#9DB4C2;max-width:850px;margin-top:18px;font-size:15px}
+.access-home{padding:70px 0}.access-home-card{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:34px 38px;display:flex;align-items:center;justify-content:space-between;gap:34px;box-shadow:var(--shadow-sm)}.access-home-card h2{font-size:clamp(30px,4vw,50px)}.access-home-card p{color:var(--ink2);max-width:700px;margin-top:12px}
+.flow-thread{display:none!important}.flow-premium{margin-top:54px}.flow-premium::before{display:none!important}.flow-premium .step{padding:0 22px 0 0}.flow-premium .dot{width:44px;height:44px;border:2px solid var(--brand);display:grid!important;place-items:center;border-radius:50%;background:var(--bg2);margin-bottom:25px;color:var(--brand);font-size:10px;font-weight:700;letter-spacing:.12em;box-shadow:0 10px 24px -17px rgba(31,101,136,.9)}.flow-premium .connector{position:absolute;left:44px;right:0;top:21px;height:2px;background:linear-gradient(90deg,var(--brand),#57C6E4);overflow:hidden}.flow-premium .connector::before{content:"";position:absolute;left:-28%;width:28%;height:100%;background:#DDF7FF;box-shadow:0 0 10px #57C6E4;animation:flowStraight 2.8s linear infinite}.flow-premium .connector::after{content:"";position:absolute;right:8px;top:-4px;width:8px;height:8px;border-top:2px solid var(--brand);border-right:2px solid var(--brand);transform:rotate(45deg)}@keyframes flowStraight{to{left:112%}}
+.ms-obvious{position:relative;gap:7px;padding:7px;border:1px solid rgba(87,198,228,.45);box-shadow:0 12px 40px -24px rgba(87,198,228,.9);transition:.3s;cursor:pointer}.ms-obvious:hover{transform:scale(1.035);border-color:#57C6E4;box-shadow:0 18px 48px -20px rgba(87,198,228,1)}.ms-toggle{width:54px;height:28px;border-radius:40px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.24);position:relative;flex:0 0 auto;pointer-events:none}.ms-knob{width:20px;height:20px;position:absolute;left:4px;top:3px;border-radius:50%;background:#57C6E4;box-shadow:0 0 16px rgba(87,198,228,.9);transition:transform .35s var(--ease)}body.acuerdos .ms-knob{transform:translateX(25px)}.ms-btn{cursor:pointer!important;transition:transform .25s,background .25s,color .25s!important}.ms-btn:hover{transform:scale(1.08);color:#fff!important;background:rgba(87,198,228,.18)!important}.ms-help{display:block;margin-top:12px;text-align:center;font-size:11px;letter-spacing:.08em;color:#89A7B8}
+@media(max-width:1180px){.menu{gap:14px}.navitem>a{font-size:11.5px}}@media(max-width:900px){.hs-grid{grid-template-columns:1fr}.access-home-card{align-items:flex-start;flex-direction:column}.flow-premium{grid-template-columns:1fr;gap:24px}.flow-premium .step{padding-left:62px;min-height:84px}.flow-premium .dot{position:absolute;left:0;top:0}.flow-premium .connector{left:21px;right:auto;top:44px;width:2px;height:60px;background:linear-gradient(var(--brand),#57C6E4)}.flow-premium .connector::after{right:-4px;top:auto;bottom:6px;transform:rotate(135deg)}}
+
 </style>
 </head>
 <body data-testid="v03-body">
@@ -1101,15 +1112,15 @@ body.acuerdos .vip-cta-mod{
         <img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" class="brand-logo-img">
       </a>
       <nav class="menu" data-testid="main-nav">
-        <div class="navitem"><a href="#quienes">Nuestra filosofía</a></div>
-        <div class="navitem"><a href="#flow">Cómo funciona</a></div>
+        <div class="navitem"><a href="/nuestra-filosofia">Nuestra filosofía</a></div>
+        <div class="navitem"><a href="/como-funciona">Cómo funciona</a></div>
         <div class="navitem"><a href="/oportunidades">Oportunidades</a></div>
-        <div class="navitem"><a href="#grupo">Grupo OPORTUNIIA</a></div>
-        <div class="navitem"><a href="#footer">Contacto</a></div>
+        <div class="navitem"><a href="/grupo-oportuniia">Grupo OPORTUNIIA</a></div>
+        <div class="navitem"><a href="/contacto">Contacto</a></div>
+        <div class="navitem"><a href="/servicers">Servicers</a></div>
       </nav>
       <div class="actions">
-        <a href="#acceso" class="ghost" data-testid="nav-private">Área privada</a>
-        <a href="#acceso" class="btn" data-testid="nav-register">Solicitar acceso <i data-lucide="arrow-up-right" style="width:16px;height:16px"></i></a>
+        <a href="/acceso" class="btn" data-testid="nav-register">Login / Registro <i data-lucide="log-in" style="width:16px;height:16px"></i></a>
         <button class="burger" id="burger" data-testid="mobile-menu-toggle" aria-label="Menú"><span></span></button>
       </div>
     </div>
@@ -1118,12 +1129,13 @@ body.acuerdos .vip-cta-mod{
 
 <!-- mobile menu -->
 <div class="mmenu" id="mmenu" data-testid="mobile-menu">
-  <a href="#quienes">Nuestra filosofía</a>
-  <a href="#flow">Cómo funciona</a>
+  <a href="/nuestra-filosofia">Nuestra filosofía</a>
+  <a href="/como-funciona">Cómo funciona</a>
   <a href="/oportunidades">Oportunidades</a>
-  <a href="#grupo">Grupo OPORTUNIIA</a>
-  <a href="#footer">Contacto</a>
-  <a href="#acceso" class="btn">Solicitar acceso</a>
+  <a href="/grupo-oportuniia">Grupo OPORTUNIIA</a>
+  <a href="/contacto">Contacto</a>
+  <a href="/servicers">Servicers</a>
+  <a href="/acceso" class="btn">Login / Registro</a>
 </div>
 
 <span id="top"></span>
@@ -1141,7 +1153,7 @@ body.acuerdos .vip-cta-mod{
           <p class="hero-lead">Seleccionamos, analizamos y estructuramos oportunidades de inversión en deuda e inmuebles, tanto en ejecuciones judiciales como mediante acuerdos.</p>
           <div class="hero-cta">
             <a href="/oportunidades" class="btn" data-testid="hero-cta-primary">Ver oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-            <a href="#quienes" class="btn line" data-testid="hero-cta-secondary">Conocer OPORTUNIIA</a>
+            <a href="/nuestra-filosofia" class="btn line" data-testid="hero-cta-secondary">Conocer OPORTUNIIA</a>
           </div>
         </div>
       </div>
@@ -1214,10 +1226,12 @@ body.acuerdos .vip-cta-mod{
     </div>
     <div class="modeswitch reveal d1" id="acuerdos" data-testid="mode-switch">
       <span class="ms-cue" data-testid="ms-cue">Explora los dos universos</span>
-      <div class="ms-pill" data-testid="mode-indicator">
+      <div class="ms-pill ms-obvious" data-testid="mode-indicator">
         <button class="ms-btn on" data-mode="judicial" data-testid="seg-judiciales">Ejecuciones Judiciales</button>
+        <span class="ms-toggle" aria-hidden="true"><span class="ms-knob"></span></span>
         <button class="ms-btn" data-mode="acuerdos" data-testid="seg-acuerdos">Universo Acuerdos</button>
       </div>
+      <span class="ms-help">Pasa el cursor y cambia de universo</span>
     </div>
     <div class="acu-surface" data-testid="acu-surface">
     <div class="deal-grid grid-rec">
@@ -1238,7 +1252,7 @@ body.acuerdos .vip-cta-mod{
             <div class="fact fact-occ"><span class="fk">Estado</span><span class="fv">Ejecución en curso</span></div>
             <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Vía hipotecaria" data-acu="Entrega pactada">Vía hipotecaria</span></div>
           </div>
-          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
       <!-- CDR · CESIÓN DE REMATE -->
@@ -1258,7 +1272,7 @@ body.acuerdos .vip-cta-mod{
             <div class="fact fact-occ"><span class="fk" data-rec="Estado" data-acu="Ocupación">Estado</span><span class="fv" data-rec="En proceso judicial" data-acu="Ocupada">En proceso judicial</span></div>
             <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Cesión de remate" data-acu="Entrega pactada">Cesión de remate</span></div>
           </div>
-          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
       <!-- REO · ACTIVO ADJUDICADO -->
@@ -1278,7 +1292,7 @@ body.acuerdos .vip-cta-mod{
             <div class="fact fact-occ"><span class="fk" data-rec="Estado" data-acu="Ocupación">Estado</span><span class="fv" data-rec="Disponible" data-acu="Libre">Disponible</span></div>
             <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Venta directa" data-acu="Venta pactada">Venta directa</span></div>
           </div>
-          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
     </div>
@@ -1300,7 +1314,7 @@ body.acuerdos .vip-cta-mod{
             <div class="fact fact-occ"><span class="fk">Ocupación</span><span class="fv">Libre</span></div>
             <div class="fact fact-deal"><span class="fk">Acuerdo</span><span class="fv">Venta pactada</span></div>
           </div>
-          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
       <!-- CDR · LOCAL CON ACUERDO -->
@@ -1320,7 +1334,7 @@ body.acuerdos .vip-cta-mod{
             <div class="fact fact-occ"><span class="fk">Ocupación</span><span class="fv">Arrendado</span></div>
             <div class="fact fact-deal"><span class="fk">Acuerdo</span><span class="fv">Entrega pactada</span></div>
           </div>
-          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
       <!-- NPL · ADOSADOS CON ACUERDO -->
@@ -1340,7 +1354,7 @@ body.acuerdos .vip-cta-mod{
             <div class="fact fact-occ"><span class="fk">Ocupación</span><span class="fv">Ocupada</span></div>
             <div class="fact fact-deal"><span class="fk">Acuerdo</span><span class="fv">Dación pactada</span></div>
           </div>
-          <a href="#acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
     </div>
@@ -1361,7 +1375,7 @@ body.acuerdos .vip-cta-mod{
         <p>Operaciones estructuradas con mayor visibilidad sobre capital, plazo y resultado previsto. Un acceso reservado, pensado para inversores y profesionales que quieren entrar antes.</p>
       </div>
       <div class="vip-side">
-        <a href="#acceso" class="vip-btn" data-testid="vip-cta">Activar Premium <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
+        <a href="/acceso" class="vip-btn" data-testid="vip-cta">Activar Premium <i data-lucide="arrow-right" style="width:17px;height:17px"></i></a>
         <p class="vip-fine">Acceso sujeto a validación profesional.</p>
       </div>
     </div>
@@ -1380,6 +1394,7 @@ body.acuerdos .vip-cta-mod{
           <p>Antes de asumir que el recorrido debe ser judicial, buscamos entender la operación, las circunstancias y las alternativas posibles. Siempre que existe una vía razonable de acuerdo, <b>trabajamos para impulsarla</b>.</p>
           <p>Porque resolver antes, reducir incertidumbre y encontrar un punto de encuentro puede generar más valor para todas las partes.</p>
           <p class="q-close"><b>Humanizar la deuda también es intentar resolverla de otra manera.</b></p>
+          <div class="home-more" style="justify-content:flex-start"><a href="/nuestra-filosofia" class="btn line">Conocer nuestra filosofía <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a></div>
         </div>
       </div>
       <figure class="q-photo reveal d1" aria-label="Conversación profesional cercana">
@@ -1400,26 +1415,14 @@ body.acuerdos .vip-cta-mod{
       </div>
       <div class="side reveal d1">Gracias a nuestra tecnología automatizamos parte del análisis de cada operación y agilizamos su estudio. Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
     </div>
-    <div class="flow-thread reveal" aria-hidden="true">
-      <svg viewBox="0 0 1000 104" role="img" preserveAspectRatio="none">
-        <defs>
-          <linearGradient id="flowg2" x1="0" x2="1"><stop offset="0" stop-color="#1F6588"/><stop offset=".55" stop-color="#2E9AC6"/><stop offset="1" stop-color="#57C6E4"/></linearGradient>
-          <filter id="glow2"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <path class="flow-base" d="M100 60 C160 60 240 60 300 34 S440 34 500 68 S640 68 700 42 S840 42 900 58"/>
-        <path class="flow-run" d="M100 60 C160 60 240 60 300 34 S440 34 500 68 S640 68 700 42 S840 42 900 58"/>
-        <path class="flow-flash" d="M100 60 C160 60 240 60 300 34 S440 34 500 68 S640 68 700 42 S840 42 900 58"/>
-        <g class="flow-nodes">
-          <circle cx="100" cy="60" r="9"/><circle cx="300" cy="34" r="9"/><circle cx="500" cy="68" r="9"/><circle cx="700" cy="42" r="9"/><circle cx="900" cy="58" r="9"/>
-        </g>
-      </svg>
+    <div class="flow-grid flow-premium">
+      <div class="step reveal d1"><div class="dot"><span>01</span></div><span class="connector"></span><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
+      <div class="step reveal d2"><div class="dot"><span>02</span></div><span class="connector"></span><h3>Estructuramos</h3><p>Le damos forma jurídica y financiera a la operación.</p></div>
+      <div class="step reveal d3"><div class="dot"><span>03</span></div><span class="connector"></span><h3>Definimos la mejor vía</h3><p>Decidimos si conviene invertir, ejecutar por vía judicial o llegar a un acuerdo.</p></div>
+      <div class="step reveal d4"><div class="dot"><span>04</span></div><span class="connector"></span><h3>Presentamos</h3><p>Te la mostramos clara, con todo lo que necesitas para decidir.</p></div>
+      <div class="step reveal d5"><div class="dot"><span>05</span></div><h3>Ejecutamos</h3><p>Cerramos y acompañamos hasta el resultado.</p></div>
     </div>
-    <div class="flow-grid">
-      <div class="step reveal d1"><div class="n">01</div><h3>Analizamos</h3><p>Estudiamos la cartera y cada activo con datos contrastados.</p></div>
-      <div class="step reveal d2"><div class="n">02</div><h3>Estructuramos</h3><p>Le damos forma jurídica y financiera a la operación.</p></div>
-      <div class="step reveal d3"><div class="n">03</div><h3>Definimos la mejor vía</h3><p>Decidimos si conviene invertir, ejecutar por vía judicial o llegar a un acuerdo.</p></div>
-      <div class="step reveal d4"><div class="n">04</div><h3>Presentamos</h3><p>Te la mostramos clara, con todo lo que necesitas para decidir.</p></div>
-      <div class="step reveal d5"><div class="n">05</div><h3>Ejecutamos</h3><p>Cerramos y acompañamos hasta el resultado.</p></div>
+    <div class="home-more reveal"><a href="/como-funciona" class="btn line">Conocer el proceso y la tecnología <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a></div>
     </div>
   </div>
 </section>
@@ -1435,7 +1438,7 @@ body.acuerdos .vip-cta-mod{
         <p style="margin-top:18px;font-size:15px;font-weight:600;color:var(--ink);letter-spacing:.01em">La tecnología al servicio de la operación.</p>
       </div>
       <div class="ecolite-right">
-        <a href="/tecnologia" class="btn tech-landing-btn" data-testid="eco-link">Conoce nuestra tecnología <i data-lucide="arrow-up-right" style="width:16px;height:16px"></i></a>
+        <a href="/como-funciona" class="btn tech-landing-btn" data-testid="eco-link">Ver cómo funciona OPORTUNIIA <i data-lucide="arrow-up-right" style="width:16px;height:16px"></i></a>
       </div>
     </div>
     <div class="tech-caps" id="tech-capacidades" data-testid="tech-capacidades">
@@ -1447,111 +1450,16 @@ body.acuerdos .vip-cta-mod{
   </div>
 </section>
 
-<!-- ================= ACCESO — ¿CÓMO VAS A ENTRAR? ================= -->
-<section class="sec access" id="acceso" data-testid="acceso">
+<!-- ================= LOGIN / REGISTRO · HOME ================= -->
+<section class="sec access-home" id="acceso" data-testid="acceso">
   <div class="wrap">
-    <div class="sec-head">
-      <div class="reveal">
-        <div class="eyebrow" style="margin-bottom:26px">Acceso profesional</div>
-        <h2>Elige cómo quieres trabajar<br class="d-break"> con OPORTUNIIA.</h2>
+    <div class="access-home-card reveal">
+      <div>
+        <div class="eyebrow" style="margin-bottom:20px">Acceso profesional</div>
+        <h2>Un único punto de entrada.</h2>
+        <p>Si ya formas parte de OPORTUNIIA, inicia tu acceso. Si todavía no estás registrado, solicita el alta desde el mismo espacio.</p>
       </div>
-      <div class="side reveal d1">Inversor, colaborador o suscriptor. Tres formas distintas de relacionarte con OPORTUNIIA.</div>
-    </div>
-    <div class="entry-grid">
-      <div class="entry feat reveal d1" data-testid="entry-inversor">
-        <span class="ei"><i data-lucide="trending-up"></i></span>
-        <div class="en">Para invertir</div>
-        <h3>Inversor</h3>
-        <p>Elige cómo quieres participar en cada oportunidad.</p>
-        <ul class="opts">
-          <li><span class="ob">A</span><span><b>Compra directa</b> — adquieres la oportunidad y continúas la operación por tu cuenta.</span></li>
-          <li><span class="ob">B</span><span><b>Compra + acompañamiento jurídico</b> — adquieres la oportunidad y puedes contar con acompañamiento jurídico durante el proceso.</span></li>
-          <li><span class="ob">C</span><span><b>Gestión integral</b> — aportas la inversión y la operación se gestiona integralmente hasta su resultado.</span></li>
-        </ul>
-        <a href="#acceso" class="ecta" data-testid="entry-inversor-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
-      </div>
-      <div class="entry reveal d2" data-testid="entry-colaborador">
-        <span class="ei"><i data-lucide="handshake"></i></span>
-        <div class="en">Para colaborar</div>
-        <h3>Colaborador</h3>
-        <p>Encuentra la oportunidad adecuada para tu cliente y elige cómo quieres estructurar la operación.</p>
-        <ul class="opts">
-          <li><span class="ob">A</span><span><b>Resultado compartido</b> — la operación se trabaja conjuntamente y la participación económica se estructura según las condiciones aplicables.</span></li>
-          <li><span class="ob">B</span><span><b>Mantienes a tu cliente</b> — conservas íntegramente tu relación comercial y OPORTUNIIA participa en la estructura y ejecución de la operación según corresponda.</span></li>
-        </ul>
-        <a href="#agenda" class="ecta" data-testid="entry-colaborador-cta">Agenda una videollamada <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
-      </div>
-      <div class="entry reveal d3" data-testid="entry-suscriptor">
-        <span class="ei"><i data-lucide="key-round"></i></span>
-        <div class="en">Ya formas parte</div>
-        <h3>Suscriptor</h3>
-        <p>Ya formas parte de OPORTUNIIA. Accede con tu código a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p>
-        <a href="#" class="ecta" data-testid="entry-suscriptor-cta">Entrar con mi código <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
-      </div>
-    </div>
-    <div class="agenda-block reveal d2" id="agenda" data-testid="agenda-videollamada">
-      <div class="ab-copy">
-        <div class="eyebrow">¿Hablamos?</div>
-        <h3>Agenda una videollamada</h3>
-        <p>Elige directamente el día y la hora en el calendario. Para inversores, colaboradores y contactos profesionales.</p>
-        <ul class="ab-benes">
-          <li><i data-lucide="calendar-check"></i> Disponibilidad en tiempo real</li>
-          <li><i data-lucide="video"></i> Videollamada personal, sin compromiso</li>
-          <li><i data-lucide="clock"></i> Eliges el momento que mejor te venga</li>
-        </ul>
-      </div>
-      <div class="cal-embed" data-testid="agenda-calendar">
-        <iframe src="https://api.leadconnectorhq.com/widget/booking/A7XNkrehcriifyMZe98E" scrolling="no" title="Reserva de videollamada OPORTUNIIA"></iframe>
-      </div>
-    </div>
-    <p class="access-foot reveal d2">Inversores y colaboradores, sujetos a verificación profesional. Suscriptores, acceso con código.</p>
-    <div class="funds-pro reveal" data-testid="funds-servicers">
-      <div class="fp-bg" aria-hidden="true">
-        <svg viewBox="0 0 1200 400" preserveAspectRatio="xMidYMid slice">
-          <defs>
-            <pattern id="fpGrid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M60 0H0V60" fill="none" stroke="rgba(255,255,255,.05)" stroke-width="1"/>
-            </pattern>
-          </defs>
-          <rect x="0" y="0" width="1200" height="400" fill="url(#fpGrid)"/>
-        </svg>
-      </div>
-      <div class="fp-inner">
-        <div class="eyebrow">Para fondos y servicers</div>
-        <h3>Su cartera. Clara, ordenada y bajo control.</h3>
-        <p class="fp-lead">Consulte la evolución de sus operaciones, ventas, descartes y resultados desde un único entorno.</p>
-        <a href="#" class="fp-cta" data-testid="funds-cta">Acceder con código <i data-lucide="lock" style="width:16px;height:16px"></i></a>
-        <p class="fp-note">Acceso reservado a fondos y servicers autorizados.</p>
-      </div>
-      <div class="fp-dash" aria-hidden="true" data-testid="funds-dashboard">
-        <div class="fpd-head">
-          <span class="fpd-title">Panel de cartera</span>
-          <span class="fpd-live"><span class="p"></span> En vivo</span>
-        </div>
-        <div class="fpd-kpis">
-          <div class="fpd-kpi"><div class="k">En cartera</div><div class="v">128</div></div>
-          <div class="fpd-kpi"><div class="k">En análisis</div><div class="v">34</div></div>
-          <div class="fpd-kpi"><div class="k">Acuerdos</div><div class="v">46</div></div>
-        </div>
-        <div class="fpd-chart">
-          <span class="bar" style="height:38%"></span>
-          <span class="bar" style="height:52%"></span>
-          <span class="bar" style="height:44%"></span>
-          <span class="bar" style="height:66%"></span>
-          <span class="bar" style="height:58%"></span>
-          <span class="bar" style="height:78%"></span>
-          <span class="bar" style="height:70%"></span>
-          <span class="bar" style="height:88%"></span>
-          <span class="bar" style="height:82%"></span>
-          <span class="bar" style="height:100%"></span>
-        </div>
-        <div class="fpd-rows">
-          <div class="fpd-row"><span class="rc">OP-1042</span><span class="rn">Residencial · garantía hipotecaria</span><span class="rs ok">En curso</span></div>
-          <div class="fpd-row"><span class="rc">OP-1039</span><span class="rn">Comercial · cesión de remate</span><span class="rs ok">Acuerdo</span></div>
-          <div class="fpd-row"><span class="rc">OP-1028</span><span class="rn">Industrial · activo adjudicado</span><span class="rs wait">En revisión</span></div>
-        </div>
-        <p class="fpd-cap">Vista ilustrativa de la interfaz · datos no reales.</p>
-      </div>
+      <a href="/acceso" class="btn">Login / Registro <i data-lucide="log-in" style="width:16px;height:16px"></i></a>
     </div>
   </div>
 </section>
@@ -1580,6 +1488,7 @@ body.acuerdos .vip-cta-mod{
         <div class="meta"><span><span class="t">ROBOTICS</span><span class="s">Optimizamos recursos para que las personas lleguen más lejos</span></span><span class="go"><i data-lucide="clock"></i></span></div>
       </div>
     </div>
+    <div class="home-more reveal"><a href="/grupo-oportuniia" class="btn line" style="color:#fff;border-color:rgba(255,255,255,.28)">Conocer Grupo OPORTUNIIA <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a></div>
   </div>
 </section>
 
@@ -1593,16 +1502,17 @@ body.acuerdos .vip-cta-mod{
       </div>
       <div class="foot-col">
         <h4>OPORTUNIIA</h4>
-        <a href="#quienes">Nuestra filosofía</a>
-        <a href="#flow">Cómo funciona</a>
+        <a href="/nuestra-filosofia">Nuestra filosofía</a>
+        <a href="/como-funciona">Cómo funciona</a>
         <a href="/oportunidades">Oportunidades</a>
-        <a href="/tecnologia">Tecnología</a>
-        <a href="#acceso">Acceso profesional</a>
+        <a href="/servicers">Servicers</a>
+        <a href="/como-funciona">Tecnología y proceso</a>
+        <a href="/acceso">Acceso profesional</a>
       </div>
       <div class="foot-col">
         <h4>Grupo OPORTUNIIA</h4>
-        <a href="#grupo">OPORTUNIIA</a>
-        <a href="#grupo">LIVING EXPERIENCE</a>
+        <a href="/grupo-oportuniia">OPORTUNIIA</a>
+        <a href="/grupo-oportuniia">LIVING EXPERIENCE</a>
         <span class="soon">ROBOTICS · Próximamente</span>
       </div>
       <div class="foot-col">
