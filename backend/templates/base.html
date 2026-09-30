@@ -63,8 +63,8 @@ input,select{font-family:inherit}
 header{position:sticky;top:0;z-index:100;background:var(--header-bg);backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid var(--line);transition:background-color .5s var(--ease),border-color .5s}
 .nav{display:flex;align-items:center;justify-content:space-between;height:76px}
 .brand-logo-img{height:60px;width:auto;object-fit:contain}
-.menu{display:flex;align-items:center;gap:34px}
-.menu a{font-size:13.5px;color:var(--ink2);font-weight:400;transition:color .25s}
+.menu{display:flex;align-items:center;gap:22px}
+.menu a{font-size:12.2px;color:var(--ink2);font-weight:400;transition:color .25s}
 .menu a:hover,.menu a.active{color:var(--ink)}
 .menu a.active{font-weight:600;color:var(--brand)}
 .actions{display:flex;align-items:center;gap:20px}
@@ -100,20 +100,29 @@ footer{background:#1F6588;color:rgba(255,255,255,.85);padding:60px 0 34px;margin
     <div class="nav">
       <a href="/" class="brand" data-testid="brand-logo"><img src="/oportuniia-logo.webp" alt="OPORTUNIIA" class="brand-logo-img"></a>
       <nav class="menu" data-testid="main-nav">
+        <a href="/nuestra-filosofia">Nuestra filosofía</a>
+        <a href="/como-funciona">Cómo funciona</a>
         <a href="/oportunidades" class="{% block nav_opp %}{% endblock %}" data-testid="nav-oportunidades">Oportunidades</a>
-        <a href="/#flow">Cómo funciona</a>
-        <a href="/#quienes">Nuestra filosofía</a>
-        <a href="/#grupo">Grupo OPORTUNIIA</a>
-        <a href="/#footer">Contacto</a>
+        <a href="/grupo-oportuniia">Grupo OPORTUNIIA</a>
+        <a href="/contacto">Contacto</a>
+        <a href="/servicers">Servicers</a>
       </nav>
       <div class="actions">
-        <a href="/#acceso" class="ghost" data-testid="nav-private">Área privada</a>
-        <a href="/#acceso" class="btn" data-testid="nav-register">Solicitar acceso <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
-        <button class="burger" onclick="location.href='/oportunidades'" aria-label="Menú"><span></span></button>
+        <a href="/acceso" class="btn" data-testid="nav-register">Login / Registro <i data-lucide="log-in" style="width:15px;height:15px"></i></a>
+        <button class="burger" id="siteBurger" aria-label="Menú"><span></span></button>
       </div>
     </div>
   </div>
 </header>
+<div id="siteMobile" style="display:none;background:var(--surface);border-bottom:1px solid var(--line);padding:18px 5vw;position:sticky;top:76px;z-index:99">
+  <a href="/nuestra-filosofia" style="display:block;padding:9px 0">Nuestra filosofía</a>
+  <a href="/como-funciona" style="display:block;padding:9px 0">Cómo funciona</a>
+  <a href="/oportunidades" style="display:block;padding:9px 0">Oportunidades</a>
+  <a href="/grupo-oportuniia" style="display:block;padding:9px 0">Grupo OPORTUNIIA</a>
+  <a href="/contacto" style="display:block;padding:9px 0">Contacto</a>
+  <a href="/servicers" style="display:block;padding:9px 0">Servicers</a>
+  <a href="/acceso" class="btn" style="margin-top:8px">Login / Registro</a>
+</div>
 
 {% block content %}{% endblock %}
 
@@ -126,10 +135,12 @@ footer{background:#1F6588;color:rgba(255,255,255,.85);padding:60px 0 34px;margin
       </div>
       <div class="foot-col">
         <h4>OPORTUNIIA</h4>
+        <a href="/nuestra-filosofia">Nuestra filosofía</a>
+        <a href="/como-funciona">Cómo funciona</a>
         <a href="/oportunidades">Oportunidades</a>
-        <a href="/#flow">Cómo funciona</a>
-        <a href="/#quienes">Nuestra filosofía</a>
-        <a href="/#acceso">Acceso profesional</a>
+        <a href="/grupo-oportuniia">Grupo OPORTUNIIA</a>
+        <a href="/servicers">Servicers</a>
+        <a href="/acceso">Login / Registro</a>
       </div>
       <div class="foot-col">
         <h4>Legal</h4>
@@ -144,7 +155,7 @@ footer{background:#1F6588;color:rgba(255,255,255,.85);padding:60px 0 34px;margin
     </div>
   </div>
 </footer>
-<script>lucide.createIcons();</script>
+<script>lucide.createIcons();const sb=document.getElementById('siteBurger'),sm=document.getElementById('siteMobile');if(sb&&sm)sb.addEventListener('click',()=>{sm.style.display=sm.style.display==='block'?'none':'block'});</script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>
