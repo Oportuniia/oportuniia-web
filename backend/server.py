@@ -460,12 +460,44 @@ app.include_router(api_router)
 TEMPLATES_DIR = ROOT_DIR / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 HOME_HTML = ROOT_DIR.parent / "frontend" / "public" / "web2.html"
+PUBLIC_DIR = ROOT_DIR.parent / "frontend" / "public"
+
+def _public_html(name: str) -> HTMLResponse:
+    return HTMLResponse((PUBLIC_DIR / name).read_text(encoding="utf-8"))
 
 
 @app.get("/", response_class=HTMLResponse)
 async def home():
     # HOME V54 (freeze). Servida tal cual desde el archivo aprobado.
     return HTMLResponse(HOME_HTML.read_text(encoding="utf-8"))
+
+@app.get("/nuestra-filosofia", response_class=HTMLResponse)
+async def nuestra_filosofia():
+    return _public_html("nuestra-filosofia.html")
+
+@app.get("/como-funciona", response_class=HTMLResponse)
+async def como_funciona():
+    return _public_html("como-funciona.html")
+
+@app.get("/grupo-oportuniia", response_class=HTMLResponse)
+async def grupo_oportuniia():
+    return _public_html("grupo-oportuniia.html")
+
+@app.get("/contacto", response_class=HTMLResponse)
+async def contacto():
+    return _public_html("contacto.html")
+
+@app.get("/servicers", response_class=HTMLResponse)
+async def servicers():
+    return _public_html("servicers.html")
+
+@app.get("/acceso", response_class=HTMLResponse)
+async def acceso():
+    return _public_html("acceso.html")
+
+@app.get("/tecnologia")
+async def tecnologia_redirect():
+    return RedirectResponse(url="/como-funciona", status_code=307)
 
 
 @app.get("/oportunidades", response_class=HTMLResponse)
