@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Query
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 from pathlib import Path
 from typing import List, Optional
@@ -27,9 +27,36 @@ async def health():
 async def home():
     return HTMLResponse((PUBLIC / "web2.html").read_text(encoding="utf-8"))
 
-@app.get("/tecnologia", response_class=HTMLResponse)
+def _public_page(name: str):
+    return HTMLResponse((PUBLIC / name).read_text(encoding="utf-8"))
+
+@app.get("/nuestra-filosofia", response_class=HTMLResponse)
+async def nuestra_filosofia():
+    return _public_page("nuestra-filosofia.html")
+
+@app.get("/como-funciona", response_class=HTMLResponse)
+async def como_funciona():
+    return _public_page("como-funciona.html")
+
+@app.get("/grupo-oportuniia", response_class=HTMLResponse)
+async def grupo_oportuniia():
+    return _public_page("grupo-oportuniia.html")
+
+@app.get("/contacto", response_class=HTMLResponse)
+async def contacto():
+    return _public_page("contacto.html")
+
+@app.get("/servicers", response_class=HTMLResponse)
+async def servicers():
+    return _public_page("servicers.html")
+
+@app.get("/acceso", response_class=HTMLResponse)
+async def acceso():
+    return _public_page("acceso.html")
+
+@app.get("/tecnologia")
 async def tecnologia():
-    return HTMLResponse((PUBLIC / "tecnologia.html").read_text(encoding="utf-8"))
+    return RedirectResponse(url="/como-funciona", status_code=307)
 
 @app.get("/api/locations/ccaa")
 async def ccaa():
