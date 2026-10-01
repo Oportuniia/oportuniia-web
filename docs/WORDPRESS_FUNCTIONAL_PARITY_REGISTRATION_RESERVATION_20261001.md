@@ -30,3 +30,13 @@ WordPress público `https://oportuniia.com`, leído mediante WPVibe REST GET:
 - PDF y versión documental soberanos pertenecen a PRESENTACIÓN y permanecen almacenados en Cloudflare R2; WEB consume por servicio protegido.
 - No publicar operaciones ni habilitar registro operativo o reserva real desde DEMO.
 - Las URL de registro actuales son conexiones descubiertas, **no** evidencia de que sus sistemas externos hayan sido auditados.
+
+## Decisión del propietario — hoja de reserva (2026-10-01)
+
+El propietario confirma que la **hoja de reserva existe como documento/flujo propio y se va a modificar**. NO identificarla ni reemplazarla por el «Formulario de Oferta» de LeadConnector; son piezas distintas hasta que se verifique contractualmente la relación entre ambas.
+
+- Mantener el mecanismo de reserva actual intacto hasta disponer de la nueva versión aprobada.
+- Solicitar el ejemplar vigente para extraer campos, condiciones, firmas, referencias y efectos; documentar propuestas de cambio por separado, sin suponer cláusulas ni importes.
+- Implementar la nueva hoja en la rama DEMO y verificar con operaciones ficticias el vínculo operación → inversor validado → hoja → firma/aceptación → trazabilidad, sujeto al contrato legal aprobado.
+- El formulario de oferta mantiene su integración actual mientras se audita, sin confundirse con la reserva.
+- La migración del registro de inversores/colaboradores puede prepararse paralelamente, manteniendo los destinos hoy verificados.
