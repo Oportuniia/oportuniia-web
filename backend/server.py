@@ -590,10 +590,14 @@ async def oportunidad_detalle(request: Request, slug: str):
     vip = await _vip_active(request)
     locked = (o["universe"] == "acuerdos" and not vip)
     interest = await _interest_signal(slug)
+    # Only published backend records carry sovereign PRESENTACIÓN document metadata.
+    from presentation_document_view import public_document_status
+    presentation_docs = public_document_status(o)
     resp = templates.TemplateResponse("detalle.html", {
         "request": request, "base_url": _public_base(request), "o": o,
         "interest": interest, "locked": locked, "vip_active": vip,
-        "docs": cat.documentation_for(o), "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",
+        "docs": cat.documentation_for(o) if presentation_docs is None else [],
+        "presentation_docs": presentation_docs, "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",
     })
     _ensure_sid(request, resp)
     return resp
