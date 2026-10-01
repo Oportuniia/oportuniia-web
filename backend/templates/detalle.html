@@ -178,7 +178,7 @@ body.modal-open{position:fixed;left:0;right:0;width:100%;overflow:hidden}
 
       <div class="det-section" data-testid="sec-documentacion">
         <h2><i data-lucide="folder"></i> Documentación</h2>
-        {% if presentation_docs is not none %}
+        {% if presentation_docs is defined and presentation_docs is not none %}
         <p style="font-size:12.5px;color:var(--ink2);font-weight:300;margin-bottom:10px">Documentos generados por PRESENTACIÓN. Su consulta se habilitará únicamente tras verificar tu identidad y los permisos de cada producto. Ningún archivo se descarga desde esta ficha sin autorización.</p>
         <div class="doc-group" data-testid="presentation-documents">
           <div class="doc-gh">Documentación de la operación</div>
