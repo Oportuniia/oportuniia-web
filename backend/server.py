@@ -593,7 +593,8 @@ async def oportunidad_detalle(request: Request, slug: str):
     # Only published backend records carry sovereign PRESENTACIÓN document metadata.
     from presentation_document_view import public_document_status
     # Fail closed: do not expose documentary inventory of restricted Acuerdos.
-    presentation_docs = [] if locked and o.get("source_output_id") else public_document_status(o)
+    raw_published_item = next((item for item in published if item.get("slug") == slug), None)
+    presentation_docs = [] if locked and raw_published_item else public_document_status(raw_published_item)
     resp = templates.TemplateResponse("detalle.html", {
         "request": request, "base_url": _public_base(request), "o": o,
         "interest": interest, "locked": locked, "vip_active": vip,
