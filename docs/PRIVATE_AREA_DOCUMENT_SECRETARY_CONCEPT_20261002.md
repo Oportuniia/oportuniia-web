@@ -31,3 +31,12 @@ Estado: visión funcional consensuada por el propietario, pendiente de desarroll
 - No crear identidades paralelas hasta definir vínculo con la validación y registro soberanos de WordPress/LeadConnector; auditar integración y migración de consentimiento.
 - Archivo personal separado de artefactos PDF soberanos de PRESENTACIÓN en R2, control estricto de acceso, cifrado, antivirus, límites, borrado/retención según política y auditoría; nada de publicar adjuntos o claves R2.
 - Prototipar en sandbox con datos ficticios y validar aceptación del propietario antes de integrar recordatorios reales o automatizaciones.
+
+## Decisión de producto: organizador exclusivo PREMIUM (2026-10-02)
+
+- El organizador inteligente de fotos/PDF (separar, clasificar, recortar, reordenar, consolidar y archivar de forma asistida) es **exclusivo de suscriptores PREMIUM con derecho vigente verificado por servidor**. No basta ocultar botones en el frontend. La titularidad del plan no sustituye la validación de identidad ni permisos documentales.
+- Los usuarios estándar conservan **sin coste adicional de PREMIUM** las funciones documentales indispensables para su registro, validación y tramitación de ofertas y reservas: subir, consultar y actualizar los documentos exigidos. No condicionar el acceso a estas operaciones a la contratación de PREMIUM.
+- El organizador funciona exclusivamente dentro del archivo privado del titular autenticado; nunca herramienta pública de conversión/edición general de PDF ni acceso a documentos de terceros.
+- Aplicar límites configurables del lado servidor: archivos, páginas, MB, ejecuciones por período, concurrencia, tiempo y consumo de IA; antivirus, validación de tipos, antispam, límites de gasto y telemetría sin contenido sensible. Definir límites concretos y precio con el propietario antes de comercializar.
+- Cuando PREMIUM venza o se cancele, conservar accesible la documentación propia del usuario y los procedimientos pendientes según la política de retención aplicable; deshabilitar únicamente nuevas ejecuciones del organizador premium.
+- El organizador se implementará en WEB / MI OPORTUNIIA con almacenamiento privado independiente, NO en LEGAL LAB y sin circulación de documentación personal a LEGAL.
