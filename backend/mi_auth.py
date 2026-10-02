@@ -22,6 +22,7 @@ from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
+from mi_private_area import safe_profile, private_documents, profile_update
 
 router = APIRouter(prefix="/api/mi", tags=["MI OPORTUNIIA"])
 COOKIE = "mi_session"
@@ -82,6 +83,10 @@ class TokenIn(BaseModel):
 
 class Approval(BaseModel):
     actor_id: str
+
+
+class ProfileChange(BaseModel):
+    preferred_name: str = Field(min_length=1, max_length=100)
 
 
 def _smtp_send(email: str, token: str):
@@ -214,6 +219,36 @@ def register_routes(db):
         _enabled()
         actor = await _session(request)
         return {"actor": public_actor(actor), "email_verified": True}
+
+    @router.get("/private/profile")
+    async def private_profile(request: Request):
+        _enabled()
+        actor = await _session(request)
+        return {"profile": {**safe_profile(actor),
+                            "preferred_name": actor.get("preferred_name", "")}}
+
+    @router.patch("/private/profile")
+    async def change_private_profile(payload: ProfileChange, request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        return await profile_update(db, actor, preferred_name=payload.preferred_name)
+
+    @router.get("/private/documents")
+    async def list_private_documents(request: Request, limit: int = 50):
+        _enabled()
+        actor = await _session(request)
+        return {"documents": await private_documents(db, actor, limit=limit)}
+
+    @router.post("/auth/logout-all")
+    async def logout_everywhere(request: Request, response: Response):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        await db.mi_sessions.delete_many({"actor_id": actor["actor_id"]})
+        response.delete_cookie(COOKIE, path="/", secure=True,
+                               httponly=True, samesite="strict")
+        return {"status": "all_sessions_revoked"}
 
     @router.post("/auth/logout")
     async def logout(request: Request, response: Response):
