@@ -27,8 +27,8 @@ label{display:block;font-weight:600;font-size:.9rem}small{color:#537082}nav a{co
 <div class="grid"><section class="card"><h2>Mi perfil</h2><div id="profile"></div>
 <form id="profile-form"><label>Nombre preferido<input id="preferred-name" minlength="1" maxlength="100" required></label><button>Guardar</button></form>
 <br><button type="button" id="logout">Cerrar todas mis sesiones</button></section>
-<section class="card"><h2>Mis documentos</h2><p>Tus documentos solo son visibles con tu sesión.</p><div id="docs"></div><button id="reload" type="button">Actualizar lista</button>
-<p><small>La carga se habilitará tras verificar el almacén privado y el control antivirus.</small></p></section>
+<section class="card"><h2>Mis documentos</h2><p>Tus documentos solo son visibles con tu sesión.</p><div id="docs"></div><label>Subir documento (PDF o fotografía)<input id="upload-file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"></label><div class="row"><button id="upload" type="button">Subir de forma segura</button><button id="reload" type="button">Actualizar lista</button></div>
+<p><small>La carga requiere que el almacenamiento privado y el antivirus estén configurados. Los documentos se verifican antes de su utilización.</small></p></section>
 <section class="card"><h2>Organizador PDF Premium</h2><p>Propone categorías y permite confirmar la separación de un PDF que ya esté verificado en tu archivo.</p>
 <label>Identificador de tu PDF<input id="file-id" placeholder="Identificador de documento"></label>
 <button id="inspect" type="button">Analizar documento</button>
@@ -59,6 +59,21 @@ $("login-form").addEventListener("submit",async e=>{e.preventDefault();try{await
 $("profile-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/private/profile",{method:"PATCH",body:JSON.stringify({preferred_name:$("preferred-name").value})});message("Perfil actualizado")}catch(err){message(err.message)}});
 $("logout").onclick=async()=>{try{await api("/api/mi/auth/logout-all",{method:"POST"});location.replace("/acceso")}catch(e){message(e.message)}};
 $("reload").onclick=refresh;
+$("upload").onclick=async()=>{
+  const file=$("upload-file").files[0];if(!file)return message("Selecciona primero un documento");
+  if(file.size>25*1024*1024)return message("El límite de carga es 25 MB");
+  $("upload").disabled=true;
+  try{
+    const init=await api("/api/mi/private/documents/upload-intent",{method:"POST",
+      body:JSON.stringify({display_name:file.name,mime:file.type,size:file.size})});
+    const sent=await fetch(init.upload_url,{method:"PUT",headers:{"Content-Type":file.type},body:file});
+    if(!sent.ok)throw Error("No se ha podido enviar el documento");
+    const result=await api("/api/mi/private/documents/"+encodeURIComponent(init.file_id)+"/confirm",{method:"POST"});
+    message("Documento "+result.status+"; disponible después del control de seguridad");
+    $("upload-file").value="";await refresh();
+  }catch(e){message(e.message)}
+  finally{$("upload").disabled=false}
+};
 $("inspect").onclick=async()=>{try{
   const fileId=$("file-id").value.trim();const result=await api("/api/mi/private/premium/pdf/"+encodeURIComponent(fileId)+"/inspect",{method:"POST"});
   review={fileId,pages:result.pages};const root=$("pages");root.replaceChildren();
