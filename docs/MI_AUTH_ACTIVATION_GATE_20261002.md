@@ -12,7 +12,7 @@ El alta pública y los códigos definitivos de inversores/colaboradores son resp
 ## Condiciones de activación
 1. Aprobación del propietario para habilitar WEB pública y sustituir expresamente enlaces antiguos de registro.
 2. Crear DB o colecciones aisladas con política de permisos, backups, conservación, borrado y auditoría; confirmar que no hay cuentas anteriores y reserva de secuencias/códigos históricos. En la primera versión los correos serán únicos por cuenta.
-3. Configurar remitente SMTP profesional, SPF/DKIM/DMARC, `MI_PUBLIC_ORIGIN` exacto HTTPS y dominio de correo. No publicar secretos.
+3. Configurar remitente SMTP profesional, SPF/DKIM/DMARC, `MI_PUBLIC_ORIGIN` exacto HTTPS y dominio de correo. Configurar `MI_TERMS_VERSION` únicamente tras aprobar legalmente la versión vigente; el servidor deniega registros sin dicha versión y rechaza formularios obsoletos. No publicar secretos.
 4. Establecer verificación de personas/representantes proporcional a las operaciones; configurar personal administrativo identificado, autorización por rol/MFA, revisión auditada. El token de bootstrap es solo provisional y debe sustituirse por consola administrativa segura antes de uso público.
 5. Implantar controles antiabuso distribuidos para registro, correo, verificación y acceso (IP/cuenta), reenvío de verificación, recuperación de contraseña y revocación de todas las sesiones tras rotación. Hasta entonces, NO habilitar.
 6. Endpoints documentales solo después de conexión a sesión real y prueba de acceso cruzado; R2 privado nuevo con límites y validación de contenidos.
