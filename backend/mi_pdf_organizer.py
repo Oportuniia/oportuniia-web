@@ -6,11 +6,10 @@ Run only on already virus-scanned, private PDF bytes in isolated workers;
 access to this module alone never grants Premium privileges.
 """
 from __future__ import annotations
-from dataclasses import dataclass
-from io import BytesIO
 import re
 
 import fitz  # PyMuPDF
+from mi_ocr import MAX_OCR_PAGES, text_for_page
 
 MAX_PDF_BYTES = 15 * 1024 * 1024
 MAX_PAGES = 100
@@ -54,10 +53,13 @@ def inspect_pdf(data: bytes) -> dict:
             document.close()
             raise ValueError("Máximo 100 páginas por trabajo")
         pages = []
+        budget = {"remaining": MAX_OCR_PAGES}
         for number, page in enumerate(document):
-            kind, high_confidence = classify_page(page.get_text())
+            text, used_ocr = text_for_page(page, budget=budget)
+            kind, high_confidence = classify_page(text)
             pages.append({"page": number + 1, "suggested_kind": kind,
                           "high_confidence": high_confidence,
+                          "ocr_attempted": used_ocr,
                           "requires_review": True})
         document.close()
         return {"page_count": len(pages), "pages": pages,
