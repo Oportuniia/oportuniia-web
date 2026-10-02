@@ -21,7 +21,7 @@ CODE_PATTERN = re.compile(r"^OI-(INV|COL)-[0-9]{6,}$")
 
 def normalize_email(value: str) -> str:
     email = (value or "").strip().lower()
-    if len(email) > 254 or not re.fullmatch(r"[^\\s@]+@[^\\s@]+\\.[^\\s@]+", email):
+    if len(email) > 254 or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email):
         raise ValueError("invalid email")
     return email
 
