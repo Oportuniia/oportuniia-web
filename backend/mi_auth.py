@@ -204,6 +204,38 @@ def register_routes(db):
             raise HTTPException(503, "No se pudo enviar la confirmación; inténtalo de nuevo")
         return {"status": "check_email"}
 
+    @router.post("/auth/resend")
+    async def resend_verification(payload: RecoveryRequest, request: Request):
+        _enabled()
+        _same_origin(request)
+        generic = {"status": "if_registered_check_email"}
+        try:
+            email = normalize_email(payload.email)
+        except ValueError:
+            return generic
+        await auth_throttle(db, request, action="resend", email=email,
+                            per_ip=8, per_email=2)
+        actor = await db.mi_actors.find_one({
+            "email": email, "email_verified": False, "validation_state": "PENDING",
+        })
+        if not actor:
+            return generic
+        if not all(os.getenv(k) for k in ("MI_SMTP_HOST", "MI_SMTP_USER", "MI_SMTP_PASSWORD", "MI_SMTP_FROM")):
+            raise HTTPException(503, "Servicio de correo no configurado")
+        token = secrets.token_urlsafe(32)
+        now = _now()
+        await db.mi_actors.update_one(
+            {"actor_id": actor["actor_id"], "email_verified": False},
+            {"$set": {"verify_hash": _digest(token),
+                      "verify_expires": now + timedelta(hours=VERIFY_HOURS),
+                      "updated_at": now}},
+        )
+        try:
+            await asyncio.to_thread(_smtp_send, email, token)
+        except Exception:
+            raise HTTPException(503, "Servicio de correo temporalmente no disponible")
+        return generic
+
     @router.post("/auth/verify")
     async def verify(payload: TokenIn, request: Request):
         _enabled()
