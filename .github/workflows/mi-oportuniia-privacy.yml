@@ -8,6 +8,10 @@ on:
       - "backend/personal_document_storage.py"
       - "backend/mi_private_area.py"
       - "backend/mi_pdf_organizer.py"
+      - "backend/mi_ocr.py"
+      - "backend/mi_subscription_bridge.py"
+      - "backend/tests/test_mi_ocr.py"
+      - "backend/tests/test_mi_subscription_bridge.py"
       - "backend/mi_premium_service.py"
       - "backend/mi_private_upload.py"
       - "backend/mi_rate_limit.py"
@@ -33,10 +37,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: Install local OCR runtime
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-spa tesseract-ocr-eng
       - name: Install privacy-test dependencies
-        run: python -m pip install pytest pytest-asyncio pytest-xdist pymongo boto3 bcrypt fastapi httpx PyMuPDF clamd
+        run: python -m pip install pytest pytest-asyncio pytest-xdist pymongo boto3 bcrypt fastapi httpx PyMuPDF clamd pytesseract Pillow
       - name: Compile private area Python modules
-        run: python -m compileall -q backend/mi_auth.py backend/mi_private_area.py backend/mi_private_upload.py backend/mi_premium_service.py backend/mi_pdf_organizer.py backend/mi_rate_limit.py backend/mi_private_download.py backend/personal_document_storage.py
+        run: python -m compileall -q backend/mi_auth.py backend/mi_private_area.py backend/mi_private_upload.py backend/mi_premium_service.py backend/mi_pdf_organizer.py backend/mi_rate_limit.py backend/mi_private_download.py backend/mi_ocr.py backend/mi_subscription_bridge.py backend/personal_document_storage.py
       - name: Validate portal JavaScript and contract wiring
         run: python backend/tests/check_private_portal.py
       - name: Run isolated registry and storage security tests
@@ -53,3 +59,5 @@ jobs:
           backend/tests/test_mi_private_upload.py
           backend/tests/test_mi_rate_limit.py
           backend/tests/test_mi_private_download.py
+          backend/tests/test_mi_ocr.py
+          backend/tests/test_mi_subscription_bridge.py
