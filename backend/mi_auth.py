@@ -26,6 +26,7 @@ from mi_private_area import safe_profile, private_documents, profile_update
 from mi_premium_service import premium_inspect, premium_confirm
 from mi_private_upload import upload_intent, confirm_upload
 from mi_rate_limit import auth_throttle, ensure_rate_indexes
+from mi_private_download import signed_private_download
 
 router = APIRouter(prefix="/api/mi", tags=["MI OPORTUNIIA"])
 COOKIE = "mi_session"
@@ -379,6 +380,14 @@ def register_routes(db):
         _enabled()
         actor = await _session(request)
         return {"documents": await private_documents(db, actor, limit=limit)}
+
+    @router.get("/private/documents/{file_id}/download")
+    async def download_private_document(file_id: str, request: Request, response: Response):
+        _enabled()
+        actor = await _session(request)
+        response.headers["Cache-Control"] = "no-store"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        return await signed_private_download(db, actor, file_id)
 
     @router.post("/private/documents/upload-intent")
     async def private_upload_intent(payload: FileIntent, request: Request):
