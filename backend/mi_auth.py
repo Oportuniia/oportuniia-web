@@ -230,6 +230,8 @@ def register_routes(db):
             email = normalize_email(payload.email)
         except ValueError:
             return generic
+        await auth_throttle(db, request, action="recover", email=email,
+                            per_ip=8, per_email=3)
         actor = await db.mi_actors.find_one({"email": email, "email_verified": True,
                      "validation_state": {"$in": ["PENDING", "VERIFIED"]}})
         if not actor:
@@ -264,6 +266,7 @@ def register_routes(db):
             new_hash = _password(payload.new_password).decode()
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
+        await auth_throttle(db, request, action="reset", per_ip=10)
         actor = await db.mi_actors.find_one_and_update(
             {"reset_hash": _digest(payload.token), "reset_expires": {"$gt": _now()},
              "email_verified": True,
@@ -287,6 +290,8 @@ def register_routes(db):
             raise HTTPException(401, "Credenciales inválidas")
         # Role is not selected from client. Duplicate email between profiles
         # requires one single role per email, enforced below by registration.
+        await auth_throttle(db, request, action="login", email=email,
+                            per_ip=30, per_email=10)
         actor = await db.mi_actors.find_one({"email": email})
         stored = actor.get("password_hash", "") if actor else ""
         if not stored or not _check_password(payload.password, stored.encode()):
