@@ -25,6 +25,7 @@ from personal_user_registry import ROLES, ensure_registry_indexes, normalize_ema
 from mi_private_area import safe_profile, private_documents, profile_update
 from mi_premium_service import premium_inspect, premium_confirm
 from mi_private_upload import upload_intent, confirm_upload
+from mi_rate_limit import auth_throttle, ensure_rate_indexes
 
 router = APIRouter(prefix="/api/mi", tags=["MI OPORTUNIIA"])
 COOKIE = "mi_session"
@@ -413,6 +414,7 @@ def register_index_lifecycle(db):
     """Explicitly called only after activation against intended database."""
     async def _indexes():
         await ensure_registry_indexes(db)
+        await ensure_rate_indexes(db)
         # Prevent multiple roles sharing an email until unified account design.
         await db.mi_actors.create_index("email", unique=True)
         await db.mi_sessions.create_index("session_hash", unique=True)
