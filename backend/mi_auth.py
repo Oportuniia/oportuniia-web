@@ -24,6 +24,7 @@ from pymongo.errors import DuplicateKeyError
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
 from mi_private_area import safe_profile, private_documents, profile_update
 from mi_premium_service import premium_inspect, premium_confirm
+from mi_private_upload import upload_intent, confirm_upload
 
 router = APIRouter(prefix="/api/mi", tags=["MI OPORTUNIIA"])
 COOKIE = "mi_session"
@@ -88,6 +89,12 @@ class Approval(BaseModel):
 
 class ProfileChange(BaseModel):
     preferred_name: str = Field(min_length=1, max_length=100)
+
+
+class FileIntent(BaseModel):
+    display_name: str = Field(min_length=1, max_length=120)
+    mime: str
+    size: int = Field(ge=1, le=25 * 1024 * 1024)
 
 
 class PdfConfirm(BaseModel):
@@ -244,6 +251,21 @@ def register_routes(db):
         _enabled()
         actor = await _session(request)
         return {"documents": await private_documents(db, actor, limit=limit)}
+
+    @router.post("/private/documents/upload-intent")
+    async def private_upload_intent(payload: FileIntent, request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        return await upload_intent(db, actor, name=payload.display_name,
+                                   mime=payload.mime, size=payload.size)
+
+    @router.post("/private/documents/{file_id}/confirm")
+    async def private_confirm_file(file_id: str, request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        return await confirm_upload(db, actor, file_id)
 
     @router.post("/private/premium/pdf/{file_id}/inspect")
     async def inspect_private_pdf(file_id: str, request: Request):
