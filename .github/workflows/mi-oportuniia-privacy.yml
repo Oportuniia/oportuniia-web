@@ -10,6 +10,8 @@ on:
       - "backend/mi_pdf_organizer.py"
       - "backend/mi_premium_service.py"
       - "backend/mi_private_upload.py"
+      - "backend/mi_rate_limit.py"
+      - "backend/tests/test_mi_rate_limit.py"
       - "backend/tests/test_mi_private_upload.py"
       - "backend/tests/test_mi_premium_service.py"
       - "backend/tests/test_mi_private_area.py"
@@ -41,3 +43,4 @@ jobs:
           backend/tests/test_mi_pdf_organizer.py
           backend/tests/test_mi_premium_service.py
           backend/tests/test_mi_private_upload.py
+          backend/tests/test_mi_rate_limit.py
