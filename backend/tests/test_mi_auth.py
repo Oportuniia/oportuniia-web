@@ -80,3 +80,41 @@ def test_registration_fails_closed_without_configured_terms(monkeypatch):
               "role": "INVERSOR", "terms_version": "2026-10-approved", "privacy_accepted": True},
     )
     assert response.status_code == 503
+
+
+def test_password_recovery_requires_explicit_activation(monkeypatch):
+    monkeypatch.delenv("MI_AUTH_ENABLED", raising=False)
+    app = FastAPI()
+    app.include_router(register_routes(object()))
+    response = TestClient(app).post(
+        "/api/mi/auth/recovery/request",
+        headers={"origin": "https://oportuniia.com"},
+        json={"email": "investor@example.com"},
+    )
+    assert response.status_code == 503
+
+
+def test_password_recovery_does_not_accept_cross_origin(monkeypatch):
+    monkeypatch.setenv("MI_AUTH_ENABLED", "1")
+    monkeypatch.setenv("MI_PUBLIC_ORIGIN", "https://oportuniia.com")
+    app = FastAPI()
+    app.include_router(register_routes(object()))
+    response = TestClient(app).post(
+        "/api/mi/auth/recovery/complete",
+        headers={"origin": "https://attacker.example"},
+        json={"token": "x" * 40, "new_password": "VeryStrongPassword_123456"},
+    )
+    assert response.status_code == 403
+
+
+def test_password_recovery_rejects_weak_new_password_without_db(monkeypatch):
+    monkeypatch.setenv("MI_AUTH_ENABLED", "1")
+    monkeypatch.setenv("MI_PUBLIC_ORIGIN", "https://oportuniia.com")
+    app = FastAPI()
+    app.include_router(register_routes(object()))
+    response = TestClient(app).post(
+        "/api/mi/auth/recovery/complete",
+        headers={"origin": "https://oportuniia.com"},
+        json={"token": "x" * 40, "new_password": "weak"},
+    )
+    assert response.status_code == 422
