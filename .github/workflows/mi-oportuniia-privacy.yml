@@ -8,6 +8,8 @@ on:
       - "backend/personal_document_storage.py"
       - "backend/mi_private_area.py"
       - "backend/mi_pdf_organizer.py"
+      - "backend/mi_premium_service.py"
+      - "backend/tests/test_mi_premium_service.py"
       - "backend/tests/test_mi_private_area.py"
       - "backend/tests/test_mi_pdf_organizer.py"
       - "backend/tests/test_personal_user_registry.py"
@@ -35,3 +37,4 @@ jobs:
           backend/tests/test_personal_document_storage.py
           backend/tests/test_mi_private_area.py
           backend/tests/test_mi_pdf_organizer.py
+          backend/tests/test_mi_premium_service.py
