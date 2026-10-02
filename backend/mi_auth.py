@@ -12,6 +12,7 @@ import os
 import re
 import secrets
 import smtplib
+import ssl
 from datetime import datetime, timedelta, timezone
 from email.message import EmailMessage
 
@@ -135,7 +136,9 @@ def _smtp_send(email: str, token: str):
         + ". Caduca en 24 horas. Si no has solicitado el registro, ignora este mensaje."
     )
     with smtplib.SMTP(host, int(os.getenv("MI_SMTP_PORT", "587")), timeout=15) as smtp:
-        smtp.starttls()
+        smtp.ehlo()
+        smtp.starttls(context=ssl.create_default_context())
+        smtp.ehlo()
         smtp.login(user, password)
         smtp.send_message(msg)
 
@@ -157,7 +160,9 @@ def _smtp_reset(email: str, token: str):
         + token + "\n\nCaduca en 30 minutos. Si no lo solicitaste, ignora este mensaje."
     )
     with smtplib.SMTP(host, int(os.getenv("MI_SMTP_PORT", "587")), timeout=15) as smtp:
-        smtp.starttls()
+        smtp.ehlo()
+        smtp.starttls(context=ssl.create_default_context())
+        smtp.ehlo()
         smtp.login(user, password)
         smtp.send_message(msg)
 
