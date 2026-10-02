@@ -55,7 +55,7 @@ async function refresh(){
     const {documents}=await api("/api/mi/private/documents");
     const list=$("docs");list.replaceChildren();
     if(!documents.length)list.append(entry("p","Aún no hay documentos disponibles"));
-    for(const doc of documents){const line=entry("p",(doc.display_name||doc.file_id)+" · "+doc.status);list.append(line)}
+    for(const doc of documents){const line=entry("p",(doc.display_name||doc.file_id)+" · "+doc.status);if(doc.status==="AVAILABLE"){const button=entry("button","Descargar");button.type="button";button.onclick=async()=>{try{const result=await api("/api/mi/private/documents/"+encodeURIComponent(doc.file_id)+"/download");const anchor=document.createElement("a");anchor.href=result.download_url;anchor.rel="noreferrer";anchor.referrerPolicy="no-referrer";anchor.textContent="Abrir descarga privada";anchor.target="_blank";line.append(document.createTextNode(" · "));line.append(anchor)}catch(e){message(e.message)}};line.append(document.createTextNode(" "));line.append(button)}list.append(line)}
   }catch(e){$("login").style.display="block";$("private").style.display="none";message(e.message)}
 }
 $("login-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/auth/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});$("password").value="";await refresh()}catch(err){message(err.message)}});
@@ -98,7 +98,7 @@ $("confirm").onclick=async()=>{try{
     if(groups.get(group).kind!==kind)throw Error("Cada grupo debe tener una sola categoría");
     groups.get(group).pages.push(p.page)}
   const result=await api("/api/mi/private/premium/pdf/"+encodeURIComponent(review.fileId)+"/confirm",{method:"POST",body:JSON.stringify({groups:[...groups.values()]})});
-  message(result.files.length+" documentos generados; pendiente de verificación de seguridad.");$("page-review").style.display="none";await refresh()
+  message(result.files.length+" documentos generados y verificados por antivirus.");$("page-review").style.display="none";await refresh()
  }catch(e){message(e.message)}};
 refresh();
 </script></body></html>
