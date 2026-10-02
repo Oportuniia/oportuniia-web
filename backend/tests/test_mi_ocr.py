@@ -53,3 +53,20 @@ def test_ocr_requires_supported_image_type(monkeypatch):
     monkeypatch.setenv("MI_OCR_ENABLED", "1")
     with pytest.raises(ValueError):
         image_to_searchable_pdf(b"fake", "application/pdf")
+
+
+def test_real_tesseract_photo_to_searchable_pdf(monkeypatch):
+    """Real local OCR smoke test against a generated, non-personal image."""
+    from PIL import Image, ImageDraw, ImageFont
+    monkeypatch.setenv("MI_OCR_ENABLED", "1")
+    monkeypatch.setenv("MI_OCR_LANGUAGE", "eng")
+    image=Image.new("RGB", (1100, 280), "white")
+    draw=ImageDraw.Draw(image)
+    font=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 64)
+    draw.text((40, 70), "NOMINA DOCUMENTO", fill="black", font=font)
+    buffer=io.BytesIO()
+    image.save(buffer, format="PNG")
+    output=image_to_searchable_pdf(buffer.getvalue(), "image/png")
+    with fitz.open(stream=output, filetype="pdf") as pdf:
+        recognized=pdf[0].get_text().upper()
+        assert "DOCUMENT" in recognized or "NOMINA" in recognized
