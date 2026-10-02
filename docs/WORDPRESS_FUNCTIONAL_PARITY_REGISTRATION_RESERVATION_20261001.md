@@ -40,3 +40,11 @@ El propietario confirma que la **hoja de reserva existe como documento/flujo pro
 - Implementar la nueva hoja en la rama DEMO y verificar con operaciones ficticias el vínculo operación → inversor validado → hoja → firma/aceptación → trazabilidad, sujeto al contrato legal aprobado.
 - El formulario de oferta mantiene su integración actual mientras se audita, sin confundirse con la reserva.
 - La migración del registro de inversores/colaboradores puede prepararse paralelamente, manteniendo los destinos hoy verificados.
+
+## Referencias aportadas por el propietario (2026-10-02)
+- Registro inversores: https://registro.oportuniia.com/inversores (página LeadConnector externa; mantener integración activa).
+- Registro colaboradores: https://registro.oportuniia.com/colaboradores (página LeadConnector externa; mantener integración activa).
+- Oferta vinculada a operación de ejemplo: https://oportuniia.com/preparar-oferta/?op=OP0001. WordPress integra el iframe LeadConnector `CVtRSGMid1wsxIDVxPOs`. **No se ha verificado que el parámetro op se transfiera al formulario incrustado**: el iframe público inspeccionado usa src fijo sin query. Requiere prueba funcional controlada o acceso autorizado a configuración del formulario antes de dar por válida la trazabilidad.
+- Contacto de referencia estética aprobado por propietario: https://oportuniia.com/contacto/. Estructura: sección «Contáctanos», datos a un lado y «¿Hablamos?» con Nombre, Correo electrónico, Categoría (Inmobiliaria, Colaborador, Inversor), Mensaje y Enviar. WordPress observado contiene lorem ipsum y teléfono provisional; no copiar como datos definitivos. Mantener estructura y adaptar tipografía Poppins/branding OPORTUNIIA en nueva WEB.
+- La hoja de reserva futura sigue siendo un documento diferente de la oferta y requiere rediseño/aprobación por separado.
+- Se ha corregido en la rama la pantalla `frontend/public/acceso.html` para mostrar ambos destinos reales de registro. No desplegado.
