@@ -1,0 +1,27 @@
+name: MI OPORTUNIIA Privacy Gate
+on:
+  pull_request:
+    paths:
+      - "backend/personal_user_registry.py"
+      - "backend/personal_document_storage.py"
+      - "backend/tests/test_personal_user_registry.py"
+      - "backend/tests/test_personal_document_storage.py"
+      - ".github/workflows/mi-oportuniia-privacy.yml"
+  workflow_dispatch:
+jobs:
+  privacy-unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install privacy-test dependencies
+        run: python -m pip install pytest pytest-asyncio pytest-xdist pymongo boto3
+      - name: Run isolated registry and storage security tests
+        env:
+          PYTHONPATH: backend
+        run: >-
+          python -m pytest -q
+          backend/tests/test_personal_user_registry.py
+          backend/tests/test_personal_document_storage.py
