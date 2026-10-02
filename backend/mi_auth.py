@@ -115,6 +115,12 @@ def register_routes(db):
         _same_origin(request)
         if payload.role not in ROLES or not payload.privacy_accepted:
             raise HTTPException(422, "Perfil o consentimiento no válido")
+        # The authoritative legal version comes from WEB, not a client claim.
+        expected_terms = os.getenv("MI_TERMS_VERSION", "")
+        if not expected_terms:
+            raise HTTPException(503, "Condiciones de registro no configuradas")
+        if not hmac.compare_digest(payload.terms_version, expected_terms):
+            raise HTTPException(409, "Las condiciones han cambiado; actualiza el formulario")
         try:
             email = normalize_email(payload.email)
             hashed = _password(payload.password)
