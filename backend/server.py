@@ -502,6 +502,12 @@ async def contacto():
 async def servicers():
     return _public_html("servicers.html")
 
+@app.get("/mi-oportuniia", response_class=HTMLResponse)
+async def mi_oportuniia():
+    # UI is public shell only; all private data/API calls require WEB session.
+    return _public_html("mi-oportuniia.html")
+
+
 @app.get("/acceso", response_class=HTMLResponse)
 async def acceso():
     return _public_html("acceso.html")
