@@ -23,6 +23,7 @@ from pymongo.errors import DuplicateKeyError
 
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
 from mi_private_area import safe_profile, private_documents, profile_update
+from mi_premium_service import premium_inspect, premium_confirm
 
 router = APIRouter(prefix="/api/mi", tags=["MI OPORTUNIIA"])
 COOKIE = "mi_session"
@@ -87,6 +88,10 @@ class Approval(BaseModel):
 
 class ProfileChange(BaseModel):
     preferred_name: str = Field(min_length=1, max_length=100)
+
+
+class PdfConfirm(BaseModel):
+    groups: list[dict] = Field(min_length=1, max_length=100)
 
 
 def _smtp_send(email: str, token: str):
@@ -239,6 +244,20 @@ def register_routes(db):
         _enabled()
         actor = await _session(request)
         return {"documents": await private_documents(db, actor, limit=limit)}
+
+    @router.post("/private/premium/pdf/{file_id}/inspect")
+    async def inspect_private_pdf(file_id: str, request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        return await premium_inspect(db, actor, file_id)
+
+    @router.post("/private/premium/pdf/{file_id}/confirm")
+    async def confirm_private_pdf(file_id: str, payload: PdfConfirm, request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        return await premium_confirm(db, actor, file_id, payload.groups)
 
     @router.post("/auth/logout-all")
     async def logout_everywhere(request: Request, response: Response):
