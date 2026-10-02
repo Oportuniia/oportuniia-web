@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from fastapi import HTTPException
 from personal_document_storage import PersonalFileScope, _scope, _r2
 from mi_pdf_organizer import MAX_PDF_BYTES, inspect_pdf, split_reviewed_pdf
+from mi_private_upload import _virus_scan
 
 
 def _gate():
@@ -77,10 +78,17 @@ async def premium_confirm(db, actor, file_id, groups):
     raw, row, client, bucket, prefix = await _scanned_pdf(db, actor, file_id)
     # Enforce current entitlement on every operation, not only when inspecting.
     outputs = await asyncio.to_thread(split_reviewed_pdf, raw, groups)
+    # Every resulting PDF is independently antivirus-scanned before upload.
+    # Scanner unavailability fails closed: no derivative becomes AVAILABLE.
+    for output in outputs:
+        try:
+            clean = await asyncio.to_thread(_virus_scan, output["bytes"])
+        except Exception as exc:
+            raise HTTPException(503, "Antivirus de salida no disponible") from exc
+        if not clean:
+            raise HTTPException(422, "Un documento generado no ha superado el antivirus")
     job_id = secrets.token_hex(16)
     now = datetime.now(timezone.utc)
-    # Deliberately QUARANTINED: a separate malware/QA verification must
-    # promote derivatives to AVAILABLE before any download.
     saved = []
     for i, output in enumerate(outputs):
         derivative_id = secrets.token_hex(16)
@@ -95,10 +103,10 @@ async def premium_confirm(db, actor, file_id, groups):
                "storage_key": key, "display_name": output["kind"] + ".pdf",
                "document_kind": output["kind"], "mime": "application/pdf",
                "size": len(data), "sha256": hashlib.sha256(data).hexdigest(),
-               "status": "QUARANTINED", "scan_verdict": "PENDING",
+               "status": "AVAILABLE", "scan_verdict": "CLEAN",
                "pages": output["pages"], "created_at": now, "updated_at": now}
         await db.mi_user_files.insert_one(doc)
         saved.append({"file_id": derivative_id, "kind": output["kind"],
-                      "pages": output["pages"], "status": "QUARANTINED"})
+                      "pages": output["pages"], "status": "AVAILABLE"})
     return {"job_id": job_id, "files": saved, "original_preserved": True,
-            "status": "pending_security_scan"}
+            "status": "available_after_security_scan"}
