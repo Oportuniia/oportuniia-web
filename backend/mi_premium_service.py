@@ -13,6 +13,9 @@ from fastapi import HTTPException
 from personal_document_storage import PersonalFileScope, _scope, _r2
 from mi_pdf_organizer import MAX_PDF_BYTES, inspect_pdf, split_reviewed_pdf
 from mi_private_upload import _virus_scan
+from mi_ocr import image_to_searchable_pdf
+from mi_pdf_organizer import classify_page
+from mi_ocr import _ocr_enabled, ocr_scanned_page
 
 
 def _gate():
@@ -36,13 +39,13 @@ async def require_premium(db, actor):
         raise HTTPException(403, "Suscripción Premium vigente necesaria")
 
 
-async def _scanned_pdf(db, actor, file_id):
+async def _scanned_file(db, actor, file_id, allowed_mime):
     if not isinstance(file_id, str) or len(file_id) != 32 or any(c not in "0123456789abcdef" for c in file_id):
         raise HTTPException(404, "Documento no encontrado")
     row = await db.mi_user_files.find_one({
         "actor_id": actor["actor_id"], "file_id": file_id,
         "status": "AVAILABLE", "scan_verdict": "CLEAN",
-        "mime": "application/pdf",
+        "mime": {"$in": list(allowed_mime)},
     })
     if not row:
         raise HTTPException(404, "Documento no disponible")
@@ -65,6 +68,60 @@ async def _scanned_pdf(db, actor, file_id):
     if hashlib.sha256(raw).hexdigest() != row.get("sha256"):
         raise HTTPException(409, "Integridad documental no verificada")
     return raw, row, client, bucket, prefix
+
+
+async def _scanned_pdf(db, actor, file_id):
+    return await _scanned_file(db, actor, file_id, ("application/pdf",))
+
+
+async def _scanned_image(db, actor, file_id):
+    return await _scanned_file(
+        db, actor, file_id, ("image/jpeg", "image/png", "image/webp"),
+    )
+
+
+async def premium_photo_inspect(db, actor, file_id):
+    await require_premium(db, actor)
+    _ocr_enabled()
+    raw, row, _, _, _ = await _scanned_image(db, actor, file_id)
+    pdf = await asyncio.to_thread(image_to_searchable_pdf, raw, row["mime"])
+    analysis = await asyncio.to_thread(inspect_pdf, pdf)
+    return {"file_id": file_id, "page_count": 1,
+            "pages": analysis["pages"], "original_preserved": True,
+            "requires_review": True}
+
+
+async def premium_photo_confirm(db, actor, file_id, kind):
+    await require_premium(db, actor)
+    _ocr_enabled()
+    if kind not in ("IDENTIDAD", "NOMINA", "RENTA", "SOCIEDAD", "BANCO", "OTROS"):
+        raise HTTPException(422, "Clasificación no válida")
+    raw, row, client, bucket, prefix = await _scanned_image(db, actor, file_id)
+    pdf = await asyncio.to_thread(image_to_searchable_pdf, raw, row["mime"])
+    try:
+        clean = await asyncio.to_thread(_virus_scan, pdf)
+    except Exception as exc:
+        raise HTTPException(503, "Antivirus de salida no disponible") from exc
+    if not clean:
+        raise HTTPException(422, "PDF OCR no ha superado el antivirus")
+    derivative_id = secrets.token_hex(16)
+    key = prefix + "derivatives/" + derivative_id
+    await asyncio.to_thread(
+        client.put_object, Bucket=bucket, Key=key, Body=pdf,
+        ContentType="application/pdf", ServerSideEncryption="AES256",
+    )
+    now = datetime.now(timezone.utc)
+    await db.mi_user_files.insert_one({
+        "actor_id": actor["actor_id"], "file_id": derivative_id,
+        "original_file_id": file_id, "organizer_job_id": secrets.token_hex(16),
+        "storage_key": key, "display_name": kind + ".pdf", "document_kind": kind,
+        "mime": "application/pdf", "size": len(pdf),
+        "sha256": hashlib.sha256(pdf).hexdigest(),
+        "status": "AVAILABLE", "scan_verdict": "CLEAN",
+        "pages": [1], "created_at": now, "updated_at": now,
+    })
+    return {"file_id": derivative_id, "kind": kind, "status": "AVAILABLE",
+            "original_preserved": True}
 
 
 async def premium_inspect(db, actor, file_id):
