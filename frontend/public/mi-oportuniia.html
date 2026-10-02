@@ -30,9 +30,9 @@ label{display:block;font-weight:600;font-size:.9rem}small{color:#537082}nav a{co
 <section class="card"><h2>Mis documentos</h2><p>Tus documentos solo son visibles con tu sesión.</p><div id="docs"></div><label>Subir documento (PDF o fotografía)<input id="upload-file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"></label><div class="row"><button id="upload" type="button">Subir de forma segura</button><button id="reload" type="button">Actualizar lista</button></div>
 <p><small>La carga requiere que el almacenamiento privado y el antivirus estén configurados. Los documentos se verifican antes de su utilización.</small></p></section>
 <section class="card"><h2>Organizador PDF Premium</h2><p>Propone categorías y permite confirmar la separación de un PDF que ya esté verificado en tu archivo.</p>
-<label>Identificador de tu PDF<input id="file-id" placeholder="Identificador de documento"></label>
+<label>Identificador de tu PDF o fotografía<input id="file-id" placeholder="Identificador de documento"></label>
 <button id="inspect" type="button">Analizar documento</button>
-<div id="page-review"><h3>Revisión de páginas</h3><div id="pages"></div><button id="confirm" type="button">Confirmar separación</button></div>
+<div id="photo-review" style="display:none"><h3>Revisar fotografía</h3><label>Tipo documental<select id="photo-kind"></select></label><button id="photo-confirm" type="button">Crear PDF OCR</button></div><div id="page-review"><h3>Revisión de páginas</h3><div id="pages"></div><button id="confirm" type="button">Confirmar separación</button></div>
 <p><small>Disponible únicamente para usuarios Premium validados. Los resultados requieren revisión de seguridad antes de su descarga.</small></p></section></div></div>
 <p id="feedback" role="status" aria-live="polite"></p></main>
 <script>
@@ -42,6 +42,8 @@ $("recover-complete").addEventListener("submit",async e=>{e.preventDefault();try
 $("resend-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/auth/resend",{method:"POST",body:JSON.stringify({email:$("resend-email").value})});message("Si tienes una cuenta pendiente, recibirás otro correo de verificación.")}catch(err){message(err.message)}});
 const kinds=["IDENTIDAD","NOMINA","RENTA","SOCIEDAD","BANCO","OTROS"];
 let review=null;
+let photoFileId=null;
+for(const kind of kinds){const el=document.createElement("option");el.value=kind;el.textContent=kind;$("photo-kind").append(el)}
 async function api(url,opt={}){const res=await fetch(url,{credentials:"same-origin",cache:"no-store",...opt,headers:{"Content-Type":"application/json",...(opt.headers||{})}});let data=await res.json().catch(()=>({}));if(!res.ok)throw Error(typeof data.detail==="string"?data.detail:"Operación no disponible");return data}
 function message(text){ $("feedback").textContent=text }
 function entry(tag,text){const el=document.createElement(tag);el.textContent=String(text??"");return el}
@@ -55,7 +57,7 @@ async function refresh(){
     const {documents}=await api("/api/mi/private/documents");
     const list=$("docs");list.replaceChildren();
     if(!documents.length)list.append(entry("p","Aún no hay documentos disponibles"));
-    for(const doc of documents){const line=entry("p",(doc.display_name||doc.file_id)+" · "+doc.status);if(doc.status==="AVAILABLE"){const button=entry("button","Descargar");button.type="button";button.onclick=async()=>{try{const result=await api("/api/mi/private/documents/"+encodeURIComponent(doc.file_id)+"/download");const anchor=document.createElement("a");anchor.href=result.download_url;anchor.rel="noreferrer";anchor.referrerPolicy="no-referrer";anchor.textContent="Abrir descarga privada";anchor.target="_blank";line.append(document.createTextNode(" · "));line.append(anchor)}catch(e){message(e.message)}};line.append(document.createTextNode(" "));line.append(button)}list.append(line)}
+    for(const doc of documents){const line=entry("p",(doc.display_name||doc.file_id)+" · "+doc.status);if(doc.status==="AVAILABLE"){const button=entry("button","Descargar");button.type="button";button.onclick=async()=>{try{const result=await api("/api/mi/private/documents/"+encodeURIComponent(doc.file_id)+"/download");const anchor=document.createElement("a");anchor.href=result.download_url;anchor.rel="noreferrer";anchor.referrerPolicy="no-referrer";anchor.textContent="Abrir descarga privada";anchor.target="_blank";line.append(document.createTextNode(" · "));line.append(anchor)}catch(e){message(e.message)}};line.append(document.createTextNode(" "));line.append(button)}line.dataset.fileId=doc.file_id;line.dataset.fileMime=doc.mime||"";list.append(line)}
   }catch(e){$("login").style.display="block";$("private").style.display="none";message(e.message)}
 }
 $("login-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/auth/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});$("password").value="";await refresh()}catch(err){message(err.message)}});
@@ -78,7 +80,11 @@ $("upload").onclick=async()=>{
   finally{$("upload").disabled=false}
 };
 $("inspect").onclick=async()=>{try{
-  const fileId=$("file-id").value.trim();const result=await api("/api/mi/private/premium/pdf/"+encodeURIComponent(fileId)+"/inspect",{method:"POST"});
+  const fileId=$("file-id").value.trim();const fileType=Array.from($("docs").querySelectorAll("[data-file-mime]")).find(el=>el.dataset.fileId===fileId)?.dataset.fileMime;
+  const photo=fileType && fileType.startsWith("image/");
+  const result=await api("/api/mi/private/premium/"+(photo?"image/":"pdf/")+encodeURIComponent(fileId)+"/inspect",{method:"POST"});
+  if(photo){photoFileId=fileId;$("photo-review").style.display="block";$("page-review").style.display="none";const suggested=result.pages[0]?.suggested_kind;$("photo-kind").value=kinds.includes(suggested)?suggested:"OTROS";message("Revisa la clasificación OCR de la fotografía.");return}
+  $("photo-review").style.display="none";
   review={fileId,pages:result.pages};const root=$("pages");root.replaceChildren();
   for(const page of review.pages){const box=entry("div","Página "+page.page+" · Categoría sugerida: "+page.suggested_kind);
     const label=entry("label","Categoría confirmada");const select=document.createElement("select");select.dataset.page=page.page;
@@ -88,6 +94,7 @@ $("inspect").onclick=async()=>{try{
     const num=document.createElement("input");num.type="number";num.min=1;num.max=100;num.value=page.page;num.dataset.group=page.page;grouping.append(num);box.append(grouping);root.append(box)}
   $("page-review").style.display="block";message("Revisa y confirma TODAS las páginas.")
  }catch(e){message(e.message)}};
+$("photo-confirm").onclick=async()=>{try{if(!photoFileId)throw Error("Selecciona una fotografía");const result=await api("/api/mi/private/premium/image/"+encodeURIComponent(photoFileId)+"/confirm",{method:"POST",body:JSON.stringify({kind:$("photo-kind").value})});message("Fotografía convertida en PDF OCR verificado.");$("photo-review").style.display="none";photoFileId=null;await refresh()}catch(e){message(e.message)}};
 $("confirm").onclick=async()=>{try{
   if(!review)throw Error("Analiza primero el PDF");
   const groups=new Map();
