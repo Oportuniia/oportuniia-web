@@ -124,8 +124,8 @@ def _smtp_send(email: str, token: str):
     msg["From"] = sender
     msg["To"] = email
     msg.set_content(
-        "Confirma tu registro de MI OPORTUNIIA con este código personal:\\n\\n"
-        + token + "\\n\\n"
+        "Confirma tu registro de MI OPORTUNIIA con este código personal:\n\n"
+        + token + "\n\n"
         + "Introdúcelo únicamente en " + base
         + ". Caduca en 24 horas. Si no has solicitado el registro, ignora este mensaje."
     )
@@ -148,8 +148,8 @@ def _smtp_reset(email: str, token: str):
     msg["To"] = email
     msg.set_content(
         "Has solicitado restablecer tu contraseña de MI OPORTUNIIA. "
-        "Introduce este código únicamente en nuestra web oficial:\\n\\n"
-        + token + "\\n\\nCaduca en 30 minutos. Si no lo solicitaste, ignora este mensaje."
+        "Introduce este código únicamente en nuestra web oficial:\n\n"
+        + token + "\n\nCaduca en 30 minutos. Si no lo solicitaste, ignora este mensaje."
     )
     with smtplib.SMTP(host, int(os.getenv("MI_SMTP_PORT", "587")), timeout=15) as smtp:
         smtp.starttls()
