@@ -1,0 +1,253 @@
+"""MI OPORTUNIIA account lifecycle; disabled unless explicitly configured.
+
+Independent of LEGAL and GHL. HTTPS cookie auth with server-side Mongo
+sessions. Creating a personal profile does NOT grant PDF permissions.
+"""
+from __future__ import annotations
+
+import asyncio
+import hashlib
+import hmac
+import os
+import re
+import secrets
+import smtplib
+from datetime import datetime, timedelta, timezone
+from email.message import EmailMessage
+
+import bcrypt
+from fastapi import APIRouter, HTTPException, Request, Response
+from pydantic import BaseModel, Field
+from pymongo import ReturnDocument
+from pymongo.errors import DuplicateKeyError
+
+from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
+
+router = APIRouter(prefix="/api/mi", tags=["MI OPORTUNIIA"])
+COOKIE = "mi_session"
+VERIFY_HOURS = 24
+SESSION_HOURS = 12
+
+
+def _enabled():
+    if os.getenv("MI_AUTH_ENABLED") != "1":
+        raise HTTPException(503, "El registro privado todavía no está habilitado")
+
+
+def _now():
+    return datetime.now(timezone.utc)
+
+
+def _digest(token: str) -> str:
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def _same_origin(request: Request):
+    """Block cross-origin mutation regardless of cookie SameSite mode."""
+    origin = request.headers.get("origin")
+    allowed = os.getenv("MI_PUBLIC_ORIGIN", "").rstrip("/")
+    if not allowed or not origin or not hmac.compare_digest(origin.rstrip("/"), allowed):
+        raise HTTPException(403, "Origen no autorizado")
+
+
+def _password(password: str) -> bytes:
+    if not 12 <= len(password) <= 72 or len(password.encode()) > 72:
+        raise ValueError("Longitud de contraseña no válida")
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt(rounds=12))
+
+
+def _check_password(password: str, hashed: bytes) -> bool:
+    try:
+        return bcrypt.checkpw(password.encode(), hashed)
+    except (ValueError, TypeError):
+        return False
+
+
+class Signup(BaseModel):
+    email: str
+    password: str
+    role: str
+    terms_version: str = Field(min_length=2, max_length=64)
+    privacy_accepted: bool
+
+
+class Login(BaseModel):
+    email: str
+    password: str
+
+
+class TokenIn(BaseModel):
+    token: str = Field(min_length=30, max_length=150)
+
+
+class Approval(BaseModel):
+    actor_id: str
+
+
+def _smtp_send(email: str, token: str):
+    host = os.getenv("MI_SMTP_HOST")
+    user = os.getenv("MI_SMTP_USER")
+    password = os.getenv("MI_SMTP_PASSWORD")
+    sender = os.getenv("MI_SMTP_FROM")
+    base = os.getenv("MI_PUBLIC_ORIGIN", "").rstrip("/")
+    if not all((host, user, password, sender, base)):
+        raise RuntimeError("SMTP configuration missing")
+    msg = EmailMessage()
+    msg["Subject"] = "Confirma tu correo · OPORTUNIIA"
+    msg["From"] = sender
+    msg["To"] = email
+    msg.set_content(
+        "Confirma tu registro de MI OPORTUNIIA con este código personal:\\n\\n"
+        + token + "\\n\\n"
+        + "Introdúcelo únicamente en " + base
+        + ". Caduca en 24 horas. Si no has solicitado el registro, ignora este mensaje."
+    )
+    with smtplib.SMTP(host, int(os.getenv("MI_SMTP_PORT", "587")), timeout=15) as smtp:
+        smtp.starttls()
+        smtp.login(user, password)
+        smtp.send_message(msg)
+
+
+def register_routes(db):
+    @router.post("/auth/register", status_code=202)
+    async def register(payload: Signup, request: Request):
+        _enabled()
+        _same_origin(request)
+        if payload.role not in ROLES or not payload.privacy_accepted:
+            raise HTTPException(422, "Perfil o consentimiento no válido")
+        try:
+            email = normalize_email(payload.email)
+            hashed = _password(payload.password)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        if not all(os.getenv(k) for k in ("MI_SMTP_HOST","MI_SMTP_USER","MI_SMTP_PASSWORD","MI_SMTP_FROM")):
+            raise HTTPException(503, "Servicio de confirmación no configurado")
+        token = secrets.token_urlsafe(32)
+        now = _now()
+        actor = {
+            "actor_id": "mi_" + secrets.token_hex(16),
+            "role": payload.role, "email": email,
+            "password_hash": hashed.decode(),
+            "validation_state": "PENDING", "email_verified": False,
+            "public_code": None, "verify_hash": _digest(token),
+            "verify_expires": now + timedelta(hours=VERIFY_HOURS),
+            "terms_version": payload.terms_version, "privacy_accepted_at": now,
+            "created_at": now, "updated_at": now,
+        }
+        try:
+            await db.mi_actors.insert_one(actor)
+        except DuplicateKeyError:
+            # Do not reveal whether the address exists.
+            return {"status": "check_email"}
+        try:
+            await asyncio.to_thread(_smtp_send, email, token)
+        except Exception:
+            # Never leave an unverifiable account due to delivery failure.
+            await db.mi_actors.delete_one({"actor_id": actor["actor_id"], "email_verified": False})
+            raise HTTPException(503, "No se pudo enviar la confirmación; inténtalo de nuevo")
+        return {"status": "check_email"}
+
+    @router.post("/auth/verify")
+    async def verify(payload: TokenIn, request: Request):
+        _enabled()
+        _same_origin(request)
+        now = _now()
+        actor = await db.mi_actors.find_one_and_update(
+            {"verify_hash": _digest(payload.token), "verify_expires": {"$gt": now},
+             "email_verified": False, "validation_state": "PENDING"},
+            {"$set": {"email_verified": True, "updated_at": now},
+             "$unset": {"verify_hash": "", "verify_expires": ""}},
+            return_document=ReturnDocument.AFTER,
+        )
+        if not actor:
+            raise HTTPException(400, "Código inválido o caducado")
+        return {"status": "email_verified", "next": "pending_validation"}
+
+    @router.post("/auth/login")
+    async def login(payload: Login, request: Request, response: Response):
+        _enabled()
+        _same_origin(request)
+        try:
+            email = normalize_email(payload.email)
+        except ValueError:
+            raise HTTPException(401, "Credenciales inválidas")
+        # Role is not selected from client. Duplicate email between profiles
+        # requires one single role per email, enforced below by registration.
+        actor = await db.mi_actors.find_one({"email": email})
+        stored = actor.get("password_hash", "") if actor else ""
+        if not stored or not _check_password(payload.password, stored.encode()):
+            raise HTTPException(401, "Credenciales inválidas")
+        if not actor.get("email_verified") or actor.get("validation_state") in ("SUSPENDED", "REJECTED"):
+            raise HTTPException(403, "Cuenta pendiente o no disponible")
+        raw = secrets.token_urlsafe(32)
+        now = _now()
+        await db.mi_sessions.insert_one({
+            "session_hash": _digest(raw), "actor_id": actor["actor_id"],
+            "created_at": now, "expires_at": now + timedelta(hours=SESSION_HOURS)
+        })
+        response.set_cookie(COOKIE, raw, secure=True, httponly=True, samesite="strict",
+                            max_age=SESSION_HOURS * 3600, path="/")
+        return {"actor": public_actor(actor), "email_verified": True}
+
+    async def _session(request: Request):
+        raw = request.cookies.get(COOKIE, "")
+        if not raw or len(raw) > 200:
+            raise HTTPException(401, "Sesión requerida")
+        row = await db.mi_sessions.find_one({
+            "session_hash": _digest(raw), "expires_at": {"$gt": _now()}
+        })
+        if not row:
+            raise HTTPException(401, "Sesión caducada")
+        actor = await db.mi_actors.find_one({"actor_id": row["actor_id"]})
+        if not actor or not actor.get("email_verified") or actor["validation_state"] not in ("PENDING", "VERIFIED"):
+            raise HTTPException(403, "Cuenta no disponible")
+        return actor
+
+    @router.get("/auth/me")
+    async def me(request: Request):
+        _enabled()
+        actor = await _session(request)
+        return {"actor": public_actor(actor), "email_verified": True}
+
+    @router.post("/auth/logout")
+    async def logout(request: Request, response: Response):
+        _enabled()
+        _same_origin(request)
+        raw = request.cookies.get(COOKIE, "")
+        if raw:
+            await db.mi_sessions.delete_one({"session_hash": _digest(raw)})
+        response.delete_cookie(COOKIE, path="/", secure=True, httponly=True, samesite="strict")
+        return {"status": "logged_out"}
+
+    @router.post("/admin/approve")
+    async def approve(payload: Approval, request: Request):
+        _enabled()
+        _same_origin(request)
+        admin_token = os.getenv("MI_ADMIN_BOOTSTRAP_TOKEN", "")
+        if len(admin_token) < 32 or not hmac.compare_digest(
+            request.headers.get("x-mi-admin-token", ""), admin_token
+        ):
+            raise HTTPException(403, "Autorización administrativa requerida")
+        actor = await db.mi_actors.find_one({"actor_id": payload.actor_id})
+        if not actor or not actor.get("email_verified"):
+            raise HTTPException(409, "Cuenta sin correo confirmado")
+        try:
+            approved = await approve_and_assign(db, actor_id=payload.actor_id, reviewer_id="mi_bootstrap_admin")
+        except (ValueError, PermissionError) as exc:
+            raise HTTPException(409, str(exc)) from exc
+        return {"actor": approved}
+
+    return router
+
+
+def register_index_lifecycle(db):
+    """Explicitly called only after activation against intended database."""
+    async def _indexes():
+        await ensure_registry_indexes(db)
+        # Prevent multiple roles sharing an email until unified account design.
+        await db.mi_actors.create_index("email", unique=True)
+        await db.mi_sessions.create_index("session_hash", unique=True)
+        await db.mi_sessions.create_index("expires_at", expireAfterSeconds=0)
+        await db.mi_actors.create_index("verify_hash", unique=True,
+            partialFilterExpression={"verify_hash": {"$type": "string"}})
+    return _indexes
