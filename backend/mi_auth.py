@@ -79,6 +79,15 @@ class Login(BaseModel):
     password: str
 
 
+class RecoveryRequest(BaseModel):
+    email: str
+
+
+class RecoveryComplete(BaseModel):
+    token: str = Field(min_length=30, max_length=150)
+    new_password: str
+
+
 class TokenIn(BaseModel):
     token: str = Field(min_length=30, max_length=150)
 
@@ -118,6 +127,28 @@ def _smtp_send(email: str, token: str):
         + token + "\\n\\n"
         + "Introdúcelo únicamente en " + base
         + ". Caduca en 24 horas. Si no has solicitado el registro, ignora este mensaje."
+    )
+    with smtplib.SMTP(host, int(os.getenv("MI_SMTP_PORT", "587")), timeout=15) as smtp:
+        smtp.starttls()
+        smtp.login(user, password)
+        smtp.send_message(msg)
+
+
+def _smtp_reset(email: str, token: str):
+    host = os.getenv("MI_SMTP_HOST")
+    user = os.getenv("MI_SMTP_USER")
+    password = os.getenv("MI_SMTP_PASSWORD")
+    sender = os.getenv("MI_SMTP_FROM")
+    if not all((host, user, password, sender)):
+        raise RuntimeError("SMTP configuration missing")
+    msg = EmailMessage()
+    msg["Subject"] = "Recuperación de acceso · OPORTUNIIA"
+    msg["From"] = sender
+    msg["To"] = email
+    msg.set_content(
+        "Has solicitado restablecer tu contraseña de MI OPORTUNIIA. "
+        "Introduce este código únicamente en nuestra web oficial:\\n\\n"
+        + token + "\\n\\nCaduca en 30 minutos. Si no lo solicitaste, ignora este mensaje."
     )
     with smtplib.SMTP(host, int(os.getenv("MI_SMTP_PORT", "587")), timeout=15) as smtp:
         smtp.starttls()
@@ -185,6 +216,62 @@ def register_routes(db):
         if not actor:
             raise HTTPException(400, "Código inválido o caducado")
         return {"status": "email_verified", "next": "pending_validation"}
+
+    @router.post("/auth/recovery/request")
+    async def recovery_request(payload: RecoveryRequest, request: Request):
+        _enabled()
+        _same_origin(request)
+        generic = {"status": "if_registered_check_email"}
+        try:
+            email = normalize_email(payload.email)
+        except ValueError:
+            return generic
+        actor = await db.mi_actors.find_one({"email": email, "email_verified": True,
+                     "validation_state": {"$in": ["PENDING", "VERIFIED"]}})
+        if not actor:
+            return generic
+        if not all(os.getenv(k) for k in ("MI_SMTP_HOST", "MI_SMTP_USER", "MI_SMTP_PASSWORD", "MI_SMTP_FROM")):
+            raise HTTPException(503, "Servicio de correo no configurado")
+        # The public route also requires a distributed per-IP/account rate limiter
+        # before MI_AUTH_ENABLED is set to 1.
+        token = secrets.token_urlsafe(32)
+        now = _now()
+        await db.mi_actors.update_one(
+            {"actor_id": actor["actor_id"]},
+            {"$set": {"reset_hash": _digest(token),
+                      "reset_expires": now + timedelta(minutes=30),
+                      "updated_at": now}},
+        )
+        try:
+            await asyncio.to_thread(_smtp_reset, email, token)
+        except Exception:
+            await db.mi_actors.update_one(
+                {"actor_id": actor["actor_id"], "reset_hash": _digest(token)},
+                {"$unset": {"reset_hash": "", "reset_expires": ""}},
+            )
+            raise HTTPException(503, "Servicio temporalmente no disponible")
+        return generic
+
+    @router.post("/auth/recovery/complete")
+    async def recovery_complete(payload: RecoveryComplete, request: Request):
+        _enabled()
+        _same_origin(request)
+        try:
+            new_hash = _password(payload.new_password).decode()
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from exc
+        actor = await db.mi_actors.find_one_and_update(
+            {"reset_hash": _digest(payload.token), "reset_expires": {"$gt": _now()},
+             "email_verified": True,
+             "validation_state": {"$in": ["PENDING", "VERIFIED"]}},
+            {"$set": {"password_hash": new_hash, "updated_at": _now()},
+             "$unset": {"reset_hash": "", "reset_expires": ""}},
+            return_document=ReturnDocument.AFTER,
+        )
+        if not actor:
+            raise HTTPException(400, "Código inválido o caducado")
+        await db.mi_sessions.delete_many({"actor_id": actor["actor_id"]})
+        return {"status": "password_updated_all_sessions_revoked"}
 
     @router.post("/auth/login")
     async def login(payload: Login, request: Request, response: Response):
@@ -330,6 +417,8 @@ def register_index_lifecycle(db):
         await db.mi_actors.create_index("email", unique=True)
         await db.mi_sessions.create_index("session_hash", unique=True)
         await db.mi_sessions.create_index("expires_at", expireAfterSeconds=0)
+        await db.mi_actors.create_index("reset_hash", unique=True,
+            partialFilterExpression={"reset_hash": {"$type": "string"}})
         await db.mi_actors.create_index("verify_hash", unique=True,
             partialFilterExpression={"verify_hash": {"$type": "string"}})
     return _indexes
