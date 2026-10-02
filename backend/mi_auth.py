@@ -177,6 +177,8 @@ def register_routes(db):
             raise HTTPException(422, str(exc)) from exc
         if not all(os.getenv(k) for k in ("MI_SMTP_HOST","MI_SMTP_USER","MI_SMTP_PASSWORD","MI_SMTP_FROM")):
             raise HTTPException(503, "Servicio de confirmación no configurado")
+        await auth_throttle(db, request, action="register", email=email,
+                            per_ip=12, per_email=3)
         token = secrets.token_urlsafe(32)
         now = _now()
         actor = {
@@ -206,6 +208,7 @@ def register_routes(db):
     async def verify(payload: TokenIn, request: Request):
         _enabled()
         _same_origin(request)
+        await auth_throttle(db, request, action="verify", per_ip=20)
         now = _now()
         actor = await db.mi_actors.find_one_and_update(
             {"verify_hash": _digest(payload.token), "verify_expires": {"$gt": now},
