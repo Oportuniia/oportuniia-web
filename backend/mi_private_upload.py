@@ -25,8 +25,8 @@ def _enabled():
 def _magic_valid(data, mime):
     checks = {
         "application/pdf": data.startswith(b"%PDF-"),
-        "image/jpeg": data.startswith(b"\\xff\\xd8\\xff"),
-        "image/png": data.startswith(b"\\x89PNG\\r\\n\\x1a\\n"),
+        "image/jpeg": data.startswith(b"\xff\xd8\xff"),
+        "image/png": data.startswith(b"\x89PNG\r\n\x1a\n"),
         "image/webp": data.startswith(b"RIFF") and data[8:12] == b"WEBP",
     }
     return checks.get(mime, False)
