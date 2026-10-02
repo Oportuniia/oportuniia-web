@@ -19,6 +19,7 @@ from wp_precheck import run_precheck, run_capability_discovery, run_item_read, r
 import catalog_data as cat
 from presentation_ingress import register_routes as register_presentation_routes
 from presentation_publish import register_publish_routes as register_presentation_publish_routes
+from mi_auth import register_routes as register_mi_auth_routes, register_index_lifecycle
 from presentation_e2e import run_presentation_e2e_if_enabled
 
 
@@ -32,6 +33,16 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+
+# Disabled by default. No genuine investor accounts or routes are activated
+# until WEB has SMTP, domain/cookie origin, admin provisioning and indexes.
+app.include_router(register_mi_auth_routes(db))
+
+@app.on_event("startup")
+async def _mi_auth_indexes_if_enabled():
+    if os.getenv("MI_AUTH_ENABLED") == "1":
+        await register_index_lifecycle(db)()
+
 
 
 @app.on_event("startup")
