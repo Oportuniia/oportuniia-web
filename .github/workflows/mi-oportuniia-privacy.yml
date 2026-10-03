@@ -5,6 +5,8 @@ on:
       - "backend/personal_user_registry.py"
       - "backend/mi_auth.py"
       - "backend/mi_role_boundaries.py"
+      - "backend/mi_collaborator_policy.py"
+      - "backend/tests/test_mi_collaborator_policy.py"
       - "backend/tests/test_mi_role_boundaries.py"
       - "backend/mi_corporate_mail.py"
       - "backend/mi_mail_templates.py"
@@ -83,7 +85,7 @@ jobs:
       - name: Install privacy-test dependencies
         run: python -m pip install pytest pytest-asyncio pytest-xdist pymongo boto3 bcrypt fastapi httpx PyMuPDF clamd pytesseract Pillow reportlab pypdf
       - name: Compile private area Python modules
-        run: python -m compileall -q backend/mi_auth.py backend/mi_role_boundaries.py backend/mi_corporate_mail.py backend/mi_mail_templates.py backend/mi_private_area.py backend/mi_private_upload.py backend/mi_premium_service.py backend/mi_pdf_organizer.py backend/mi_rate_limit.py backend/mi_private_download.py backend/mi_ocr.py backend/mi_subscription_bridge.py backend/mi_offer_prefill.py backend/mi_offer_deadlines.py backend/mi_payment_rails.py backend/mi_offer_expiry_worker.py backend/mi_document_notifications.py backend/mi_notification_outbox.py backend/mi_notification_center.py backend/mi_notification_mock_delivery.py backend/mi_notification_scheduler.py backend/mi_payroll_notifications.py backend/mi_personalized_secretary.py backend/mi_secretary_proposals.py backend/mi_personal_calendar.py backend/mi_notification_validation.py backend/mi_offer_pdf.py backend/personal_document_storage.py
+        run: python -m compileall -q backend/mi_auth.py backend/mi_role_boundaries.py backend/mi_collaborator_policy.py backend/mi_corporate_mail.py backend/mi_mail_templates.py backend/mi_private_area.py backend/mi_private_upload.py backend/mi_premium_service.py backend/mi_pdf_organizer.py backend/mi_rate_limit.py backend/mi_private_download.py backend/mi_ocr.py backend/mi_subscription_bridge.py backend/mi_offer_prefill.py backend/mi_offer_deadlines.py backend/mi_payment_rails.py backend/mi_offer_expiry_worker.py backend/mi_document_notifications.py backend/mi_notification_outbox.py backend/mi_notification_center.py backend/mi_notification_mock_delivery.py backend/mi_notification_scheduler.py backend/mi_payroll_notifications.py backend/mi_personalized_secretary.py backend/mi_secretary_proposals.py backend/mi_personal_calendar.py backend/mi_notification_validation.py backend/mi_offer_pdf.py backend/personal_document_storage.py
       - name: Validate portal JavaScript and contract wiring
         run: python backend/tests/check_private_portal.py
       - name: Validate premium offer page JavaScript
@@ -98,6 +100,7 @@ jobs:
           backend/tests/test_personal_user_registry.py
           backend/tests/test_mi_auth.py
           backend/tests/test_mi_role_boundaries.py
+          backend/tests/test_mi_collaborator_policy.py
           backend/tests/test_mi_corporate_mail.py
           backend/tests/test_mi_mail_templates.py
           backend/tests/test_personal_document_storage.py
