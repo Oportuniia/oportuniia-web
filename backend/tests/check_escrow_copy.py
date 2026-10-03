@@ -16,7 +16,7 @@ for value in (
     "Cláusula matriz propuesta para contratos",
     "sujeta a aprobación de LEGAL",
     "personas físicas no son necesariamente empresas",
-    "No se infiere que cualquier pasarela API equivale a escrow regulado",
+    "no inferir que cualquier pasarela API equivale a escrow regulado",
 ):
     assert value in architecture, value
 assert "proveedor tercero debidamente habilitado" in architecture
