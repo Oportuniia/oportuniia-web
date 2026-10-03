@@ -24,6 +24,7 @@ from pymongo.errors import DuplicateKeyError
 
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
 from mi_private_area import safe_profile, private_documents, profile_update, set_document_reminder_consent, set_document_review_date
+from mi_secretary_proposals import preview_signals, confirm_proposal, list_confirmed_signals
 from mi_premium_service import require_premium, premium_inspect, premium_confirm, premium_photo_inspect, premium_photo_confirm
 from mi_private_upload import upload_intent, confirm_upload
 from mi_rate_limit import auth_throttle, ensure_rate_indexes
@@ -100,6 +101,16 @@ class TokenIn(BaseModel):
 
 class Approval(BaseModel):
     actor_id: str
+
+
+class SecretaryAnalyze(BaseModel):
+    analysis_consent: bool = False
+
+
+class SecretaryConfirm(BaseModel):
+    proposal_id: str = Field(min_length=40, max_length=40)
+    kind: str = Field(min_length=1, max_length=40)
+    value: str | int
 
 
 class DocumentReviewDate(BaseModel):
@@ -425,6 +436,33 @@ def register_routes(db):
         return await set_document_reminder_consent(
             db, actor, enabled=payload.document_reminders,
         )
+
+    @router.post("/private/premium/secretary/{file_id}/analyze")
+    async def analyze_private_secretary(file_id: str, payload: SecretaryAnalyze,
+                                        request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        return await preview_signals(
+            db, actor, file_id=file_id, analysis_consent=payload.analysis_consent,
+        )
+
+    @router.post("/private/premium/secretary/confirm")
+    async def confirm_private_secretary(payload: SecretaryConfirm,
+                                        request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        return await confirm_proposal(
+            db, actor, proposal_id=payload.proposal_id,
+            kind=payload.kind, value=payload.value,
+        )
+
+    @router.get("/private/premium/secretary/signals")
+    async def private_secretary_signals(request: Request):
+        _enabled()
+        actor = await _session(request)
+        return {"signals": await list_confirmed_signals(db, actor)}
 
     @router.get("/private/documents")
     async def list_private_documents(request: Request, limit: int = 50):
