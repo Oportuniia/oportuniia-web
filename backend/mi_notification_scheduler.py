@@ -45,6 +45,8 @@ async def schedule_offer_reminders(db, *, now: datetime, limit: int = 50) -> dic
     ).sort("document_deadline", 1).limit(count)
     eligible = queued = 0
     async for offer in cursor:
+        if not offer.get("notice_delivery_ref"):
+            continue
         # A corrupted/migrated record must not stop the other notifications.
         try:
             planned = offer_deadline_notifications(offer, now=at)
