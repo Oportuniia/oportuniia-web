@@ -25,6 +25,13 @@ def test_no_guessed_month_end_or_invalid_timezone():
         next_payroll_occurrence(now=NOW,day=15,lead_days=9)
 
 
+class OptionalQueue:
+    async def update_many(self,query,update):
+        assert query["actor_id"]=="mi_owner"
+        assert query["kind"]=="PREMIUM_PAYROLL_REMINDER"
+        return type("Result",(),{"modified_count":0})()
+
+
 class Signals:
     def __init__(self, *,found=True):
         self.row={"actor_id":"mi_owner","signal_id":SIGNAL,
@@ -46,7 +53,8 @@ class Signals:
 @pytest.mark.asyncio
 async def test_activation_is_explicit_and_revocable_on_owner_signal():
     files=Signals()
-    db=type("DB",(),{"mi_secretary_signals":files})()
+    db=type("DB",(),{"mi_secretary_signals":files,
+                       "mi_notification_outbox":OptionalQueue()})()
     result=await set_payroll_calendar(db,{"actor_id":"mi_owner"},
                                      signal_id=SIGNAL,enabled=True,lead_days=2)
     assert result["calendar_enabled"] is True
