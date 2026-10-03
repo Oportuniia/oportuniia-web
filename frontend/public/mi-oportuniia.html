@@ -122,8 +122,9 @@ async function refreshPersonalCalendar(){
           option.textContent=days===0?"El mismo día":"Con "+days+" día(s) de antelación";
           lead.append(option);
         }
+        lead.value=String(signal.calendar_lead_days??1);
         block.append(entry("label","Antelación del recordatorio"));block.append(lead);
-        const toggle=entry("button",signal.calendar_enabled?"Desactivar aviso":"Activar aviso de cobro");
+        const toggle=entry("button",signal.calendar_enabled?"Quitar de mi calendario":"Añadir a mi calendario");
         toggle.type="button";
         toggle.onclick=async()=>{
           toggle.disabled=true;
@@ -133,7 +134,7 @@ async function refreshPersonalCalendar(){
                 enabled:!signal.calendar_enabled,lead_days:Number(lead.value)
               })
             });
-            message(signal.calendar_enabled?"Recordatorio desactivado.":"Calendario personal activado.");
+            message(signal.calendar_enabled?"Evento retirado de tu calendario.":"Evento añadido a tu calendario. El envío de avisos todavía no está activo.");
             await refreshPersonalCalendar();
           }catch(e){message(e.message);toggle.disabled=false}
         };block.append(toggle);
