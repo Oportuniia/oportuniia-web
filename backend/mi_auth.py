@@ -23,8 +23,8 @@ from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
-from mi_private_area import safe_profile, private_documents, profile_update, set_document_reminder_consent
-from mi_premium_service import premium_inspect, premium_confirm, premium_photo_inspect, premium_photo_confirm
+from mi_private_area import safe_profile, private_documents, profile_update, set_document_reminder_consent, set_document_review_date
+from mi_premium_service import require_premium, premium_inspect, premium_confirm, premium_photo_inspect, premium_photo_confirm
 from mi_private_upload import upload_intent, confirm_upload
 from mi_rate_limit import auth_throttle, ensure_rate_indexes
 from mi_private_download import signed_private_download
@@ -100,6 +100,10 @@ class TokenIn(BaseModel):
 
 class Approval(BaseModel):
     actor_id: str
+
+
+class DocumentReviewDate(BaseModel):
+    next_review_at: datetime | None = None
 
 
 class ReminderPreferences(BaseModel):
@@ -427,6 +431,17 @@ def register_routes(db):
         _enabled()
         actor = await _session(request)
         return {"documents": await private_documents(db, actor, limit=limit)}
+
+    @router.put("/private/documents/{file_id}/review-date")
+    async def change_document_review_date(file_id: str, payload: DocumentReviewDate,
+                                          request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        await require_premium(db, actor)
+        return await set_document_review_date(
+            db, actor, file_id=file_id, next_review_at=payload.next_review_at,
+        )
 
     @router.get("/private/documents/{file_id}/download")
     async def download_private_document(file_id: str, request: Request, response: Response):
