@@ -19,6 +19,8 @@
 - Proveedores y circuitos financieros: escrow B2B exclusivamente en firma notarial y eventual cuenta separada de reservas, **ambos aparcados** por orden del propietario hasta tener proveedores y validación de LEGAL/TESORERÍA.
 - Logo oficial definitivo del borrador PDF, pendiente del activo original.
 
+**Directriz de identidad añadida en validación:** MI OPORTUNIIA corresponde exclusivamente al usuario inversor; el colaborador exige aprobación expresa propia de OPORTUNIIA; el suscriptor conserva código, contraseña, ficha e historial en OPORTUNIIAPP y nunca accede a MI. Ver `docs/MASTER_THREE_PROFILES_ACCESS_20261003.md`. La interconexión autenticada con OPORTUNIIAPP está pendiente, sin reutilizar contraseñas ni duplicar su historial.
+
 ## Plan secuencial de integración y criterios de aceptación
 
 1. **Inventario y seguridad.** Revisar requisitos por servicio, perfiles y permisos, alcance GDPR/consentimiento, retención y supresión con LEGAL. Mantener `MI_SMTP_ENABLED=0` y bloqueos equivalentes de las otras integraciones. Confirmar que no se exponen servicios mock ni identificadores privados.
