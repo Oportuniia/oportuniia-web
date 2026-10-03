@@ -58,7 +58,44 @@ async function refresh(){
     const {documents}=await api("/api/mi/private/documents");
     const list=$("docs");list.replaceChildren();
     if(!documents.length)list.append(entry("p","Aún no hay documentos disponibles"));
-    for(const doc of documents){const line=entry("p",(doc.display_name||doc.file_id)+" · "+doc.status);if(doc.status==="AVAILABLE"){const button=entry("button","Descargar");button.type="button";button.onclick=async()=>{try{const result=await api("/api/mi/private/documents/"+encodeURIComponent(doc.file_id)+"/download");const anchor=document.createElement("a");anchor.href=result.download_url;anchor.rel="noreferrer";anchor.referrerPolicy="no-referrer";anchor.textContent="Abrir descarga privada";anchor.target="_blank";line.append(document.createTextNode(" · "));line.append(anchor)}catch(e){message(e.message)}};line.append(document.createTextNode(" "));line.append(button)}line.dataset.fileId=doc.file_id;line.dataset.fileMime=doc.mime||"";list.append(line)}
+    for(const doc of documents){const line=entry("p",(doc.display_name||doc.file_id)+" · "+doc.status);if(doc.status==="AVAILABLE"){const button=entry("button","Descargar");button.type="button";button.onclick=async()=>{try{const result=await api("/api/mi/private/documents/"+encodeURIComponent(doc.file_id)+"/download");const anchor=document.createElement("a");anchor.href=result.download_url;anchor.rel="noreferrer";anchor.referrerPolicy="no-referrer";anchor.textContent="Abrir descarga privada";anchor.target="_blank";line.append(document.createTextNode(" · "));line.append(anchor)}catch(e){message(e.message)}};line.append(document.createTextNode(" "));line.append(button)}if(doc.status==="AVAILABLE"){
+      const reviewBox=entry("div","");
+      reviewBox.style.margin="10px 0 18px 0";
+      const label=entry("label","Próxima fecha de revisión (Premium, opcional)");
+      const reviewInput=document.createElement("input");
+      reviewInput.type="date";
+      reviewInput.setAttribute("aria-label","Revisión para "+(doc.display_name||"documento"));
+      if(doc.next_review_at){
+        const value=new Date(doc.next_review_at);
+        if(!Number.isNaN(value.getTime()))reviewInput.value=value.toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
+      }
+      label.append(reviewInput);reviewBox.append(label);
+      const save=entry("button","Guardar fecha de revisión");
+      save.type="button";
+      save.onclick=async()=>{
+        save.disabled=true;
+        try{
+          let nextReview=null;
+          if(reviewInput.value){
+            // Store noon UTC: all scheduled dates must be explicit, no inferred expiry.
+            const dt=new Date(reviewInput.value+"T12:00:00Z");
+            if(Number.isNaN(dt.getTime()))throw Error("Fecha inválida");
+            nextReview=dt.toISOString();
+          }
+          await api("/api/mi/private/documents/"+encodeURIComponent(doc.file_id)+"/review-date",{
+            method:"PUT",body:JSON.stringify({next_review_at:nextReview})
+          });
+          message(nextReview?"Fecha de revisión guardada.":"Fecha de revisión eliminada.");
+          await refresh();
+        }catch(e){message(e.message)}
+        finally{save.disabled=false}
+      };
+      reviewBox.append(save);
+      const hint=entry("small","Esta fecha no es una caducidad legal. Solo se utilizará para recordatorios si los activas y tienes Premium vigente.");
+      reviewBox.append(hint);
+      line.append(reviewBox);
+    }
+    line.dataset.fileId=doc.file_id;line.dataset.fileMime=doc.mime||"";list.append(line)}
   }catch(e){$("login").style.display="block";$("private").style.display="none";message(e.message)}
 }
 $("login-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/auth/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});$("password").value="";await refresh()}catch(err){message(err.message)}});
