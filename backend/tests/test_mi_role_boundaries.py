@@ -39,3 +39,15 @@ def test_all_web_private_routes_are_guarded():
         '    @router.post("/auth/logout-all")',1)[0]
     assert "require_mi_investor" in private_section
     assert "actor = await _session(request)" not in private_section
+
+
+def test_unapproved_collaborator_cannot_get_web_session():
+    from pathlib import Path
+    source=(Path(__file__).resolve().parents[1]/"mi_auth.py").read_text()
+    login=source.split('    @router.post("/auth/login")',1)[1].split(
+        '    async def _session(request',1)[0]
+    session=source.split('    async def _session(request',1)[1].split(
+        '    @router.get("/auth/me")',1)[0]
+    assert 'actor.get("role")=="COLABORADOR"' in login
+    assert 'actor.get("role")=="COLABORADOR"' in session
+    assert 'actor["validation_state"]!="VERIFIED"' in session
