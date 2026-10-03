@@ -11,7 +11,7 @@ from datetime import datetime, timedelta, timezone
 from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
-KINDS={"OFFER_DOCUMENT_DEADLINE", "PREMIUM_DOCUMENT_REVIEW"}
+KINDS={"OFFER_DOCUMENT_DEADLINE", "PREMIUM_DOCUMENT_REVIEW", "PREMIUM_PAYROLL_REMINDER"}
 LEASE=timedelta(minutes=10)
 
 
@@ -47,9 +47,14 @@ async def enqueue(db, planned: dict, *, now: datetime) -> bool:
         doc["offer_id"]=planned["offer_id"]
         doc["deadline"]=_utc(planned["deadline"])
         doc["threshold_hours"]=planned["threshold_hours"]
-    else:
+    elif kind=="PREMIUM_DOCUMENT_REVIEW":
         doc["file_id"]=planned["file_id"]
         doc["review_at"]=_utc(planned["review_at"])
+    else:
+        doc["signal_id"]=planned["signal_id"]
+        doc["calendar_version"]=planned["calendar_version"]
+        doc["event_at"]=_utc(planned["event_at"])
+        doc["notify_at"]=_utc(planned["notify_at"])
     try:
         await db.mi_notification_outbox.insert_one(doc)
         return True
