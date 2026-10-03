@@ -14,7 +14,7 @@ import secrets
 import smtplib
 import ssl
 from datetime import datetime, timedelta, timezone
-from email.message import EmailMessage
+from mi_corporate_mail import send_corporate_message, mailbox_config
 
 import bcrypt
 from fastapi import APIRouter, HTTPException, Request, Response
@@ -132,53 +132,33 @@ class PdfConfirm(BaseModel):
 
 
 def _smtp_send(email: str, token: str):
-    host = os.getenv("MI_SMTP_HOST")
-    user = os.getenv("MI_SMTP_USER")
-    password = os.getenv("MI_SMTP_PASSWORD")
-    sender = os.getenv("MI_SMTP_FROM")
     base = os.getenv("MI_PUBLIC_ORIGIN", "").rstrip("/")
-    if not all((host, user, password, sender, base)):
-        raise RuntimeError("SMTP configuration missing")
-    msg = EmailMessage()
-    msg["Subject"] = "Confirma tu correo · OPORTUNIIA"
-    msg["From"] = sender
-    msg["To"] = email
-    msg.set_content(
-        "Confirma tu registro de MI OPORTUNIIA con este código personal:\n\n"
-        + token + "\n\n"
-        + "Introdúcelo únicamente en " + base
-        + ". Caduca en 24 horas. Si no has solicitado el registro, ignora este mensaje."
+    if not base.startswith("https://"):
+        raise RuntimeError("Verified HTTPS WEB origin required")
+    send_corporate_message(
+        to=email, subject="Confirma tu correo · OPORTUNIIA",
+        body=("Confirma tu registro de MI OPORTUNIIA con este código personal:\\n\\n"
+              + token + "\\n\\n"
+              + "Introdúcelo únicamente en " + base
+              + ". Caduca en 24 horas. Si no has solicitado el registro, ignora este mensaje."),
     )
-    with smtplib.SMTP(host, int(os.getenv("MI_SMTP_PORT", "587")), timeout=15) as smtp:
-        smtp.ehlo()
-        smtp.starttls(context=ssl.create_default_context())
-        smtp.ehlo()
-        smtp.login(user, password)
-        smtp.send_message(msg)
 
 
 def _smtp_reset(email: str, token: str):
-    host = os.getenv("MI_SMTP_HOST")
-    user = os.getenv("MI_SMTP_USER")
-    password = os.getenv("MI_SMTP_PASSWORD")
-    sender = os.getenv("MI_SMTP_FROM")
-    if not all((host, user, password, sender)):
-        raise RuntimeError("SMTP configuration missing")
-    msg = EmailMessage()
-    msg["Subject"] = "Recuperación de acceso · OPORTUNIIA"
-    msg["From"] = sender
-    msg["To"] = email
-    msg.set_content(
-        "Has solicitado restablecer tu contraseña de MI OPORTUNIIA. "
-        "Introduce este código únicamente en nuestra web oficial:\n\n"
-        + token + "\n\nCaduca en 30 minutos. Si no lo solicitaste, ignora este mensaje."
+    send_corporate_message(
+        to=email, subject="Recuperación de acceso · OPORTUNIIA",
+        body=("Has solicitado restablecer tu contraseña de MI OPORTUNIIA. "
+              "Introduce este código únicamente en nuestra web oficial:\\n\\n"
+              + token + "\\n\\nCaduca en 30 minutos. Si no lo solicitaste, ignora este mensaje."),
     )
-    with smtplib.SMTP(host, int(os.getenv("MI_SMTP_PORT", "587")), timeout=15) as smtp:
-        smtp.ehlo()
-        smtp.starttls(context=ssl.create_default_context())
-        smtp.ehlo()
-        smtp.login(user, password)
-        smtp.send_message(msg)
+
+
+def _mail_ready():
+    try:
+        mailbox_config()
+        return True
+    except RuntimeError:
+        return False
 
 
 def register_routes(db):
@@ -199,7 +179,7 @@ def register_routes(db):
             hashed = _password(payload.password)
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
-        if not all(os.getenv(k) for k in ("MI_SMTP_HOST","MI_SMTP_USER","MI_SMTP_PASSWORD","MI_SMTP_FROM")):
+        if not _mail_ready():
             raise HTTPException(503, "Servicio de confirmación no configurado")
         await auth_throttle(db, request, action="register", email=email,
                             per_ip=12, per_email=3)
@@ -244,7 +224,7 @@ def register_routes(db):
         })
         if not actor:
             return generic
-        if not all(os.getenv(k) for k in ("MI_SMTP_HOST", "MI_SMTP_USER", "MI_SMTP_PASSWORD", "MI_SMTP_FROM")):
+        if not _mail_ready():
             raise HTTPException(503, "Servicio de correo no configurado")
         token = secrets.token_urlsafe(32)
         now = _now()
