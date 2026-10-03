@@ -29,6 +29,8 @@ from mi_private_upload import upload_intent, confirm_upload
 from mi_rate_limit import auth_throttle, ensure_rate_indexes
 from mi_private_download import signed_private_download
 from mi_offer_prefill import prefilling
+from mi_offer_pdf import make_offer_preview_pdf
+from fastapi.responses import Response as BinaryResponse
 
 router = APIRouter(prefix="/api/mi", tags=["MI OPORTUNIIA"])
 COOKIE = "mi_session"
@@ -108,6 +110,13 @@ class FileIntent(BaseModel):
     display_name: str = Field(min_length=1, max_length=120)
     mime: str
     size: int = Field(ge=1, le=25 * 1024 * 1024)
+
+
+class OfferPreview(BaseModel):
+    legal_name: str = Field(min_length=1, max_length=140)
+    tax_identifier: str = Field(min_length=1, max_length=30)
+    amount_eur: str = Field(min_length=1, max_length=22)
+    notes: str = Field(default="", max_length=1200)
 
 
 class PhotoConfirm(BaseModel):
@@ -370,6 +379,34 @@ def register_routes(db):
         _enabled()
         actor = await _session(request)
         return {"actor": public_actor(actor), "email_verified": True}
+
+    @router.post("/private/offers/{op}/preview-pdf")
+    async def preview_offer_pdf(op: str, payload: OfferPreview, request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        snapshot = await prefilling(db, actor, op)
+        prop = snapshot["property"]
+        try:
+            raw = await asyncio.to_thread(
+                make_offer_preview_pdf,
+                reference=prop["public_reference"],
+                property_title=prop["title"],
+                property_city=", ".join(filter(None, (prop.get("city"), prop.get("province")))),
+                applicant_name=payload.legal_name,
+                tax_identifier=payload.tax_identifier,
+                email=actor["email"],
+                amount_eur=payload.amount_eur,
+                notes=payload.notes,
+            )
+        except (ValueError, ArithmeticError) as exc:
+            raise HTTPException(422, "Datos de propuesta no válidos") from exc
+        return BinaryResponse(
+            content=raw, media_type="application/pdf",
+            headers={"Cache-Control": "private, no-store",
+                     "Content-Disposition": 'attachment; filename="oportuniia-oferta-borrador.pdf"',
+                     "X-Content-Type-Options": "nosniff"},
+        )
 
     @router.get("/private/offers/prefill")
     async def private_offer_prefill(op: str, request: Request, response: Response):
