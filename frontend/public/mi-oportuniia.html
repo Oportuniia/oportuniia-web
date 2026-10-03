@@ -34,6 +34,7 @@ label{display:block;font-weight:600;font-size:.9rem}small{color:#537082}nav a{co
 <label style="display:flex;gap:8px;align-items:center"><input id="secretary-consent" type="checkbox" style="width:auto">Autorizo este análisis documental puntual</label>
 <button id="secretary-analyze" type="button">Analizar y proponer</button><div id="secretary-candidates"></div><div style="margin-top:16px"><h3>Mi calendario confirmado</h3><button id="secretary-calendar-reload" type="button">Actualizar mi calendario</button><div id="secretary-calendar"></div></div>
 <p><small>La propuesta indica lo que aparece en el documento, no tu situación actual. Confirma únicamente datos vigentes.</small></p></section>
+<section class="card"><h2>Mis notificaciones</h2><p>Consulta el estado de tus recordatorios sin mostrar información sensible.</p><button id="notices-refresh" type="button">Actualizar notificaciones</button><div id="notices-private"></div><p><small>«Procesado» no confirma la entrega en tu correo. Puedes cambiar tus preferencias en tu perfil.</small></p></section>
 <section class="card"><h2>Organizador PDF Premium</h2><p>Propone categorías y permite confirmar la separación de un PDF que ya esté verificado en tu archivo.</p>
 <label>Identificador de tu PDF o fotografía<input id="file-id" placeholder="Identificador de documento"></label>
 <button id="inspect" type="button">Analizar documento</button>
@@ -60,6 +61,7 @@ async function refresh(){
     const block=$("profile");block.replaceChildren(entry("p",profile.email),entry("p",profile.public_code||"Código pendiente de validación"));
     $("preferred-name").value=profile.preferred_name||"";
     $("document-reminders").checked=profile.document_reminders===true;
+    await refreshNotices();
     const {documents}=await api("/api/mi/private/documents");
     const list=$("docs");list.replaceChildren();
     if(!documents.length)list.append(entry("p","Aún no hay documentos disponibles"));
@@ -186,6 +188,18 @@ $("secretary-analyze").onclick=async()=>{
   }catch(e){message(e.message)}
   finally{$("secretary-analyze").disabled=false;$("secretary-consent").checked=false}
 };
+async function refreshNotices(){
+  const root=$("notices-private");root.replaceChildren();
+  try{
+    const result=await api("/api/mi/private/notifications");
+    if(!result.notices.length){root.append(entry("p","No tienes notificaciones registradas."));return}
+    for(const notice of result.notices){
+      const date=notice.created_at?new Date(notice.created_at).toLocaleDateString("es-ES"):"";
+      root.append(entry("p",notice.title+" · "+notice.status+(date?" · "+date:"")));
+    }
+  }catch(e){root.append(entry("small",e.message))}
+}
+$("notices-refresh").onclick=refreshNotices;
 $("reload").onclick=refresh;
 $("upload").onclick=async()=>{
   const file=$("upload-file").files[0];if(!file)return message("Selecciona primero un documento");
