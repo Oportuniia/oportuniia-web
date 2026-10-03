@@ -4,7 +4,7 @@ import pytest
 from pymongo.errors import DuplicateKeyError
 
 from mi_notification_scheduler import (
-    schedule_notifications, schedule_offer_reminders, schedule_premium_reviews,
+    schedule_notifications, schedule_offer_reminders, schedule_premium_reviews, schedule_payroll_reminders,
 )
 
 NOW = datetime(2026, 10, 3, 12, tzinfo=timezone.utc)
@@ -138,3 +138,30 @@ async def test_worker_rejects_unbounded_batches_and_naive_dates():
         await schedule_premium_reviews(database(), now=NOW, limit=9999)
     with pytest.raises(ValueError):
         await schedule_offer_reminders(database(), now=NOW.replace(tzinfo=None))
+
+
+@pytest.mark.asyncio
+async def test_payroll_scheduler_prevents_duplicates_and_fails_closed_without_consent():
+    start=datetime(2026,10,3,8,tzinfo=timezone.utc)
+    sig={"actor_id":ACTOR,"signal_id":"b"*32,
+         "kind":"PAYROLL_PAYMENT_DAY",
+         "source":"OWNER_CONFIRMED_DOCUMENT_PROPOSAL",
+         "active":True,"calendar_enabled":True,
+         "calendar_timezone":"Europe/Madrid",
+         "confirmed_value":4,"calendar_lead_days":1,
+         "calendar_version":3}
+    actors=[premium_actor()]
+    subs=[premium_subscription()]
+    db=database(actors=actors,entitlements=subs)
+    db.mi_secretary_signals=Find([sig])
+    # Existing fake Premium subscription is valid at the requested test hour.
+    first=await schedule_payroll_reminders(db,now=start)
+    second=await schedule_payroll_reminders(db,now=start)
+    assert first["queued"]==1
+    assert second["queued"]==0
+    assert list(db.mi_notification_outbox.saved.values())[0]["signal_id"]=="b"*32
+    assert all("email" not in row and "salary" not in row
+               for row in db.mi_notification_outbox.saved.values())
+    db.mi_actors=Find([{**premium_actor(),"document_reminders":False}])
+    other=await schedule_payroll_reminders(db,now=start)
+    assert other["queued"]==0
