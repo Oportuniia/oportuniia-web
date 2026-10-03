@@ -521,6 +521,14 @@ async def mi_oportuniia():
     return _public_html("mi-oportuniia.html")
 
 
+@app.get("/preparar-oferta", response_class=HTMLResponse)
+@app.get("/preparar-oferta/", response_class=HTMLResponse)
+async def preparar_oferta_private_shell():
+    # No offer may be submitted merely by visiting this public shell.
+    # Prefill data requires an authenticated, validated investor session.
+    return _public_html("preparar-oferta.html")
+
+
 @app.get("/acceso", response_class=HTMLResponse)
 async def acceso():
     return _public_html("acceso.html")
