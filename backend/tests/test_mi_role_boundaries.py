@@ -2,7 +2,7 @@ import pytest
 from fastapi import HTTPException
 from mi_role_boundaries import (
     require_mi_investor, collaborator_is_approved,
-    subscriber_access_contract,
+    subscriber_access_contract, subscriber_referral_eligible,
 )
 
 
@@ -28,7 +28,9 @@ def test_subscriber_uses_existing_app_identity_without_mi():
     contract=subscriber_access_contract()
     assert contract["credentials"]=="EXISTING_CODE_AND_PASSWORD"
     assert contract["profile_source"]==contract["history_source"]=="OPORTUNIIAPP"
-    assert contract["mi_oportuniia_allowed"] is False
+    assert contract["personal_investor_mi_allowed"] is False
+    assert contract["web_referral_section_allowed_after_app_verification"] is True
+    assert contract["referral_contract_model"]=="A"
     assert contract["integration_status"]=="PENDING"
 
 
@@ -51,3 +53,12 @@ def test_unapproved_collaborator_cannot_get_web_session():
     assert 'actor.get("role")=="COLABORADOR"' in login
     assert 'actor.get("role")=="COLABORADOR"' in session
     assert 'actor["validation_state"]!="VERIFIED"' in session
+
+
+def test_subscriber_requires_trusted_active_app_membership_not_web_input():
+    good={"issuer":"OPORTUNIIAPP","verified_by_backend":True,
+          "membership_active":True,"app_subject":"app_123"}
+    assert subscriber_referral_eligible(good)
+    assert not subscriber_referral_eligible({**good,"verified_by_backend":False})
+    assert not subscriber_referral_eligible({**good,"membership_active":False})
+    assert not subscriber_referral_eligible({**good,"issuer":"WEB"})
