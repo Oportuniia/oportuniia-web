@@ -23,7 +23,7 @@ from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
-from mi_private_area import safe_profile, private_documents, profile_update
+from mi_private_area import safe_profile, private_documents, profile_update, set_document_reminder_consent
 from mi_premium_service import premium_inspect, premium_confirm, premium_photo_inspect, premium_photo_confirm
 from mi_private_upload import upload_intent, confirm_upload
 from mi_rate_limit import auth_throttle, ensure_rate_indexes
@@ -100,6 +100,10 @@ class TokenIn(BaseModel):
 
 class Approval(BaseModel):
     actor_id: str
+
+
+class ReminderPreferences(BaseModel):
+    document_reminders: bool
 
 
 class ProfileChange(BaseModel):
@@ -428,6 +432,15 @@ def register_routes(db):
         _same_origin(request)
         actor = await _session(request)
         return await profile_update(db, actor, preferred_name=payload.preferred_name)
+
+    @router.put("/private/preferences/document-reminders")
+    async def change_reminder_preferences(payload: ReminderPreferences, request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        return await set_document_reminder_consent(
+            db, actor, enabled=payload.document_reminders,
+        )
 
     @router.get("/private/documents")
     async def list_private_documents(request: Request, limit: int = 50):
