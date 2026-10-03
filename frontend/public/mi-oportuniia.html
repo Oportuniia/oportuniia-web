@@ -29,6 +29,11 @@ label{display:block;font-weight:600;font-size:.9rem}small{color:#537082}nav a{co
 <div style="margin:20px 0;border-top:1px solid #dce7ed;padding-top:16px"><h3>Secretaría documental Premium</h3><label style="display:flex;gap:10px;align-items:start"><input id="document-reminders" type="checkbox" style="width:auto;margin-top:5px">Quiero recibir recordatorios para revisar mis documentos</label><p><small>Opcional y configurable. Los avisos necesarios de ofertas aprobadas son independientes.</small></p><button id="save-reminders" type="button">Guardar preferencias</button></div><br><button type="button" id="logout">Cerrar todas mis sesiones</button></section>
 <section class="card"><h2>Mis documentos</h2><p>Tus documentos solo son visibles con tu sesión.</p><div id="docs"></div><label>Subir documento (PDF o fotografía)<input id="upload-file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"></label><div class="row"><button id="upload" type="button">Subir de forma segura</button><button id="reload" type="button">Actualizar lista</button></div>
 <p><small>La carga requiere que el almacenamiento privado y el antivirus estén configurados. Los documentos se verifican antes de su utilización.</small></p></section>
+<section class="card"><h2>Secretaría personalizada Premium</h2><p>Analiza voluntariamente una nómina o declaración ya clasificada para obtener propuestas. No calculamos obligaciones fiscales ni programamos avisos sin tu confirmación.</p>
+<label>Identificador de documento privado<input id="secretary-file-id" placeholder="ID de una nómina o renta ya revisada"></label>
+<label style="display:flex;gap:8px;align-items:center"><input id="secretary-consent" type="checkbox" style="width:auto">Autorizo este análisis documental puntual</label>
+<button id="secretary-analyze" type="button">Analizar y proponer</button><div id="secretary-candidates"></div>
+<p><small>La propuesta indica lo que aparece en el documento, no tu situación actual. Confirma únicamente datos vigentes.</small></p></section>
 <section class="card"><h2>Organizador PDF Premium</h2><p>Propone categorías y permite confirmar la separación de un PDF que ya esté verificado en tu archivo.</p>
 <label>Identificador de tu PDF o fotografía<input id="file-id" placeholder="Identificador de documento"></label>
 <button id="inspect" type="button">Analizar documento</button>
@@ -102,6 +107,41 @@ $("login-form").addEventListener("submit",async e=>{e.preventDefault();try{await
 $("profile-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/private/profile",{method:"PATCH",body:JSON.stringify({preferred_name:$("preferred-name").value})});message("Perfil actualizado")}catch(err){message(err.message)}});
 $("logout").onclick=async()=>{try{await api("/api/mi/auth/logout-all",{method:"POST"});location.replace("/acceso")}catch(e){message(e.message)}};
 $("save-reminders").onclick=async()=>{try{const result=await api("/api/mi/private/preferences/document-reminders",{method:"PUT",body:JSON.stringify({document_reminders:$("document-reminders").checked})});message(result.document_reminders?"Recordatorios documentales activados.":"Recordatorios documentales desactivados.")}catch(e){message(e.message)}};
+$("secretary-analyze").onclick=async()=>{
+  const fileId=$("secretary-file-id").value.trim();
+  if(!/^[0-9a-f]{32}$/.test(fileId))return message("Selecciona un identificador válido de tu documento.");
+  if(!$("secretary-consent").checked)return message("Debes autorizar el análisis de este documento.");
+  $("secretary-analyze").disabled=true;
+  try{
+    const result=await api("/api/mi/private/premium/secretary/"+encodeURIComponent(fileId)+"/analyze",
+      {method:"POST",body:JSON.stringify({analysis_consent:true})});
+    const root=$("secretary-candidates");root.replaceChildren();
+    if(!result.candidates.length){root.append(entry("p","No se detectaron propuestas seguras. Introduce tus fechas manualmente cuando esté disponible."));return}
+    for(const candidate of result.candidates){
+      const box=document.createElement("div");box.className="notice";
+      box.append(entry("p","Propuesta: "+candidate.kind+" · Valor detectado: "+candidate.candidate_value));
+      if(candidate.warning)box.append(entry("small",candidate.warning));
+      const label=entry("label","Confirma o corrige el valor actual");
+      const field=document.createElement("input");field.value=candidate.candidate_value;
+      if(candidate.kind==="PAYROLL_PAYMENT_DAY"){field.type="number";field.min=1;field.max=28}
+      label.append(field);box.append(label);
+      const confirm=entry("button","Confirmar esta propuesta");confirm.type="button";
+      confirm.onclick=async()=>{
+        confirm.disabled=true;
+        try{
+          const value=candidate.kind==="PAYROLL_PAYMENT_DAY"?Number(field.value):field.value;
+          await api("/api/mi/private/premium/secretary/confirm",
+            {method:"POST",body:JSON.stringify({proposal_id:result.proposal_id,kind:candidate.kind,value})});
+          root.replaceChildren();
+          message("Dato confirmado y guardado. Los recordatorios no se activan automáticamente.");
+        }catch(e){message(e.message);confirm.disabled=false}
+      };
+      box.append(confirm);root.append(box);
+    }
+    message("Revisa cada dato: el análisis documental puede estar desactualizado.");
+  }catch(e){message(e.message)}
+  finally{$("secretary-analyze").disabled=false;$("secretary-consent").checked=false}
+};
 $("reload").onclick=refresh;
 $("upload").onclick=async()=>{
   const file=$("upload-file").files[0];if(!file)return message("Selecciona primero un documento");
