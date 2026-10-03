@@ -136,7 +136,8 @@ async def test_review_date_can_only_modify_owners_clean_verified_file():
 @pytest.mark.asyncio
 async def test_review_date_clearing_disables_document_reminders():
     files=FakeReviewFiles()
-    db=type("DB", (), {"mi_user_files": files})()
+    db=type("DB", (), {"mi_user_files": files,
+                        "mi_notification_outbox": OptionalQueue()})()
     result=await set_document_review_date(
         db, {"actor_id":"mi_owner"}, file_id="a"*32,
         next_review_at=None,
@@ -149,7 +150,8 @@ async def test_review_date_clearing_disables_document_reminders():
 async def test_review_date_rejects_past_unowned_and_invalid_file_ids():
     future=datetime.now(timezone.utc)+timedelta(days=8)
     files=FakeReviewFiles(found=False)
-    db=type("DB", (), {"mi_user_files": files})()
+    db=type("DB", (), {"mi_user_files": files,
+                        "mi_notification_outbox": OptionalQueue()})()
     with pytest.raises(HTTPException) as exc:
         await set_document_review_date(
             db, {"actor_id":"mi_owner"}, file_id="a"*32,
