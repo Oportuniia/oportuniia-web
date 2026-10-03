@@ -111,3 +111,20 @@ async def cancel_pending(db, *, key: str, reason: str, now: datetime):
         {"$set":{"state":"CANCELLED","cancel_reason":reason,"cancelled_at":at}},
     )
     return result.modified_count==1
+
+
+async def cancel_claimed(db, *, key: str, worker_id: str, reason: str,
+                         now: datetime):
+    """Withdraw a claimed notice if live eligibility is revoked pre-send."""
+    if reason not in ("NOT_ELIGIBLE", "DOCUMENTS_RECEIVED", "OPT_OUT",
+                      "PREMIUM_EXPIRED", "DOCUMENT_UPDATED"):
+        raise ValueError("invalid claimed cancellation reason")
+    at=_utc(now)
+    result=await db.mi_notification_outbox.update_one(
+        {"key":key,"state":"CLAIMED","worker_id":worker_id,
+         "lease_expires_at":{"$gte":at}},
+        {"$set":{"state":"CANCELLED","cancel_reason":reason,
+                 "cancelled_at":at},
+         "$unset":{"worker_id":"","lease_expires_at":""}},
+    )
+    return result.modified_count==1
