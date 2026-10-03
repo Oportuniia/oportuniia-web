@@ -130,6 +130,6 @@ async def list_confirmed_signals(db,actor):
     cursor=db.mi_secretary_signals.find(
         {"actor_id":actor["actor_id"],"active":True},
         {"_id":0,"signal_id":1,"kind":1,"confirmed_value":1,
-         "calendar_enabled":1,"owner_confirmed_at":1},
+         "calendar_enabled":1,"calendar_lead_days":1,"owner_confirmed_at":1},
     ).limit(50)
     return [row async for row in cursor]
