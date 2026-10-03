@@ -20,6 +20,14 @@ from mi_premium_service import require_premium, _scanned_pdf
 PROPOSAL_TTL=timedelta(minutes=20)
 
 
+async def ensure_secretary_indexes(db):
+    """Required before enabling the private secretary against MongoDB."""
+    await db.mi_secretary_proposals.create_index("proposal_id", unique=True)
+    await db.mi_secretary_proposals.create_index("expires_at", expireAfterSeconds=0)
+    await db.mi_secretary_signals.create_index([("actor_id", 1), ("active", 1)])
+
+
+
 def extract_proposals(pdf: bytes, *, kind: str, file_id: str):
     """Local bounded text/OCR; never send source material to external AI."""
     if kind not in {"NOMINA","RENTA"}:
