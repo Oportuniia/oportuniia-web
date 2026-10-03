@@ -37,6 +37,9 @@ on:
       - "backend/tests/test_mi_offer_deadlines.py"
       - "frontend/public/preparar-oferta.html"
       - "backend/tests/check_offer_portal.py"
+      - "backend/tests/check_escrow_copy.py"
+      - "docs/MASTER_B2B_ESCROW_API_PAYMENT_ARCHITECTURE_20261003.md"
+      - "frontend/public/como-funciona.html"
       - "backend/mi_subscription_bridge.py"
       - "backend/tests/test_mi_ocr.py"
       - "backend/tests/test_mi_subscription_bridge.py"
@@ -75,6 +78,8 @@ jobs:
         run: python backend/tests/check_private_portal.py
       - name: Validate premium offer page JavaScript
         run: python backend/tests/check_offer_portal.py
+      - name: Validate escrow explanatory and contract wording
+        run: python backend/tests/check_escrow_copy.py
       - name: Run isolated registry and storage security tests
         env:
           PYTHONPATH: backend
