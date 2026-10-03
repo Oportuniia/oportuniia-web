@@ -1,9 +1,9 @@
 """WEB vs OPORTUNIIAPP access boundaries, independent of visual navigation.
 
-INVERSOR owns MI OPORTUNIIA. COLABORADOR may register in WEB but
-requires independent OPORTUNIIA administrative validation; cannot enter the
-investor's private area. SUSCRIPTOR is authenticated by OPORTUNIIAPP,
-whose own profile and history remain authoritative; no MI identity is minted.
+Only INVERSOR accesses personal/documentary MI. COLABORADOR has a separately
+approved WEB referral workspace. SUSCRIPTOR keeps APP identity and historical
+operations but may access the separate WEB referral section (always model A)
+after trusted APP membership attestation, never a duplicate WEB password.
 """
 from fastapi import HTTPException
 
@@ -23,11 +23,22 @@ def collaborator_is_approved(actor):
                 and str(actor["public_code"]).startswith("OI-COL-"))
 
 
+def subscriber_referral_eligible(attestation):
+    """Trusted backend-only APP assertion; never client-supplied or bearer login."""
+    return bool(attestation and attestation.get("issuer")=="OPORTUNIIAPP"
+                and attestation.get("verified_by_backend") is True
+                and attestation.get("membership_active") is True
+                and isinstance(attestation.get("app_subject"),str)
+                and attestation.get("app_subject"))
+
+
 def subscriber_access_contract():
     """Integration contract; do not assert SSO has been implemented."""
     return {"identity_source":"OPORTUNIIAPP",
             "credentials":"EXISTING_CODE_AND_PASSWORD",
             "profile_source":"OPORTUNIIAPP",
             "history_source":"OPORTUNIIAPP",
-            "mi_oportuniia_allowed":False,
+            "personal_investor_mi_allowed":False,
+            "web_referral_section_allowed_after_app_verification":True,
+            "referral_contract_model":"A",
             "integration_status":"PENDING"}
