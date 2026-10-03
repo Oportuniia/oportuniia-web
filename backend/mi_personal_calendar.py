@@ -11,6 +11,7 @@ import re
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 from fastapi import HTTPException
+from mi_notification_center import cancel_pending_optional
 
 ZONE="Europe/Madrid"
 KINDS={"PAYROLL_PAYMENT_DAY"}
@@ -71,6 +72,8 @@ async def set_payroll_calendar(db, actor, *, signal_id: str,
     )
     if update.modified_count!=1:
         raise HTTPException(409,"Preferencias modificadas: actualiza tu calendario")
+    await cancel_pending_optional(db,actor_id=actor["actor_id"],
+                                  signal_id=signal_id,now=now)
     return {"signal_id":signal_id,"calendar_enabled":enabled,
             "lead_days":lead_days if enabled else None}
 
