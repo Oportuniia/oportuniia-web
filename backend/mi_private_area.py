@@ -5,7 +5,7 @@ Personal documents remain in dedicated Mongo collections and a separate private
 R2 bucket; no document bytes or cloud keys appear in list responses.
 """
 from __future__ import annotations
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from fastapi import HTTPException
 
 ALLOWED_STATES = {"PENDING", "AVAILABLE", "QUARANTINED", "REJECTED"}
@@ -26,7 +26,7 @@ def safe_profile(actor: dict) -> dict:
 def safe_document(row: dict) -> dict:
     return {key: row.get(key) for key in (
         "file_id", "display_name", "mime", "size", "status", "created_at",
-        "updated_at", "document_kind"
+        "updated_at", "document_kind", "review_reminders", "next_review_at"
     )}
 
 
@@ -70,3 +70,42 @@ async def set_document_reminder_consent(db, actor: dict, *, enabled: bool):
     if result.matched_count != 1:
         raise HTTPException(403, "Cuenta no disponible")
     return {"document_reminders": enabled}
+
+
+async def set_document_review_date(db, actor: dict, *, file_id: str,
+                                   next_review_at: datetime | None):
+    """Owner-scoped review schedule, NOT a legal document expiry date.
+
+    Caller must verify current Premium entitlement before allowing date edits.
+    Clearing a date also clears that file's reminder opt-in.
+    """
+    import re
+    if not actor or not actor.get("actor_id"):
+        raise HTTPException(401, "Sesión necesaria")
+    if not isinstance(file_id, str) or not re.fullmatch(r"[0-9a-f]{32}", file_id):
+        raise HTTPException(404, "Documento no encontrado")
+    now = datetime.now(timezone.utc)
+    if next_review_at is not None:
+        if not isinstance(next_review_at, datetime) or next_review_at.tzinfo is None:
+            raise HTTPException(422, "Fecha y zona horaria obligatorias")
+        next_review_at = next_review_at.astimezone(timezone.utc)
+        if next_review_at <= now or next_review_at > now + timedelta(days=730):
+            raise HTTPException(422, "Selecciona una fecha futura dentro de los próximos dos años")
+    update = {"$set": {
+        "review_reminders": next_review_at is not None,
+        "updated_at": now,
+    }}
+    if next_review_at is not None:
+        update["$set"]["next_review_at"] = next_review_at
+    else:
+        update["$unset"] = {"next_review_at": ""}
+    result = await db.mi_user_files.update_one(
+        {"actor_id": actor["actor_id"], "file_id": file_id,
+         "status": "AVAILABLE", "scan_verdict": "CLEAN"},
+        update,
+    )
+    if result.matched_count != 1:
+        raise HTTPException(404, "Documento privado verificado no encontrado")
+    return {"file_id": file_id,
+            "review_reminders": next_review_at is not None,
+            "next_review_at": next_review_at}
