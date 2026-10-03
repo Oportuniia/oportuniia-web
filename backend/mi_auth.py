@@ -28,6 +28,7 @@ from mi_premium_service import premium_inspect, premium_confirm, premium_photo_i
 from mi_private_upload import upload_intent, confirm_upload
 from mi_rate_limit import auth_throttle, ensure_rate_indexes
 from mi_private_download import signed_private_download
+from mi_offer_prefill import prefilling
 
 router = APIRouter(prefix="/api/mi", tags=["MI OPORTUNIIA"])
 COOKIE = "mi_session"
@@ -369,6 +370,13 @@ def register_routes(db):
         _enabled()
         actor = await _session(request)
         return {"actor": public_actor(actor), "email_verified": True}
+
+    @router.get("/private/offers/prefill")
+    async def private_offer_prefill(op: str, request: Request, response: Response):
+        _enabled()
+        actor = await _session(request)
+        response.headers["Cache-Control"] = "private, no-store"
+        return await prefilling(db, actor, op)
 
     @router.get("/private/profile")
     async def private_profile(request: Request):
