@@ -24,6 +24,7 @@ from pymongo.errors import DuplicateKeyError
 
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
 from mi_notification_center import list_my_notices
+from mi_role_boundaries import require_mi_investor
 from mi_private_area import safe_profile, private_documents, profile_update, set_document_reminder_consent, set_document_review_date
 from mi_secretary_proposals import preview_signals, confirm_proposal, list_confirmed_signals
 from mi_personal_calendar import set_payroll_calendar, list_payroll_calendar
@@ -390,7 +391,7 @@ def register_routes(db):
     async def preview_offer_pdf(op: str, payload: OfferPreview, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         snapshot = await prefilling(db, actor, op)
         prop = snapshot["property"]
         try:
@@ -417,14 +418,14 @@ def register_routes(db):
     @router.get("/private/offers/prefill")
     async def private_offer_prefill(op: str, request: Request, response: Response):
         _enabled()
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         response.headers["Cache-Control"] = "private, no-store"
         return await prefilling(db, actor, op)
 
     @router.get("/private/profile")
     async def private_profile(request: Request):
         _enabled()
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return {"profile": {**safe_profile(actor),
                             "preferred_name": actor.get("preferred_name", "")}}
 
@@ -432,20 +433,20 @@ def register_routes(db):
     async def change_private_profile(payload: ProfileChange, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await profile_update(db, actor, preferred_name=payload.preferred_name)
 
     @router.get("/private/notifications")
     async def private_notification_center(request: Request):
         _enabled()
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return {"notices": await list_my_notices(db, actor)}
 
     @router.put("/private/preferences/document-reminders")
     async def change_reminder_preferences(payload: ReminderPreferences, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await set_document_reminder_consent(
             db, actor, enabled=payload.document_reminders,
         )
@@ -455,7 +456,7 @@ def register_routes(db):
                                         request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await preview_signals(
             db, actor, file_id=file_id, analysis_consent=payload.analysis_consent,
         )
@@ -465,7 +466,7 @@ def register_routes(db):
                                         request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await confirm_proposal(
             db, actor, proposal_id=payload.proposal_id,
             kind=payload.kind, value=payload.value,
@@ -477,7 +478,7 @@ def register_routes(db):
                                        request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         await require_premium(db, actor)
         return await set_payroll_calendar(
             db, actor, signal_id=signal_id, enabled=payload.enabled,
@@ -487,7 +488,7 @@ def register_routes(db):
     @router.get("/private/premium/calendar")
     async def personal_calendar(request: Request):
         _enabled()
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         await require_premium(db, actor)
         return {"events": await list_payroll_calendar(
             db, actor, now=datetime.now(timezone.utc),
@@ -496,13 +497,13 @@ def register_routes(db):
     @router.get("/private/premium/secretary/signals")
     async def private_secretary_signals(request: Request):
         _enabled()
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return {"signals": await list_confirmed_signals(db, actor)}
 
     @router.get("/private/documents")
     async def list_private_documents(request: Request, limit: int = 50):
         _enabled()
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return {"documents": await private_documents(db, actor, limit=limit)}
 
     @router.put("/private/documents/{file_id}/review-date")
@@ -510,7 +511,7 @@ def register_routes(db):
                                           request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         await require_premium(db, actor)
         return await set_document_review_date(
             db, actor, file_id=file_id, next_review_at=payload.next_review_at,
@@ -519,7 +520,7 @@ def register_routes(db):
     @router.get("/private/documents/{file_id}/download")
     async def download_private_document(file_id: str, request: Request, response: Response):
         _enabled()
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         response.headers["Cache-Control"] = "no-store"
         response.headers["Referrer-Policy"] = "no-referrer"
         return await signed_private_download(db, actor, file_id)
@@ -528,7 +529,7 @@ def register_routes(db):
     async def private_upload_intent(payload: FileIntent, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await upload_intent(db, actor, name=payload.display_name,
                                    mime=payload.mime, size=payload.size)
 
@@ -536,35 +537,35 @@ def register_routes(db):
     async def private_confirm_file(file_id: str, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await confirm_upload(db, actor, file_id)
 
     @router.post("/private/premium/image/{file_id}/inspect")
     async def inspect_private_image(file_id: str, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await premium_photo_inspect(db, actor, file_id)
 
     @router.post("/private/premium/image/{file_id}/confirm")
     async def confirm_private_image(file_id: str, payload: PhotoConfirm, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await premium_photo_confirm(db, actor, file_id, payload.kind)
 
     @router.post("/private/premium/pdf/{file_id}/inspect")
     async def inspect_private_pdf(file_id: str, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await premium_inspect(db, actor, file_id)
 
     @router.post("/private/premium/pdf/{file_id}/confirm")
     async def confirm_private_pdf(file_id: str, payload: PdfConfirm, request: Request):
         _enabled()
         _same_origin(request)
-        actor = await _session(request)
+        actor = require_mi_investor(await _session(request))
         return await premium_confirm(db, actor, file_id, payload.groups)
 
     @router.post("/auth/logout-all")
