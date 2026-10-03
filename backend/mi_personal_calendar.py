@@ -7,7 +7,6 @@ generated from old declarations.
 """
 from __future__ import annotations
 
-import calendar
 import re
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
@@ -63,9 +62,11 @@ async def set_payroll_calendar(db, actor, *, signal_id: str,
              "calendar_version":result.get("calendar_version",0)+1}
     if enabled:
         changes.update({"calendar_lead_days":lead_days,"calendar_timezone":ZONE})
+    version_filter=(result["calendar_version"] if "calendar_version" in result
+                    else {"$exists":False})
     update=await db.mi_secretary_signals.update_one(
         {"actor_id":actor["actor_id"],"signal_id":signal_id,
-         "active":True,"calendar_version":result.get("calendar_version",0)},
+         "active":True,"calendar_version":version_filter},
         {"$set":changes},
     )
     if update.modified_count!=1:
