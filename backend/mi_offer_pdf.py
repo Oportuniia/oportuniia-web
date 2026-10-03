@@ -21,7 +21,7 @@ MUTED=colors.HexColor("#506878")
 def _clean(s,limit=180):
     if not isinstance(s,str) or not 1<=len(s.strip())<=limit or any(ord(ch)<32 for ch in s):
         raise ValueError("Dato de oferta incompleto o inválido")
-    return re.sub(r"\\s+"," ",s.strip())
+    return re.sub(r"\s+"," ",s.strip())
 
 def _line(c,label,value,y):
     c.setFont("Helvetica",9)
@@ -49,7 +49,7 @@ def make_offer_preview_pdf(*,reference,property_title,property_city,applicant_na
     applicant_name=_clean(applicant_name,140)
     tax_identifier=_clean(tax_identifier,30)
     email=_clean(email,254)
-    if notes and (len(notes)>1200 or any(ord(ch)<32 and ch not in "\\n\\t" for ch in notes)):
+    if notes and (len(notes)>1200 or any(ord(ch)<32 and ch not in "\n\t" for ch in notes)):
         raise ValueError("Observaciones no admitidas")
     stream=BytesIO()
     c=Canvas(stream,pagesize=A4,pageCompression=1)
@@ -74,7 +74,7 @@ def make_offer_preview_pdf(*,reference,property_title,property_city,applicant_na
     ):
         y=_line(c,label,value,y)
     if notes:
-        y=_line(c,"Observaciones declaradas",notes.replace("\\n"," "),y-3)
+        y=_line(c,"Observaciones declaradas",notes.replace("\n"," "),y-3)
     if y<140:
         c.showPage()
         y=755
