@@ -54,7 +54,7 @@ button:disabled{opacity:.5;cursor:not-allowed}.muted{font-size:12px;color:#637d8
 <label>Observaciones para el equipo<textarea id="notes" maxlength="1500" placeholder="Información opcional que quieras acompañar a tu oferta"></textarea></label>
 <label class="row" style="align-items:start"><input id="ack" type="checkbox" required style="width:auto;margin-top:3px"><span>He revisado mis datos y entiendo que preparar esta propuesta no constituye aceptación, adjudicación ni reserva.</span></label>
 <div class="row"><button id="review" disabled>Revisar propuesta</button><span class="muted">Sin cargos ni envío automático</span></div></form>
-<div class="preview" id="preview"><h3>Vista previa de tu propuesta</h3><div id="summary"></div><p class="muted">Este prototipo crea una vista previa local. El envío al equipo comercial se habilitará después de validar la conexión CRM, los consentimientos y las firmas aplicables.</p><button type="button" id="edit">Modificar datos</button></div>
+<div class="preview" id="preview"><h3>Vista previa de tu propuesta</h3><div id="summary"></div><p class="muted">Este prototipo crea una vista previa local. El envío al equipo comercial se habilitará después de validar la conexión CRM, los consentimientos y las firmas aplicables.</p><div class="row"><button type="button" id="generate-pdf">Generar PDF de borrador</button><button type="button" id="edit" style="background:#5b7180">Modificar datos</button></div></div>
 </div></div>
 <aside>
 <div class="panel dark"><div class="eyebrow" style="color:#82d4ed">Un proceso transparente</div><h2>La confianza también se prepara</h2>
@@ -98,6 +98,24 @@ $("offer-form").addEventListener("submit",e=>{
  for(const row of rows){const p=document.createElement("p");p.textContent=row[0]+": "+row[1];summary.append(p)}
  $("preview").style.display="block";$("preview").scrollIntoView({behavior:"smooth",block:"start"});
 });
+$("generate-pdf").onclick=async()=>{
+ if(!profile||!property)return status("No se ha validado la oportunidad.",true);
+ $("generate-pdf").disabled=true;
+ try{
+  const response=await fetch("/api/mi/private/offers/"+encodeURIComponent(ref)+"/preview-pdf",{
+    method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({legal_name:$("legal_name").value,tax_identifier:$("tax_identifier").value,
+      amount_eur:$("amount").value,notes:$("notes").value})
+  });
+  if(!response.ok)throw Error("No se ha podido generar el PDF de propuesta");
+  const url=URL.createObjectURL(await response.blob());
+  const a=document.createElement("a");
+  a.href=url;a.download="OPORTUNIIA-"+ref+"-borrador.pdf";a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),30000);
+  status("Borrador PDF generado. El envío y la firma aún no están habilitados.")
+ }catch(e){status(e.message,true)}
+ finally{$("generate-pdf").disabled=false}
+};
 $("edit").onclick=()=>{$("preview").style.display="none";$("legal_name").focus()};
 load();
 </script></body></html>
