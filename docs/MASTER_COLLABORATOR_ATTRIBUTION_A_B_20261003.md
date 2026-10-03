@@ -1,6 +1,6 @@
 # DIRECTRIZ MASTER · Aportación, protección y monetización del colaborador
 
-**Decisión del propietario, 2026-10-03 · Arquitectura y propuesta para LEGAL.** Desarrollo nuevo, **separado del alcance funcional congelado de MI OPORTUNIIA inversor**. No activado, no publicado; el convenio A/B y sus textos exactos requieren su versión oficial y firma. Este documento NO presupone que ya estén jurídicamente aprobados sus detalles.
+**Decisión del propietario, 2026-10-03 · Arquitectura y propuesta para LEGAL. Los contratos A/B YA EXISTEN; deben REFORZARSE y ACTUALIZARSE, no redactarse como acuerdos inexistentes.** Desarrollo nuevo, **separado del alcance funcional congelado de MI OPORTUNIIA inversor**. No activado, no publicado; el convenio A/B y sus textos exactos requieren su versión oficial y firma. Este documento NO presupone que ya estén jurídicamente aprobados sus detalles.
 
 ## 1. Alta y vinculación del inversor aportado
 
@@ -45,20 +45,25 @@ El contrato B define exclusivamente los derechos que consten efectivamente en su
 
 Si se acreditan **10 compraventas al año** bajo el código del colaborador realizadas por inversores atribuidos a él (métrica y periodo exactos sujetos a validación OPERACIONES), generar **ALERTA DORADA INTERNA SOLO PARA ADMINISTRACIÓN**. Representa una propuesta de reconocimiento discrecional cuyo importe, formato y otorgamiento OPORTUNIIA decidirá posteriormente; nunca crea deuda exigible, cifra prometida ni acceso externo a la alerta. Evitar doble cómputo de una misma operación, cancelaciones o atribuciones en disputa.
 
-## 6. Panel privado del colaborador
+## 6. Zona privada del colaborador · listado por código y operaciones desplegables
 
-Solo tras aprobación de OPORTUNIIA, habilitar un **panel de colaborador diferenciado**, con:
-- listado mínimo de inversores aportados y su estado de vinculación, con información permitida al inversor y base contractual;
-- operaciones atribuibles y estados verificables (en curso, escritura acreditada, eventual venta posterior y validación de liquidación), sin exponer documentos ni cifras personales no necesarios;
-- monetización y liquidación: acuerdo A/B, documentos pendientes, devengos previstos/no devengados y pagados verificados, retenciones por litigio solo si LEGAL lo autoriza;
-- solicitudes de desvinculación, expedientes de conflicto en estado genérico, posibilidad de aportar documentación por canal restringido;
-- el disparador de diez operaciones B **no se muestra en el panel ni se comunica al colaborador**: únicamente administración ve su señal interna.
+**Todas las operaciones, atribuciones, liquidaciones, alertas y posibles incidencias estarán sometidas a revisión humana por OPORTUNIIA. Ninguna genera pagos, premios, sanciones o conclusiones automáticas.** Los indicadores técnicos solo preparan expedientes de comprobación.
 
-Cada consulta se filtra por `collaborator_id` aprobado; un código publicable nunca sustituye autorización. No dar al colaborador acceso al archivo privado MI del inversor ni al historial ajeno de OPORTUNIIAPP.
+Solo tras aprobación de OPORTUNIIA, el colaborador dispondrá de una sección privada y propia, distinta del archivo MI OPORTUNIIA de cada inversor:
+
+1. **Entradas bajo su código:** listado de todos sus inversores aportados, identificados por su código de usuario, siempre tras atribución y verificación por OPERACIONES. No se muestran personas que solo recibieron una invitación sin aceptarla.
+2. **Al pulsar un código de usuario:** desplegar las operaciones de ese inversor asociadas a la aportación, separadas entre **EN MARCHA** y **REALIZADAS**. Cada ficha contiene la **referencia de operación**, su estado contrastado y la información mínima autorizada.
+3. **Colaborador con contrato A:** junto a cada referencia aparecen los **honorarios generados y comprobados**, exclusivamente cuando LEGAL/OPERACIONES han verificado el reconocimiento de honorarios aceptado antes de la firma notarial y CONTABILIDAD haya contrastado devengo/base/cuantía. Si están pendientes, indicar "PENDIENTE DE REVISIÓN" sin importe inventado. Diferenciar generado, pendiente de cobro y liquidado si el contrato lo contempla.
+4. **Colaborador con contrato B:** exclusivamente **operaciones realizadas y en marcha**, con sus referencias y estados. **No visualizar honorarios, cálculos de monetización ni alerta dorada** en su panel.
+5. Si existe desvinculación o conflicto, la cuenta del inversor puede dejar de mostrarse como relación comercial activa, conservando la atribución probada y su seguimiento contractual durante el periodo aplicable, con datos estrictamente necesarios. Se hará mediante revisión humana, no por inferencia unilateral.
+
+La API deberá autorizar a cada colaborador aprobado por `actor_id`, no solo por código en la URL. **Nunca** devolver inversores de otro colaborador, datos fiscales, nóminas, archivos personales, recibos privados ni operaciones no atribuibles. El detalle por código requiere comprobar de nuevo la relación y los permisos.
+
+El reconocimiento extraordinario del modelo B a partir de 10 operaciones **solo genera un candidato de alerta interna para revisión administrativa**; no constituye regalo automático, importe ni compromiso contractual.
 
 ## 7. Puertas de implementación
 
-1. LEGAL aporta contratos A/B oficiales y documento de reconocimiento de honorarios; define base del 50 %, dos años (inicio y fecha final), devengos, incumplimientos, desvinculación y evidencias admisibles.
+1. LEGAL revisa y actualiza los contratos A/B YA EXISTENTES y el documento de reconocimiento de honorarios, contrastando sus versiones vigentes; define base del 50 %, dos años (inicio y fecha final), devengos, incumplimientos, desvinculación y evidencias admisibles.
 2. OPERACIONES valida el proceso de aprobación de colaboradores, invitación, aceptación explícita del inversor, atribución conflictiva y fuente fidedigna de compraventas/ventas posteriores.
 3. ARQUITECTURA separa identidad, historia comercial, permisos del panel y MI del inversor. Los suscriptores continúan con su perfil e historial soberanos en OPORTUNIIAPP.
 4. LEGAL/PRIVACIDAD valida conflicto, derecho de respuesta, retención, sanciones y propuesta de vetos de socios/administradores antes de habilitar cualquier medida.
