@@ -355,6 +355,9 @@ def register_routes(db):
         stored = actor.get("password_hash", "") if actor else ""
         if not stored or not _check_password(payload.password, stored.encode()):
             raise HTTPException(401, "Credenciales inválidas")
+        # A collaborator's mailbox verification is NOT OPORTUNIIA approval.
+        if actor.get("role")=="COLABORADOR" and actor.get("validation_state")!="VERIFIED":
+            raise HTTPException(403, "Colaborador pendiente de aprobación de OPORTUNIIA")
         if not actor.get("email_verified") or actor.get("validation_state") in ("SUSPENDED", "REJECTED"):
             raise HTTPException(403, "Cuenta pendiente o no disponible")
         raw = secrets.token_urlsafe(32)
@@ -377,7 +380,7 @@ def register_routes(db):
         if not row:
             raise HTTPException(401, "Sesión caducada")
         actor = await db.mi_actors.find_one({"actor_id": row["actor_id"]})
-        if not actor or not actor.get("email_verified") or actor["validation_state"] not in ("PENDING", "VERIFIED"):
+        if not actor or not actor.get("email_verified") or actor["validation_state"] not in ("PENDING", "VERIFIED") or (actor.get("role")=="COLABORADOR" and actor["validation_state"]!="VERIFIED"):
             raise HTTPException(403, "Cuenta no disponible")
         return actor
 
