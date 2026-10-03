@@ -25,6 +25,7 @@ from pymongo.errors import DuplicateKeyError
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
 from mi_private_area import safe_profile, private_documents, profile_update, set_document_reminder_consent, set_document_review_date
 from mi_secretary_proposals import preview_signals, confirm_proposal, list_confirmed_signals
+from mi_personal_calendar import set_payroll_calendar, list_payroll_calendar
 from mi_premium_service import require_premium, premium_inspect, premium_confirm, premium_photo_inspect, premium_photo_confirm
 from mi_private_upload import upload_intent, confirm_upload
 from mi_rate_limit import auth_throttle, ensure_rate_indexes
@@ -101,6 +102,11 @@ class TokenIn(BaseModel):
 
 class Approval(BaseModel):
     actor_id: str
+
+
+class PayrollCalendarPreference(BaseModel):
+    enabled: bool
+    lead_days: int = Field(default=1, ge=0, le=7)
 
 
 class SecretaryAnalyze(BaseModel):
@@ -457,6 +463,28 @@ def register_routes(db):
             db, actor, proposal_id=payload.proposal_id,
             kind=payload.kind, value=payload.value,
         )
+
+    @router.put("/private/premium/calendar/{signal_id}")
+    async def change_personal_calendar(signal_id: str,
+                                       payload: PayrollCalendarPreference,
+                                       request: Request):
+        _enabled()
+        _same_origin(request)
+        actor = await _session(request)
+        await require_premium(db, actor)
+        return await set_payroll_calendar(
+            db, actor, signal_id=signal_id, enabled=payload.enabled,
+            lead_days=payload.lead_days,
+        )
+
+    @router.get("/private/premium/calendar")
+    async def personal_calendar(request: Request):
+        _enabled()
+        actor = await _session(request)
+        await require_premium(db, actor)
+        return {"events": await list_payroll_calendar(
+            db, actor, now=datetime.now(timezone.utc),
+        )}
 
     @router.get("/private/premium/secretary/signals")
     async def private_secretary_signals(request: Request):
