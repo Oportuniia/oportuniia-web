@@ -1,6 +1,7 @@
+from datetime import datetime, timedelta, timezone
 import pytest
 from fastapi import HTTPException
-from mi_private_area import safe_profile, safe_document, private_documents, profile_update, set_document_reminder_consent
+from mi_private_area import safe_profile, safe_document, private_documents, profile_update, set_document_reminder_consent, set_document_review_date
 
 
 def test_profile_exposes_only_approved_fields():
@@ -94,3 +95,75 @@ async def test_reminder_consent_cannot_be_set_anonymously():
     with pytest.raises(HTTPException) as exc:
         await set_document_reminder_consent(None, None, enabled=True)
     assert exc.value.status_code == 401
+
+
+
+class FakeReviewFiles:
+    def __init__(self, found=True):
+        self.found = found
+        self.query = None
+        self.update = None
+    async def update_one(self, query, update):
+        self.query, self.update = query, update
+        return type("Result", (), {"matched_count": int(self.found)})()
+
+
+@pytest.mark.asyncio
+async def test_review_date_can_only_modify_owners_clean_verified_file():
+    files=FakeReviewFiles()
+    db=type("DB", (), {"mi_user_files": files})()
+    date=datetime.now(timezone.utc)+timedelta(days=30)
+    result=await set_document_review_date(
+        db, {"actor_id":"mi_owner"}, file_id="a"*32,
+        next_review_at=date,
+    )
+    assert files.query == {"actor_id":"mi_owner","file_id":"a"*32,
+                           "status":"AVAILABLE","scan_verdict":"CLEAN"}
+    assert files.update["$set"]["review_reminders"] is True
+    assert result["next_review_at"] == date
+
+
+@pytest.mark.asyncio
+async def test_review_date_clearing_disables_document_reminders():
+    files=FakeReviewFiles()
+    db=type("DB", (), {"mi_user_files": files})()
+    result=await set_document_review_date(
+        db, {"actor_id":"mi_owner"}, file_id="a"*32,
+        next_review_at=None,
+    )
+    assert result["review_reminders"] is False
+    assert "next_review_at" in files.update["$unset"]
+
+
+@pytest.mark.asyncio
+async def test_review_date_rejects_past_unowned_and_invalid_file_ids():
+    future=datetime.now(timezone.utc)+timedelta(days=8)
+    files=FakeReviewFiles(found=False)
+    db=type("DB", (), {"mi_user_files": files})()
+    with pytest.raises(HTTPException) as exc:
+        await set_document_review_date(
+            db, {"actor_id":"mi_owner"}, file_id="a"*32,
+            next_review_at=future,
+        )
+    assert exc.value.status_code == 404
+    with pytest.raises(HTTPException) as exc:
+        await set_document_review_date(
+            db, {"actor_id":"mi_owner"}, file_id="a"*32,
+            next_review_at=datetime.now(timezone.utc)-timedelta(days=1),
+        )
+    assert exc.value.status_code == 422
+    with pytest.raises(HTTPException) as exc:
+        await set_document_review_date(
+            db, {"actor_id":"mi_owner"}, file_id="../other",
+            next_review_at=future,
+        )
+    assert exc.value.status_code == 404
+
+
+def test_review_field_whitelist_never_includes_storage_secrets():
+    doc=safe_document({"file_id":"a"*32,"status":"AVAILABLE",
+                       "next_review_at":datetime.now(timezone.utc),
+                       "review_reminders":True,"storage_key":"private"})
+    assert doc["review_reminders"] is True
+    assert "next_review_at" in doc
+    assert "storage_key" not in doc
