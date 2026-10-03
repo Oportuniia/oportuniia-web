@@ -75,6 +75,14 @@ async def test_invalid_profile_update_never_reaches_db():
     assert exc.value.status_code == 422
 
 
+class OptionalQueue:
+    def __init__(self):
+        self.calls=[]
+    async def update_many(self,query,update):
+        self.calls.append((query,update))
+        return type("Result",(),{"modified_count":0})()
+
+
 class PreferenceActors:
     async def update_one(self, query, update):
         assert query["actor_id"] == "mi_owner"
@@ -84,7 +92,8 @@ class PreferenceActors:
 
 @pytest.mark.asyncio
 async def test_optional_reminder_consent_changes_only_current_actor():
-    db = type("DB", (), {"mi_actors": PreferenceActors()})()
+    db = type("DB", (), {"mi_actors": PreferenceActors(),
+                           "mi_notification_outbox": OptionalQueue()})()
     result = await set_document_reminder_consent(
         db, {"actor_id": "mi_owner"}, enabled=True)
     assert result == {"document_reminders": True}
@@ -111,7 +120,8 @@ class FakeReviewFiles:
 @pytest.mark.asyncio
 async def test_review_date_can_only_modify_owners_clean_verified_file():
     files=FakeReviewFiles()
-    db=type("DB", (), {"mi_user_files": files})()
+    db=type("DB", (), {"mi_user_files": files,
+                           "mi_notification_outbox": OptionalQueue()})()
     date=datetime.now(timezone.utc)+timedelta(days=30)
     result=await set_document_review_date(
         db, {"actor_id":"mi_owner"}, file_id="a"*32,
