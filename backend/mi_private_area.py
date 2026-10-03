@@ -7,6 +7,7 @@ R2 bucket; no document bytes or cloud keys appear in list responses.
 from __future__ import annotations
 from datetime import datetime, timezone, timedelta
 from fastapi import HTTPException
+from mi_notification_center import cancel_pending_optional
 
 ALLOWED_STATES = {"PENDING", "AVAILABLE", "QUARANTINED", "REJECTED"}
 
@@ -69,6 +70,8 @@ async def set_document_reminder_consent(db, actor: dict, *, enabled: bool):
     )
     if result.matched_count != 1:
         raise HTTPException(403, "Cuenta no disponible")
+    if not enabled:
+        await cancel_pending_optional(db,actor_id=actor["actor_id"],now=now)
     return {"document_reminders": enabled}
 
 
@@ -106,6 +109,9 @@ async def set_document_review_date(db, actor: dict, *, file_id: str,
     )
     if result.matched_count != 1:
         raise HTTPException(404, "Documento privado verificado no encontrado")
+    # Changing the date or removing it invalidates old queued reminder keys.
+    await cancel_pending_optional(db,actor_id=actor["actor_id"],
+                                  file_id=file_id,now=now)
     return {"file_id": file_id,
             "review_reminders": next_review_at is not None,
             "next_review_at": next_review_at}
