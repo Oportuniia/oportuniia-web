@@ -1,6 +1,6 @@
 import pytest
 from fastapi import HTTPException
-from mi_private_area import safe_profile, safe_document, private_documents, profile_update
+from mi_private_area import safe_profile, safe_document, private_documents, profile_update, set_document_reminder_consent
 
 
 def test_profile_exposes_only_approved_fields():
@@ -72,3 +72,25 @@ async def test_invalid_profile_update_never_reaches_db():
     with pytest.raises(HTTPException) as exc:
         await profile_update(None, {"actor_id": "mi_actor_owner"}, preferred_name="  ")
     assert exc.value.status_code == 422
+
+
+class PreferenceActors:
+    async def update_one(self, query, update):
+        assert query["actor_id"] == "mi_owner"
+        assert update["$set"]["document_reminders"] is True
+        return type("Result", (), {"matched_count": 1})()
+
+
+@pytest.mark.asyncio
+async def test_optional_reminder_consent_changes_only_current_actor():
+    db = type("DB", (), {"mi_actors": PreferenceActors()})()
+    result = await set_document_reminder_consent(
+        db, {"actor_id": "mi_owner"}, enabled=True)
+    assert result == {"document_reminders": True}
+
+
+@pytest.mark.asyncio
+async def test_reminder_consent_cannot_be_set_anonymously():
+    with pytest.raises(HTTPException) as exc:
+        await set_document_reminder_consent(None, None, enabled=True)
+    assert exc.value.status_code == 401
