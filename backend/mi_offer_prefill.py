@@ -22,7 +22,8 @@ def applicant_snapshot(actor):
     validated=set(actor.get("validated_offer_fields") or [])
     result={key: profile.get(key, "") if key in validated else ""
             for key in allowed}
-    return {"fields": result, "verified_fields": sorted(set(result)&validated),
+    return {"fields": result, "email": actor.get("email", ""),
+            "verified_fields": sorted(set(result)&validated),
             "missing_fields": [key for key in allowed if not result[key]],
             "public_code": actor.get("public_code")}
 
