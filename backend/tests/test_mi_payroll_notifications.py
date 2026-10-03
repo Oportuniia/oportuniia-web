@@ -46,5 +46,5 @@ def test_lead_days_cross_month_and_december_to_january():
 def test_neutral_email_body():
     subject,body=render_notice({"kind":"PREMIUM_PAYROLL_REMINDER",
         "employer":"CONFIDENTIAL COMPANY","salary":"90000","day":4})
-    assert "agenda personal" in body
+    assert "agenda privada" in body
     assert "CONFIDENTIAL" not in subject+body and "90000" not in body
