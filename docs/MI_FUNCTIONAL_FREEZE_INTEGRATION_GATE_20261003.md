@@ -19,7 +19,7 @@
 - Proveedores y circuitos financieros: escrow B2B exclusivamente en firma notarial y eventual cuenta separada de reservas, **ambos aparcados** por orden del propietario hasta tener proveedores y validación de LEGAL/TESORERÍA.
 - Logo oficial definitivo del borrador PDF, pendiente del activo original.
 
-**Directriz de identidad añadida en validación:** MI OPORTUNIIA corresponde exclusivamente al usuario inversor; el colaborador exige aprobación expresa propia de OPORTUNIIA; el suscriptor conserva código, contraseña, ficha e historial en OPORTUNIIAPP y nunca accede a MI. Ver `docs/MASTER_THREE_PROFILES_ACCESS_20261003.md`. La interconexión autenticada con OPORTUNIIAPP está pendiente, sin reutilizar contraseñas ni duplicar su historial.
+**Directriz de identidad actualizada:** MI OPORTUNIIA **personal/documental** corresponde exclusivamente al inversor; el colaborador aprobado y el suscriptor dispondrán de un apartado **comercial** de aportación de inversores en WEB. El suscriptor conserva sus credenciales, perfil e historial soberanos en OPORTUNIIAPP, pero se le habilitará una sección WEB independiente de aportaciones, siempre modelo A, previa autenticación APP confiable. Ver `docs/MASTER_THREE_PROFILES_ACCESS_20261003.md`. La integración real de OPORTUNIIAPP, el botón de alta, el enlace masivo y el QR siguen pendientes; no se comparten contraseñas ni historiales.
 
 ## Plan secuencial de integración y criterios de aceptación
 
