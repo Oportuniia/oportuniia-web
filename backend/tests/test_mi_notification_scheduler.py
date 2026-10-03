@@ -65,6 +65,7 @@ def database(offers=(), documents=(), actors=(), entitlements=()):
         "mi_actors": Find(list(actors)),
         "mi_premium_entitlements": Find(list(entitlements)),
         "mi_notification_outbox": Outbox(),
+        "mi_secretary_signals": Find([]),
     })()
 
 
