@@ -23,6 +23,7 @@ from pymongo import ReturnDocument
 from pymongo.errors import DuplicateKeyError
 
 from personal_user_registry import ROLES, ensure_registry_indexes, normalize_email, approve_and_assign, public_actor
+from mi_notification_center import list_my_notices
 from mi_private_area import safe_profile, private_documents, profile_update, set_document_reminder_consent, set_document_review_date
 from mi_secretary_proposals import preview_signals, confirm_proposal, list_confirmed_signals
 from mi_personal_calendar import set_payroll_calendar, list_payroll_calendar
@@ -433,6 +434,12 @@ def register_routes(db):
         _same_origin(request)
         actor = await _session(request)
         return await profile_update(db, actor, preferred_name=payload.preferred_name)
+
+    @router.get("/private/notifications")
+    async def private_notification_center(request: Request):
+        _enabled()
+        actor = await _session(request)
+        return {"notices": await list_my_notices(db, actor)}
 
     @router.put("/private/preferences/document-reminders")
     async def change_reminder_preferences(payload: ReminderPreferences, request: Request):
