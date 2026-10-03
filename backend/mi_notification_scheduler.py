@@ -52,7 +52,11 @@ async def schedule_offer_reminders(db, *, now: datetime, limit: int = 50) -> dic
             planned = offer_deadline_notifications(offer, now=at)
         except (KeyError, TypeError, ValueError):
             continue
-        # Never catch up two stale thresholds with simultaneous emails.\n        if len(planned) > 1:\n            planned = [min(planned, key=lambda n: n["threshold_hours"])]\n        for notice in planned:\n            eligible += 1
+        # Never catch up two stale thresholds with simultaneous emails.
+        if len(planned) > 1:
+            planned = [min(planned, key=lambda n: n["threshold_hours"])]
+        for notice in planned:
+            eligible += 1
             if await enqueue(db, notice, now=at):
                 queued += 1
     return {"kind": "OFFER_DOCUMENT_DEADLINE",
