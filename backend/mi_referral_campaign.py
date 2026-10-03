@@ -16,11 +16,13 @@ CODE=re.compile(r"^(OI-COL-[0-9]{6,}|OI-SUB-[0-9]{6,})$")
 def eligible_referrer(*,referrer,subscriber_attestation=None):
     kind=referrer.get("kind") if isinstance(referrer,dict) else None
     if kind=="COLABORADOR":
-        return collaborator_is_approved(referrer.get("web_actor"))
+        return (collaborator_is_approved(referrer.get("web_actor"))
+                and referrer.get("referrer_code")==referrer["web_actor"].get("public_code"))
     if kind=="SUSCRIPTOR":
         return (subscriber_referral_eligible(subscriber_attestation)
                 and referrer.get("app_subject")==subscriber_attestation.get("app_subject")
-                and referrer.get("contract_model")=="A")
+                and referrer.get("contract_model")=="A"
+                and referrer.get("referrer_code")==subscriber_attestation.get("approved_web_referrer_code"))
     return False
 
 
