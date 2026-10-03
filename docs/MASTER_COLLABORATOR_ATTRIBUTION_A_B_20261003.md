@@ -61,6 +61,16 @@ La API deberá autorizar a cada colaborador aprobado por `actor_id`, no solo por
 
 El reconocimiento extraordinario del modelo B a partir de 10 operaciones **solo genera un candidato de alerta interna para revisión administrativa**; no constituye regalo automático, importe ni compromiso contractual.
 
+## 6 bis. Suscriptores como aportadores Modelo A
+
+**Actualización 2026-10-03:** el suscriptor de OPORTUNIIAPP también puede aportar inversores desde una sección comercial de MI OPORTUNIIA WEB, independiente de su cuenta e historial de OPORTUNIIAPP. Se identifica ante WEB por integración segura con su identidad OPORTUNIIAPP (pendiente de construir), sin contraseña WEB duplicada. Para el suscriptor la atribución económica es **siempre modelo A**. Su código de aportación WEB y sus relaciones comerciales no deben confundirse con su código de autenticación OPORTUNIIAPP.
+
+La nueva regla comercial: aunque el inversor rescinda su relación directa con el suscriptor, mientras este **siga formando parte de la estructura OPORTUNIIA**, se preservarán los derechos A de sus inversores aportados conforme al contrato existente que será reforzado por LEGAL. Esta condición es diferente del plazo inicial de dos años del colaborador externo. OPERACIONES verifica permanencia y hechos; CONTABILIDAD y LEGAL revisan honorarios; nada se paga automáticamente. LEGAL deberá definir fecha de corte, supuestos de baja o suspensión y alcance de operaciones nacidas antes de la salida.
+
+Ambos perfiles dispondrán de **alta asistida con botón** y **enlace de campaña reutilizable para difusión masiva con QR descargable/imprimible**. Los tres caminos crean un expediente individual y nunca atribuyen por sí solos: el inversor debe aceptar su relación y confirmar personalmente el correo, y OPORTUNIIA revisará asignaciones y duplicidades. El enlace/QR difundido no funciona como contraseña ni como prueba definitiva de consentimiento. Los inversores visibles y la exposición A/B siguen las reglas anteriores.
+
+Véase `docs/MASTER_THREE_PROFILES_ACCESS_20261003.md` para la separación actualizada de identidades y permisos.
+
 ## 7. Puertas de implementación
 
 1. LEGAL revisa y actualiza los contratos A/B YA EXISTENTES y el documento de reconocimiento de honorarios, contrastando sus versiones vigentes; define base del 50 %, dos años (inicio y fecha final), devengos, incumplimientos, desvinculación y evidencias admisibles.
