@@ -7,6 +7,7 @@ of provider acceptance; inbox delivery is a distinct fact.
 from __future__ import annotations
 from datetime import datetime, timezone
 from mi_document_notifications import premium_document_review_reminder
+from mi_payroll_notifications import plan_payroll_reminder
 
 
 def _now(now):
@@ -38,6 +39,34 @@ async def revalidate_claimed_notice(db, notice, *, now):
         except (ValueError,KeyError,TypeError):
             return False
         return any(item["key"]==notice.get("key") for item in plans)
+    if notice.get("kind")=="PREMIUM_PAYROLL_REMINDER":
+        actor_id=notice["actor_id"]
+        actor=await db.mi_actors.find_one({
+            "actor_id":actor_id,"email_verified":True,
+            "validation_state":"VERIFIED","document_reminders":True,
+        })
+        if not actor:
+            return False
+        entitlement=await db.mi_premium_entitlements.find_one({
+            "actor_id":actor_id,"status":"ACTIVE","source_verified":True,
+            "valid_from":{"$lte":at},"expires_at":{"$gt":at},
+        })
+        if not entitlement:
+            return False
+        signal=await db.mi_secretary_signals.find_one({
+            "actor_id":actor_id,"signal_id":notice.get("signal_id"),
+            "kind":"PAYROLL_PAYMENT_DAY","active":True,
+            "calendar_enabled":True,
+            "calendar_version":notice.get("calendar_version"),
+        })
+        if not signal:
+            return False
+        try:
+            plan=plan_payroll_reminder(signal,actor=actor,
+                                      entitlement=entitlement,now=at)
+        except (ValueError,KeyError,TypeError):
+            return False
+        return bool(plan and plan["key"]==notice.get("key"))
     if notice.get("kind")=="PREMIUM_DOCUMENT_REVIEW":
         actor_id=notice["actor_id"]
         actor=await db.mi_actors.find_one({
