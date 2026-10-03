@@ -21,6 +21,7 @@ from presentation_ingress import register_routes as register_presentation_routes
 from presentation_publish import register_publish_routes as register_presentation_publish_routes
 from mi_auth import register_routes as register_mi_auth_routes, register_index_lifecycle
 from mi_subscription_bridge import verify_signed_event, apply_signed_event, ensure_subscription_indexes
+from mi_app_integration_api import register_routes as register_app_integration_routes
 from presentation_e2e import run_presentation_e2e_if_enabled
 
 
@@ -38,6 +39,9 @@ app = FastAPI()
 # Disabled by default. No genuine investor accounts or routes are activated
 # until WEB has SMTP, domain/cookie origin, admin provisioning and indexes.
 app.include_router(register_mi_auth_routes(db))
+# Synthetic sandbox only; absent by default in all environments.
+if os.getenv('WEB_APP_SANDBOX_INTEGRATION_ENABLED') == '1':
+    app.include_router(register_app_integration_routes(db))
 @app.post("/api/mi/internal/subscriptions/events", include_in_schema=False)
 async def trusted_subscription_bridge(request: Request):
     # Server-to-server only. A fresh HMAC signature covers exact payload bytes.
