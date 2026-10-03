@@ -1,23 +1,32 @@
-"""Static validation that escrow copy is conditional, not a live-payment claim."""
+"""Ensure distinct notarial escrow and independent reservation bank flows."""
 from pathlib import Path
 
 root=Path(__file__).resolve().parents[2]
 page=(root/"frontend/public/como-funciona.html").read_text(encoding="utf-8")
 architecture=(root/"docs/MASTER_B2B_ESCROW_API_PAYMENT_ARCHITECTURE_20261003.md").read_text(encoding="utf-8")
-for value in (
-    'id="pagos-protegidos"', "fianza de un coche de alquiler",
-    "tipo escrow", "mediante API", "todavía no está contratado ni activado",
-    "OPORTUNIIA no se presenta como depositaria",
-    "Una retención en tarjeta, un depósito y una cuenta escrow son mecanismos diferentes",
+
+for required in (
+    'id="pagos-protegidos"',
+    "Firma ante notario",
+    "infraestructura tipo escrow mediante API",
+    "garantía de un coche de alquiler",
+    "una retención en tarjeta, una fianza y un servicio escrow son mecanismos diferentes",
+    "Las cantidades de reserva se tramitarán por un circuito independiente",
+    "cuenta bancaria exclusiva para reservas",
+    "todavía no contratados ni activados",
 ):
-    assert value in page, value
-for value in (
+    assert required in page, required
+
+for required in (
     "Pago B2B con Infraestructura Escrow (vía API)",
-    "Cláusula matriz propuesta para contratos",
-    "sujeta a aprobación de LEGAL",
-    "personas físicas no son necesariamente empresas",
-    "no inferir que cualquier pasarela API equivale a escrow regulado",
+    "firma ante notario",
+    "cuenta bancaria separada y exclusiva para reservas",
+    "Cláusula matriz propuesta para contratos (sujeta a aprobación de LEGAL)",
+    "Una cuenta exclusiva para reservas",
+    "no equivale automáticamente a una cuenta escrow",
+    "personas físicas o consumidores",
 ):
-    assert value in architecture, value
-assert "proveedor tercero debidamente habilitado" in architecture
-print("WEB escrow explanation and MASTER contract draft constraints: OK")
+    assert required in architecture, required
+
+assert "no a las reservas" in architecture
+print("Separate notarial escrow and reservation-bank messaging: OK")
