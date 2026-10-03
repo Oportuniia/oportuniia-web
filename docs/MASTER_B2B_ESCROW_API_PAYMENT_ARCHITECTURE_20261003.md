@@ -1,44 +1,46 @@
-# DIRECTRIZ MASTER · Arquitectura de pagos OPORTUNIIA
+# DIRECTRIZ MASTER · Dos circuitos de pago independientes
 
-**Decisión del propietario — 2026-10-03:** el sistema previsto de pagos para operaciones empresariales seguirá un modelo de **Pago B2B con Infraestructura Escrow (vía API)**.
+**Corrección del propietario (2026-10-03):** el modelo **Pago B2B con Infraestructura Escrow (vía API)** se aplica específicamente a los **pagos de operaciones formalizadas mediante firma ante notario**, no a las reservas. La opción preferida para reservas es estudiar **una cuenta bancaria separada y exclusiva para reservas**, con sus propias condiciones y conciliación.
 
-**Estado:** decisión de arquitectura y propuesta de cláusula, no contrato jurídico aprobado, reserva operativa ni proveedor ya contratado.
+**Estado:** decisión de arquitectura pendiente de aprobación y concreción por LEGAL, TESORERÍA y ARQUITECTURA MASTER; ni proveedor escrow ni cuenta de reservas se consideran activos.
 
-## Cláusula matriz propuesta para contratos (sujeta a aprobación de LEGAL)
+## 1 · Firma ante notario: pago B2B mediante infraestructura escrow vía API
 
-«Las partes acuerdan que, cuando la operación contemple pagos, garantías o cantidades condicionadas, su gestión se realizará mediante una infraestructura tecnológica de pago entre empresas (B2B), con funcionalidad escrow o mecanismo equivalente jurídicamente validado, prestada por un proveedor tercero debidamente habilitado para los servicios que correspondan y conectado mediante API a la plataforma OPORTUNIIA.
+### Cláusula matriz propuesta para contratos (sujeta a aprobación de LEGAL)
 
-La identidad del proveedor, la modalidad jurídica y operativa del servicio, la titularidad y salvaguarda de los fondos, las verificaciones exigibles, los hitos que autorizan la liberación y/o devolución, los plazos de ejecución, las tarifas, el procedimiento de resolución de incidencias, las obligaciones KYC/KYB y las responsabilidades de las partes se concretarán en el documento particular de la operación y en las condiciones del proveedor, que deberán entregarse y aceptarse antes de ordenar el pago.
+«Las partes acuerdan que el pago correspondiente a la operación de compraventa que deba formalizarse ante notario se articulará, cuando resulte jurídica y operativamente aplicable, mediante una infraestructura de pagos entre empresas (B2B) con funcionalidad escrow o mecanismo condicional equivalente, gestionada por un proveedor tercero debidamente habilitado e integrada mediante API con los sistemas de OPORTUNIIA.
 
-OPORTUNIIA actuará exclusivamente en el papel que legalmente le corresponda conforme al modelo finalmente aprobado. En ningún caso esta cláusula permitirá presentar a OPORTUNIIA como entidad depositaria, prestadora autorizada de servicios de pago o garante de la devolución mientras no exista habilitación legal expresa para ello. Ningún cobro, bloqueo, transferencia o liberación se ejecutará antes de la selección, integración y validación del proveedor y de las condiciones contractuales.»
+Las condiciones particulares identificarán al proveedor, la modalidad exacta de tratamiento y salvaguarda de fondos, las partes y el importe, los requisitos previos, los hitos verificables asociados a la firma notarial y el procedimiento para liberar, devolver o resolver controversias sobre las cantidades, incluidos los plazos y comisiones aplicables. Ninguna liberación se producirá por una instrucción unilateral no autorizada de la plataforma: se verificará la evidencia notarial y contractual que proceda.
 
-**Notas esenciales para LEGAL**
-- El término comercial escrow **no sustituye** la definición jurídica exacta del mecanismo que ofrezca el proveedor. Comprobar si se trata de custodia condicional, salvaguarda regulatoria, cuenta de pago, retención de tarjeta, mandato o mecanismo contractual diferente y usar la denominación correcta.
-- La analogía de la fianza del coche de alquiler es solo divulgativa y NO implica devolución automática o íntegra ni retención en tarjeta. Los supuestos de pérdida, devolución parcial, adjudicación y controversia deben especificarse.
-- Diferenciar **oferta comercial**, **aprobación**, **documentación en 72 horas**, **hoja de reserva** y **pago condicionado**; una oferta presentada o aprobada no autoriza por sí sola captura de fondos.
-- Fijar si el importe objetivo de 5.000 EUR (mínimo comercial debatido de 3.000 EUR) resulta exigible en una modalidad de operación determinada, si es fianza, depósito, arras u otra figura, y quién lo recibe; no presentarlo como tarifa ni como cobro activo sin validación.
-- Revisar el carácter realmente B2B: inversores personas físicas no son necesariamente empresas; habilitar la modalidad correspondiente solo para perfiles elegibles y preparar un circuito diferente si se admiten consumidores.
-- Adecuar KYC/KYB, prevención de blanqueo, información previa, protección de datos, registro de evidencias, disputas, reversos, insolvencia del proveedor, conciliación, retención y comisiones.
-- Verificar autorizaciones del proveedor y ámbitos de actividad con registro y asesoría; no inferir que cualquier pasarela API equivale a escrow regulado.
+OPORTUNIIA desempeñará únicamente su función contractual y tecnológica autorizada. No se presenta como entidad depositaria, entidad de pago ni garante de la devolución. La selección, contratación y revisión jurídica del proveedor y las condiciones particulares son requisitos previos a cualquier cobro real por este mecanismo.»
 
-## Arquitectura de integración que deberá desarrollarse
+**IMPORTANTE:** el servicio comercial descrito como escrow no constituye por sí mismo una modalidad regulatoria: LEGAL debe verificar la solución exacta ofrecida y las autorizaciones exigibles. El circuito B2B no se atribuirá automáticamente a inversores personas físicas o consumidores.
 
-1. LEGAL emite `payment_terms_version` por tipo de operación: partes, importe, mecanismo, eventos verificables y condiciones de devolución y conflicto.
-2. WEB presenta los términos vigentes y obtiene aceptación expresa y trazable antes del pago; nunca deriva importes o identidad del beneficiario de datos editables del navegador.
-3. Backend prepara una intención de pago idempotente (`offer_id`, `operation_id`, `provider_reference`) solo tras aprobación documental y autorización aplicable, sin almacenar credenciales bancarias ni saldos como custodio.
-4. API del proveedor autorizado ejecuta recepción/custodia condicional y emite callbacks firmados. WEB verifica autenticidad, idempotencia, correlación, versiones y reconciliación diaria. Ningún callback del cliente libera fondos.
-5. Las instrucciones de liberación o devolución requieren condiciones acreditadas, segregación de funciones y autorización conforme a LEGAL, evitando que un único operador o una automatización no autorizada decida unilateralmente.
-6. n8n coordina notificaciones y tareas técnicas sin custodiar fondos, ni sustituir al proveedor o la decisión jurídica.
-7. Auditoría: estados de pago, evidencias de entrega/notificación, respuesta API, discrepancias, rechazo y disputa; datos y permisos mínimos.
+### Arquitectura de integración notarial
 
-## Bloqueos antes de activar
+1. LEGAL y OPERACIONES fijan el protocolo de la operación y los hitos verificables de la firma notarial, con reglas de excepción y controversias.
+2. WEB presenta y registra la aceptación de las condiciones particulares del pago notarial; el backend valida y fija importes y destinatarios, nunca el navegador.
+3. Backend comunica a la API del proveedor especializado una intención idempotente y conserva referencias operativas, no custodia ni credenciales bancarias.
+4. Eventos del proveedor con autenticidad verificada y evidencias del hito notarial permiten solicitar liberación o devolución conforme a la autoridad y condiciones pactadas. Firma notarial no significa automáticamente liberación si quedan requisitos contractuales pendientes.
+5. Conciliación, auditoría, gestión de conflictos, seguridad de webhooks y segregación de funciones; n8n solo orquesta información y tareas.
 
-- Selección comercial y validación por LEGAL del proveedor y modalidad real (autorización/registro y API condicional, cobertura geográfica y precio).
-- Contratos finales, reparto de roles, requisitos operacionales, términos particulares y política de reclamaciones.
-- Aprobación de seguridad y ensayos integrales en entorno de pruebas: webhooks, idempotencia, doble evento, reverso, disputa, proveedor caído, conciliación, perfiles físicos y jurídicos.
-- Validación expresa del circuito real de reserva, comisiones e impuestos.
-- Hasta finalizar lo anterior, «Cómo funciona» describe el **modelo previsto**, sin afirmar disponibilidad comercial, custodia actual ni devoluciones garantizadas.
+## 2 · Reservas: cuenta bancaria dedicada, separada del escrow notarial
 
-## Referencia regulatoria a contrastar con LEGAL
+**Propuesta del propietario:** estudiar una cuenta exclusiva para recibir y administrar las cantidades de reserva; no compartirla con ingresos generales ni con el circuito de pago notarial.
 
-Banco de España: los servicios de pago regulados requieren, según actividad y excepciones aplicables, proveedores autorizados o registrados. La custodia y salvaguarda de fondos se rigen por requisitos concretos; un mero nombre comercial «escrow» no acredita el cumplimiento. Documentar validación legal antes de contratar.
+Antes de implantarla, LEGAL y TESORERÍA deberán concretar: titularidad de la cuenta, si existe obligación de cuenta segregada o tercero custodio, naturaleza jurídica de la reserva (depósito, arras u otra figura), cuantía por operación, recibo e identificación bancaria, conciliación, fecha y criterios de aplicación al precio, supuestos de devolución/pérdida, impuestos, comisiones, controles de acceso y protección ante incidencias o insolvencia.
+
+Una cuenta exclusiva para reservas **no equivale automáticamente a una cuenta escrow ni garantiza por sí sola la protección legal o devolución de los fondos**. No cobrar reservas hasta que las condiciones contractuales y bancarias estén aprobadas.
+
+La cifra comercial antes debatida de 5.000 EUR (mínimo 3.000 EUR) queda sujeta a definición específica y aprobación legal de la hoja de reserva: NO se incorpora como importe del pago notarial por defecto. Oferta, aceptación, documentación en 72 horas, reserva y firma notarial son etapas distintas.
+
+## Para «Cómo funciona»
+
+Se explica la firma notarial con la analogía limitada de la garantía del coche de alquiler: fondos sujetos a condiciones y verificación previa a su destino. Debe aclararse que una fianza/retención de tarjeta y escrow no son lo mismo. Aparte, se presenta el proyecto de cuenta exclusiva para reservas, sin mezclarlos.
+
+## Pendiente antes del despliegue
+
+- LEGAL: validar cláusulas separadas de compraventa notarial y reserva, y adecuación a perfiles empresariales o consumidores.
+- TESORERÍA: definir banco y titularidad de la cuenta de reservas, política de conciliación y devolución; ninguna cuenta afirmada como existente.
+- PAGOS: verificar proveedor habilitado, condiciones de custodia y API, pruebas sandbox de webhooks e idempotencia.
+- ARQUITECTURA MASTER: reflejar la separación de procesos, hitos, permisos y contabilización en el ecosistema.
