@@ -49,4 +49,10 @@ def render_notice(notice: dict, *, web_area_url: str = WEB_AREA_URL):
               "OPORTUNIIA · WEB"
         )
         return subject, body
+    if kind == "PREMIUM_PAYROLL_REMINDER":
+        # Do not disclose day, employer, salary, tax status or document names.
+        return ("OPORTUNIIA Premium · Tu agenda personal",
+                "Tienes una tarea programada en tu agenda privada de MI OPORTUNIIA.\n"
+                "Consulta los detalles y modifica o cancela tus preferencias en:\n"
+                + web_area_url + "\n\nOPORTUNIIA · WEB")
     raise ValueError("unsupported notice")
