@@ -14,6 +14,7 @@ from mi_document_notifications import (
     premium_document_review_reminder,
 )
 from mi_notification_outbox import enqueue
+from mi_payroll_notifications import plan_payroll_reminder
 
 
 def _now(value):
@@ -121,9 +122,52 @@ async def schedule_premium_reviews(db, *, now: datetime, limit: int = 50) -> dic
             "eligible": eligible, "queued": queued}
 
 
+async def schedule_payroll_reminders(db, *, now: datetime, limit: int = 50) -> dict:
+    """Bounded scan of confirmed owner-enabled recurring calendars, no SMTP."""
+    at = _now(now)
+    count = _limit(limit)
+    cursor = db.mi_secretary_signals.find(
+        {"kind":"PAYROLL_PAYMENT_DAY","source":"OWNER_CONFIRMED_DOCUMENT_PROPOSAL",
+         "active":True,"calendar_enabled":True,"calendar_timezone":"Europe/Madrid"},
+        {"_id":0,"actor_id":1,"signal_id":1,"kind":1,"source":1,
+         "active":1,"calendar_enabled":1,"calendar_timezone":1,
+         "calendar_lead_days":1,"calendar_version":1,"confirmed_value":1},
+    ).limit(count)
+    actors, entitlements = {}, {}
+    eligible = queued = 0
+    async for signal in cursor:
+        actor_id = signal.get("actor_id")
+        if not isinstance(actor_id,str) or not actor_id.startswith("mi_"):
+            continue
+        if actor_id not in actors:
+            actors[actor_id] = await db.mi_actors.find_one({
+                "actor_id":actor_id,"email_verified":True,
+                "validation_state":"VERIFIED","document_reminders":True,
+            })
+        actor=actors[actor_id]
+        if not actor:
+            continue
+        if actor_id not in entitlements:
+            entitlements[actor_id] = await db.mi_premium_entitlements.find_one({
+                "actor_id":actor_id,"status":"ACTIVE","source_verified":True,
+                "valid_from":{"$lte":at},"expires_at":{"$gt":at},
+            })
+        subscription=entitlements[actor_id]
+        if not subscription:
+            continue
+        planned=plan_payroll_reminder(signal,actor=actor,
+                                       entitlement=subscription,now=at)
+        if planned:
+            eligible += 1
+            if await enqueue(db,planned,now=at):
+                queued += 1
+    return {"kind":"PREMIUM_PAYROLL_REMINDER","eligible":eligible,"queued":queued}
+
+
 async def schedule_notifications(db, *, now: datetime, limit: int = 50) -> dict:
     """One iteration; caller owns configuration, pacing, and observability."""
     return {
         "offer": await schedule_offer_reminders(db, now=now, limit=limit),
         "premium": await schedule_premium_reviews(db, now=now, limit=limit),
+        "payroll": await schedule_payroll_reminders(db, now=now, limit=limit),
     }
