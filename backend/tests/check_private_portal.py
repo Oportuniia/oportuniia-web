@@ -12,6 +12,7 @@ for required in [
     "/api/mi/private/premium/pdf/",
     "/api/mi/private/documents/",
     "/review-date", "next_review_at", "/private/premium/calendar",
+    "/api/mi/private/notifications", 'id="notices-private"',
     "oportuniia-logo.webp", 'id="profile-form"'
 ]:
     assert required in html, f"Missing private portal feature: {required}"
