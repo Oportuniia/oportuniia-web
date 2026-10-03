@@ -32,7 +32,7 @@ label{display:block;font-weight:600;font-size:.9rem}small{color:#537082}nav a{co
 <section class="card"><h2>Secretaría personalizada Premium</h2><p>Analiza voluntariamente una nómina o declaración ya clasificada para obtener propuestas. No calculamos obligaciones fiscales ni programamos avisos sin tu confirmación.</p>
 <label>Identificador de documento privado<input id="secretary-file-id" placeholder="ID de una nómina o renta ya revisada"></label>
 <label style="display:flex;gap:8px;align-items:center"><input id="secretary-consent" type="checkbox" style="width:auto">Autorizo este análisis documental puntual</label>
-<button id="secretary-analyze" type="button">Analizar y proponer</button><div id="secretary-candidates"></div>
+<button id="secretary-analyze" type="button">Analizar y proponer</button><div id="secretary-candidates"></div><div style="margin-top:16px"><h3>Mi calendario confirmado</h3><button id="secretary-calendar-reload" type="button">Actualizar mi calendario</button><div id="secretary-calendar"></div></div>
 <p><small>La propuesta indica lo que aparece en el documento, no tu situación actual. Confirma únicamente datos vigentes.</small></p></section>
 <section class="card"><h2>Organizador PDF Premium</h2><p>Propone categorías y permite confirmar la separación de un PDF que ya esté verificado en tu archivo.</p>
 <label>Identificador de tu PDF o fotografía<input id="file-id" placeholder="Identificador de documento"></label>
@@ -107,6 +107,49 @@ $("login-form").addEventListener("submit",async e=>{e.preventDefault();try{await
 $("profile-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/private/profile",{method:"PATCH",body:JSON.stringify({preferred_name:$("preferred-name").value})});message("Perfil actualizado")}catch(err){message(err.message)}});
 $("logout").onclick=async()=>{try{await api("/api/mi/auth/logout-all",{method:"POST"});location.replace("/acceso")}catch(e){message(e.message)}};
 $("save-reminders").onclick=async()=>{try{const result=await api("/api/mi/private/preferences/document-reminders",{method:"PUT",body:JSON.stringify({document_reminders:$("document-reminders").checked})});message(result.document_reminders?"Recordatorios documentales activados.":"Recordatorios documentales desactivados.")}catch(e){message(e.message)}};
+async function refreshPersonalCalendar(){
+  const root=$("secretary-calendar");root.replaceChildren();
+  try{
+    const result=await api("/api/mi/private/premium/secretary/signals");
+    if(!result.signals.length){root.append(entry("p","No has confirmado datos todavía."));return}
+    for(const signal of result.signals){
+      const block=document.createElement("div");block.className="notice";
+      block.append(entry("p",signal.kind+" · Dato confirmado: "+signal.confirmed_value));
+      if(signal.kind==="PAYROLL_PAYMENT_DAY"){
+        const lead=document.createElement("select");
+        for(let days=0;days<=7;days++){
+          const option=document.createElement("option");option.value=String(days);
+          option.textContent=days===0?"El mismo día":"Con "+days+" día(s) de antelación";
+          lead.append(option);
+        }
+        block.append(entry("label","Antelación del recordatorio"));block.append(lead);
+        const toggle=entry("button",signal.calendar_enabled?"Desactivar aviso":"Activar aviso de cobro");
+        toggle.type="button";
+        toggle.onclick=async()=>{
+          toggle.disabled=true;
+          try{
+            await api("/api/mi/private/premium/calendar/"+encodeURIComponent(signal.signal_id),{
+              method:"PUT",body:JSON.stringify({
+                enabled:!signal.calendar_enabled,lead_days:Number(lead.value)
+              })
+            });
+            message(signal.calendar_enabled?"Recordatorio desactivado.":"Calendario personal activado.");
+            await refreshPersonalCalendar();
+          }catch(e){message(e.message);toggle.disabled=false}
+        };block.append(toggle);
+      }else{
+        block.append(entry("small","Dato informativo. No genera avisos ni determina obligaciones fiscales."));
+      }
+      root.append(block);
+    }
+    const events=await api("/api/mi/private/premium/calendar");
+    for(const item of events.events){
+      const eventDate=new Date(item.event_at).toLocaleString("es-ES",{timeZone:"Europe/Madrid"});
+      root.append(entry("p","Próximo evento confirmado: "+eventDate+" (España peninsular)"));
+    }
+  }catch(e){root.append(entry("small",e.message))}
+}
+$("secretary-calendar-reload").onclick=refreshPersonalCalendar;
 $("secretary-analyze").onclick=async()=>{
   const fileId=$("secretary-file-id").value.trim();
   if(!/^[0-9a-f]{32}$/.test(fileId))return message("Selecciona un identificador válido de tu documento.");
@@ -133,7 +176,7 @@ $("secretary-analyze").onclick=async()=>{
           await api("/api/mi/private/premium/secretary/confirm",
             {method:"POST",body:JSON.stringify({proposal_id:result.proposal_id,kind:candidate.kind,value})});
           root.replaceChildren();
-          message("Dato confirmado y guardado. Los recordatorios no se activan automáticamente.");
+          message("Dato confirmado y guardado. Los recordatorios no se activan automáticamente.");await refreshPersonalCalendar();
         }catch(e){message(e.message);confirm.disabled=false}
       };
       box.append(confirm);root.append(box);
