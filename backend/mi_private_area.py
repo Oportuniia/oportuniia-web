@@ -19,6 +19,7 @@ def safe_profile(actor: dict) -> dict:
         "public_code": actor.get("public_code"),
         "email": actor["email"],
         "email_verified": bool(actor.get("email_verified")),
+        "document_reminders": actor.get("document_reminders") is True,
     }
 
 
@@ -52,3 +53,20 @@ async def profile_update(db, actor: dict, *, preferred_name: str):
         {"$set": {"preferred_name": clean, "updated_at": datetime.now(timezone.utc)}}
     )
     return {"preferred_name": clean}
+
+
+async def set_document_reminder_consent(db, actor: dict, *, enabled: bool):
+    """Document-specific Premium opt-in; does not affect essential offer notices."""
+    if not actor or not actor.get("actor_id"):
+        raise HTTPException(401, "Sesión necesaria")
+    if type(enabled) is not bool:
+        raise HTTPException(422, "Consentimiento no válido")
+    now = datetime.now(timezone.utc)
+    result = await db.mi_actors.update_one(
+        {"actor_id": actor["actor_id"], "validation_state": {"$in": ["PENDING", "VERIFIED"]}},
+        {"$set": {"document_reminders": enabled, "document_reminders_updated_at": now,
+                  "updated_at": now}},
+    )
+    if result.matched_count != 1:
+        raise HTTPException(403, "Cuenta no disponible")
+    return {"document_reminders": enabled}
