@@ -498,7 +498,12 @@ _BY_SLUG = {o["slug"]: o for o in OPPORTUNITIES}
 
 
 def enrich(o):
-    d = dict(o)
+    # Public catalogue is NOT an authorization boundary: never leak the
+    # PRESENTACIÓN publication payload, R2 keys, document hashes or source ids.
+    d = {k: v for k, v in o.items() if k not in (
+        "documents", "source_output_id", "source_output_version",
+        "source_output_hash", "internal_id",
+    )}
     d["product_name"] = product_name(o["product"])
     d["asset_name"] = asset_name(o["asset_type"])
     # Datos dinámicos de PRESENTACIÓN pueden traer nombres soberanos ya resueltos.

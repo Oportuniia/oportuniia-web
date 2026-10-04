@@ -19,6 +19,9 @@ from wp_precheck import run_precheck, run_capability_discovery, run_item_read, r
 import catalog_data as cat
 from presentation_ingress import register_routes as register_presentation_routes
 from presentation_publish import register_publish_routes as register_presentation_publish_routes
+from mi_auth import register_routes as register_mi_auth_routes, register_index_lifecycle
+from mi_subscription_bridge import verify_signed_event, apply_signed_event, ensure_subscription_indexes
+from mi_app_integration_api import register_routes as register_app_integration_routes
 from presentation_e2e import run_presentation_e2e_if_enabled
 
 
@@ -32,6 +35,31 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+
+# Disabled by default. No genuine investor accounts or routes are activated
+# until WEB has SMTP, domain/cookie origin, admin provisioning and indexes.
+app.include_router(register_mi_auth_routes(db))
+# Synthetic sandbox only; absent by default in all environments.
+if os.getenv('WEB_APP_SANDBOX_INTEGRATION_ENABLED') == '1':
+    app.include_router(register_app_integration_routes(db))
+@app.post("/api/mi/internal/subscriptions/events", include_in_schema=False)
+async def trusted_subscription_bridge(request: Request):
+    # Server-to-server only. A fresh HMAC signature covers exact payload bytes.
+    raw = await request.body()
+    event = verify_signed_event(
+        raw, timestamp=request.headers.get("x-mi-timestamp", ""),
+        signature=request.headers.get("x-mi-signature", ""),
+    )
+    return await apply_signed_event(db, event)
+
+
+@app.on_event("startup")
+async def _mi_auth_indexes_if_enabled():
+    if os.getenv("MI_AUTH_ENABLED") == "1":
+        await register_index_lifecycle(db)()
+    if os.getenv('MI_BILLING_BRIDGE_ENABLED') == '1':
+        await ensure_subscription_indexes(db)
+
 
 
 @app.on_event("startup")
@@ -491,6 +519,20 @@ async def contacto():
 async def servicers():
     return _public_html("servicers.html")
 
+@app.get("/mi-oportuniia", response_class=HTMLResponse)
+async def mi_oportuniia():
+    # UI is public shell only; all private data/API calls require WEB session.
+    return _public_html("mi-oportuniia.html")
+
+
+@app.get("/preparar-oferta", response_class=HTMLResponse)
+@app.get("/preparar-oferta/", response_class=HTMLResponse)
+async def preparar_oferta_private_shell():
+    # No offer may be submitted merely by visiting this public shell.
+    # Prefill data requires an authenticated, validated investor session.
+    return _public_html("preparar-oferta.html")
+
+
 @app.get("/acceso", response_class=HTMLResponse)
 async def acceso():
     return _public_html("acceso.html")
@@ -590,10 +632,16 @@ async def oportunidad_detalle(request: Request, slug: str):
     vip = await _vip_active(request)
     locked = (o["universe"] == "acuerdos" and not vip)
     interest = await _interest_signal(slug)
+    # Only published backend records carry sovereign PRESENTACIÓN document metadata.
+    from presentation_document_view import public_document_status
+    # Fail closed: do not expose documentary inventory of restricted Acuerdos.
+    raw_published_item = next((item for item in published if item.get("slug") == slug), None)
+    presentation_docs = [] if locked and raw_published_item else public_document_status(raw_published_item)
     resp = templates.TemplateResponse("detalle.html", {
         "request": request, "base_url": _public_base(request), "o": o,
         "interest": interest, "locked": locked, "vip_active": vip,
-        "docs": cat.documentation_for(o), "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",
+        "docs": cat.documentation_for(o) if presentation_docs is None else [],
+        "presentation_docs": presentation_docs, "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",
     })
     _ensure_sid(request, resp)
     return resp
