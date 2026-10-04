@@ -74,3 +74,13 @@ async def test_legal_gate_and_empty_scoped_portfolio(setup):
             assert result.status_code==200
             assert result.json()["investors"]==[] and result.json()["sync_status"]=="SOURCE_ADAPTER_PENDING"
             assert (await c.get(root+"/subscriber-portfolio",headers={**h,"x-app-subject":"bob"})).status_code==403
+
+@pytest.mark.asyncio
+async def test_unknown_third_party_fields_are_rejected(setup):
+    app,_=setup
+    h={"x-oportuniia-web-app-m2m-key":"synthetic-secret","x-app-subject":"alice","idempotency-key":"retry-key-3"}
+    payload={"app_event_id":"event-00003","app_report_id":"report-3","app_subject":"alice","investor_name":"must-not-be-silently-accepted"}
+    with patch.dict(os.environ,{"WEB_APP_N8N_ORCHESTRATOR_KEY":"synthetic-secret"},clear=False):
+        async with AsyncClient(transport=ASGITransport(app=app),base_url="http://test") as client:
+            response=await client.post("/api/integrations/oportuniiapp/v1/referral-intakes",json=payload,headers=h)
+            assert response.status_code==422
