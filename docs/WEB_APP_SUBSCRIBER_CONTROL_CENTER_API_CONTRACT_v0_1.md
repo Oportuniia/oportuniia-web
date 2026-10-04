@@ -3,7 +3,7 @@ Estado: PROPUESTA DE CONTRATO. NO existe aún endpoint HTTP operativo ni comunic
 
 ## Identidad y confianza
 - APP autentica al suscriptor y WEB verifica mediante un vínculo registrado y aprobado app_subject ↔ web_referrer_code (OI-SUB-...), suscripción activa y alcance específico. Nunca confiar en un referrer_code aportado por el navegador.
-- Transporte canónico del ecosistema: OPORTUNIIAPP → n8n propio de OPORTUNIIA → WEB y WEB → n8n propio → OPORTUNIIAPP cuando corresponda. Los receptores siguen siendo endpoints M2M internos; n8n orquesta, reintenta y audita sin asumir autoridad de negocio. Credencial M2M dedicada en variable de entorno, cabecera x-oportuniia-web-app-m2m-key, autorización por recurso/suscriptor, TLS, límites de frecuencia y secretos fuera del repositorio. No compartir bases de datos.
+- Transporte canónico: M2M DIRECTO OPORTUNIIAPP ↔ WEB conforme a docs/ARQUITECTURA_M2M_MASTER_v1.md. n8n no será intermediario obligatorio; solo se conservará donde exista orquestación real no sustituida. Credencial M2M dedicada por relación en variable de entorno, autorización por recurso/suscriptor, TLS, anti-replay, rate limiting, outbox/inbox persistentes, ACK, correlación, hash y secretos fuera del repositorio. No compartir bases de datos.
 - El centro de control APP es un agregador visual; APP y WEB conservan datos y responsabilidades separados.
 
 ## ENTRADA WEB: solicitud APP «Vendido por mí»
