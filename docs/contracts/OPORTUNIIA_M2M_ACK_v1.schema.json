@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oportuniia.com/schemas/OPORTUNIIA_M2M_ACK_v1.schema.json",
+  "title": "OPORTUNIIA_M2M_ACK_v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version","event_id","correlation_id","payload_hash",
+    "receiver","ack_status","received_at"
+  ],
+  "properties": {
+    "schema_version": {"const": "OPORTUNIIA_M2M_ACK_v1"},
+    "event_id": {"type": "string", "minLength": 8, "maxLength": 200},
+    "correlation_id": {"type": "string", "minLength": 8, "maxLength": 200},
+    "payload_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "receiver": {"type": "string", "minLength": 1, "maxLength": 100},
+    "ack_status": {"enum": ["ACCEPTED","REPLAYED","CONFLICT","REJECTED"]},
+    "received_at": {"type": "string", "format": "date-time"},
+    "business_state": {"type": ["string","null"], "maxLength": 200},
+    "error_code": {"type": ["string","null"], "maxLength": 200}
+  }
+}
