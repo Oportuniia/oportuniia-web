@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://oportuniia.com/schemas/OPORTUNIIA_M2M_EVENT_v1.schema.json",
+  "title": "OPORTUNIIA_M2M_EVENT_v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version","event_id","event_type","producer","consumer",
+    "contract_name","contract_version","correlation_id","occurred_at",
+    "payload_hash","hash_algorithm","payload"
+  ],
+  "properties": {
+    "schema_version": {"const": "OPORTUNIIA_M2M_EVENT_v1"},
+    "event_id": {"type": "string", "minLength": 8, "maxLength": 200},
+    "event_type": {"type": "string", "minLength": 1, "maxLength": 200},
+    "producer": {"type": "string", "minLength": 1, "maxLength": 100},
+    "consumer": {"type": "string", "minLength": 1, "maxLength": 100},
+    "contract_name": {"type": "string", "minLength": 1, "maxLength": 200},
+    "contract_version": {"type": "string", "minLength": 1, "maxLength": 50},
+    "correlation_id": {"type": "string", "minLength": 8, "maxLength": 200},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "payload_hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "hash_algorithm": {"const": "SHA-256"},
+    "payload": {},
+    "transport": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "timestamp": {"type": "string", "format": "date-time"},
+        "nonce": {"type": "string", "minLength": 8, "maxLength": 200},
+        "attempt": {"type": "integer", "minimum": 1, "maximum": 6}
+      }
+    }
+  }
+}
