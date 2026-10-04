@@ -24,3 +24,12 @@ La interfaz no realiza cobros reales, no activa entitlement Premium y no contien
 
 ## Gate
 El diseño B2C y la interfaz de checkout quedan preparados en sandbox. El gate no autoriza producción ni sustituye la revisión final de LEGALLAB.
+
+
+## Integración contractual posterior · Modalidades por operación (05/10/2026)
+
+La contratación Premium no fija una modalidad A/B/C/D permanente al inversor. La modalidad de servicio se selecciona separadamente para cada reserva/operación.
+
+Cuando la operación sea B o D, el componente jurídico será prestado por profesional/despacho externo e independiente bajo su correspondiente encargo profesional. Cuando sea C o D, la comercialización posterior será un servicio operativo OPORTUNIIA diferenciado.
+
+Toda operación queda además condicionada al expediente documental vigente y al gate PBC/Compliance CLEARED conforme a la decisión MASTER vigente.
