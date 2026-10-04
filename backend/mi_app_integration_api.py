@@ -21,9 +21,9 @@ class Intake(BaseModel):
     consent_evidence_ref:str|None=None
 
 def _authorize(request,subject=None):
-    secret=os.getenv("WEB_APP_SANDBOX_SERVICE_TOKEN","")
-    supplied=request.headers.get("authorization","")
-    if not secret or not hmac.compare_digest(supplied,"Bearer "+secret):
+    secret=os.getenv("WEB_APP_N8N_ORCHESTRATOR_KEY","")
+    supplied=request.headers.get("x-oportuniia-web-app-m2m-key","")
+    if not secret or not hmac.compare_digest(supplied,secret):
         raise HTTPException(401,"Service authentication required")
     bound=request.headers.get("x-app-subject","")
     if not bound or (subject is not None and not hmac.compare_digest(bound,subject)):
