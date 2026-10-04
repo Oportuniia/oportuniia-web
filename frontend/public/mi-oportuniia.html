@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MI OPORTUNIIA · Área privada</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{font-family:Poppins,system-ui,sans-serif;color:#112a3c;background:#f4f7f8}*{box-sizing:border-box}
+body{margin:0}header{background:#0a1622;color:white;padding:20px max(20px,calc((100vw - 1120px)/2));display:flex;align-items:center;justify-content:space-between;gap:20px}
+header img{width:190px;max-width:45vw}main{max-width:1120px;margin:auto;padding:42px 20px}
+h1{font-size:clamp(2rem,5vw,3.5rem);margin:.2em 0}h2{font-size:1.35rem;margin-top:0}
+p{line-height:1.7;color:#485e6b}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:22px}
+.card{background:white;padding:25px;border-radius:15px;box-shadow:0 10px 35px #0a16220d;border:1px solid #e1eaf0}
+button{font:inherit;background:#1f6588;color:white;border:0;border-radius:7px;padding:11px 17px;cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}input,select{font:inherit;padding:10px;border:1px solid #b8cbd6;border-radius:7px;width:100%;margin:7px 0 12px}
+label{display:block;font-weight:600;font-size:.9rem}small{color:#537082}nav a{color:#c5e5f5;text-decoration:none}
+#private,#page-review{display:none}.notice{border-left:4px solid #1f6588;background:#e9f2f6;padding:13px 17px;margin:20px 0}
+.row{display:flex;align-items:center;gap:15px;flex-wrap:wrap}pre{white-space:pre-wrap;word-break:break-word}
+</style></head><body>
+<header><a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA"></a><nav><a href="/oportunidades">Oportunidades</a></nav></header>
+<main><small>OPORTUNIIA · HUMANIZAMOS LA DEUDA</small><h1>MI OPORTUNIIA</h1>
+<p>Tu espacio personal. La documentación privada y los permisos de cada operación se administran por separado.</p>
+<div id="login" class="card"><h2>Acceso seguro</h2><p>Introduce las credenciales de tu cuenta WEB. Si aún estás en el sistema anterior, utiliza el registro oficial.</p>
+<form id="login-form"><label>Correo electrónico<input id="email" type="email" autocomplete="username" required></label>
+<label>Contraseña<input id="password" type="password" autocomplete="current-password" required></label>
+<button>Entrar</button></form><details><summary>¿No has recibido el correo de verificación?</summary><form id="resend-form"><label>Correo electrónico<input id="resend-email" type="email" required></label><button>Reenviar código</button></form></details><details><summary>¿Has olvidado tu contraseña?</summary><p>Solicita un código por correo electrónico y establece una contraseña nueva.</p><form id="recover-request"><label>Correo electrónico<input id="recover-email" type="email" required></label><button>Solicitar código</button></form><form id="recover-complete"><label>Código recibido<input id="recover-token" required minlength="30"></label><label>Contraseña nueva<input id="recover-password" type="password" required minlength="12"></label><button>Cambiar contraseña</button></form></details>
+<p><a href="https://registro.oportuniia.com/inversores">Registro de inversores</a> · <a href="https://registro.oportuniia.com/colaboradores">Registro de colaboradores</a></p></div>
+<div id="private"><div class="notice" id="account-status"></div>
+<div class="grid"><section class="card"><h2>Mi perfil</h2><div id="profile"></div>
+<form id="profile-form"><label>Nombre preferido<input id="preferred-name" minlength="1" maxlength="100" required></label><button>Guardar</button></form>
+<div style="margin:20px 0;border-top:1px solid #dce7ed;padding-top:16px"><h3>Secretaría documental Premium</h3><label style="display:flex;gap:10px;align-items:start"><input id="document-reminders" type="checkbox" style="width:auto;margin-top:5px">Quiero recibir recordatorios para revisar mis documentos</label><p><small>Opcional y configurable. Los avisos necesarios de ofertas aprobadas son independientes.</small></p><button id="save-reminders" type="button">Guardar preferencias</button></div><br><button type="button" id="logout">Cerrar todas mis sesiones</button></section>
+<section class="card"><h2>Mis documentos</h2><p>Tus documentos solo son visibles con tu sesión.</p><div id="docs"></div><label>Subir documento (PDF o fotografía)<input id="upload-file" type="file" accept=".pdf,.jpg,.jpeg,.png,.webp,application/pdf,image/jpeg,image/png,image/webp"></label><div class="row"><button id="upload" type="button">Subir de forma segura</button><button id="reload" type="button">Actualizar lista</button></div>
+<p><small>La carga requiere que el almacenamiento privado y el antivirus estén configurados. Los documentos se verifican antes de su utilización.</small></p></section>
+<section class="card"><h2>Secretaría personalizada Premium</h2><p>Analiza voluntariamente una nómina o declaración ya clasificada para obtener propuestas. No calculamos obligaciones fiscales ni programamos avisos sin tu confirmación.</p>
+<label>Identificador de documento privado<input id="secretary-file-id" placeholder="ID de una nómina o renta ya revisada"></label>
+<label style="display:flex;gap:8px;align-items:center"><input id="secretary-consent" type="checkbox" style="width:auto">Autorizo este análisis documental puntual</label>
+<button id="secretary-analyze" type="button">Analizar y proponer</button><div id="secretary-candidates"></div><div style="margin-top:16px"><h3>Mi calendario confirmado</h3><button id="secretary-calendar-reload" type="button">Actualizar mi calendario</button><div id="secretary-calendar"></div></div>
+<p><small>La propuesta indica lo que aparece en el documento, no tu situación actual. Confirma únicamente datos vigentes.</small></p></section>
+<section class="card"><h2>Mis notificaciones</h2><p>Consulta el estado de tus recordatorios sin mostrar información sensible.</p><button id="notices-refresh" type="button">Actualizar notificaciones</button><div id="notices-private"></div><p><small>«Procesado» no confirma la entrega en tu correo. Puedes cambiar tus preferencias en tu perfil.</small></p></section>
+<section class="card"><h2>Organizador PDF Premium</h2><p>Propone categorías y permite confirmar la separación de un PDF que ya esté verificado en tu archivo.</p>
+<label>Identificador de tu PDF o fotografía<input id="file-id" placeholder="Identificador de documento"></label>
+<button id="inspect" type="button">Analizar documento</button>
+<div id="photo-review" style="display:none"><h3>Revisar fotografía</h3><label>Tipo documental<select id="photo-kind"></select></label><button id="photo-confirm" type="button">Crear PDF OCR</button></div><div id="page-review"><h3>Revisión de páginas</h3><div id="pages"></div><button id="confirm" type="button">Confirmar separación</button></div>
+<p><small>Disponible únicamente para usuarios Premium validados. Los resultados requieren revisión de seguridad antes de su descarga.</small></p></section></div></div>
+<p id="feedback" role="status" aria-live="polite"></p></main>
+<script>
+const $=id=>document.getElementById(id);
+$("recover-request").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/auth/recovery/request",{method:"POST",body:JSON.stringify({email:$("recover-email").value})});message("Si el correo está registrado, recibirás instrucciones.")}catch(err){message(err.message)}});
+$("recover-complete").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/auth/recovery/complete",{method:"POST",body:JSON.stringify({token:$("recover-token").value,new_password:$("recover-password").value})});$("recover-password").value="";message("Contraseña actualizada. Inicia sesión de nuevo.")}catch(err){message(err.message)}});
+$("resend-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/auth/resend",{method:"POST",body:JSON.stringify({email:$("resend-email").value})});message("Si tienes una cuenta pendiente, recibirás otro correo de verificación.")}catch(err){message(err.message)}});
+const kinds=["IDENTIDAD","NOMINA","RENTA","SOCIEDAD","BANCO","OTROS"];
+let review=null;
+let photoFileId=null;
+for(const kind of kinds){const el=document.createElement("option");el.value=kind;el.textContent=kind;$("photo-kind").append(el)}
+async function api(url,opt={}){const res=await fetch(url,{credentials:"same-origin",cache:"no-store",...opt,headers:{"Content-Type":"application/json",...(opt.headers||{})}});let data=await res.json().catch(()=>({}));if(!res.ok)throw Error(typeof data.detail==="string"?data.detail:"Operación no disponible");return data}
+function message(text){ $("feedback").textContent=text }
+function entry(tag,text){const el=document.createElement(tag);el.textContent=String(text??"");return el}
+async function refresh(){
+  try{
+    const {profile}=await api("/api/mi/private/profile");
+    $("login").style.display="none";$("private").style.display="block";
+    $("account-status").textContent="Cuenta: "+profile.role+" · Estado: "+profile.validation_state;
+    const block=$("profile");block.replaceChildren(entry("p",profile.email),entry("p",profile.public_code||"Código pendiente de validación"));
+    $("preferred-name").value=profile.preferred_name||"";
+    $("document-reminders").checked=profile.document_reminders===true;
+    await refreshNotices();
+    const {documents}=await api("/api/mi/private/documents");
+    const list=$("docs");list.replaceChildren();
+    if(!documents.length)list.append(entry("p","Aún no hay documentos disponibles"));
+    for(const doc of documents){const line=entry("p",(doc.display_name||doc.file_id)+" · "+doc.status);if(doc.status==="AVAILABLE"){const button=entry("button","Descargar");button.type="button";button.onclick=async()=>{try{const result=await api("/api/mi/private/documents/"+encodeURIComponent(doc.file_id)+"/download");const anchor=document.createElement("a");anchor.href=result.download_url;anchor.rel="noreferrer";anchor.referrerPolicy="no-referrer";anchor.textContent="Abrir descarga privada";anchor.target="_blank";line.append(document.createTextNode(" · "));line.append(anchor)}catch(e){message(e.message)}};line.append(document.createTextNode(" "));line.append(button)}if(doc.status==="AVAILABLE"){
+      const reviewBox=entry("div","");
+      reviewBox.style.margin="10px 0 18px 0";
+      const label=entry("label","Próxima fecha de revisión (Premium, opcional)");
+      const reviewInput=document.createElement("input");
+      reviewInput.type="date";
+      reviewInput.setAttribute("aria-label","Revisión para "+(doc.display_name||"documento"));
+      if(doc.next_review_at){
+        const value=new Date(doc.next_review_at);
+        if(!Number.isNaN(value.getTime()))reviewInput.value=value.toLocaleDateString("sv-SE",{timeZone:"Europe/Madrid"});
+      }
+      label.append(reviewInput);reviewBox.append(label);
+      const save=entry("button","Guardar fecha de revisión");
+      save.type="button";
+      save.onclick=async()=>{
+        save.disabled=true;
+        try{
+          let nextReview=null;
+          if(reviewInput.value){
+            // Store noon UTC: all scheduled dates must be explicit, no inferred expiry.
+            const dt=new Date(reviewInput.value+"T12:00:00Z");
+            if(Number.isNaN(dt.getTime()))throw Error("Fecha inválida");
+            nextReview=dt.toISOString();
+          }
+          await api("/api/mi/private/documents/"+encodeURIComponent(doc.file_id)+"/review-date",{
+            method:"PUT",body:JSON.stringify({next_review_at:nextReview})
+          });
+          message(nextReview?"Fecha de revisión guardada.":"Fecha de revisión eliminada.");
+          await refresh();
+        }catch(e){message(e.message)}
+        finally{save.disabled=false}
+      };
+      reviewBox.append(save);
+      const hint=entry("small","Esta fecha no es una caducidad legal. Solo se utilizará para recordatorios si los activas y tienes Premium vigente.");
+      reviewBox.append(hint);
+      line.append(reviewBox);
+    }
+    line.dataset.fileId=doc.file_id;line.dataset.fileMime=doc.mime||"";list.append(line)}
+  }catch(e){$("login").style.display="block";$("private").style.display="none";message(e.message)}
+}
+$("login-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/auth/login",{method:"POST",body:JSON.stringify({email:$("email").value,password:$("password").value})});$("password").value="";await refresh()}catch(err){message(err.message)}});
+$("profile-form").addEventListener("submit",async e=>{e.preventDefault();try{await api("/api/mi/private/profile",{method:"PATCH",body:JSON.stringify({preferred_name:$("preferred-name").value})});message("Perfil actualizado")}catch(err){message(err.message)}});
+$("logout").onclick=async()=>{try{await api("/api/mi/auth/logout-all",{method:"POST"});location.replace("/acceso")}catch(e){message(e.message)}};
+$("save-reminders").onclick=async()=>{try{const result=await api("/api/mi/private/preferences/document-reminders",{method:"PUT",body:JSON.stringify({document_reminders:$("document-reminders").checked})});message(result.document_reminders?"Recordatorios documentales activados.":"Recordatorios documentales desactivados.")}catch(e){message(e.message)}};
+async function refreshPersonalCalendar(){
+  const root=$("secretary-calendar");root.replaceChildren();
+  try{
+    const result=await api("/api/mi/private/premium/secretary/signals");
+    if(!result.signals.length){root.append(entry("p","No has confirmado datos todavía."));return}
+    for(const signal of result.signals){
+      const block=document.createElement("div");block.className="notice";
+      block.append(entry("p",signal.kind+" · Dato confirmado: "+signal.confirmed_value));
+      if(signal.kind==="PAYROLL_PAYMENT_DAY"){
+        const lead=document.createElement("select");
+        for(let days=0;days<=7;days++){
+          const option=document.createElement("option");option.value=String(days);
+          option.textContent=days===0?"El mismo día":"Con "+days+" día(s) de antelación";
+          lead.append(option);
+        }
+        lead.value=String(signal.calendar_lead_days??1);
+        block.append(entry("label","Antelación del recordatorio"));block.append(lead);
+        const toggle=entry("button",signal.calendar_enabled?"Quitar de mi calendario":"Añadir a mi calendario");
+        toggle.type="button";
+        toggle.onclick=async()=>{
+          toggle.disabled=true;
+          try{
+            await api("/api/mi/private/premium/calendar/"+encodeURIComponent(signal.signal_id),{
+              method:"PUT",body:JSON.stringify({
+                enabled:!signal.calendar_enabled,lead_days:Number(lead.value)
+              })
+            });
+            message(signal.calendar_enabled?"Evento retirado de tu calendario.":"Evento añadido a tu calendario. El envío de avisos todavía no está activo.");
+            await refreshPersonalCalendar();
+          }catch(e){message(e.message);toggle.disabled=false}
+        };block.append(toggle);
+      }else{
+        block.append(entry("small","Dato informativo. No genera avisos ni determina obligaciones fiscales."));
+      }
+      root.append(block);
+    }
+    const events=await api("/api/mi/private/premium/calendar");
+    for(const item of events.events){
+      const eventDate=new Date(item.event_at).toLocaleString("es-ES",{timeZone:"Europe/Madrid"});
+      root.append(entry("p","Próximo evento confirmado: "+eventDate+" (España peninsular)"));
+    }
+  }catch(e){root.append(entry("small",e.message))}
+}
+$("secretary-calendar-reload").onclick=refreshPersonalCalendar;
+$("secretary-analyze").onclick=async()=>{
+  const fileId=$("secretary-file-id").value.trim();
+  if(!/^[0-9a-f]{32}$/.test(fileId))return message("Selecciona un identificador válido de tu documento.");
+  if(!$("secretary-consent").checked)return message("Debes autorizar el análisis de este documento.");
+  $("secretary-analyze").disabled=true;
+  try{
+    const result=await api("/api/mi/private/premium/secretary/"+encodeURIComponent(fileId)+"/analyze",
+      {method:"POST",body:JSON.stringify({analysis_consent:true})});
+    const root=$("secretary-candidates");root.replaceChildren();
+    if(!result.candidates.length){root.append(entry("p","No se detectaron propuestas seguras. Introduce tus fechas manualmente cuando esté disponible."));return}
+    for(const candidate of result.candidates){
+      const box=document.createElement("div");box.className="notice";
+      box.append(entry("p","Propuesta: "+candidate.kind+" · Valor detectado: "+candidate.candidate_value));
+      if(candidate.warning)box.append(entry("small",candidate.warning));
+      const label=entry("label","Confirma o corrige el valor actual");
+      const field=document.createElement("input");field.value=candidate.candidate_value;
+      if(candidate.kind==="PAYROLL_PAYMENT_DAY"){field.type="number";field.min=1;field.max=28}
+      label.append(field);box.append(label);
+      const confirm=entry("button","Confirmar esta propuesta");confirm.type="button";
+      confirm.onclick=async()=>{
+        confirm.disabled=true;
+        try{
+          const value=candidate.kind==="PAYROLL_PAYMENT_DAY"?Number(field.value):field.value;
+          await api("/api/mi/private/premium/secretary/confirm",
+            {method:"POST",body:JSON.stringify({proposal_id:result.proposal_id,kind:candidate.kind,value})});
+          root.replaceChildren();
+          message("Dato confirmado y guardado. Los recordatorios no se activan automáticamente.");await refreshPersonalCalendar();
+        }catch(e){message(e.message);confirm.disabled=false}
+      };
+      box.append(confirm);root.append(box);
+    }
+    message("Revisa cada dato: el análisis documental puede estar desactualizado.");
+  }catch(e){message(e.message)}
+  finally{$("secretary-analyze").disabled=false;$("secretary-consent").checked=false}
+};
+async function refreshNotices(){
+  const root=$("notices-private");root.replaceChildren();
+  try{
+    const result=await api("/api/mi/private/notifications");
+    if(!result.notices.length){root.append(entry("p","No tienes notificaciones registradas."));return}
+    for(const notice of result.notices){
+      const date=notice.created_at?new Date(notice.created_at).toLocaleDateString("es-ES"):"";
+      root.append(entry("p",notice.title+" · "+notice.status+(date?" · "+date:"")));
+    }
+  }catch(e){root.append(entry("small",e.message))}
+}
+$("notices-refresh").onclick=refreshNotices;
+$("reload").onclick=refresh;
+$("upload").onclick=async()=>{
+  const file=$("upload-file").files[0];if(!file)return message("Selecciona primero un documento");
+  if(file.size>25*1024*1024)return message("El límite de carga es 25 MB");
+  $("upload").disabled=true;
+  try{
+    const init=await api("/api/mi/private/documents/upload-intent",{method:"POST",
+      body:JSON.stringify({display_name:file.name,mime:file.type,size:file.size})});
+    const sent=await fetch(init.upload_url,{method:"PUT",headers:{"Content-Type":file.type},body:file});
+    if(!sent.ok)throw Error("No se ha podido enviar el documento");
+    const result=await api("/api/mi/private/documents/"+encodeURIComponent(init.file_id)+"/confirm",{method:"POST"});
+    message("Documento "+result.status+"; disponible después del control de seguridad");
+    $("upload-file").value="";await refresh();
+  }catch(e){message(e.message)}
+  finally{$("upload").disabled=false}
+};
+$("inspect").onclick=async()=>{try{
+  const fileId=$("file-id").value.trim();const fileType=Array.from($("docs").querySelectorAll("[data-file-mime]")).find(el=>el.dataset.fileId===fileId)?.dataset.fileMime;
+  const photo=fileType && fileType.startsWith("image/");
+  const result=await api("/api/mi/private/premium/"+(photo?"image/":"pdf/")+encodeURIComponent(fileId)+"/inspect",{method:"POST"});
+  if(photo){photoFileId=fileId;$("photo-review").style.display="block";$("page-review").style.display="none";const suggested=result.pages[0]?.suggested_kind;$("photo-kind").value=kinds.includes(suggested)?suggested:"OTROS";message("Revisa la clasificación OCR de la fotografía.");return}
+  $("photo-review").style.display="none";
+  review={fileId,pages:result.pages};const root=$("pages");root.replaceChildren();
+  for(const page of review.pages){const box=entry("div","Página "+page.page+" · Categoría sugerida: "+page.suggested_kind);
+    const label=entry("label","Categoría confirmada");const select=document.createElement("select");select.dataset.page=page.page;
+    for(const kind of kinds){const option=document.createElement("option");option.value=kind;option.textContent=kind;
+      if(kind===(page.suggested_kind==="SIN_CLASIFICAR"?"OTROS":page.suggested_kind))option.selected=true;select.append(option)}
+    label.append(select);box.append(label);const grouping=entry("label","Número de documento (mismo número agrupa páginas)");
+    const num=document.createElement("input");num.type="number";num.min=1;num.max=100;num.value=page.page;num.dataset.group=page.page;grouping.append(num);box.append(grouping);root.append(box)}
+  $("page-review").style.display="block";message("Revisa y confirma TODAS las páginas.")
+ }catch(e){message(e.message)}};
+$("photo-confirm").onclick=async()=>{try{if(!photoFileId)throw Error("Selecciona una fotografía");const result=await api("/api/mi/private/premium/image/"+encodeURIComponent(photoFileId)+"/confirm",{method:"POST",body:JSON.stringify({kind:$("photo-kind").value})});message("Fotografía convertida en PDF OCR verificado.");$("photo-review").style.display="none";photoFileId=null;await refresh()}catch(e){message(e.message)}};
+$("confirm").onclick=async()=>{try{
+  if(!review)throw Error("Analiza primero el PDF");
+  const groups=new Map();
+  for(const p of review.pages){const kind=document.querySelector('[data-page="'+p.page+'"]').value;
+    const group=parseInt(document.querySelector('[data-group="'+p.page+'"]').value,10);
+    if(!Number.isInteger(group)||group<1||group>100)throw Error("Grupo incorrecto");
+    if(!groups.has(group))groups.set(group,{kind,pages:[]});
+    if(groups.get(group).kind!==kind)throw Error("Cada grupo debe tener una sola categoría");
+    groups.get(group).pages.push(p.page)}
+  const result=await api("/api/mi/private/premium/pdf/"+encodeURIComponent(review.fileId)+"/confirm",{method:"POST",body:JSON.stringify({groups:[...groups.values()]})});
+  message(result.files.length+" documentos generados y verificados por antivirus.");$("page-review").style.display="none";await refresh()
+ }catch(e){message(e.message)}};
+refresh();
+</script></body></html>
