@@ -1,0 +1,27 @@
+name: M2M MASTER Contract Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/m2m_master_contract.py"
+      - "backend/tests/test_m2m_master_contract.py"
+      - "docs/contracts/**"
+      - "docs/M2M_TRANSPORT_MASTER_v1.md"
+      - ".github/workflows/m2m-master-contract-gate.yml"
+  push:
+    branches:
+      - "sandbox/m2m-master-aligned-v1-20261004"
+
+jobs:
+  m2m-master-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test dependency
+        run: pip install pytest
+      - name: Run common M2M MASTER contract tests
+        run: pytest -q backend/tests/test_m2m_master_contract.py
