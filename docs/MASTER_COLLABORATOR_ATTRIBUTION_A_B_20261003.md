@@ -23,9 +23,9 @@ El sistema distingue por separado:
 
 No presumir que todas las operaciones generan comisiones: el contrato determina base, plazo, territorios, operaciones cubiertas, momento de devengo, impuestos, intermediación y caducidad. No extender automáticamente la protección dos años desde cada compra sucesiva.
 
-## 3. Modelo A: requisito documental para cobrar el 50 %
+## 3. Modelo A: cesión y documentación económica
 
-**Regla comercial comunicada:** la participación del colaborador del **50 % de la operación según la base definida en el contrato A** exige aportar, **ANTES de la firma notarial de la compraventa**, el contrato de reconocimiento de honorarios aceptado por el inversor. El documento debe identificar al colaborador, inversor y la operación; y especificar si los honorarios se calculan sobre su **venta posterior del activo** o sobre un **beneficio pactado del inversor**, conforme al modelo concreto.
+**Contrato aportado 2026-10-04:** en Modalidad A, el COLABORADOR tiene derecho al **50 % de los honorarios netos efectivamente percibidos por OPORTUNIIA derivados de la cesión**, condicionado a la documentación exigida por el propio contrato. Las condiciones económicas futuras entre INVERSOR y COLABORADOR relativas a adquisición, adjudicación, explotación, comercialización o venta posterior se documentan separadamente. No confundir ambos derechos ni calcular pagos automáticamente. El documento debe identificar al colaborador, inversor y la operación; y especificar si los honorarios se calculan sobre su **venta posterior del activo** o sobre un **beneficio pactado del inversor**, conforme al modelo concreto.
 
 - Al cerrar la operación, LEGAL/OPERACIONES verifican fecha anterior a notaría, partes, firmas, versión y vinculación documental. El sistema no marca comisión como pagadera si falta contrato válido. **No confundir el 50 % con 50 % del precio inmobiliario ni con un porcentaje fijo de ganancia** hasta conocer el texto firmado.
 - Venta posterior, obligación de liquidar, cuantía real, plazo de pago y prueba de impago se determinan por el contrato y sus hechos verificables. La venta o la fecha notarial por sí solas no prueban beneficio ni habilitan un cobro automático.
