@@ -40,8 +40,8 @@ def setup():
 async def test_auth_isolation_and_idempotence(setup):
     app,db=setup
     body={"app_event_id":"event-00001","app_report_id":"report-1","app_subject":"alice"}
-    h={"authorization":"Bearer synthetic-secret","x-app-subject":"alice","idempotency-key":"retry-key-1"}
-    with patch.dict(os.environ,{"WEB_APP_SANDBOX_SERVICE_TOKEN":"synthetic-secret"},clear=False):
+    h={"x-oportuniia-web-app-m2m-key":"synthetic-secret","x-app-subject":"alice","idempotency-key":"retry-key-1"}
+    with patch.dict(os.environ,{"WEB_APP_N8N_ORCHESTRATOR_KEY":"synthetic-secret"},clear=False):
         async with AsyncClient(transport=ASGITransport(app=app),base_url="http://test") as c:
             url="/api/integrations/oportuniiapp/v1/referral-intakes"
             assert (await c.post(url,json=body)).status_code==401
@@ -59,9 +59,9 @@ async def test_auth_isolation_and_idempotence(setup):
 @pytest.mark.asyncio
 async def test_legal_gate_and_empty_scoped_portfolio(setup):
     app,db=setup
-    h={"authorization":"Bearer synthetic-secret","x-app-subject":"alice","idempotency-key":"retry-key-2"}
+    h={"x-oportuniia-web-app-m2m-key":"synthetic-secret","x-app-subject":"alice","idempotency-key":"retry-key-2"}
     root="/api/integrations/oportuniiapp/v1"
-    with patch.dict(os.environ,{"WEB_APP_SANDBOX_SERVICE_TOKEN":"synthetic-secret",
+    with patch.dict(os.environ,{"WEB_APP_N8N_ORCHESTRATOR_KEY":"synthetic-secret",
                                 "WEB_APP_LEGAL_THIRD_PARTY_CONTACTS_ENABLED":"0"},clear=False):
         async with AsyncClient(transport=ASGITransport(app=app),base_url="http://test") as c:
             payload={"app_event_id":"event-00002","app_report_id":"report-2",
