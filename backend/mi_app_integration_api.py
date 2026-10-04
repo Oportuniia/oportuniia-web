@@ -5,12 +5,13 @@ import json
 import os
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 
 router=APIRouter(prefix="/api/integrations/oportuniiapp/v1",include_in_schema=False)
 STATES={"WEB_CHECK_PENDING","INDEX_UNAVAILABLE","DUPLICATE_BLOCKED","INVESTOR_VERIFICATION_PENDING","HUMAN_REVIEW_PENDING","APPROVED_WITH_WEB_CODE","REJECTED"}
 
 class Intake(BaseModel):
+    model_config=ConfigDict(extra="forbid")
     schema_version:str="1"
     app_event_id:str=Field(min_length=8,max_length=128)
     app_report_id:str=Field(min_length=1,max_length=128)
