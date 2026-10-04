@@ -1,12 +1,23 @@
-from backend.m2m_master_contract import (
-    M2MContractError,
-    build_ack,
-    build_event,
-    payload_hash,
-    retry_offset_seconds,
-    validate_ack,
-    validate_event,
-)
+try:
+    from backend.m2m_master_contract import (
+        M2MContractError,
+        build_ack,
+        build_event,
+        payload_hash,
+        retry_offset_seconds,
+        validate_ack,
+        validate_event,
+    )
+except ModuleNotFoundError:
+    from m2m_master_contract import (
+        M2MContractError,
+        build_ack,
+        build_event,
+        payload_hash,
+        retry_offset_seconds,
+        validate_ack,
+        validate_event,
+    )
 
 
 def test_hash_is_deterministic_for_key_order():
