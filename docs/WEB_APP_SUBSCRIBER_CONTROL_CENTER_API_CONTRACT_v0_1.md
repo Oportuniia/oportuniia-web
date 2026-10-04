@@ -3,12 +3,12 @@ Estado: PROPUESTA DE CONTRATO. NO existe aún endpoint HTTP operativo ni comunic
 
 ## Identidad y confianza
 - APP autentica al suscriptor y WEB verifica mediante un vínculo registrado y aprobado app_subject ↔ web_referrer_code (OI-SUB-...), suscripción activa y alcance específico. Nunca confiar en un referrer_code aportado por el navegador.
-- Llamadas exclusivamente backend a backend mediante credenciales de servicio rotables y audiencia/alcance; autorización por recurso, auditoría mínima, TLS, límites de frecuencia, prevención de enumeración y secretos fuera del repositorio.
+- Transporte canónico del ecosistema: OPORTUNIIAPP → n8n propio de OPORTUNIIA → WEB y WEB → n8n propio → OPORTUNIIAPP cuando corresponda. Los receptores siguen siendo endpoints M2M internos; n8n orquesta, reintenta y audita sin asumir autoridad de negocio. Credencial M2M dedicada en variable de entorno, cabecera x-oportuniia-web-app-m2m-key, autorización por recurso/suscriptor, TLS, límites de frecuencia y secretos fuera del repositorio. No compartir bases de datos.
 - El centro de control APP es un agregador visual; APP y WEB conservan datos y responsabilidades separados.
 
 ## ENTRADA WEB: solicitud APP «Vendido por mí»
 Propuesta: POST /api/integrations/oportuniiapp/v1/referral-intakes
-Headers: Authorization: Bearer <service-token>, Idempotency-Key: <opaque-event-key>
+Headers: x-oportuniia-web-app-m2m-key: <n8n-m2m-secret>, Idempotency-Key: <opaque-event-key>, x-app-subject: <authenticated-app-subject>
 Body (mínimo, sujeto a LEGAL): schema_version, app_event_id, app_report_id, app_subject, investor_email y/o investor_phone, consent_evidence_ref, captured_at.
 APP debe verificar actor y propiedad del informe en su servidor. Consentimiento verificable en servidor; una casilla enviada por navegador no es prueba suficiente. No almacenar ni enviar PII del comprador mientras LEGAL no autorice la recogida; cerrar primero el posible bypass del guard de collaborator_sale en rutas APP.
 - Validación WEB: autenticidad, idempotencia, vinculación APP↔WEB, identidad normalizada email O teléfono; cotejo contra registros WEB y fuentes APP legalmente autorizadas. Comprobación atómica en persistencia y revalidación al aprobar.
