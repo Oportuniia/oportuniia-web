@@ -9,6 +9,9 @@ import os
 import json
 import secrets
 import logging
+import re
+import time
+from collections import defaultdict, deque
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
@@ -121,6 +124,82 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+# ── OPORTUNIIAPP → WEB · Subscriber Control Center (READ-ONLY M2M) ──────────
+WEB_APP_SCHEMA = "WEB_OPORTUNIIAPP_SUBSCRIBER_PORTFOLIO_v1"
+WEB_APP_KEY_ENV = "WEB_OPORTUNIIAPP_CONTROL_M2M_KEY"
+_WEB_APP_SUBJECT_RE = re.compile(r"^[A-Za-z0-9._:@+\\-]{1,200}$")
+_WEB_APP_RATE = defaultdict(deque)
+_WEB_APP_RATE_LIMIT = int(os.environ.get("WEB_OPORTUNIIAPP_CONTROL_RATE_LIMIT_PER_MINUTE", "60"))
+
+def _web_app_rate_allowed(client_key: str) -> bool:
+    now = time.monotonic()
+    q = _WEB_APP_RATE[client_key]
+    while q and now - q[0] >= 60:
+        q.popleft()
+    if len(q) >= _WEB_APP_RATE_LIMIT:
+        return False
+    q.append(now)
+    return True
+
+async def _resolve_web_subject(subject: str) -> tuple[bool, str | None]:
+    """Resolve only explicit WEB-owned identity mappings. Never create/infer identity."""
+    # Dedicated mapping collection is WEB-owned. If no mapping exists, fail safely as NOT_REGISTERED.
+    mapping = await db.oportuniiapp_web_identity_map.find_one(
+        {"app_subject": subject, "active": {"$ne": False}},
+        {"_id": 0, "web_subject_id": 1},
+    )
+    if not mapping or not mapping.get("web_subject_id"):
+        return False, None
+    web_subject_id = str(mapping["web_subject_id"])
+    # WEB registration remains sovereign. Support the WEB-owned registration collection only.
+    registered = await db.web_users.find_one(
+        {"subject_id": web_subject_id},
+        {"_id": 1},
+    )
+    return bool(registered), web_subject_id
+
+@api_router.get("/integrations/oportuniiapp/v1/subscriber-portfolio")
+async def oportuniiapp_subscriber_portfolio(request: Request):
+    configured_key = (os.environ.get(WEB_APP_KEY_ENV) or "").strip()
+    if not configured_key:
+        return JSONResponse({"error": "m2m_not_configured"}, status_code=503)
+
+    supplied_key = (request.headers.get("x-oportuniia-web-app-m2m-key") or "").strip()
+    if not supplied_key or not secrets.compare_digest(supplied_key, configured_key):
+        return JSONResponse({"error": "unauthorized"}, status_code=401)
+
+    client_key = request.client.host if request.client else "m2m"
+    if not _web_app_rate_allowed(client_key):
+        return JSONResponse({"error": "rate_limited"}, status_code=429)
+
+    subject = (request.headers.get("x-app-subject") or "").strip()
+    if not subject or not _WEB_APP_SUBJECT_RE.fullmatch(subject):
+        return JSONResponse({"error": "invalid_subject"}, status_code=400)
+
+    correlation_id = (request.headers.get("X-OPORTUNIIA-Correlation-ID") or "").strip()
+    if not correlation_id:
+        correlation_id = str(uuid.uuid4())
+    elif len(correlation_id) > 200 or any(ord(ch) < 32 for ch in correlation_id):
+        return JSONResponse({"error": "invalid_correlation_id"}, status_code=400)
+
+    registered, web_subject_id = await _resolve_web_subject(subject)
+    status = "REGISTERED" if registered else "NOT_REGISTERED"
+
+    # Need-to-know only. Investor exposure is intentionally empty until a WEB-owned,
+    # permission-checked relationship source is explicitly approved.
+    investors = []
+
+    logging.info("WEB_OPORTUNIIAPP_CONTROL lookup correlation_id=%s result=%s", correlation_id, status)
+    return {
+        "schema_version": WEB_APP_SCHEMA,
+        "subject_id": subject,
+        "registration": {"registered": registered, "status": status},
+        "investors": investors,
+        "generated_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "correlation_id": correlation_id,
+    }
+
 
 # ── OPORTUNIIA · WordPress READ-ONLY precheck (Phase 2) ──────────────────────
 # These endpoints NEVER auto-run. They execute only on an explicit HTTP call.
