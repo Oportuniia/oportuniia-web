@@ -336,6 +336,10 @@ class SavedSearchIn(BaseModel):
 class OperationIntentIn(BaseModel):
     slug: str
     action: str  # "reservar" | "comprar"
+    # Investor chooses services per operation, never as a permanent profile attribute.
+    modality: str  # A | B | C | D
+    documentation_status: str = "PENDING"  # CURRENT | PENDING | EXPIRED | REVIEW
+    pbc_status: str = "REQUIRED"  # CLEARED required to advance
 
 
 # ==== APIs FUNCIONALES ====
@@ -457,13 +461,33 @@ async def operation_intent(payload: OperationIntentIn, request: Request, respons
     published = await _published_catalog_items()
     if not cat.get_by_slug(payload.slug, extra=published):
         return JSONResponse({"error": "unknown slug"}, status_code=404)
+    if payload.modality not in ("A", "B", "C", "D"):
+        return JSONResponse({"error": "invalid modality", "allowed": ["A", "B", "C", "D"]}, status_code=400)
+    compliance_cleared = payload.documentation_status == "CURRENT" and payload.pbc_status == "CLEARED"
     await db.demo_operation_intents.insert_one({
         "session_id": sid, "slug": payload.slug, "action": payload.action,
-        "state": "DEMO", "created_at": datetime.now(timezone.utc).isoformat(),
+        "modality": payload.modality,
+        "documentation_status": payload.documentation_status,
+        "pbc_status": payload.pbc_status,
+        "compliance_cleared": compliance_cleared,
+        "state": "READY_FOR_CONTRACT" if compliance_cleared else "COMPLIANCE_BLOCKED",
+        "created_at": datetime.now(timezone.utc).isoformat(),
     })
-    return {"status": "demo", "action": payload.action, "transactional": False,
-            "future_flow": ["actor_id", "opportunity", "operation", "mi_oportuniia", "documentation"],
-            "note": "Interacción DEMO. Reservar y Comprar son acciones distintas; reglas contractuales no definidas en esta fase."}
+    return {
+        "status": "ready_for_contract" if compliance_cleared else "compliance_blocked",
+        "action": payload.action,
+        "modality": payload.modality,
+        "services": {
+            "legal_partner": payload.modality in ("B", "D"),
+            "oportuniia_resale": payload.modality in ("C", "D"),
+        },
+        "transactional": False,
+        "documentation_status": payload.documentation_status,
+        "pbc_status": payload.pbc_status,
+        "can_advance": compliance_cleared,
+        "rule": "No operation advances without current documentation and PBC/compliance CLEARED.",
+        "note": "Sandbox/prepared only. Real reservation, payment and entitlement remain disabled until production authorization.",
+    }
 
 
 async def _interest_signal(slug: str) -> Optional[str]:
