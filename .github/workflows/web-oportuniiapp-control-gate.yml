@@ -1,0 +1,26 @@
+name: WEB OPORTUNIIAPP Control Gate
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "backend/server.py"
+      - "backend/tests/test_oportuniiapp_control.py"
+      - ".github/workflows/web-oportuniiapp-control-gate.yml"
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend requirements
+        run: pip install -r backend/requirements.txt
+      - name: Run control endpoint contract tests
+        env:
+          MONGO_URL: mongodb://localhost:27017
+          DB_NAME: test
+          PYTHONPATH: backend
+        run: pytest -q backend/tests/test_oportuniiapp_control.py
