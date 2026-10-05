@@ -336,6 +336,22 @@ class SavedSearchIn(BaseModel):
 class OperationIntentIn(BaseModel):
     slug: str
     action: str  # "reservar" | "comprar"
+    # Investor chooses services per operation, never as a permanent profile attribute.
+    modality: str  # A | B | C | D
+    # Compliance is sovereign server/M2M state. Client must never submit CLEARED.
+
+class OperationReadinessSyncIn(BaseModel):
+    operation_id: str
+    investor_id: str
+    modality: str
+    documentation_current: bool
+    pbc_cleared: bool
+    territorial_cleared: bool
+    legal_partner_ready: bool
+    can_contract: bool
+    blockers: List[str] = []
+    authoritative: bool
+    source: str = "OPORTUNIIAPP_M2M"
 
 
 # ==== APIs FUNCIONALES ====
@@ -457,14 +473,74 @@ async def operation_intent(payload: OperationIntentIn, request: Request, respons
     published = await _published_catalog_items()
     if not cat.get_by_slug(payload.slug, extra=published):
         return JSONResponse({"error": "unknown slug"}, status_code=404)
+    if payload.modality not in ("A", "B", "C", "D"):
+        return JSONResponse({"error": "invalid modality", "allowed": ["A", "B", "C", "D"]}, status_code=400)
+    # Fail closed: WEB never manufactures compliance clearance.
+    # Authoritative state will be synchronized from OPORTUNIIAPP/Compliance via server-side M2M.
+    documentation_status = "PENDING"
+    pbc_status = "REQUIRED"
+    compliance_cleared = False
+    territorial_status = "PENDING_REVIEW" if payload.modality in ("C", "D") else "NOT_REQUIRED"
     await db.demo_operation_intents.insert_one({
         "session_id": sid, "slug": payload.slug, "action": payload.action,
-        "state": "DEMO", "created_at": datetime.now(timezone.utc).isoformat(),
+        "modality": payload.modality,
+        "documentation_status": documentation_status,
+        "pbc_status": pbc_status,
+        "territorial_status": territorial_status,
+        "compliance_source": "AUTHORITATIVE_SERVER_M2M_PENDING",
+        "compliance_cleared": compliance_cleared,
+        "state": "COMPLIANCE_BLOCKED",
+        "created_at": datetime.now(timezone.utc).isoformat(),
     })
-    return {"status": "demo", "action": payload.action, "transactional": False,
-            "future_flow": ["actor_id", "opportunity", "operation", "mi_oportuniia", "documentation"],
-            "note": "Interacción DEMO. Reservar y Comprar son acciones distintas; reglas contractuales no definidas en esta fase."}
+    return {
+        "status": "ready_for_contract" if compliance_cleared else "compliance_blocked",
+        "action": payload.action,
+        "modality": payload.modality,
+        "services": {
+            "legal_partner": payload.modality in ("B", "D"),
+            "oportuniia_resale": payload.modality in ("C", "D"),
+        },
+        "transactional": False,
+        "documentation_status": documentation_status,
+        "pbc_status": pbc_status,
+        "territorial_status": territorial_status,
+        "can_advance": compliance_cleared,
+        "rule": "No operation advances without current documentation and PBC/compliance CLEARED.",
+        "note": "Sandbox/prepared only. Real reservation, payment and entitlement remain disabled until production authorization.",
+    }
 
+
+@api_router.post("/operations/readiness-sync")
+async def operation_readiness_sync(payload: OperationReadinessSyncIn, request: Request):
+    # Server/M2M ingress only. Never trust a browser session as compliance authority.
+    m2m_marker = request.headers.get("X-OPORTUNIIA-M2M", "")
+    if m2m_marker != "authoritative":
+        return JSONResponse({"error": "authoritative M2M required"}, status_code=403)
+    if not payload.authoritative or payload.source != "OPORTUNIIAPP_M2M":
+        return JSONResponse({"error": "invalid readiness authority"}, status_code=422)
+    if payload.modality not in ("A", "B", "C", "D"):
+        return JSONResponse({"error": "invalid modality"}, status_code=422)
+    computed = (payload.documentation_current and payload.pbc_cleared and
+                (payload.territorial_cleared or payload.modality in ("A", "B")) and
+                (payload.legal_partner_ready or payload.modality in ("A", "C")))
+    if payload.can_contract != computed:
+        return JSONResponse({"error": "inconsistent readiness payload"}, status_code=409)
+    doc = payload.model_dump()
+    doc["received_at"] = datetime.now(timezone.utc).isoformat()
+    doc["immutable_snapshot"] = True
+    await db.operation_readiness_snapshots.insert_one(doc)
+    return {"status": "synced", "operation_id": payload.operation_id,
+            "can_contract": computed, "blockers": payload.blockers}
+
+@api_router.get("/operations/{operation_id}/readiness")
+async def operation_readiness(operation_id: str):
+    row = await db.operation_readiness_snapshots.find_one(
+        {"operation_id": operation_id}, {"_id": 0}, sort=[("received_at", -1)])
+    if not row:
+        return {"operation_id": operation_id, "can_contract": False,
+                "state": "AUTHORITATIVE_READINESS_PENDING",
+                "blockers": ["AUTHORITATIVE_READINESS_PENDING"]}
+    return {**row, "state": "READY_FOR_CONTRACT" if row.get("can_contract") else "COMPLIANCE_BLOCKED"}
 
 async def _interest_signal(slug: str) -> Optional[str]:
     # Señal de interés VERAZ y agregada (privacy-safe). 0 evidencia = 0 mensaje.

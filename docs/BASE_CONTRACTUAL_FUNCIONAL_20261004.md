@@ -36,7 +36,7 @@ Revisión transversal de WEB, OPORTUNIIAPP, VISUAL, IA, CORE y LEGAL. Las cláus
 - OPORTUNIIAPP como herramienta operativa de campo: asignaciones, visitas, informes, fotografías, notas, comunidad/ITE-IEE, estados e histórico.
 - El actor queda atribuido por su identidad autenticada; acceso solo a recursos asignados.
 - Calidad: Quality Score/Quality Star versionados y revisables. La Quality Star no debe confundirse con una certificación del activo.
-- Regla comercial Quality Star → rappel confirmada v1: elegibilidad con Quality Star >=4,5; comisión base 5%; 5,5% a 3 meses; 6% a 6 meses; 7% al cierre del primer año; consolidación anual +1 punto; máximo 10%; horizonte máximo cinco años cualificados. En el techo del sistema, venta de crédito: 60% suscriptor / 40% OPORTUNIIA. Debe incorporarse al contrato solo con redacción final de LEGAL.
+- Regla comercial Quality Star → rappel v2 ÚNICA VIGENTE: revisión semestral; umbral >=3,75/5; variación de +0,5 puntos por semestre completo favorable y -0,5 por semestre completo desfavorable; primer periodo proporcional con mínimo de 3 meses computables; reversibilidad; suelo 5%; techo 10%; al alcanzar el techo, venta de crédito con reparto 60% suscriptor / 40% OPORTUNIIA. Las variaciones producen efectos hacia futuro desde su comunicación. Queda retirada la fórmula v1.
 - Protocolo de 3 días para documentación/PBC cuando el circuito de venta propia lo active.
 - Incidencias, avisos, suspensión/desactivación y consecuencias por falta de diligencia: la APP ya conserva evidencia operativa, pero NO existe en repos una escala contractual automática de penalizaciones. LEGAL debe definir proporcionalidad, preaviso, subsanación, reincidencia y efectos económicos antes de convertirlo en sanción.
 - Fotos/informes: origen, evidencia y trazabilidad; VISUAL puede mejorar presentación sin falsear hechos.
@@ -49,7 +49,7 @@ Revisión transversal de WEB, OPORTUNIIAPP, VISUAL, IA, CORE y LEGAL. Las cláus
 - Distinguir siempre incluido / bajo petición / sujeto a disponibilidad, autorización o viabilidad. No prometer resultado.
 
 ## Puntos que NO deben cerrarse sin LEGAL
-1. Escala concreta de avisos, penalizaciones, suspensión y resolución del suscriptor.
+1. Régimen de incidencias, avisos, suspensión y resolución del suscriptor: debe existir evidencia, notificación, alegación/subsanación razonable y decisión trazable; no pérdida automática de derechos económicos ya devengados.
 2. Consecuencias exactas del incumplimiento del plazo 72h y régimen de pérdida/devolución de reservas.
 3. Redacción de atribución/conflictos de inversores aportados.
 4. Encaje contractual definitivo del rappel Quality Star y transición desde porcentajes históricos.
@@ -62,3 +62,4 @@ La WEB main revisada contiene beneficios Premium, pero todavía no publica el pr
 
 ## Criterio de cierre
 Esta matriz es la base funcional oficial a fecha 2026-10-04. Si después de esta fecha se aprueba una nueva regla de negocio material, deberá abrirse nueva revisión contractual antes de considerarla vigente.
+\n\n## GATE LEGAL 04/10/2026\nLEGALLAB: APTO CON CORRECCIONES. Fuente: `docs/LEGAL_CONTRACTUAL_REVIEW_20261004.md` del repositorio `Oportuniia/oportuniia-legal-lab`, commit `9886fb120e9cd6ca9c7789e37e89f55c2384a8b6`. Quality v1 queda expresamente retirada de esta base. Producción seguirá cerrada para los gates condicionados hasta prueba técnica y GATE FINAL CONTRACTUAL.\n
