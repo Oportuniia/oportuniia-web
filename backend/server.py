@@ -338,8 +338,7 @@ class OperationIntentIn(BaseModel):
     action: str  # "reservar" | "comprar"
     # Investor chooses services per operation, never as a permanent profile attribute.
     modality: str  # A | B | C | D
-    documentation_status: str = "PENDING"  # CURRENT | PENDING | EXPIRED | REVIEW
-    pbc_status: str = "REQUIRED"  # CLEARED required to advance
+    # Compliance is sovereign server/M2M state. Client must never submit CLEARED.
 
 
 # ==== APIs FUNCIONALES ====
@@ -463,14 +462,21 @@ async def operation_intent(payload: OperationIntentIn, request: Request, respons
         return JSONResponse({"error": "unknown slug"}, status_code=404)
     if payload.modality not in ("A", "B", "C", "D"):
         return JSONResponse({"error": "invalid modality", "allowed": ["A", "B", "C", "D"]}, status_code=400)
-    compliance_cleared = payload.documentation_status == "CURRENT" and payload.pbc_status == "CLEARED"
+    # Fail closed: WEB never manufactures compliance clearance.
+    # Authoritative state will be synchronized from OPORTUNIIAPP/Compliance via server-side M2M.
+    documentation_status = "PENDING"
+    pbc_status = "REQUIRED"
+    compliance_cleared = False
+    territorial_status = "PENDING_REVIEW" if payload.modality in ("C", "D") else "NOT_REQUIRED"
     await db.demo_operation_intents.insert_one({
         "session_id": sid, "slug": payload.slug, "action": payload.action,
         "modality": payload.modality,
-        "documentation_status": payload.documentation_status,
-        "pbc_status": payload.pbc_status,
+        "documentation_status": documentation_status,
+        "pbc_status": pbc_status,
+        "territorial_status": territorial_status,
+        "compliance_source": "AUTHORITATIVE_SERVER_M2M_PENDING",
         "compliance_cleared": compliance_cleared,
-        "state": "READY_FOR_CONTRACT" if compliance_cleared else "COMPLIANCE_BLOCKED",
+        "state": "COMPLIANCE_BLOCKED",
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
     return {
@@ -482,8 +488,9 @@ async def operation_intent(payload: OperationIntentIn, request: Request, respons
             "oportuniia_resale": payload.modality in ("C", "D"),
         },
         "transactional": False,
-        "documentation_status": payload.documentation_status,
-        "pbc_status": payload.pbc_status,
+        "documentation_status": documentation_status,
+        "pbc_status": pbc_status,
+        "territorial_status": territorial_status,
         "can_advance": compliance_cleared,
         "rule": "No operation advances without current documentation and PBC/compliance CLEARED.",
         "note": "Sandbox/prepared only. Real reservation, payment and entitlement remain disabled until production authorization.",
