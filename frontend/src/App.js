@@ -34,6 +34,25 @@ function PremiumCheckout() {
           <span><strong>{p.name}</strong><b>{p.price}</b><small>{p.detail}</small><small>{p.duration}</small></span>
         </label>)}
       </div>
+      <section className="legal premium-benefits">
+        <h2>Ventajas de OPORTUNIIA Premium</h2>
+        <p>Premium amplía el acceso a herramientas, información y coordinación operativa de OPORTUNIIA. Las prestaciones se aplican según el perfil, la operación y las condiciones particulares.</p>
+        <ul>
+          <li><strong>Universo Acuerdos:</strong> acceso para perfiles autorizados a oportunidades y acuerdos disponibles en este entorno.</li>
+          <li><strong>Perímetros personalizados y actualizados:</strong> preparación y seguimiento de perímetros adaptados a los criterios del cliente.</li>
+          <li><strong>Análisis avanzado:</strong> herramientas de filtrado, análisis y apoyo a la evaluación de oportunidades, sin garantía de resultado o rentabilidad.</li>
+          <li><strong>Peticiones a la carta:</strong> posibilidad de solicitar búsquedas, documentación o actuaciones específicas dentro del alcance disponible.</li>
+          <li><strong>Documentación y reportajes ampliados:</strong> acceso a información, evidencias y materiales adicionales cuando existan y puedan facilitarse.</li>
+          <li><strong>MI OPORTUNIIA:</strong> espacio privado para organizar documentación, operaciones, comunicaciones y seguimiento.</li>
+          <li><strong>Recordatorios y seguimiento:</strong> apoyo para mantener al día hitos, documentación y actuaciones vinculadas a las operaciones.</li>
+          <li><strong>Motor de IA OPORTUNIIA:</strong> asistencia tecnológica para análisis, organización y apoyo operativo; sus resultados no sustituyen validaciones profesionales exigibles.</li>
+          <li><strong>Apoyo jurídico cuando proceda:</strong> acceso y coordinación con profesionales o despachos externos e independientes, sujeto a modalidad, encargo, disponibilidad y condiciones aplicables.</li>
+          <li><strong>Secretaría MI OPORTUNIIA:</strong> apoyo en preparación, actualización, organización y subsanación documental, sin sustituir Compliance ni conceder validaciones.</li>
+          <li><strong>Ofertas y reservas:</strong> preparación y coordinación ágil de ofertas y reservas dentro de los circuitos habilitados.</li>
+          <li><strong>Visitas y comprobaciones de campo:</strong> posibilidad de solicitar actuaciones presenciales cuando estén disponibles, autorizadas y sean viables.</li>
+        </ul>
+        <p><strong>Alcance:</strong> determinadas prestaciones son bajo petición o están sujetas a disponibilidad, autorización, viabilidad, territorio, modalidad de operación y cumplimiento normativo. Premium no garantiza adjudicación, rentabilidad, financiación, aceptación de ofertas ni resultado jurídico o comercial.</p>
+      </section>
       <section className="legal">
         <h2>Antes de contratar</h2>
         <p>Precio seleccionado: <strong>{selected.price} {selected.detail}</strong>. No existe permanencia adicional ni renovación obligatoria. Una nueva contratación al finalizar requiere una nueva decisión del cliente.</p>
