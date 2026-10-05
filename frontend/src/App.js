@@ -8,7 +8,8 @@ const plans = {
 };
 
 function Home() {
-  return <main className="shell"><section className="hero"><p className="eyebrow">OPORTUNIIA</p><h1>Experiencia Premium</h1><p>Acceso Premium preparado. La contratación y el cobro real permanecen desactivados hasta autorización de producción.</p><div className="hero-actions"><Link className="primary" to="/inversor">Soy inversor · A/B/C/D</Link><Link className="primary" to="/premium">Ver Premium</Link></div></section></main>;
+  window.location.replace("/web2.html");
+  return null;
 }
 
 const investorModes = {
