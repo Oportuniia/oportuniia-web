@@ -64,3 +64,24 @@ Ningún merge/deploy/apertura de válvula se autoriza por este documento. Antes 
 3) LEGALLAB debe emitir GATE FINAL CONTRACTUAL;
 4) resolver únicamente correcciones concretas;
 5) autorización expresa de RAFA para producción.
+
+
+## 15. GATE FINAL LEGALLAB · APTO CON CORRECCIONES
+Dictamen LEGALLAB de 05/10/2026: el modelo completo es jurídicamente implementable y no requiere cambios de negocio. Las siguientes cuatro correcciones son obligatorias en implementación:
+
+### 15.1 PBC propio cuando OPORTUNIIA sea sujeto obligado
+Cuando OPORTUNIIA actúe materialmente como agencia, comisión o intermediación profesional en compraventa inmobiliaria y resulte sujeto obligado conforme a la normativa PBC/FT aplicable, debe ejecutar y acreditar sus propias obligaciones PBC. Un CLEARED de servicer/tercero no sustituye el cumplimiento propio de OPORTUNIIA. El Gate universal existente se mantiene y debe distinguir soberanía/origen del CLEARED y obligaciones propias/terceras.
+
+### 15.2 Gate territorial de intermediación inmobiliaria
+Antes de activar comercialización/intermediación C/D en una comunidad autónoma, Compliance debe verificar y registrar los requisitos territoriales aplicables: registros, habilitaciones, garantías, seguros, información u otros requisitos exigibles. Estado por territorio: PENDING_REVIEW / CLEARED / BLOCKED. Sin CLEARED territorial no se activa la actividad afectada en ese territorio.
+
+### 15.3 Secretaría · aprendizaje privacy-preserving
+El aprendizaje histórico de Secretaría sigue ADVISORY ONLY. Para patrones, métricas y recomendaciones se usarán preferentemente datos anonimizados/agregados. La seudonimización no convierte los datos en anónimos y, cuando se usen datos personales seudonimizados, siguen sujetos al RGPD y a finalidad, minimización, acceso y retención aplicables. Ningún patrón puede identificar innecesariamente a una persona ni sustituir el Gate Compliance.
+
+### 15.4 Retención por categoría
+La evidencia puede permanecer vinculada al expediente, pero no existe una regla única de conservación eterna para todo su contenido. Cada categoría documental/dato tendrá retention_policy_code, finalidad/base y plazo jurídicamente justificable. La documentación PBC se someterá a su régimen específico aplicable (incluido el plazo legal de 10 años cuando corresponda). Fotos y coordenadas conservarán sólo el plazo justificable por su finalidad contractual/probatoria/legal, sin heredar automáticamente el plazo PBC. Al vencer: supresión, anonimización o bloqueo cuando jurídicamente proceda.
+
+## 16. Estado del diseño
+GATE FINAL CONTRACTUAL = APTO CON CORRECCIONES / MODELO APROBADO PARA IMPLEMENTACIÓN.
+Las cuatro correcciones anteriores son requisitos de implementación, no reapertura del modelo comercial.
+PRODUCCIÓN = NO AUTORIZADA.
