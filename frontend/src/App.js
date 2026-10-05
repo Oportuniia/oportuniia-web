@@ -8,7 +8,37 @@ const plans = {
 };
 
 function Home() {
-  return <main className="shell"><section className="hero"><p className="eyebrow">OPORTUNIIA</p><h1>Experiencia Premium</h1><p>Acceso Premium preparado. La contratación y el cobro real permanecen desactivados hasta autorización de producción.</p><Link className="primary" to="/premium">Ver Premium</Link></section></main>;
+  return <main className="shell"><section className="hero"><p className="eyebrow">OPORTUNIIA</p><h1>Experiencia Premium</h1><p>Acceso Premium preparado. La contratación y el cobro real permanecen desactivados hasta autorización de producción.</p><div className="hero-actions"><Link className="primary" to="/inversor">Soy inversor · A/B/C/D</Link><Link className="primary" to="/premium">Ver Premium</Link></div></section></main>;
+}
+
+const investorModes = {
+  A: { title: "A · Compra", text: "Compra de la oportunidad con el circuito operativo y documental aplicable." },
+  B: { title: "B · Compra + servicio jurídico", text: "Compra con activación del servicio jurídico externo e independiente para la operación." },
+  C: { title: "C · Compra + comercialización", text: "Compra con encargo posterior de comercialización a OPORTUNIIA." },
+  D: { title: "D · Integral", text: "Compra con servicio jurídico y comercialización posterior, sujetos a sus condiciones específicas." },
+};
+
+function Investor() {
+  const [mode, setMode] = useState("A");
+  return <main className="shell"><section className="checkout">
+    <p className="eyebrow">OPORTUNIIA · INVERSOR</p><h1>Elige cómo quieres operar</h1>
+    <p className="lead">La modalidad se elige para cada operación. Tu perfil de inversor no queda fijado para siempre en una modalidad.</p>
+    <div className="plans" role="radiogroup" aria-label="Modalidad de operación del inversor">
+      {Object.entries(investorModes).map(([key,m]) => <label className={"plan "+(mode===key?"selected":"")} key={key}>
+        <input type="radio" name="investor-mode" value={key} checked={mode===key} onChange={()=>setMode(key)} />
+        <span><strong>{m.title}</strong><small>{m.text}</small></span>
+      </label>)}
+    </div>
+    <section className="legal">
+      <h2>Documentación contractual</h2>
+      <p><strong>Siempre:</strong> Condiciones Marco del Inversor + Condiciones Particulares de la operación A/B/C/D.</p>
+      <p><strong>Modalidad B:</strong> se añade el Anexo de Servicio Jurídico B/D.</p>
+      <p><strong>Modalidad C:</strong> se añade el Anexo de Comercialización Posterior C/D.</p>
+      <p><strong>Modalidad D:</strong> se añaden ambos anexos: Servicio Jurídico B/D y Comercialización Posterior C/D.</p>
+      <p>La documentación PBC, privacidad y retención se incorpora cuando corresponda al expediente. Cada aceptación queda vinculada a su versión y evidencia electrónica.</p>
+    </section>
+    <div className="summary"><div><span>Modalidad elegida</span><strong>{investorModes[mode].title}</strong></div></div>
+  </section></main>;
 }
 
 function PremiumCheckout() {
@@ -69,5 +99,5 @@ function PremiumCheckout() {
 }
 
 export default function App() {
-  return <div className="App"><BrowserRouter><Routes><Route path="/" element={<Home />} /><Route path="/premium" element={<PremiumCheckout />} /></Routes></BrowserRouter></div>;
+  return <div className="App"><BrowserRouter><Routes><Route path="/" element={<Home />} /><Route path="/inversor" element={<Investor />} /><Route path="/premium" element={<PremiumCheckout />} /></Routes></BrowserRouter></div>;
 }
