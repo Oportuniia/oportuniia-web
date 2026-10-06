@@ -1,0 +1,10 @@
+{
+  "rewrites": [
+    {"source": "/como-funciona", "destination": "/como-funciona.html"},
+    {"source": "/acceso", "destination": "/acceso.html"},
+    {"source": "/grupo-oportuniia", "destination": "/grupo-oportuniia.html"},
+    {"source": "/nuestra-filosofia", "destination": "/nuestra-filosofia.html"},
+    {"source": "/contacto", "destination": "/contacto.html"},
+    {"source": "/servicers", "destination": "/servicers.html"}
+  ]
+}
