@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import "@/App.css";
+
+const BrandHeader = () => <header className="brand-header"><a href="/web2.html"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" /></a><nav><a href="/web2.html">Inicio</a><a href="/oportunidades">Oportunidades</a><a href="/acceso">Login / Registro</a></nav></header>;
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 const plans = {
@@ -21,7 +23,7 @@ const investorModes = {
 
 function Investor() {
   const [mode, setMode] = useState("A");
-  return <main className="shell"><section className="checkout">
+  return <><BrandHeader /><main className="shell"><section className="checkout">
     <p className="eyebrow">OPORTUNIIA · INVERSOR</p><h1>Elige cómo quieres operar</h1>
     <p className="lead">La modalidad se elige para cada operación. Tu perfil de inversor no queda fijado para siempre en una modalidad.</p>
     <div className="plans" role="radiogroup" aria-label="Modalidad de operación del inversor">
@@ -39,7 +41,7 @@ function Investor() {
       <p>La documentación PBC, privacidad y retención se incorpora cuando corresponda al expediente. Cada aceptación queda vinculada a su versión y evidencia electrónica.</p>
     </section>
     <div className="summary"><div><span>Modalidad elegida</span><strong>{investorModes[mode].title}</strong></div></div>
-  </section></main>;
+  </section></main></>;
 }
 
 function PremiumCheckout() {
@@ -54,7 +56,7 @@ function PremiumCheckout() {
     window.alert("Checkout preparado en sandbox. No se realizará ningún cargo mientras la pasarela permanezca cerrada.");
   };
 
-  return <main className="shell">
+  return <><BrandHeader /><main className="shell">
     <section className="checkout">
       <p className="eyebrow">OPORTUNIIA · PREMIUM</p>
       <h1>Contratar Experiencia Premium</h1>
@@ -96,7 +98,7 @@ function PremiumCheckout() {
       <button className="pay" disabled={!accepted} onClick={prepare}>Contratar Premium y pagar {selected.price} + impuestos</button>
       <p className="closed">PASARELA DE COBRO: CERRADA · SANDBOX · ningún cargo real</p>
     </section>
-  </main>;
+  </main></>;
 }
 
 export default function App() {
