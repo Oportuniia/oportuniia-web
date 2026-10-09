@@ -1,0 +1,28 @@
+<form class="filters" method="get" action="{{ filter_action }}">
+<input type="hidden" name="universo" value="{{ universe }}">
+<div class="filters-top">
+  <div class="search"><label>Buscar</label><input type="text" name="q" value="{{ q }}" placeholder="Referencia, municipio, provincia…"></div>
+  <div><label>ROI mínimo (%)</label><input type="number" name="roi_min" value="{{ f.roi_min or '' }}"></div>
+  <div><label>Precio máximo (€)</label><input type="number" name="precio_max" value="{{ f.price_max or '' }}"></div>
+  <button type="submit">Buscar</button>
+</div>
+<details open><summary>Ubicación y producto</summary>
+<div class="filter-grid">
+<div><label>Comunidad autónoma</label><select name="ccaa"><option value="">Todas</option>{% for c in ccaa_list %}<option value="{{ c.code }}" {{ 'selected' if f.ccaa==c.code }}>{{ c.name }}{% if counts.ccaa.get(c.code) %} ({{ counts.ccaa[c.code] }}){% endif %}</option>{% endfor %}</select></div>
+<div><label>Provincia</label><select name="provincia"><option value="">Todas</option>{% for p in provincias_cur %}<option value="{{ p.code }}" {{ 'selected' if f.provincia==p.code }}>{{ p.name }}</option>{% endfor %}</select></div>
+<div><label>Municipio</label><select name="municipio"><option value="">Todos</option>{% for m in municipios_cur %}<option value="{{ m.code }}" {{ 'selected' if f.municipio==m.code }}>{{ m.name }}</option>{% endfor %}</select></div>
+<div><label>Capital desde (€)</label><input type="number" name="precio_min" value="{{ f.price_min or '' }}"></div>
+<div><label>Tipo de activo</label><select name="activo" multiple size="4">{% for g in asset_groups %}{% for code,name in g['items'] %}<option value="{{ code }}" {{ 'selected' if code in f.assets }}>{{ name }}</option>{% endfor %}{% endfor %}</select></div>
+<div class="checkset"><label>Producto</label>{% for p in products %}<label class="check"><input type="checkbox" name="tipo" value="{{ p.code }}" {{ 'checked' if p.code in f.products }}> {{ p.code }} · {{ p.name }} <b>{{ counts.product.get(p.code,0) }}</b></label>{% endfor %}</div>
+</div></details>
+<details><summary>Procedimiento, fase y ocupación</summary>
+<div class="filter-grid">
+<div class="checkset"><label>Tipo de procedimiento</label>{% for p in procedure_types %}<label class="check"><input type="checkbox" name="procedimiento" value="{{ p.code }}" {{ 'checked' if p.code in f.procedures }}> {{ p.name }} <b>{{ counts.procedure.get(p.code,0) }}</b></label>{% endfor %}</div>
+<div class="checkset"><label>Fase principal</label>{% for p in phase_principal %}<label class="check"><input type="checkbox" name="fase_principal" value="{{ p.code }}" {{ 'checked' if p.code in f.phases_principal }}> {{ p.name }} <b>{{ counts.phase_principal.get(p.code,0) }}</b></label>{% endfor %}</div>
+<div class="checkset"><label>Estado ocupacional</label>{% for p in possession_states %}<label class="check"><input type="checkbox" name="posesion" value="{{ p.code }}" {{ 'checked' if p.code in f.possessions }}> {{ p.name }} <b>{{ counts.possession.get(p.code,0) }}</b></label>{% endfor %}</div>
+<div><label>Plazo máximo (meses)</label><input type="number" name="plazo_max" value="{{ f.term_max or '' }}"></div>
+</div>
+<div class="phase-list"><label>Fase / hito procesal</label>{% for group in phase_groups %}<div class="phase-group"><strong>{{ group.name }}</strong>{% for p in group['items'] %}<label class="check"><input type="checkbox" name="fase" value="{{ p.code }}" {{ 'checked' if p.code in f.phases }}> {{ p.name }} <b>{{ counts.phase.get(p.code,0) }}</b></label>{% endfor %}</div>{% endfor %}</div>
+</details>
+<div class="filter-foot"><button type="submit">Aplicar filtros · {{ total }} resultados</button><a href="{{ filter_action }}?universo={{ universe }}">Limpiar</a></div>
+</form>
