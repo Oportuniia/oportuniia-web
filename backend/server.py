@@ -23,6 +23,7 @@ import catalog_data as cat
 from presentation_ingress import register_routes as register_presentation_routes
 from presentation_publish import register_publish_routes as register_presentation_publish_routes
 from presentation_e2e import run_presentation_e2e_if_enabled
+from private_area import register_private_area_routes
 
 
 ROOT_DIR = Path(__file__).parent
@@ -614,6 +615,7 @@ app.include_router(api_router)
 # ── SSR (Jinja2) · páginas públicas servidas por el backend a través del proxy CRA ──
 TEMPLATES_DIR = ROOT_DIR / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+register_private_area_routes(app, templates)
 HOME_HTML = ROOT_DIR.parent / "frontend" / "public" / "web2.html"
 PUBLIC_DIR = ROOT_DIR.parent / "frontend" / "public"
 
