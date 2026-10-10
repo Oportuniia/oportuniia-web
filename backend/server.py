@@ -333,6 +333,7 @@ class FavoriteToggle(BaseModel):
 
 class SavedSearchIn(BaseModel):
     query: str
+    name: Optional[str] = None
 
 class OperationIntentIn(BaseModel):
     slug: str
@@ -452,17 +453,45 @@ async def toggle_favorite(payload: FavoriteToggle, request: Request, response: R
     return {"favorited": favorited, "count": len(slugs)}
 
 
+@api_router.get("/saved-searches")
+async def get_saved_searches(request: Request):
+    sid = _get_sid(request)
+    if not sid:
+        return {"items": []}
+    rows = await db.demo_saved_searches.find(
+        {"session_id": sid}, {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    return {"items": rows}
+
+
 @api_router.post("/saved-searches")
 async def save_search(payload: SavedSearchIn, request: Request, response: Response):
-    # PREPARED / demo: se guarda un registro de sesión no autoritativo.
-    # El contrato final asocia la búsqueda a actor_id en Mi OPORTUNIIA.
+    # PREPARED / session-scoped until the sovereign WEB actor_id is wired.
     sid = _ensure_sid(request, response)
+    search_id = str(uuid.uuid4())
+    name = (payload.name or "").strip()[:120] or "Búsqueda guardada"
+    query = (payload.query or "").strip()
     await db.demo_saved_searches.insert_one({
-        "session_id": sid, "query": payload.query,
+        "id": search_id,
+        "session_id": sid,
+        "name": name,
+        "query": query,
         "created_at": datetime.now(timezone.utc).isoformat(),
     })
-    return {"status": "prepared", "stored": "demo",
-            "note": "Contrato listo para actor_id · notificaciones futuras opt-in."}
+    return {"status": "prepared", "stored": "session", "id": search_id,
+            "name": name,
+            "note": "Listo para migrar a actor_id cuando la identidad privada autoritativa esté conectada."}
+
+
+@api_router.delete("/saved-searches/{search_id}")
+async def delete_saved_search(search_id: str, request: Request):
+    sid = _get_sid(request)
+    if not sid:
+        return JSONResponse({"error": "not_found"}, status_code=404)
+    res = await db.demo_saved_searches.delete_one({"session_id": sid, "id": search_id})
+    if not res.deleted_count:
+        return JSONResponse({"error": "not_found"}, status_code=404)
+    return {"deleted": True, "id": search_id}
 
 
 @api_router.post("/operations/intent")

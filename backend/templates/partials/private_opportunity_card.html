@@ -1,6 +1,6 @@
 <article class="op-card">
 <a class="op-hit" href="/mi-oportuniia/oportunidades/{{ o.slug }}" aria-label="Abrir {{ o.title }}"></a>
-<div class="op-img">{% if o.image %}<img src="{{ o.image }}" alt="{{ o.title }}" loading="lazy">{% endif %}<span class="badge">{{ o.product }}</span><span class="loc">{{ o.municipio_name }}</span></div>
+<div class="op-img">{% if o.image %}<img src="{{ o.image }}" alt="{{ o.title }}" loading="lazy">{% endif %}<span class="badge">{{ o.product }}</span><span class="loc">{{ o.municipio_name }}</span><button type="button" class="fav-toggle" data-fav-slug="{{ o.slug }}" aria-label="Añadir a favoritos">♡</button></div>
 <div class="op-body"><div class="cat">{{ o.category }}</div><h3>{{ o.title }}</h3><div class="meta">{{ o.asset_name }} · {{ o.provincia_name }} · {{ o.price_label }}</div>
 <div class="metrics"><div><small>ROI</small><strong>{{ o.roi }}</strong></div><div><small>Plazo</small><b>{{ o.timeframe }} meses</b></div></div>
 <div class="situation">{{ o.situation }}</div></div></article>

@@ -1,0 +1,37 @@
+{% extends "mi_oportuniia_base.html" %}
+{% block title %}Búsquedas guardadas · MI OPORTUNIIA{% endblock %}{% block nav_saved %}active{% endblock %}
+{% block styles %}
+.list{display:grid;gap:12px}.saved{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center}.saved h3{font-size:14px;margin:0 0 5px}.saved p{font-size:11px;color:var(--muted);margin:0;word-break:break-word}.actions{display:flex;gap:8px}.actions a,.actions button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:9px 12px;font-size:11px;font-weight:600;cursor:pointer}.actions a{background:var(--brand);color:#fff;border-color:var(--brand)}.empty{background:#fff;border:1px solid var(--line);border-radius:14px;padding:34px;text-align:center;color:var(--muted)}.empty a{display:inline-block;margin-top:12px;background:var(--brand);color:#fff;padding:10px 14px;border-radius:9px;font-size:12px;font-weight:600}
+@media(max-width:640px){.saved{grid-template-columns:1fr}.actions{justify-content:flex-start}}
+{% endblock %}
+{% block content %}
+<div class="page-head"><div><h2>Búsquedas guardadas</h2><p>Recupera en un clic una combinación de filtros del buscador profesional.</p></div></div>
+<div class="empty" id="savedEmpty" style="display:none">Todavía no has guardado ninguna búsqueda.<br><a href="/mi-oportuniia/oportunidades">Crear una desde Oportunidades</a></div>
+<div class="list" id="savedList"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+(function(){
+  const list=document.getElementById("savedList"), empty=document.getElementById("savedEmpty");
+  function esc(s){return String(s||"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));}
+  async function load(){
+    try{
+      const r=await fetch("/api/saved-searches"); const data=await r.json(); const items=data.items||[];
+      if(!items.length){empty.style.display="block";list.innerHTML="";return;}
+      empty.style.display="none";
+      list.innerHTML=items.map(x=>{
+        const href="/mi-oportuniia/oportunidades"+(x.query?"?"+x.query:"");
+        return '<article class="saved" data-id="'+esc(x.id)+'"><div><h3>'+esc(x.name||"Búsqueda guardada")+'</h3><p>'+esc(x.query||"Sin filtros")+'</p></div><div class="actions"><a href="'+href+'">Ejecutar</a><button type="button" data-delete="'+esc(x.id)+'">Eliminar</button></div></article>';
+      }).join("");
+    }catch(e){empty.style.display="block";}
+  }
+  document.addEventListener("click",async function(ev){
+    const b=ev.target.closest("[data-delete]"); if(!b)return;
+    const id=b.dataset.delete;
+    const r=await fetch("/api/saved-searches/"+encodeURIComponent(id),{method:"DELETE"});
+    if(r.ok)load();
+  });
+  load();
+})();
+</script>
+{% endblock %}
