@@ -1,13 +1,17 @@
 import { useMemo, useState } from "react";
-import "@/App.css";
-
-const BrandHeader = () => <header className="brand-header"><a href="/web2.html"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" /></a><nav><a href="/web2.html">Inicio</a><a href="/oportunidades">Oportunidades</a><a href="/acceso">Login / Registro</a></nav></header>;
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import "@/App.css";
 
 const plans = {
   monthly: { name: "Premium mensual", price: "1.000 €", detail: "+ impuestos / mes", duration: "1 mes", code: "PREMIUM_MONTHLY" },
   annual: { name: "Premium anual", price: "10.000 €", detail: "+ impuestos / 12 meses", duration: "12 meses desde la activación", code: "PREMIUM_ANNUAL" },
 };
+
+const BrandHeader = () => <header className="brand-header">
+  <a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" /></a>
+  <nav><a href="/nuestra-filosofia">Nuestra filosofía</a><a href="/como-funciona">Cómo funciona</a><a href="/oportunidades">Oportunidades</a><a href="/tecnologia">Tecnología</a><a href="/grupo-oportuniia">Grupo OPORTUNIIA</a><a href="/contacto">Contacto</a><a href="/servicers">Canal profesional</a></nav>
+  <a className="account-link" href="/mi-oportuniia">MI OPORTUNIIA</a>
+</header>;
 
 function Home() {
   window.location.replace("/web2.html");
@@ -37,8 +41,8 @@ function Investor() {
       <p><strong>Siempre:</strong> Condiciones Marco del Inversor + Condiciones Particulares de la operación A/B/C/D.</p>
       <p><strong>Modalidad B:</strong> se añade el Anexo de Servicio Jurídico B/D.</p>
       <p><strong>Modalidad C:</strong> se añade el Anexo de Comercialización Posterior C/D.</p>
-      <p><strong>Modalidad D:</strong> se añaden ambos anexos: Servicio Jurídico B/D y Comercialización Posterior C/D.</p>
-      <p>La documentación PBC, privacidad y retención se incorpora cuando corresponda al expediente. Cada aceptación queda vinculada a su versión y evidencia electrónica.</p>
+      <p><strong>Modalidad D:</strong> se añaden ambos anexos.</p>
+      <p>La documentación PBC, privacidad y retención se incorpora cuando corresponda al expediente.</p>
     </section>
     <div className="summary"><div><span>Modalidad elegida</span><strong>{investorModes[mode].title}</strong></div></div>
   </section></main></>;
@@ -56,51 +60,108 @@ function PremiumCheckout() {
     window.alert("Checkout preparado en sandbox. No se realizará ningún cargo mientras la pasarela permanezca cerrada.");
   };
 
-  return <><BrandHeader /><main className="shell">
-    <section className="checkout">
-      <p className="eyebrow">OPORTUNIIA · PREMIUM</p>
-      <h1>Contratar Experiencia Premium</h1>
-      <p className="lead">Elige modalidad. El plan anual dura 12 meses completos desde su activación; el 31 de diciembre no altera su vigencia.</p>
-      <div className="plans" role="radiogroup" aria-label="Modalidad Premium">
-        {Object.entries(plans).map(([key, p]) => <label className={"plan "+(plan===key?"selected":"")} key={key}>
-          <input type="radio" name="plan" value={key} checked={plan===key} onChange={() => setPlan(key)} />
-          <span><strong>{p.name}</strong><b>{p.price}</b><small>{p.detail}</small><small>{p.duration}</small></span>
-        </label>)}
-      </div>
-      <section className="legal premium-benefits">
-        <h2>Ventajas de OPORTUNIIA Premium</h2>
-        <p>Premium amplía el acceso a herramientas, información y coordinación operativa de OPORTUNIIA. Las prestaciones se aplican según el perfil, la operación y las condiciones particulares.</p>
-        <ul>
-          <li><strong>Universo Acuerdos:</strong> acceso para perfiles autorizados a oportunidades y acuerdos disponibles en este entorno.</li>
-          <li><strong>Perímetros personalizados y actualizados:</strong> preparación y seguimiento de perímetros adaptados a los criterios del cliente.</li>
-          <li><strong>Análisis avanzado:</strong> herramientas de filtrado, análisis y apoyo a la evaluación de oportunidades, sin garantía de resultado o rentabilidad.</li>
-          <li><strong>Peticiones a la carta:</strong> posibilidad de solicitar búsquedas, documentación o actuaciones específicas dentro del alcance disponible.</li>
-          <li><strong>Documentación y reportajes ampliados:</strong> acceso a información, evidencias y materiales adicionales cuando existan y puedan facilitarse.</li>
-          <li><strong>MI OPORTUNIIA:</strong> espacio privado para organizar documentación, operaciones, comunicaciones y seguimiento.</li>
-          <li><strong>Recordatorios y seguimiento:</strong> apoyo para mantener al día hitos, documentación y actuaciones vinculadas a las operaciones.</li>
-          <li><strong>Motor de IA OPORTUNIIA:</strong> asistencia tecnológica para análisis, organización y apoyo operativo; sus resultados no sustituyen validaciones profesionales exigibles.</li>
-          <li><strong>Apoyo jurídico cuando proceda:</strong> acceso y coordinación con profesionales o despachos externos e independientes, sujeto a modalidad, encargo, disponibilidad y condiciones aplicables.</li>
-          <li><strong>Secretaría MI OPORTUNIIA:</strong> apoyo en preparación, actualización, organización y subsanación documental, sin sustituir Compliance ni conceder validaciones.</li>
-          <li><strong>Ofertas y reservas:</strong> preparación y coordinación ágil de ofertas y reservas dentro de los circuitos habilitados.</li>
-          <li><strong>Visitas y comprobaciones de campo:</strong> posibilidad de solicitar actuaciones presenciales cuando estén disponibles, autorizadas y sean viables.</li>
-        </ul>
-        <p><strong>Alcance:</strong> determinadas prestaciones son bajo petición o están sujetas a disponibilidad, autorización, viabilidad, territorio, modalidad de operación y cumplimiento normativo. Premium no garantiza adjudicación, rentabilidad, financiación, aceptación de ofertas ni resultado jurídico o comercial.</p>
-      </section>
-      <section className="legal">
-        <h2>Antes de contratar</h2>
-        <p>Precio seleccionado: <strong>{selected.price} {selected.detail}</strong>. No existe permanencia adicional ni renovación obligatoria. Una nueva contratación al finalizar requiere una nueva decisión del cliente.</p>
-        <p>Antes del pago deben ponerse a disposición del cliente la información precontractual y una copia descargable de las condiciones aplicables, identificadas por versión y huella documental.</p>
-        <p>Si actúas como consumidor, se aplicarán los derechos imperativos que correspondan, incluido el desistimiento cuando sea aplicable. Si solicitas que el servicio comience durante ese plazo, esa petición debe quedar registrada expresamente y se aplicará, cuando corresponda, el régimen legal de ejecución anticipada y pago proporcional.</p>
-        <label className="check"><input type="checkbox" checked={early} onChange={e=>setEarly(e.target.checked)} /> Solicito expresamente que, una vez confirmado el pago, el servicio pueda comenzar antes de finalizar el plazo de desistimiento, cuando éste resulte aplicable.</label>
-        <label className="check required"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} /> He leído y acepto expresamente las condiciones de Premium y la información precontractual aplicable. Entiendo que el siguiente paso implica una obligación de pago.</label>
-      </section>
-      <div className="summary"><div><span>Modalidad</span><strong>{selected.name}</strong></div><div><span>Importe</span><strong>{selected.price} {selected.detail}</strong></div><div><span>Vigencia</span><strong>{selected.duration}</strong></div></div>
-      <button className="pay" disabled={!accepted} onClick={prepare}>Contratar Premium y pagar {selected.price} + impuestos</button>
-      <p className="closed">PASARELA DE COBRO: CERRADA · SANDBOX · ningún cargo real</p>
+  return <><BrandHeader /><main className="shell"><section className="checkout">
+    <p className="eyebrow">OPORTUNIIA · PREMIUM</p>
+    <h1>Contratar Experiencia Premium</h1>
+    <p className="lead">Elige modalidad. El plan anual dura 12 meses completos desde su activación.</p>
+    <div className="plans" role="radiogroup" aria-label="Modalidad Premium">
+      {Object.entries(plans).map(([key, p]) => <label className={"plan "+(plan===key?"selected":"")} key={key}>
+        <input type="radio" name="plan" value={key} checked={plan===key} onChange={() => setPlan(key)} />
+        <span><strong>{p.name}</strong><b>{p.price}</b><small>{p.detail}</small><small>{p.duration}</small></span>
+      </label>)}
+    </div>
+    <section className="legal premium-benefits">
+      <h2>Ventajas de OPORTUNIIA Premium</h2>
+      <ul><li>Universo Acuerdos</li><li>Perímetros personalizados y screening avanzado</li><li>Peticiones a la carta</li><li>Documentación ampliada</li><li>MI OPORTUNIIA</li><li>Secretaría, PBC/Compliance, IA y trazabilidad según perfil y operación</li></ul>
     </section>
-  </main></>;
+    <section className="legal">
+      <h2>Antes de contratar</h2>
+      <p>Precio seleccionado: <strong>{selected.price} {selected.detail}</strong>.</p>
+      <label className="check"><input type="checkbox" checked={early} onChange={e=>setEarly(e.target.checked)} /> Solicito expresamente que el servicio pueda comenzar antes de finalizar el plazo de desistimiento, cuando resulte aplicable.</label>
+      <label className="check required"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} /> He leído y acepto expresamente las condiciones de Premium y la información precontractual aplicable.</label>
+    </section>
+    <div className="summary"><div><span>Modalidad</span><strong>{selected.name}</strong></div><div><span>Importe</span><strong>{selected.price} {selected.detail}</strong></div><div><span>Vigencia</span><strong>{selected.duration}</strong></div></div>
+    <button className="pay" disabled={!accepted} onClick={prepare}>Contratar Premium y pagar {selected.price} + impuestos</button>
+    <p className="closed">PASARELA DE COBRO: CERRADA · SANDBOX · ningún cargo real</p>
+  </section></main></>;
+}
+
+const privateDeals = [
+  {code:"NPL", city:"Madrid", title:"Residencial con garantía hipotecaria", roi:"31,8%", term:"9 meses", status:"Judicial", img:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80"},
+  {code:"CDR", city:"Barcelona", title:"Activo residencial · cesión de remate", roi:"26,4%", term:"6 meses", status:"Cesión", img:"https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=80"},
+  {code:"REO", city:"Valencia", title:"Local comercial en zona consolidada", roi:"21,7%", term:"12 meses", status:"Disponible", img:"https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1000&q=80"},
+  {code:"NPL", city:"Málaga", title:"Residencial con estrategia de acuerdo", roi:"34,1%", term:"8 meses", status:"Acuerdo", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"},
+];
+
+function DealCard({deal}) {
+  return <article className="private-deal">
+    <div className="private-deal-media"><img src={deal.img} alt="" /><span className="private-tag">{deal.code}</span><button className="favorite" aria-label="Añadir a favoritos">♡</button></div>
+    <div className="private-deal-body"><div className="private-city">{deal.city}</div><h3>{deal.title}</h3>
+      <div className="private-kpis"><div><span>ROI</span><b>{deal.roi}</b></div><div><span>Plazo</span><b>{deal.term}</b></div><div><span>Estado</span><b>{deal.status}</b></div></div>
+      <div className="private-actions"><button>Añadir a Mis operaciones</button><a href="/oportunidades">Ver operación →</a></div>
+    </div>
+  </article>
+}
+
+function MiOportuniia() {
+  const [section,setSection] = useState("Oportunidades");
+  const sections=["Oportunidades","Mis operaciones","Favoritos y búsquedas","Documentación","Secretaría","PBC / Compliance","Comunicaciones","IA","LEGAL","Ofertas / reservas","Visitas","Premium"];
+  return <div className="private-app">
+    <header className="private-topbar"><a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA"/></a><div className="private-user"><span>MI OPORTUNIIA</span><button>RAFAEL QUEROL ▾</button></div></header>
+    <div className="private-shell">
+      <aside className="private-sidebar">
+        <div className="private-side-k">ÁREA PRIVADA</div>
+        {sections.map(x=><button key={x} className={section===x?"active":""} onClick={()=>setSection(x)}>{x}</button>)}
+        <a href="/" className="private-back">← Volver a la web</a>
+      </aside>
+      <main className="private-main">
+        {section==="Oportunidades" ? <>
+          <div className="private-head"><div><span className="private-eyebrow">OPORTUNIDADES</span><h1>El mismo catálogo.<br/><em>Más capacidad.</em></h1><p>Busca, filtra, guarda y sigue oportunidades sin perder la experiencia visual de OPORTUNIIA.</p></div>
+          <div className="private-head-actions"><button>Guardar búsqueda</button><button className="primary-private">Crear perímetro</button></div></div>
+          <div className="private-catalog">
+            <aside className="private-filters">
+              <input placeholder="Buscar por ubicación, operación..." />
+              <label>Producto<select><option>Todos</option><option>NPL</option><option>CDR</option><option>REO</option></select></label>
+              <label>Situación<select><option>Todas</option><option>Judicial</option><option>Acuerdo</option><option>Cesión</option></select></label>
+              <label>Ubicación<select><option>España</option><option>Madrid</option><option>Barcelona</option><option>Valencia</option></select></label>
+              <label>ROI mínimo<input type="range" min="0" max="40" defaultValue="15"/></label>
+              <label>Precio / inversión<select><option>Cualquier rango</option><option>Hasta 100.000 €</option><option>100.000–250.000 €</option><option>+250.000 €</option></select></label>
+              <button className="filter-save">Guardar filtros</button>
+            </aside>
+            <section className="private-results"><div className="private-results-head"><span>24 oportunidades · acceso profesional</span><div><button className="universe active">Ejecuciones Judiciales</button><button className="universe">Universo Acuerdos</button></div></div>
+              <div className="private-grid">{privateDeals.map((d,i)=><DealCard deal={d} key={i}/>)}</div>
+            </section>
+          </div>
+        </> : <PrivateSection title={section}/>}
+      </main>
+    </div>
+  </div>
+}
+
+function PrivateSection({title}) {
+  const copy={
+    "Mis operaciones":"Seguimiento privado de las operaciones que has incorporado a tu perímetro.",
+    "Favoritos y búsquedas":"Tus favoritos, búsquedas guardadas y perímetros personalizados en un solo lugar.",
+    "Documentación":"Documentación ampliada organizada por usuario y por operación.",
+    "Secretaría":"Preparación, actualización y subsanación documental desde Secretaría MI OPORTUNIIA.",
+    "PBC / Compliance":"Estado documental y de cumplimiento asociado a tu perfil y a cada operación.",
+    "Comunicaciones":"Historial de comunicaciones y trazabilidad operativa.",
+    "IA":"Asistencia de IA OPORTUNIIA aplicada a análisis, organización y apoyo operativo.",
+    "LEGAL":"Acceso al circuito legal cuando proceda para la operación.",
+    "Ofertas / reservas":"Preparación y seguimiento de ofertas y reservas dentro de los circuitos habilitados.",
+    "Visitas":"Solicitudes de visitas y comprobaciones de campo cuando estén disponibles.",
+    "Premium":"Servicios Premium disponibles para ampliar el acceso y la profundidad de trabajo."
+  };
+  return <section className="private-section"><span className="private-eyebrow">MI OPORTUNIIA</span><h1>{title}</h1><p>{copy[title]}</p>
+    <div className="private-placeholder-grid"><div><b>Estado</b><span>Preparado para integración con datos reales.</span></div><div><b>Trazabilidad</b><span>La capa visual queda separada de la autoridad backend existente.</span></div><div><b>M2M</b><span>Sin tráfico real abierto. Válvulas permanecen cerradas.</span></div></div>
+  </section>
 }
 
 export default function App() {
-  return <div className="App"><BrowserRouter><Routes><Route path="/" element={<Home />} /><Route path="/inversor" element={<Investor />} /><Route path="/premium" element={<PremiumCheckout />} /></Routes></BrowserRouter></div>;
+  return <div className="App"><BrowserRouter><Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/inversor" element={<Investor />} />
+    <Route path="/premium" element={<PremiumCheckout />} />
+    <Route path="/mi-oportuniia" element={<MiOportuniia />} />
+  </Routes></BrowserRouter></div>;
 }
