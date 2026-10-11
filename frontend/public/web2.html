@@ -1187,7 +1187,7 @@ body.acuerdos .vip-cta-mod{
 <span id="top"></span>
 
 <!-- ================= HERO ================= -->
-<section class="hero" id="hero" data-testid="hero">
+<section class="hero opp-centered" id="hero" data-testid="hero">
   <div class="wrap">
     <div class="hero-grid">
       <div>
@@ -1222,15 +1222,15 @@ body.acuerdos .vip-cta-mod{
 </section>
 
 <!-- ================= OPORTUNIDADES ================= -->
-<section class="sec" id="producto" data-testid="producto">
+<section class="sec opp-compact" id="producto" data-testid="producto">
   <div class="prod-hero">
     <div class="wrap">
-      <div class="sec-head">
+      <div class="sec-head opp-centered-copy">
         <div class="reveal">
-          <div class="eyebrow" style="margin-bottom:22px">Oportunidades</div>
+          <div class="eyebrow" style="margin-bottom:18px">Oportunidades</div>
           <h2>NPL, CDR y REO<span class="dot">.</span></h2>
+          <div class="side reveal d1">Tres formas de entrar en una operación.<br>Mostramos lo necesario para entenderla; el detalle completo se facilita con acceso profesional.</div>
         </div>
-        <div class="side reveal d1">Tres formas de entrar en una operación. Mostramos lo necesario para entenderla; el detalle completo se facilita con acceso profesional.</div>
       </div>
     </div>
   </div>
@@ -1253,7 +1253,7 @@ body.acuerdos .vip-cta-mod{
       </div>
     </div>
     <div class="universe-intro reveal" data-testid="universe-intro">
-      <h3>Dos universos.<br class="d-break"> Una diferencia importante.</h3>
+      <h3>Dos vías de actuación.<br class="d-break"> Una diferencia importante.</h3>
       <div class="uni-grid">
         <div class="uni-card" data-testid="uni-judicial">
           <span class="uni-k">Ejecuciones Judiciales</span>
@@ -1266,10 +1266,6 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
     </div>
-    <div class="universe-cta reveal d1" data-testid="universe-cta">
-      <a href="/oportunidades" class="btn universe-go">Explorar oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-      <span>Consulta el catálogo completo y filtra por producto, fase, ubicación y estado.</span>
-    </div>
     <div class="modeswitch reveal d1" id="acuerdos" data-testid="mode-switch">
       <span class="ms-cue" data-testid="ms-cue">Explora los dos universos</span>
       <div class="ms-pill ms-obvious" data-testid="mode-indicator">
@@ -1281,7 +1277,7 @@ body.acuerdos .vip-cta-mod{
     <div class="acu-surface" data-testid="acu-surface">
     <div class="deal-grid grid-rec">
       <!-- NPL -->
-      <div class="deal reveal d1" data-testid="deal-npl">
+      <div class="deal reveal d1" data-testid="deal-npl" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1755441067629-8755d974a90b?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Edificio de viviendas" loading="lazy">
           <span class="deal-tag">NPL</span>
@@ -1301,7 +1297,7 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
       <!-- CDR · CESIÓN DE REMATE -->
-      <div class="deal reveal d2" data-testid="deal-cdr">
+      <div class="deal reveal d2" data-testid="deal-cdr" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1663293761246-56a9b0693052?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Apartamentos turísticos" loading="lazy">
           <span class="deal-tag">CDR</span>
@@ -1321,7 +1317,7 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
       <!-- REO · ACTIVO ADJUDICADO -->
-      <div class="deal reveal d3" data-testid="deal-reo">
+      <div class="deal reveal d3" data-testid="deal-reo" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1758789667762-56175fe4601c?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Nave logística" loading="lazy">
           <span class="deal-tag">REO</span>
@@ -1428,17 +1424,32 @@ body.acuerdos .vip-cta-mod{
   </div>
 </section>
 
+
+<!-- ================= CÓMO TRABAJAMOS · REMIX ================= -->
+<section class="sec" id="flow-remix" data-testid="home-flow-remix">
+  <div class="wrap">
+    <div class="opp-centered-copy reveal">
+      <div class="eyebrow" style="margin-bottom:18px">Cómo trabajamos</div>
+      <h2>Una forma de trabajar.<br>Cada operación, una estrategia.</h2>
+      <div class="side" style="margin-top:18px">El ecosistema nos ayuda a recorrer cinco pasos de forma coherente.<br>La profundidad está dentro de cada operación.</div>
+    </div>
+    <div class="flow-premium" style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px;position:relative">
+      <div class="card opp-dark step reveal d1" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">01</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Analizamos</h3><p style="font-size:13px;color:#9DB4C2">Estudiamos la cartera y cada activo con información contrastada.</p></div><div class="card opp-dark step reveal d2" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">02</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Estructuramos</h3><p style="font-size:13px;color:#9DB4C2">Damos forma jurídica, financiera y operativa a la oportunidad.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">03</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Definimos la mejor vía</h3><p style="font-size:13px;color:#9DB4C2">Comparamos escenarios y valoramos si conviene invertir, ejecutar o buscar un acuerdo.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">04</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Presentamos</h3><p style="font-size:13px;color:#9DB4C2">Mostramos la operación con la información necesaria para decidir con criterio.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">05</span><h3 style="font-size:18px;margin:0 0 10px">Ejecutamos</h3><p style="font-size:13px;color:#9DB4C2">Acompañamos la estrategia elegida hasta donde corresponda en cada operación.</p></div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= FONDOS & SERVICERS · HOME ================= -->
 <section class="home-servicers" data-testid="home-servicers">
   <div class="wrap">
     <div class="hs-grid reveal">
       <div>
-        <div class="eyebrow" style="margin-bottom:18px">Fondos & Servicers</div>
-        <h2>Producto, seguimiento y una entrada directa al ecosistema.</h2>
-        <p>Un espacio específico para organizaciones que aportan cartera y necesitan entender cómo avanza cada operación, qué información requiere y qué salida alcanza.</p>
+        <div class="eyebrow" style="margin-bottom:18px">Carteras · Producto · Seguimiento</div>
+        <h2>Una infraestructura para convertir cartera en oportunidades.</h2>
+        <p>Producto, contexto y seguimiento para organizaciones que necesitan entender cómo evoluciona cada operación y qué salida tiene sentido en cada momento.</p>
       </div>
       <div class="hs-actions">
-        <a href="/servicers" class="btn">Conocer el espacio Servicers <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
+        <a href="/servicers" class="btn">Conocer el canal profesional <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
       </div>
     </div>
   </div>
@@ -1463,6 +1474,27 @@ body.acuerdos .vip-cta-mod{
   </div>
 </section>
 
+
+<!-- ================= TECNOLOGÍA · HOME REMIX ================= -->
+<section class="sec" id="tecnologia" data-testid="home-technology-remix" style="background:#0A1622;color:#eef6fa">
+  <div class="wrap">
+    <div class="hs-grid reveal">
+      <div>
+        <div class="eyebrow" style="margin-bottom:18px;color:#57C6E4">Tecnología propia</div>
+        <h2 style="font-size:clamp(34px,4.4vw,58px);color:#fff">Tecnología que nos ayuda<br>a tomar mejores decisiones.</h2>
+        <div class="editorial-copy" style="margin-top:18px;color:#B9CDD8;max-width:720px"><p>Hemos desarrollado herramientas propias para analizar, estructurar, contrastar y presentar cada operación.</p><p><strong style="color:#fff">La tecnología al servicio de la operación.</strong></p></div>
+      </div>
+      <div class="hs-actions"><a href="/tecnologia" class="btn">Conoce nuestra tecnología <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a></div>
+    </div>
+    <div class="grid3" style="grid-template-columns:repeat(4,1fr);gap:14px;margin-top:34px">
+      <div class="card opp-dark"><div class="kicker">01</div><h3>Analizar</h3><p>Leer y ordenar la información para entender cada operación a fondo.</p></div>
+      <div class="card opp-dark"><div class="kicker">02</div><h3>Estructurar</h3><p>Dar forma jurídica y financiera a cada operación sobre una base sólida.</p></div>
+      <div class="card opp-dark"><div class="kicker">03</div><h3>Contrastar</h3><p>Comparar escenarios y posibles salidas antes de decidir la mejor vía.</p></div>
+      <div class="card opp-dark"><div class="kicker">04</div><h3>Presentar</h3><p>Mostrar cada oportunidad con claridad, para decidir con criterio y agilidad.</p></div>
+    </div>
+  </div>
+</section>
+
 <!-- ================= ACCESO PROFESIONAL · TRES FORMAS ================= -->
 <section class="sec access" id="acceso" data-testid="acceso">
   <div class="wrap">
@@ -1480,13 +1512,7 @@ body.acuerdos .vip-cta-mod{
         <div class="en">Para invertir</div>
         <h3>Inversor</h3>
         <p>Elige cómo quieres participar en cada oportunidad.</p>
-        <ul class="opts">
-          <li><span class="ob">A</span><span><b>Compra directa</b> — adquieres la oportunidad y continúas la operación por tu cuenta.</span></li>
-          <li><span class="ob">B</span><span><b>Compra + acompañamiento jurídico</b> — adquieres la oportunidad y puedes contar con acompañamiento jurídico durante el proceso.</span></li>
-          <li><span class="ob">C</span><span><b>Compra + comercialización posterior</b> — adquieres la oportunidad y OPORTUNIIA coordina la comercialización posterior conforme a sus condiciones.</span></li>
-          <li><span class="ob">D</span><span><b>Integral</b> — compra + acompañamiento jurídico + comercialización posterior, sujetos a las condiciones de cada servicio.</span></li>
-        </ul>
-        <a href="/acceso" class="ecta" data-testid="entry-inversor-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <div class="opts-note">Elige la modalidad que mejor encaje contigo en cada oportunidad.</div><a href="/acceso" class="ecta" data-testid="entry-inversor-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
 
       <div class="entry reveal d2" data-testid="entry-colaborador">
@@ -1494,11 +1520,7 @@ body.acuerdos .vip-cta-mod{
         <div class="en">Para colaborar</div>
         <h3>Colaborador</h3>
         <p>Encuentra la oportunidad adecuada para tu cliente y elige cómo quieres estructurar la operación.</p>
-        <ul class="opts">
-          <li><span class="ob">A</span><span><b>Resultado compartido</b> — la operación se trabaja conjuntamente y la participación económica se estructura según las condiciones aplicables.</span></li>
-          <li><span class="ob">B</span><span><b>Mantienes a tu cliente</b> — conservas íntegramente tu relación comercial y OPORTUNIIA participa en la estructura y ejecución según corresponda.</span></li>
-        </ul>
-        <a href="/contacto" class="ecta" data-testid="entry-colaborador-cta">Quiero colaborar <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+        <div class="opts-note">La colaboración se solicita y OPORTUNIIA la revisa antes de continuar.</div><a href="/contacto" class="ecta" data-testid="entry-colaborador-cta">Quiero colaborar <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
       </div>
 
       <div class="entry reveal d3" data-testid="entry-suscriptor">
@@ -1584,14 +1606,7 @@ body.acuerdos .vip-cta-mod{
         <a href="/nuestra-filosofia">Nuestra filosofía</a>
         <a href="/como-funciona">Cómo funciona</a>
         <a href="/oportunidades">Oportunidades</a>
-        <a href="/servicers">Canal profesional</a>
-                <a href="/acceso">Acceso profesional</a>
-      </div>
-      <div class="foot-col">
-        <h4>Grupo OPORTUNIIA</h4>
-        <a href="/grupo-oportuniia">OPORTUNIIA</a>
-        <a href="/grupo-oportuniia">LIVING EXPERIENCE</a>
-        <span class="soon">ROBOTICS · Próximamente</span>
+        <a href="/servicers">Canal profesional</a><a href="/contacto">Contacto</a><a href="/acceso">Acceso profesional</a>
       </div>
       <div class="foot-col">
         <h4>Legal</h4>
