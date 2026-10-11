@@ -93,3 +93,14 @@ body.dark-page .card{background:#0f2535;border-color:rgba(87,198,228,.28);color:
 body.dark-page .card p{color:#a8bdc9}
 body.dark-page .btn.line{color:#f4fbfe;border-color:rgba(255,255,255,.24)}
 body.dark-page footer{border-top:1px solid rgba(255,255,255,.1)}
+
+/* /oportunidades uses the approved HOME catalogue as a dedicated professional catalogue */
+body.catalog-page{background:#0A1622}
+body.catalog-page header{background:rgba(8,24,39,.92)!important;backdrop-filter:blur(20px);border-bottom:1px solid rgba(255,255,255,.08)!important}
+body.catalog-page header .brand-logo-img{filter:none!important}
+body.catalog-page header .navitem>a,body.catalog-page header .ghost{color:#a9bdc8!important}
+body.catalog-page header .navitem>a.active,body.catalog-page header .navitem>a:hover{color:#57c6e4!important}
+body.catalog-page #producto{min-height:calc(100vh - 84px)}
+body.catalog-page #producto .prod-hero{padding-top:72px}
+body.catalog-page #producto .deal{cursor:pointer}
+body.catalog-page #producto .deal:hover{transform:translateY(-5px) scale(1.012)}
