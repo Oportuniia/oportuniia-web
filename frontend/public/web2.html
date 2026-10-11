@@ -1202,6 +1202,54 @@ body.acuerdos .vip-cta-mod{
 #tecnologia .grid3>.card:hover h3,#tecnologia .grid3>.card:hover p,#tecnologia .grid3>.card:hover .kicker{color:#0b1a28!important}
 @media(max-width:800px){.home-servicers .hs-grid{grid-template-columns:1fr!important}#tecnologia .grid3{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
 @media(max-width:500px){#tecnologia .grid3{grid-template-columns:1fr!important}.portfolio-row{flex-wrap:wrap}}
+</style><style id="rafa-exact-visual-corrections">
+/* Universo: no hover ni inversión de color en las dos cajas, ni de sus descendientes */
+#producto .uni-card,#producto .uni-card:hover,#producto .uni-card:focus-within,
+body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
+ transform:none!important;filter:none!important;box-shadow:none!important;transition:none!important;
+}
+#producto .uni-card:hover *,#producto .uni-card:focus-within *{transform:none!important;filter:none!important}
+#producto .uni-card:not(.uni-hi),#producto .uni-card:not(.uni-hi):hover{background:rgba(255,255,255,.04)!important;color:#fff!important}
+#producto .uni-card.uni-hi,#producto .uni-card.uni-hi:hover{background:#f7f5f0!important;color:#0c1d28!important}
+#producto .uni-card.uni-hi p,#producto .uni-card.uni-hi:hover p{color:#243748!important}
+#producto .uni-card.uni-hi .uni-k,#producto .uni-card.uni-hi:hover .uni-k{color:#0c1d28!important}
+#producto .uni-card:not(.uni-hi) p,#producto .uni-card:not(.uni-hi):hover p{color:#c6d6e0!important}
+#quienes .q-grid{display:block!important}
+#quienes .q-grid>.reveal{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:clamp(45px,6vw,100px)!important;align-items:start!important}
+#quienes .q-grid .eyebrow,#quienes .q-grid .q-title{grid-column:1!important;grid-row:auto!important}
+#quienes .q-grid .q-title{margin-top:24px!important;font-size:clamp(37px,3.9vw,61px)!important;line-height:1.12!important}
+#quienes .q-grid .q-body{grid-column:2!important;grid-row:1/span 2!important;margin-top:12px!important;align-self:center!important}
+#flow-remix .opp-centered-copy{width:100%!important;max-width:none!important;text-align:left!important;margin:0 0 55px!important;padding:0!important}
+#flow-remix .opp-centered-copy h2{width:100%!important;max-width:none!important;font-size:clamp(38px,4.8vw,82px)!important;line-height:1.07!important;letter-spacing:-.045em!important;margin:0!important;text-align:left!important}
+#flow-remix .opp-centered-copy .eyebrow{margin-left:0!important}
+#flow-remix .opp-centered-copy .side{max-width:800px!important;margin:20px 0 0!important}
+#flow-remix .flow-action{background:#2686a9!important;color:#fff!important;margin-top:24px!important}
+#flow-remix .flow-premium .card:hover{background:#f6f3ed!important}
+#flow-remix .flow-premium .card:hover h3{color:#102738!important}
+#flow-remix .flow-premium .card:hover p{color:#263d4b!important}
+#flow-remix .flow-premium .card:hover .dot{background:#102738!important;color:white!important}
+#flow-remix .flow-premium .card .connector{position:absolute!important;top:25px!important;left:55px!important;right:0!important;height:2px!important;background:#57c6e4!important}
+#flow-remix .flow-premium .card .connector:after{right:0!important;top:-4px!important}
+#flow-remix .flow-premium .card:last-child:before{content:"";position:absolute;top:25px;left:55px;right:0;height:2px;background:#57c6e4}
+#flow-remix .flow-premium .card:last-child:after{content:"";position:absolute;top:21px;right:0;border-left:9px solid #57c6e4;border-top:5px solid transparent;border-bottom:5px solid transparent}
+#tecnologia .grid3>.card:hover h3,#tecnologia .grid3>.card:hover p{color:#102738!important}
+#tecnologia .grid3>.card:hover .kicker{color:#102738!important}
+#tecnologia .grid3>.card h3{color:#fff!important}
+#tecnologia .grid3>.card p{color:#a6bac6!important}
+#acceso .access-final{gap:26px!important}
+#acceso .access-final .entry{background:#0b2130!important;border:1px solid #235268!important;border-radius:17px!important;padding:40px!important;min-height:580px!important;display:flex!important;flex-direction:column!important}
+#acceso .access-final .entry .ei{color:#57c6e4!important;background:#17394b!important;border:1px solid #296078!important;width:65px!important;height:65px!important}
+#acceso .access-final .entry .en{color:#57c6e4!important;margin-top:10px!important}
+#acceso .access-final .entry h3{color:white!important;font-size:29px!important}
+#acceso .access-final .entry p{color:#b9ccd7!important;font-size:15px!important;line-height:1.7!important}
+#acceso .access-badges{display:flex;gap:14px;min-height:54px;margin-top:30px}
+#acceso .access-badges span{display:grid;place-items:center;width:52px;height:52px;border-radius:10px;background:#173d50;color:#57c6e4;font-weight:700;font-size:20px}
+#acceso .access-detail{margin-top:18px;color:#d5e2ea;line-height:1.65;font-size:14px;flex:1}
+#acceso .access-final .ecta{margin-top:25px!important;min-height:66px!important;background:#246c90!important;color:#fff!important}
+#acceso .access-final .inversor .ecta{background:#57c6e4!important;color:#092333!important}
+#acceso .access-final .entry:hover{transform:translateY(-5px)!important;box-shadow:0 24px 45px rgba(0,0,0,.16)!important}
+@media(max-width:800px){#quienes .q-grid>.reveal{display:block!important}#quienes .q-grid .q-body{margin-top:30px!important}#flow-remix .flow-premium{grid-template-columns:1fr 1fr!important}#acceso .access-final{grid-template-columns:1fr!important}}
+@media(max-width:520px){#flow-remix .flow-premium{grid-template-columns:1fr!important}#acceso .access-final .entry{min-height:0!important}}
 </style></head>
 <body data-testid="v03-body">
 <div class="atmos" aria-hidden="true"></div>
@@ -1556,30 +1604,24 @@ body.acuerdos .vip-cta-mod{
       <div class="side reveal d1">Inversor, colaborador o suscriptor. Tres formas distintas de relacionarte con OPORTUNIIA.</div>
     </div>
 
-    <div class="entry-grid">
-      <div class="entry feat reveal d1" data-testid="entry-inversor">
-        <span class="ei"><i data-lucide="trending-up"></i></span>
-        <div class="en">Para invertir</div>
-        <h3>Inversor</h3>
-        <p>Elige cómo quieres participar en cada oportunidad.</p>
-        <div class="opts-note">Elige la modalidad que mejor encaje contigo en cada oportunidad.</div><a href="/acceso" class="ecta" data-testid="entry-inversor-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+    <div class="entry-grid access-final">
+      <div class="entry reveal inversor" data-testid="entry-inversor">
+        <span class="ei"><i data-lucide="trending-up"></i></span><div class="en">Para invertir</div><h3>Inversor</h3>
+        <p>Creas tu cuenta y participas en las operaciones que elijas.</p><div class="access-badges"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+        <div class="access-detail">Como inversor eliges la modalidad <strong>operación a operación</strong>, no al registrarte ni de forma permanente. Podrás elegir la modalidad que mejor encaje contigo en cada oportunidad.</div>
+        <a href="/registro?rol=inversor" class="ecta">Darse de alta <i data-lucide="arrow-up-right"></i></a>
       </div>
-
-      <div class="entry reveal d2" data-testid="entry-colaborador">
-        <span class="ei"><i data-lucide="handshake"></i></span>
-        <div class="en">Para colaborar</div>
-        <h3>Colaborador</h3>
-        <p>Encuentra la oportunidad adecuada para tu cliente y elige cómo quieres estructurar la operación.</p>
-        <div class="opts-note">La colaboración se solicita y OPORTUNIIA la revisa antes de continuar.</div><a href="/contacto" class="ecta" data-testid="entry-colaborador-cta">Quiero colaborar <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+      <div class="entry reveal colaborador" data-testid="entry-colaborador">
+        <span class="ei"><i data-lucide="handshake"></i></span><div class="en">Para colaborar</div><h3>Colaborador</h3>
+        <p>Aportas oportunidades o clientes. La colaboración no es un alta automática: se solicita y OPORTUNIIA la revisa antes de continuar.</p><div class="access-badges"><span>A</span><span>B</span></div>
+        <div class="access-detail">Las modalidades de colaboración A/B se determinan en el momento de formalizar el contrato de colaboración, de acuerdo con las condiciones aplicables.</div>
+        <a href="/solicitar-colaboracion" class="ecta">Solicitar colaboración <i data-lucide="arrow-up-right"></i></a>
       </div>
-
-      <div class="entry reveal d3" data-testid="entry-suscriptor">
-        <span class="ei"><i data-lucide="key-round"></i></span>
-        <div class="en">Ya formas parte</div>
-        <h3>Suscriptor</h3>
-        <p>Ya formas parte de OPORTUNIIA. Accede a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p>
-        <div class="opts-note">Tu acceso puede incluir oportunidades, documentación y servicios disponibles para tu perfil.</div>
-        <a href="/acceso" class="ecta" data-testid="entry-suscriptor-cta">Entrar <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+      <div class="entry reveal suscriptor" data-testid="entry-suscriptor">
+        <span class="ei"><i data-lucide="key-round"></i></span><div class="en">Ya formas parte</div><h3>Suscriptor</h3>
+        <p>Ya formas parte de OPORTUNIIA. Accede con tu código a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p><div class="access-badges access-empty"></div>
+        <div class="access-detail"></div>
+        <a href="/login" class="ecta">Entrar con mi código <i data-lucide="arrow-up-right"></i></a>
       </div>
     </div>
 
