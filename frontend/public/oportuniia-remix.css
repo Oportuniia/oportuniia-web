@@ -1,0 +1,82 @@
+/* OPORTUNIIA · Visual Remix 2026-10-11
+   Consolidates Rafa-approved interaction, header, footer and premium hover language. */
+:root{
+  --opp-navy:#081827;
+  --opp-navy-2:#0f2535;
+  --opp-petrol:#123e52;
+  --opp-cyan:#57c6e4;
+  --opp-blue:#2e9ac6;
+  --opp-ivory:#f6f3ed;
+  --opp-white:#f7fbfd;
+  --opp-text:#dbe8ee;
+  --opp-muted:#9db4c2;
+  --opp-ease:cubic-bezier(.22,.61,.36,1);
+}
+html{scroll-behavior:smooth}
+a,button,.card,.entry,.type-item,.uni-card,.deal,.gcard{transition:transform .28s var(--opp-ease),background-color .28s var(--opp-ease),color .28s var(--opp-ease),border-color .28s var(--opp-ease),box-shadow .28s var(--opp-ease)}
+/* Active nav + stable width */
+.menu a,.navitem>a{font-weight:500}
+.menu a.active,.navitem>a.active,[aria-current="page"]{color:var(--opp-cyan)!important;font-weight:600}
+.menu,.nav{transform:none!important}
+header .wrap{max-width:1440px}
+/* Premium hover language: visible but elegant */
+.card:hover,.entry:hover,.type-item:hover,.uni-card:hover,.deal:hover,.gcard:hover{
+  transform:translateY(-4px) scale(1.012);
+  box-shadow:0 22px 52px -28px rgba(87,198,228,.48);
+}
+.dark .card:hover,.card.opp-dark:hover,.entry:hover,.type-item:hover,.uni-card:hover{
+  background:var(--opp-ivory)!important;color:var(--opp-navy)!important;border-color:rgba(87,198,228,.75)!important;
+}
+.dark .card:hover p,.dark .card:hover h3,.dark .card:hover .kicker,
+.entry:hover p,.entry:hover h3,.entry:hover .en,
+.type-item:hover p,.type-item:hover .type-name,
+.uni-card:hover p,.uni-card:hover .uni-k{color:var(--opp-navy)!important}
+/* Cards that are clickable feel clickable */
+a.deal,.deal[data-href],.gcard,a.entry{cursor:pointer}
+.deal:hover{transform:translateY(-5px) scale(1.015)}
+.deal:hover .deal-media img{transform:scale(1.025)}
+.deal-media img{transition:transform .45s var(--opp-ease)}
+/* Logo microinteraction */
+.brand img,.brand-logo-img,.footer-brand-logo,.logo img{
+  transition:transform .38s var(--opp-ease),filter .38s var(--opp-ease),opacity .38s var(--opp-ease);
+}
+.brand:hover img,.brand:hover .brand-logo-img,.logo:hover img{
+  transform:rotate(-2.2deg) scale(1.045);
+  filter:drop-shadow(0 0 16px rgba(87,198,228,.38));
+}
+/* Editorial rule: make paragraph blocks breathe */
+.editorial-copy p+p{margin-top:14px}
+.editorial-copy strong{font-weight:700}
+.opp-line{display:block}
+/* Footer final */
+footer{background:var(--opp-navy)!important;color:var(--opp-text)!important}
+footer .foot-grid,footer .foot{gap:clamp(34px,5vw,76px)!important}
+footer .foot-brand{text-align:center}
+footer .footer-brand-logo,footer .foot-brand img{height:auto!important;max-height:82px!important;margin:0 auto}
+footer .foot-brand p{margin-top:6px!important;font-size:16px!important;font-weight:600!important}
+footer h4{font-size:13px!important;letter-spacing:.18em!important;color:#b7d0dc!important;font-weight:700!important}
+footer a,footer .soon{font-size:14px!important;line-height:1.75!important}
+footer .foot-bottom,footer .copy{font-size:12px!important}
+/* Hero remix */
+.hero.opp-centered .wrap{text-align:center}
+.hero.opp-centered h1{max-width:1250px;margin-inline:auto}
+.hero.opp-centered .hero-lead{max-width:760px;margin:34px auto 0;text-align:center}
+.hero.opp-centered .hero-bottom{display:grid;grid-template-columns:1fr minmax(280px,760px) 1fr;align-items:end;gap:24px;margin-top:28px}
+.hero.opp-centered .hero-bottom .hero-lead{grid-column:2;margin:0 auto}
+.hero.opp-centered .hero-cta{grid-column:1/-1;display:flex;justify-content:space-between;width:100%;margin-top:10px}
+/* compact section rhythm */
+.opp-compact{padding-top:clamp(34px,4vw,64px)!important}
+.opp-centered-copy{text-align:center;max-width:920px;margin-inline:auto}
+.opp-centered-copy .side{max-width:780px;margin:18px auto 0}
+/* Premium gate/modal */
+.opp-gate{position:fixed;inset:0;z-index:999;background:rgba(5,16,25,.74);backdrop-filter:blur(10px);display:none;align-items:center;justify-content:center;padding:24px}
+.opp-gate.open{display:flex}
+.opp-gate-card{width:min(620px,94vw);background:linear-gradient(145deg,#0b1b29,#123e52);border:1px solid rgba(87,198,228,.38);border-radius:22px;padding:36px;color:#eef8fb;box-shadow:0 30px 90px rgba(0,0,0,.48);text-align:center}
+.opp-gate-card h3{font-size:clamp(30px,4vw,46px);line-height:1.05;margin:12px 0}
+.opp-gate-card p{color:#b7ccd7;line-height:1.7}
+.opp-gate-card .btn{margin-top:24px}
+@media(max-width:820px){
+  .hero.opp-centered .hero-bottom{grid-template-columns:1fr}
+  .hero.opp-centered .hero-bottom .hero-lead,.hero.opp-centered .hero-cta{grid-column:1}
+  .hero.opp-centered .hero-cta{justify-content:center;flex-wrap:wrap}
+}
