@@ -80,3 +80,16 @@ footer .foot-bottom,footer .copy{font-size:12px!important}
   .hero.opp-centered .hero-bottom .hero-lead,.hero.opp-centered .hero-cta{grid-column:1}
   .hero.opp-centered .hero-cta{justify-content:center;flex-wrap:wrap}
 }
+
+/* Dark editorial pages selected in review */
+body.dark-page{background:var(--opp-navy);color:var(--opp-white)}
+body.dark-page header{background:rgba(8,24,39,.92)!important;border-color:rgba(255,255,255,.1)!important}
+body.dark-page header .brand img{filter:brightness(0) invert(1)}
+body.dark-page .menu a{color:#a9bdc8}
+body.dark-page .menu a:hover,body.dark-page .menu a.active{color:var(--opp-cyan)!important}
+body.dark-page .hero,body.dark-page .sec{background:var(--opp-navy)!important;color:var(--opp-white)}
+body.dark-page .hero p,body.dark-page .lead,body.dark-page .sec p{color:var(--opp-muted)}
+body.dark-page .card{background:#0f2535;border-color:rgba(87,198,228,.28);color:#f4fbfe}
+body.dark-page .card p{color:#a8bdc9}
+body.dark-page .btn.line{color:#f4fbfe;border-color:rgba(255,255,255,.24)}
+body.dark-page footer{border-top:1px solid rgba(255,255,255,.1)}
