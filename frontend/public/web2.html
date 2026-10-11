@@ -1171,7 +1171,38 @@ body.acuerdos .vip-cta-mod{
 #acceso .entry-grid .entry:hover{transform:translateY(-5px) scale(1.012)!important;border-color:#57c6e4!important;box-shadow:0 20px 38px rgba(0,0,0,.17)!important}
 @media(max-width:760px){#producto .opp-product-heading h2{font-size:clamp(30px,7vw,52px)!important}#quienes .q-grid{display:block!important}#quienes .q-grid>.reveal{display:block}#quienes .q-grid .q-body{margin-top:22px}}
 </style>
-</head>
+<style id="rafa-evidence-fixes">
+/* Header position and identity must not change on scroll */
+#hdr,#hdr.sc{transform:none!important;top:0!important}
+#hdr .actions{flex-shrink:0!important}
+#producto .uni-card{transition:box-shadow .32s ease,transform .32s ease,filter .32s ease!important}
+#producto .uni-card:hover{transform:scale(1.008)!important;filter:brightness(1.035)!important;box-shadow:0 0 18px rgba(87,198,228,.12)!important}
+#producto .uni-card:hover,#producto .uni-card:hover *{background-color:unset}
+.home-servicers{padding:clamp(65px,8vw,115px) 0!important}
+.home-servicers .hs-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:center!important;gap:clamp(28px,4vw,70px)!important}
+.home-servicers .hs-copy{max-width:590px}
+.home-servicers .hs-copy h2{font-size:clamp(34px,3.6vw,56px)!important;line-height:1.15!important}
+.home-servicers .hs-copy p{max-width:490px!important;line-height:1.7!important}
+.home-servicers .hs-copy .btn{margin-top:22px}
+.portfolio-preview{background:#091b29;color:#eef7fa;border:1px solid rgba(87,198,228,.45);border-radius:15px;padding:24px;box-shadow:0 20px 55px rgba(0,0,0,.2);min-width:0}
+.portfolio-top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:22px}.portfolio-top span{font-size:11px;letter-spacing:.14em;color:#57c6e4}
+.portfolio-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.portfolio-stats>div{background:#142633;border:1px solid #29404c;padding:16px 12px;border-radius:10px}.portfolio-stats small{display:block;color:#8daab9;font-size:10px;letter-spacing:.08em}.portfolio-stats b{display:block;color:#fff;font-size:26px;margin-top:7px}
+.portfolio-chart{height:110px;display:flex;align-items:end;gap:7px;border-bottom:1px solid #365160;margin:22px 0}.portfolio-chart i{display:block;flex:1;background:linear-gradient(#55c8e4,#16729b);border-radius:4px 4px 0 0}
+.portfolio-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #213746;font-size:12px}.portfolio-row b{color:#55c8e4}.portfolio-row span{flex:1;color:#bacbd5}.portfolio-row em{font-style:normal;font-size:10px;color:#9ce4f4;background:#173b4a;border-radius:20px;padding:6px}
+.portfolio-disclaimer{display:block;color:#7794a4;margin-top:15px;font-size:11px}
+#flow-remix .opp-centered-copy h2{font-size:clamp(38px,4.5vw,72px)!important;line-height:1.13!important}
+#flow-remix .opp-centered-copy .side{max-width:720px!important}
+#flow-remix .flow-action{display:inline-flex;background:#2686a9!important;color:white!important;margin:20px 0 0}
+#flow-remix .flow-premium .card h3{color:#57c6e4!important}
+#flow-remix .flow-premium .card .dot{background:#123d56!important;color:white!important;border-color:#57c6e4!important}
+#flow-remix .flow-premium .card .connector:after{content:"";position:absolute;right:-4px;top:-5px;border-left:9px solid #57c6e4;border-top:5px solid transparent;border-bottom:5px solid transparent}
+#tecnologia .grid3{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;margin-top:48px!important;border:1px solid #304b5c;border-radius:12px;overflow:hidden}
+#tecnologia .grid3>.card{background:#102738!important;border-radius:0!important;border:0!important;border-right:1px solid #304b5c!important;padding:28px!important;transition:background .25s,color .25s,transform .25s}
+#tecnologia .grid3>.card:hover{background:#f6f3ed!important;transform:none!important}
+#tecnologia .grid3>.card:hover h3,#tecnologia .grid3>.card:hover p,#tecnologia .grid3>.card:hover .kicker{color:#0b1a28!important}
+@media(max-width:800px){.home-servicers .hs-grid{grid-template-columns:1fr!important}#tecnologia .grid3{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:500px){#tecnologia .grid3{grid-template-columns:1fr!important}.portfolio-row{flex-wrap:wrap}}
+</style></head>
 <body data-testid="v03-body">
 <div class="atmos" aria-hidden="true"></div>
 
@@ -1451,20 +1482,14 @@ body.acuerdos .vip-cta-mod{
 
 
 <!-- ================= FONDOS & SERVICERS · HOME ================= -->
-<section class="home-servicers" data-testid="home-servicers">
-  <div class="wrap">
-    <div class="hs-grid reveal">
-      <div>
-        <div class="eyebrow" style="margin-bottom:18px">Carteras · Producto · Seguimiento</div>
-        <h2>Una infraestructura para convertir cartera en oportunidades.</h2>
-        <p>Producto, contexto y seguimiento para organizaciones que necesitan entender cómo evoluciona cada operación y qué salida tiene sentido en cada momento.</p>
-      </div>
-      <div class="hs-actions">
-        <a href="/servicers" class="btn">Conocer el canal profesional <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-      </div>
-    </div>
-  </div>
-</section>
+<section class="home-servicers" data-testid="home-servicers"><div class="wrap"><div class="hs-grid reveal"><div class="hs-copy"><div class="eyebrow" style="margin-bottom:18px">Carteras · Producto · Seguimiento</div><h2>Una infraestructura para convertir cartera en oportunidades.</h2><p>Producto, contexto y seguimiento para entender cada operación y valorar su mejor salida.</p><a href="/servicers" class="btn">Conocer el canal profesional <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a></div><div class="portfolio-preview" aria-label="Vista ilustrativa del panel de cartera">
+<div class="portfolio-top"><strong>Panel de cartera</strong><span>● EN VIVO</span></div>
+<div class="portfolio-stats"><div><small>EN CARTERA</small><b>128</b></div><div><small>EN ANÁLISIS</small><b>34</b></div><div><small>ACUERDOS</small><b>46</b></div></div>
+<div class="portfolio-chart" aria-hidden="true"><i style="height:38%"></i><i style="height:51%"></i><i style="height:46%"></i><i style="height:64%"></i><i style="height:57%"></i><i style="height:78%"></i><i style="height:69%"></i><i style="height:88%"></i><i style="height:82%"></i><i style="height:100%"></i></div>
+<div class="portfolio-row"><b>OP-1042</b><span>Residencial · garantía hipotecaria</span><em>EN CURSO</em></div>
+<div class="portfolio-row"><b>OP-1039</b><span>Comercial · cesión de remate</span><em>ACUERDO</em></div>
+<div class="portfolio-row"><b>OP-1028</b><span>Industrial · activo adjudicado</span><em>EN REVISIÓN</em></div>
+<small class="portfolio-disclaimer">Vista ilustrativa de la interfaz · datos no reales.</small></div></div></div></section>
 
 <!-- ================= QUIÉNES SOMOS ================= -->
 <section class="sec quienes" id="quienes" data-testid="quienes">
@@ -1490,9 +1515,9 @@ body.acuerdos .vip-cta-mod{
 <section class="sec" id="flow-remix" data-testid="home-flow-remix">
   <div class="wrap">
     <div class="opp-centered-copy reveal">
-      <div class="eyebrow" style="margin-bottom:18px">Cómo trabajamos</div>
-      <h2>Una forma de trabajar.<br>Cada operación, una estrategia.</h2>
-      <div class="side" style="margin-top:18px">El ecosistema nos ayuda a recorrer cinco pasos de forma coherente.<br>La profundidad está dentro de cada operación.</div>
+      <div class="eyebrow" style="margin-bottom:18px">Cómo funciona</div>
+      <h2>Una forma de trabajar.<br>Cada operación, una estrategia.</h2><a href="/como-funciona" class="btn flow-action">Cómo funciona <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
+      <div class="side" style="margin-top:18px">Gracias a nuestra tecnología automatizamos parte del análisis de cada operación y agilizamos su estudio. Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
     </div>
     <div class="flow-premium" style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px;position:relative">
       <div class="card opp-dark step reveal d1" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">01</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Analizamos</h3><p style="font-size:13px;color:#9DB4C2">Estudiamos la cartera y cada activo con información contrastada.</p></div><div class="card opp-dark step reveal d2" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">02</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Estructuramos</h3><p style="font-size:13px;color:#9DB4C2">Damos forma jurídica, financiera y operativa a la oportunidad.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">03</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Definimos la mejor vía</h3><p style="font-size:13px;color:#9DB4C2">Comparamos escenarios y valoramos si conviene invertir, ejecutar o buscar un acuerdo.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">04</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Presentamos</h3><p style="font-size:13px;color:#9DB4C2">Mostramos la operación con la información necesaria para decidir con criterio.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">05</span><h3 style="font-size:18px;margin:0 0 10px">Ejecutamos</h3><p style="font-size:13px;color:#9DB4C2">Acompañamos la estrategia elegida hasta donde corresponda en cada operación.</p></div>
