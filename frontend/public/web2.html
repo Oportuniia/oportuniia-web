@@ -1250,7 +1250,28 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
 #acceso .access-final .entry:hover{transform:translateY(-5px)!important;box-shadow:0 24px 45px rgba(0,0,0,.16)!important}
 @media(max-width:800px){#quienes .q-grid>.reveal{display:block!important}#quienes .q-grid .q-body{margin-top:30px!important}#flow-remix .flow-premium{grid-template-columns:1fr 1fr!important}#acceso .access-final{grid-template-columns:1fr!important}}
 @media(max-width:520px){#flow-remix .flow-premium{grid-template-columns:1fr!important}#acceso .access-final .entry{min-height:0!important}}
-</style></head>
+</style>
+<style id="rafa-static-universe-and-philosophy-20261011">
+/* Approved reference: three-line philosophy heading and stable editorial proportions. */
+@media(min-width:901px){
+#quienes .q-grid>.reveal{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:clamp(54px,5vw,96px)!important}
+#quienes .q-grid .q-title{font-size:clamp(38px,3.15vw,60px)!important;line-height:1.075!important;letter-spacing:-.035em!important;margin-top:24px!important}
+}
+@media(max-width:900px){#quienes .philosophy-desktop-break{display:none!important}}
+/* The two universe description cards are NEVER interactive; the switch below is independent. */
+#producto .uni-card,#producto .uni-card:hover,#producto .uni-card:focus,#producto .uni-card:focus-within,
+body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
+ transform:none!important;filter:none!important;box-shadow:none!important;
+ transition:none!important;animation:none!important;cursor:default!important;
+}
+#producto .uni-card:not(.uni-hi),#producto .uni-card:not(.uni-hi):hover,#producto .uni-card:not(.uni-hi):focus-within{background:#14212d!important;border-color:#2b3b4b!important}
+#producto .uni-card.uni-hi,#producto .uni-card.uni-hi:hover,#producto .uni-card.uni-hi:focus-within{background:#0b2e40!important;border-color:#20799d!important}
+#producto .uni-card *,#producto .uni-card:hover *,#producto .uni-card:focus-within *{transform:none!important;filter:none!important;transition:none!important;animation:none!important}
+#producto .uni-card:not(.uni-hi) .uni-k,#producto .uni-card:not(.uni-hi):hover .uni-k{color:#9bbacb!important}
+#producto .uni-card.uni-hi .uni-k,#producto .uni-card.uni-hi:hover .uni-k{color:#57c6e4!important}
+#producto .uni-card p,#producto .uni-card:hover p{color:#c6d6e0!important}
+</style>
+</head>
 <body data-testid="v03-body">
 <div class="atmos" aria-hidden="true"></div>
 
@@ -1545,7 +1566,7 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
     <div class="q-grid q-human">
       <div class="reveal">
         <div class="eyebrow" style="margin-bottom:24px">Nuestra filosofía</div>
-        <h2 class="q-title">Detrás de cada deuda hay una solución que merece ser explorada.</h2>
+        <h2 class="q-title">Detrás de cada deuda hay<br class="philosophy-desktop-break"> una solución que merece<br class="philosophy-desktop-break"> ser explorada.</h2>
         <div class="q-body">
           <p>Antes de asumir que el recorrido debe ser judicial, buscamos entender la operación, las circunstancias y las alternativas posibles. Siempre que existe una vía razonable de acuerdo, <b>trabajamos para impulsarla</b>.</p>
           <p>Porque resolver antes, reducir incertidumbre y encontrar un punto de encuentro puede generar más valor para todas las partes.</p>
