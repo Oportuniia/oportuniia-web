@@ -1186,6 +1186,17 @@ header,header.sc{background:rgba(255,255,255,.97)!important;border-bottom:1px so
 header .navitem>a,header .ghost{color:#18384e!important}header .navitem>a:hover,header .navitem>a.active{color:#1f6588!important}header .burger span,header .burger span::before,header .burger span::after{background:#18384e!important}
 /* Los dos universos conservan sus estilos independientes y aprobados. */
 @media(prefers-reduced-motion:reduce){.deal,.card,.entry{transition:none!important}}
+
+/* QA móvil · selector sin cambios de color, tamaño ni sombra al hover */
+#producto .modeswitch .ms-btn:hover,#producto .modeswitch .ms-btn:focus-visible{transform:none!important;filter:none!important;box-shadow:none!important}
+#producto .modeswitch .ms-btn:not(.on):hover,#producto .modeswitch .ms-btn:not(.on):focus-visible{background:transparent!important;color:#c5d5df!important}
+#producto .modeswitch .ms-btn.on:hover,#producto .modeswitch .ms-btn.on:focus-visible{background:#247da2!important;color:#fff!important}
+/* Modalidades alineadas por fila dentro de las tarjetas */
+#acceso .access-final .entry{display:flex!important;flex-direction:column!important}
+#acceso .access-final .entry>.access-badges{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:nowrap!important;margin-top:22px!important;min-height:48px!important}
+#acceso .access-final .entry>.access-badges span{width:clamp(32px,3.5vw,46px)!important;height:clamp(32px,3.5vw,46px)!important;flex:0 0 auto!important;font-size:clamp(14px,1.4vw,18px)!important}
+#acceso .access-final .entry>.access-detail{flex:1!important}
+@media(max-width:800px){#acceso .access-final .entry>.access-badges{gap:8px!important}}
 </style>
 <link rel="stylesheet" href="/oportuniia-remix.css?v=20261011-remix">
 <style id="rafa-final-home-fixes">
@@ -1651,20 +1662,6 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
   </div>
 </section>
 
-
-<!-- ================= CÓMO TRABAJAMOS · REMIX ================= -->
-<section class="sec" id="flow-remix" data-testid="home-flow-remix">
-  <div class="wrap">
-    <div class="opp-centered-copy reveal">
-      <div class="eyebrow" style="margin-bottom:18px">Cómo funciona</div>
-      <h2>Una forma de trabajar.<br>Cada operación, una estrategia.</h2><a href="/como-funciona" class="btn flow-action">Cómo funciona <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-      <div class="side" style="margin-top:18px">Gracias a nuestra tecnología automatizamos parte del análisis de cada operación y agilizamos su estudio. Analizamos cada caso, definimos la vía y la llevamos hasta el resultado.</div>
-    </div>
-    <div class="flow-premium" style="display:grid;grid-template-columns:repeat(5,1fr);gap:18px;position:relative">
-      <div class="card opp-dark step reveal d1" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">01</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Analizamos</h3><p style="font-size:13px;color:#9DB4C2">Estudiamos la cartera y cada activo con información contrastada.</p></div><div class="card opp-dark step reveal d2" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">02</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Estructuramos</h3><p style="font-size:13px;color:#9DB4C2">Damos forma jurídica, financiera y operativa a la oportunidad.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">03</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Definimos la mejor vía</h3><p style="font-size:13px;color:#9DB4C2">Comparamos escenarios y valoramos si conviene invertir, ejecutar o buscar un acuerdo.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">04</span><span class="connector"></span><h3 style="font-size:18px;margin:0 0 10px">Presentamos</h3><p style="font-size:13px;color:#9DB4C2">Mostramos la operación con la información necesaria para decidir con criterio.</p></div><div class="card opp-dark step reveal d3" style="position:relative;background:#0F2130;color:#fff;border:1px solid rgba(87,198,228,.22);border-radius:16px;padding:24px"><span class="dot">05</span><h3 style="font-size:18px;margin:0 0 10px">Ejecutamos</h3><p style="font-size:13px;color:#9DB4C2">Acompañamos la estrategia elegida hasta donde corresponda en cada operación.</p></div>
-    </div>
-  </div>
-</section>
 
 <!-- ================= TECNOLOGÍA · HOME REMIX ================= -->
 <section class="sec" id="tecnologia" data-testid="home-technology-remix" style="background:#0A1622;color:#eef6fa">
