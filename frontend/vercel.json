@@ -55,6 +55,10 @@
     {
       "source": "/tecnologia",
       "destination": "/tecnologia.html"
+    },
+    {
+      "source": "/oportunidad",
+      "destination": "/oportunidad.html"
     }
   ]
 }
