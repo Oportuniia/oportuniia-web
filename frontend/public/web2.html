@@ -1152,6 +1152,11 @@ body.acuerdos .vip-cta-mod{
 .deal[data-href]{cursor:pointer}
 .deal[data-href]:focus-visible{outline:3px solid #57c6e4;outline-offset:4px}
 
+
+/* Botones de selección: estado visual fijo incluso al pasar el cursor */
+.modeswitch .ms-btn:hover,.modeswitch .ms-btn:focus-visible{transform:none!important;filter:none!important;box-shadow:none!important}
+.modeswitch .ms-btn.on:hover,.modeswitch .ms-btn.on:focus-visible{background:#247da2!important;color:#fff!important}
+.modeswitch .ms-btn:not(.on):hover,.modeswitch .ms-btn:not(.on):focus-visible{background:transparent!important;color:#c5d5df!important}
 /* Selector de universos: hover no cambia la selección ni el color de Acuerdos */
 .modeswitch .ms-btn[data-mode="acuerdos"]:not(.on):hover,
 body.acuerdos .modeswitch .ms-btn[data-mode="acuerdos"]:not(.on):hover{background:transparent!important;color:inherit!important;box-shadow:none!important;transform:none!important}
