@@ -1179,6 +1179,13 @@ body.acuerdos .modeswitch .ms-btn[data-mode="acuerdos"]:not(.on):hover{backgroun
 @keyframes oppHeroBeam{from{transform:translateX(-90%) skewX(-12deg);opacity:0}35%{opacity:1}to{transform:translateX(110%) skewX(-12deg);opacity:0}}
 @keyframes oppHeroGlow{from{opacity:0}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.hero::before,.hero::after,.hero h1 .l,.hero .hero-bottom{animation:none!important;opacity:1!important;filter:none!important;transform:none!important}}
+
+/* CIERRE VISUAL CAP.22 · Navy dominante, excepciones aprobadas */
+body:not(.acuerdos){--bg:#091b2b;--bg2:#0e2638;--surface:#122e42;--panel:#122e42;--ink:#edf6fa;--ink2:#c1d5e0;--faint:#96b2c3;--line:rgba(170,210,231,.18);--line-2:rgba(170,210,231,.10);--brand:#57afd6;--brand-2:#75c7e9;--brand-tint:rgba(74,172,216,.12);--brand-line:rgba(93,185,222,.35)}
+header,header.sc{background:rgba(255,255,255,.97)!important;border-bottom:1px solid rgba(12,40,60,.12)!important;backdrop-filter:blur(18px)}
+header .navitem>a,header .ghost{color:#18384e!important}header .navitem>a:hover,header .navitem>a.active{color:#1f6588!important}header .burger span,header .burger span::before,header .burger span::after{background:#18384e!important}
+/* Los dos universos conservan sus estilos independientes y aprobados. */
+@media(prefers-reduced-motion:reduce){.deal,.card,.entry{transition:none!important}}
 </style>
 <link rel="stylesheet" href="/oportuniia-remix.css?v=20261011-remix">
 <style id="rafa-final-home-fixes">
@@ -1350,6 +1357,7 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
         <div class="navitem"><a href="/como-funciona">Cómo funciona</a></div>
         <div class="navitem"><a href="/oportunidades">Oportunidades</a></div>
         <div class="navitem"><a href="/grupo-oportuniia">Grupo OPORTUNIIA</a></div>
+        <div class="navitem"><a href="/tecnologia">Tecnología</a></div>
         <div class="navitem"><a href="/contacto">Contacto</a></div>
         <div class="navitem"><a href="/servicers">Canal profesional</a></div>
       </nav>
@@ -1367,6 +1375,7 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
   <a href="/como-funciona">Cómo funciona</a>
   <a href="/oportunidades">Oportunidades</a>
   <a href="/grupo-oportuniia">Grupo OPORTUNIIA</a>
+  <a href="/tecnologia">Tecnología</a>
   <a href="/contacto">Contacto</a>
   <a href="/servicers">Canal profesional</a>
   <a href="/acceso" class="btn">Login / Registro</a>
@@ -1465,7 +1474,7 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
     <div class="acu-surface" data-testid="acu-surface">
     <div class="deal-grid grid-rec">
       <!-- NPL -->
-      <div class="deal reveal d1" data-testid="deal-npl" data-href="/oportunidad?tipo=NPL">
+      <div class="deal reveal d1" data-testid="deal-npl" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1755441067629-8755d974a90b?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Edificio de viviendas" loading="lazy">
           <span class="deal-tag">NPL</span>
@@ -1481,11 +1490,11 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
             <div class="fact fact-occ"><span class="fk">Estado</span><span class="fv">Ejecución en curso</span></div>
             <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Vía hipotecaria" data-acu="Entrega pactada">Vía hipotecaria</span></div>
           </div>
-          <a href="/oportunidad?tipo=NPL" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
       <!-- CDR · CESIÓN DE REMATE -->
-      <div class="deal reveal d2" data-testid="deal-cdr" data-href="/oportunidad?tipo=CDR">
+      <div class="deal reveal d2" data-testid="deal-cdr" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1663293761246-56a9b0693052?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Apartamentos turísticos" loading="lazy">
           <span class="deal-tag">CDR</span>
@@ -1501,11 +1510,11 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
             <div class="fact fact-occ"><span class="fk" data-rec="Estado" data-acu="Ocupación">Estado</span><span class="fv" data-rec="En proceso judicial" data-acu="Ocupada">En proceso judicial</span></div>
             <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Cesión de remate" data-acu="Entrega pactada">Cesión de remate</span></div>
           </div>
-          <a href="/oportunidad?tipo=CDR" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
       <!-- REO · ACTIVO ADJUDICADO -->
-      <div class="deal reveal d3" data-testid="deal-reo" data-href="/oportunidad?tipo=REO">
+      <div class="deal reveal d3" data-testid="deal-reo" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1758789667762-56175fe4601c?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Nave logística" loading="lazy">
           <span class="deal-tag">REO</span>
@@ -1521,7 +1530,7 @@ body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
             <div class="fact fact-occ"><span class="fk" data-rec="Estado" data-acu="Ocupación">Estado</span><span class="fv" data-rec="Disponible" data-acu="Libre">Disponible</span></div>
             <div class="fact fact-deal"><span class="fk" data-rec="Estrategia" data-acu="Acuerdo">Estrategia</span><span class="fv" data-rec="Venta directa" data-acu="Venta pactada">Venta directa</span></div>
           </div>
-          <a href="/oportunidad?tipo=REO" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
+          <a href="/acceso" class="deal-go">Ver operación <i data-lucide="arrow-right" style="width:15px;height:15px"></i></a>
         </div>
       </div>
     </div>
