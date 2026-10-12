@@ -1,12 +1,60 @@
 {
   "rewrites": [
-    {"source": "/como-funciona", "destination": "/como-funciona.html"},
-    {"source": "/acceso", "destination": "/acceso.html"},
-    {"source": "/grupo-oportuniia", "destination": "/grupo-oportuniia.html"},
-    {"source": "/nuestra-filosofia", "destination": "/nuestra-filosofia.html"},
-    {"source": "/contacto", "destination": "/contacto.html"},
-    {"source": "/servicers", "destination": "/servicers.html"},
-    {"source": "/oportunidades", "destination": "/web2.html"},
-    {"source": "/mi-oportuniia", "destination": "/index.html"}
+    {
+      "source": "/como-funciona",
+      "destination": "/como-funciona.html"
+    },
+    {
+      "source": "/acceso",
+      "destination": "/acceso.html"
+    },
+    {
+      "source": "/grupo-oportuniia",
+      "destination": "/grupo-oportuniia.html"
+    },
+    {
+      "source": "/nuestra-filosofia",
+      "destination": "/nuestra-filosofia.html"
+    },
+    {
+      "source": "/contacto",
+      "destination": "/contacto.html"
+    },
+    {
+      "source": "/servicers",
+      "destination": "/servicers.html"
+    },
+    {
+      "source": "/oportunidades",
+      "destination": "/web2.html"
+    },
+    {
+      "source": "/mi-oportuniia",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/login",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/registro",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/solicitar-colaboracion",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/premium",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/inversor",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/tecnologia",
+      "destination": "/tecnologia.html"
+    }
   ]
 }
