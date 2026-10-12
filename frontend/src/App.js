@@ -49,41 +49,40 @@ function Investor() {
 }
 
 function PremiumCheckout() {
-  const [plan, setPlan] = useState("annual");
-  const [accepted, setAccepted] = useState(false);
-  const [early, setEarly] = useState(false);
-  const selected = useMemo(() => plans[plan], [plan]);
-
-  const prepare = (event) => {
-    event.preventDefault();
-    if (!accepted) return;
-    window.alert("Checkout preparado en sandbox. No se realizará ningún cargo mientras la pasarela permanezca cerrada.");
-  };
-
-  return <><BrandHeader /><main className="shell"><section className="checkout">
-    <p className="eyebrow">OPORTUNIIA · PREMIUM</p>
-    <h1>Contratar Experiencia Premium</h1>
-    <p className="lead">Elige modalidad. El plan anual dura 12 meses completos desde su activación.</p>
-    <div className="plans" role="radiogroup" aria-label="Modalidad Premium">
-      {Object.entries(plans).map(([key, p]) => <label className={"plan "+(plan===key?"selected":"")} key={key}>
-        <input type="radio" name="plan" value={key} checked={plan===key} onChange={() => setPlan(key)} />
-        <span><strong>{p.name}</strong><b>{p.price}</b><small>{p.detail}</small><small>{p.duration}</small></span>
-      </label>)}
-    </div>
-    <section className="legal premium-benefits">
-      <h2>Ventajas de OPORTUNIIA Premium</h2>
-      <ul><li>Universo Acuerdos</li><li>Perímetros personalizados y screening avanzado</li><li>Peticiones a la carta</li><li>Documentación ampliada</li><li>MI OPORTUNIIA</li><li>Secretaría, PBC/Compliance, IA y trazabilidad según perfil y operación</li></ul>
-    </section>
-    <section className="legal">
-      <h2>Antes de contratar</h2>
-      <p>Precio seleccionado: <strong>{selected.price} {selected.detail}</strong>.</p>
-      <label className="check"><input type="checkbox" checked={early} onChange={e=>setEarly(e.target.checked)} /> Solicito expresamente que el servicio pueda comenzar antes de finalizar el plazo de desistimiento, cuando resulte aplicable.</label>
-      <label className="check required"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} /> He leído y acepto expresamente las condiciones de Premium y la información precontractual aplicable.</label>
-    </section>
-    <div className="summary"><div><span>Modalidad</span><strong>{selected.name}</strong></div><div><span>Importe</span><strong>{selected.price} {selected.detail}</strong></div><div><span>Vigencia</span><strong>{selected.duration}</strong></div></div>
-    <button className="pay" disabled={!accepted} onClick={prepare}>Contratar Premium y pagar {selected.price} + impuestos</button>
-    <p className="closed">PASARELA DE COBRO: CERRADA · SANDBOX · ningún cargo real</p>
-  </section></main></>;
+  const [interest,setInterest] = useState("inversor");
+  return <div className="premium-experience"><BrandHeader />
+    <main className="premium-main">
+      <div className="premium-ambient" aria-hidden="true" />
+      <div className="premium-wrap">
+        <div className="premium-intro">
+          <span className="premium-kicker">OPORTUNIIA <span>·</span> EXPERIENCIA PREMIUM</span>
+          <h1>Una perspectiva<br/><em>más profunda.</em></h1>
+          <p>Accede a una experiencia de inversión diseñada para quienes necesitan más información, mayor control y una visión completa de cada oportunidad.</p>
+          <div className="premium-highlights"><span>Universo Acuerdos</span><span>Información ampliada</span><span>Atención profesional</span></div>
+        </div>
+        <section className="premium-feature" aria-label="Ventajas Premium">
+          <div className="premium-feature-top"><span>01 / ACCESO DIFERENCIAL</span><span>UNIVERSO ACUERDOS</span></div>
+          <h2>Más control.<br/>Menos incertidumbre.</h2>
+          <p>Operaciones estructuradas con visibilidad sobre capital, horizonte temporal y resultado económico previsto, sujetas al análisis y documentación de cada operación.</p>
+          <div className="premium-benefit-grid">
+            <div><b>01</b><strong>Oportunidades</strong><span>Exploración de NPL, CDR, REO y Universo Acuerdos.</span></div>
+            <div><b>02</b><strong>Perímetros a medida</strong><span>Filtros, seguimiento y selección de activos.</span></div>
+            <div><b>03</b><strong>Documentación</strong><span>Mayor profundidad documental según perfil y operación.</span></div>
+            <div><b>04</b><strong>MI OPORTUNIIA</strong><span>Un entorno de trabajo conectado a tu actividad.</span></div>
+          </div>
+        </section>
+        <section className="premium-interest">
+          <div><span className="premium-kicker">ACCESO PROFESIONAL</span><h2>El siguiente paso empieza aquí.</h2><p>El acceso Premium está sujeto a validación. En esta versión de pruebas no se realizan pagos ni se recogen solicitudes.</p></div>
+          <div className="premium-interest-actions">
+            <label htmlFor="premium-profile">Perfil profesional</label>
+            <select id="premium-profile" value={interest} onChange={e=>setInterest(e.target.value)}><option value="inversor">Inversor</option><option value="colaborador">Colaborador</option></select>
+            <a className="premium-action" href={interest==="inversor"?"/registro?rol=inversor":"/solicitar-colaboracion"}>Solicitar acceso <span aria-hidden="true">↗</span></a>
+            <small>Sin contratación ni cargos en esta fase.</small>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>;
 }
 
 const privateDeals = [
@@ -105,9 +104,15 @@ function DealCard({deal}) {
 
 function MiOportuniia() {
   const [section,setSection] = useState("Oportunidades");
+  const [search,setSearch] = useState("");
+  const [product,setProduct] = useState("Todos");
+  const [situation,setSituation] = useState("Todas");
+  const [location,setLocation] = useState("España");
+  const [universe,setUniverse] = useState("Ejecuciones Judiciales");
+  const filteredDeals = privateDeals.filter(d => (product === "Todos" || d.code === product) && (situation === "Todas" || d.status === situation) && (location === "España" || d.city === location) && (!search || (d.city+" "+d.title+" "+d.code).toLocaleLowerCase("es").includes(search.toLocaleLowerCase("es"))) && (universe === "Universo Acuerdos" ? d.status === "Acuerdo" : d.status !== "Acuerdo"));
   const sections=["Oportunidades","Mis operaciones","Favoritos y búsquedas","Documentación","Secretaría","PBC / Compliance","Comunicaciones","IA","LEGAL","Ofertas / reservas","Visitas","Premium"];
   return <div className="private-app">
-    <header className="private-topbar"><a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA"/></a><div className="private-user"><span>MI OPORTUNIIA</span><button>RAFAEL QUEROL ▾</button></div></header>
+    <header className="private-topbar"><a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA"/></a><div className="private-user"><span>MI OPORTUNIIA</span><span>VISTA DEMO · SIN SESIÓN REAL</span></div></header>
     <div className="private-shell">
       <aside className="private-sidebar">
         <div className="private-side-k">ÁREA PRIVADA</div>
@@ -120,16 +125,16 @@ function MiOportuniia() {
           <div className="private-head-actions"><button>Guardar búsqueda</button><button className="primary-private">Crear perímetro</button></div></div>
           <div className="private-catalog">
             <aside className="private-filters">
-              <input placeholder="Buscar por ubicación, operación..." />
-              <label>Producto<select><option>Todos</option><option>NPL</option><option>CDR</option><option>REO</option></select></label>
-              <label>Situación<select><option>Todas</option><option>Judicial</option><option>Acuerdo</option><option>Cesión</option></select></label>
-              <label>Ubicación<select><option>España</option><option>Madrid</option><option>Barcelona</option><option>Valencia</option></select></label>
+              <input aria-label="Buscar oportunidades" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar por ubicación, operación..." />
+              <label>Producto<select value={product} onChange={e=>setProduct(e.target.value)}><option>Todos</option><option>NPL</option><option>CDR</option><option>REO</option></select></label>
+              <label>Situación<select value={situation} onChange={e=>setSituation(e.target.value)}><option>Todas</option><option>Judicial</option><option>Acuerdo</option><option>Cesión</option><option>Disponible</option></select></label>
+              <label>Ubicación<select value={location} onChange={e=>setLocation(e.target.value)}><option>España</option><option>Madrid</option><option>Barcelona</option><option>Valencia</option><option>Málaga</option></select></label>
               <label>ROI mínimo<input type="range" min="0" max="40" defaultValue="15"/></label>
               <label>Precio / inversión<select><option>Cualquier rango</option><option>Hasta 100.000 €</option><option>100.000–250.000 €</option><option>+250.000 €</option></select></label>
               <button className="filter-save">Guardar filtros</button>
             </aside>
-            <section className="private-results"><div className="private-results-head"><span>24 oportunidades · acceso profesional</span><div><button className="universe active">Ejecuciones Judiciales</button><button className="universe">Universo Acuerdos</button></div></div>
-              <div className="private-grid">{privateDeals.map((d,i)=><DealCard deal={d} key={i}/>)}</div>
+            <section className="private-results"><div className="private-results-head"><span>{filteredDeals.length} oportunidades de demostración · sin datos reales</span><div><button onClick={()=>setUniverse("Ejecuciones Judiciales")} className={"universe "+(universe==="Ejecuciones Judiciales"?"active":"")}>Ejecuciones Judiciales</button><button onClick={()=>setUniverse("Universo Acuerdos")} className={"universe "+(universe==="Universo Acuerdos"?"active":"")}>Universo Acuerdos</button></div></div>
+              <div className="private-grid">{filteredDeals.map((d,i)=><DealCard deal={d} key={i}/>)}{filteredDeals.length===0 && <p>No hay oportunidades de demostración con estos filtros.</p>}</div>
             </section>
           </div>
         </> : <PrivateSection title={section}/>}
@@ -157,11 +162,40 @@ function PrivateSection({title}) {
   </section>
 }
 
+
+function AccessForm({kind}) {
+  const isLogin = kind === "login";
+  const isCollab = kind === "colaborador";
+  const title = isLogin ? "Acceder a MI OPORTUNIIA" : isCollab ? "Solicitud de colaboración" : "Registro de inversor";
+  const [notice,setNotice] = useState("");
+  function handleSubmit(e) {
+    e.preventDefault();
+    setNotice("Formulario en preparación. No se han enviado ni almacenado tus datos. El alta real se habilitará tras validar la conexión segura.");
+  }
+  return <><BrandHeader/><main className="shell"><section className="checkout" style={{maxWidth:700,margin:"3rem auto"}}>
+    <p className="eyebrow">OPORTUNIIA · ACCESO PROFESIONAL</p><h1>{title}</h1>
+    <p className="lead">{isLogin ? "Acceso reservado a usuarios autorizados." : "Facilítanos tus datos cuando el circuito de alta esté habilitado."}</p>
+    <form onSubmit={handleSubmit} style={{display:"grid",gap:16}}>
+      {!isLogin && <label>Nombre y apellidos<input required autoComplete="name" type="text" placeholder="Nombre y apellidos" style={{display:"block",width:"100%",padding:14}}/></label>}
+      {isCollab && <label>Empresa o actividad profesional<input required type="text" placeholder="Empresa o actividad" style={{display:"block",width:"100%",padding:14}}/></label>}
+      <label>Correo electrónico<input required autoComplete="email" type="email" placeholder="tu@empresa.com" style={{display:"block",width:"100%",padding:14}}/></label>
+      {isLogin && <label>Contraseña<input required autoComplete="current-password" type="password" placeholder="Contraseña" style={{display:"block",width:"100%",padding:14}}/></label>}
+      <button className="pay" type="submit">{isLogin ? "Acceder" : "Continuar"}</button>
+      {notice && <p role="status" className="closed">{notice}</p>}
+      <p className="closed">ENTORNO DE PRUEBAS · Sin autenticación ni envío de datos reales.</p>
+    </form>
+    <p style={{marginTop:20}}><a href="/acceso">← Volver a las opciones de acceso</a></p>
+  </section></main></>;
+}
+
 export default function App() {
   return <div className="App"><BrowserRouter><Routes>
     <Route path="/" element={<Home />} />
     <Route path="/inversor" element={<Investor />} />
     <Route path="/premium" element={<PremiumCheckout />} />
     <Route path="/mi-oportuniia" element={<MiOportuniia />} />
+    <Route path="/login" element={<AccessForm kind="login" />} />
+    <Route path="/registro" element={<AccessForm kind="inversor" />} />
+    <Route path="/solicitar-colaboracion" element={<AccessForm kind="colaborador" />} />
   </Routes></BrowserRouter></div>;
 }
