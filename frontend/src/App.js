@@ -105,9 +105,15 @@ function DealCard({deal}) {
 
 function MiOportuniia() {
   const [section,setSection] = useState("Oportunidades");
+  const [search,setSearch] = useState("");
+  const [product,setProduct] = useState("Todos");
+  const [situation,setSituation] = useState("Todas");
+  const [location,setLocation] = useState("España");
+  const [universe,setUniverse] = useState("Ejecuciones Judiciales");
+  const filteredDeals = privateDeals.filter(d => (product === "Todos" || d.code === product) && (situation === "Todas" || d.status === situation) && (location === "España" || d.city === location) && (!search || (d.city+" "+d.title+" "+d.code).toLocaleLowerCase("es").includes(search.toLocaleLowerCase("es"))) && (universe === "Universo Acuerdos" ? d.status === "Acuerdo" : d.status !== "Acuerdo"));
   const sections=["Oportunidades","Mis operaciones","Favoritos y búsquedas","Documentación","Secretaría","PBC / Compliance","Comunicaciones","IA","LEGAL","Ofertas / reservas","Visitas","Premium"];
   return <div className="private-app">
-    <header className="private-topbar"><a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA"/></a><div className="private-user"><span>MI OPORTUNIIA</span><button>RAFAEL QUEROL ▾</button></div></header>
+    <header className="private-topbar"><a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA"/></a><div className="private-user"><span>MI OPORTUNIIA</span><span>VISTA DEMO · SIN SESIÓN REAL</span></div></header>
     <div className="private-shell">
       <aside className="private-sidebar">
         <div className="private-side-k">ÁREA PRIVADA</div>
@@ -120,16 +126,16 @@ function MiOportuniia() {
           <div className="private-head-actions"><button>Guardar búsqueda</button><button className="primary-private">Crear perímetro</button></div></div>
           <div className="private-catalog">
             <aside className="private-filters">
-              <input placeholder="Buscar por ubicación, operación..." />
-              <label>Producto<select><option>Todos</option><option>NPL</option><option>CDR</option><option>REO</option></select></label>
-              <label>Situación<select><option>Todas</option><option>Judicial</option><option>Acuerdo</option><option>Cesión</option></select></label>
-              <label>Ubicación<select><option>España</option><option>Madrid</option><option>Barcelona</option><option>Valencia</option></select></label>
+              <input aria-label="Buscar oportunidades" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar por ubicación, operación..." />
+              <label>Producto<select value={product} onChange={e=>setProduct(e.target.value)}><option>Todos</option><option>NPL</option><option>CDR</option><option>REO</option></select></label>
+              <label>Situación<select value={situation} onChange={e=>setSituation(e.target.value)}><option>Todas</option><option>Judicial</option><option>Acuerdo</option><option>Cesión</option><option>Disponible</option></select></label>
+              <label>Ubicación<select value={location} onChange={e=>setLocation(e.target.value)}><option>España</option><option>Madrid</option><option>Barcelona</option><option>Valencia</option><option>Málaga</option></select></label>
               <label>ROI mínimo<input type="range" min="0" max="40" defaultValue="15"/></label>
               <label>Precio / inversión<select><option>Cualquier rango</option><option>Hasta 100.000 €</option><option>100.000–250.000 €</option><option>+250.000 €</option></select></label>
               <button className="filter-save">Guardar filtros</button>
             </aside>
-            <section className="private-results"><div className="private-results-head"><span>24 oportunidades · acceso profesional</span><div><button className="universe active">Ejecuciones Judiciales</button><button className="universe">Universo Acuerdos</button></div></div>
-              <div className="private-grid">{privateDeals.map((d,i)=><DealCard deal={d} key={i}/>)}</div>
+            <section className="private-results"><div className="private-results-head"><span>{filteredDeals.length} oportunidades de demostración · sin datos reales</span><div><button onClick={()=>setUniverse("Ejecuciones Judiciales")} className={"universe "+(universe==="Ejecuciones Judiciales"?"active":"")}>Ejecuciones Judiciales</button><button onClick={()=>setUniverse("Universo Acuerdos")} className={"universe "+(universe==="Universo Acuerdos"?"active":"")}>Universo Acuerdos</button></div></div>
+              <div className="private-grid">{filteredDeals.map((d,i)=><DealCard deal={d} key={i}/>)}{filteredDeals.length===0 && <p>No hay oportunidades de demostración con estos filtros.</p>}</div>
             </section>
           </div>
         </> : <PrivateSection title={section}/>}
