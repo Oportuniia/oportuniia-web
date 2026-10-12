@@ -1151,6 +1151,11 @@ body.acuerdos .vip-cta-mod{
 .acu-value .av-vars li:hover{transform:translateY(-4px);background:rgba(87,198,228,.16)!important;border-color:#57c6e4!important;box-shadow:0 12px 25px rgba(0,0,0,.14)}
 .deal[data-href]{cursor:pointer}
 .deal[data-href]:focus-visible{outline:3px solid #57c6e4;outline-offset:4px}
+
+/* Selector de universos: hover no cambia la selección ni el color de Acuerdos */
+.modeswitch .ms-btn[data-mode="acuerdos"]:not(.on):hover,
+body.acuerdos .modeswitch .ms-btn[data-mode="acuerdos"]:not(.on):hover{background:transparent!important;color:inherit!important;box-shadow:none!important;transform:none!important}
+.modeswitch .ms-btn[data-mode="judicial"]:not(.on):hover{background:transparent!important;box-shadow:none!important;transform:none!important}
 </style>
 <link rel="stylesheet" href="/oportuniia-remix.css?v=20261011-remix">
 <style id="rafa-final-home-fixes">
