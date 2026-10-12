@@ -12,6 +12,13 @@ body:before{content:"";position:fixed;inset:0;pointer-events:none;background-ima
 .guard{margin-top:24px;border-left:3px solid var(--brand);background:rgba(31,101,136,.12);padding:20px 22px;color:#a9bdc9;font-size:13.5px;line-height:1.7}.cta{display:flex;align-items:center;justify-content:space-between;gap:30px;margin:50px 0 76px;padding:32px;border:1px solid var(--line);border-radius:16px;background:#0b1d2b}.cta h3{margin:0 0 8px;font-size:26px}.cta p{margin:0;color:var(--mut)}.btn{display:inline-flex;align-items:center;justify-content:center;white-space:nowrap;text-decoration:none;color:#fff;background:#1f6588;padding:14px 22px;border-radius:7px;font-weight:600;font-size:13px}
 @media(max-width:900px){.hero-grid,.intro{grid-template-columns:1fr}.cards{grid-template-columns:1fr 1fr}.hero{padding-top:54px}}@media(max-width:620px){.cards{grid-template-columns:1fr}.cta{align-items:flex-start;flex-direction:column}.nav img{height:46px}}
 @media(prefers-reduced-motion:reduce){.circuit path,.circuit circle{animation:none}}
+
+/* Interacción premium de las aplicaciones, sin sustituir logotipos oficiales */
+.cards .card{position:relative;isolation:isolate;transition:transform .32s cubic-bezier(.2,.7,.2,1),border-color .3s,box-shadow .3s;transform-origin:center;overflow:visible}
+.cards .card::before{content:"";position:absolute;z-index:-1;inset:16% 8%;border-radius:50%;background:radial-gradient(ellipse,rgba(87,198,228,.30),rgba(31,101,136,.09) 45%,transparent 73%);filter:blur(22px);opacity:0;transform:scale(.7);transition:opacity .32s,transform .32s;pointer-events:none}
+.cards .card:hover,.cards .card:focus-within{transform:translateY(-8px) rotate(-1.6deg) scale(1.025);border-color:rgba(87,198,228,.65);box-shadow:0 24px 45px rgba(0,0,0,.2)}
+.cards .card:hover::before,.cards .card:focus-within::before{opacity:1;transform:scale(1.2)}
+@media(prefers-reduced-motion:reduce){.cards .card,.cards .card::before{transition:none}.cards .card:hover{transform:none}}
 </style><link rel="stylesheet" href="/oportuniia-remix.css?v=20261011-remix"></head><body>
 <header><div class="wrap nav"><a href="/"><img src="/oportuniia-logo.webp" alt="OPORTUNIIA"></a><a class="back" href="/">← Volver a OPORTUNIIA</a></div></header>
 <main>
