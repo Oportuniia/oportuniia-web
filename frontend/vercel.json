@@ -43,6 +43,18 @@
     {
       "source": "/solicitar-colaboracion",
       "destination": "/index.html"
+    },
+    {
+      "source": "/tecnologia",
+      "destination": "/tecnologia.html"
+    },
+    {
+      "source": "/premium",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/inversor",
+      "destination": "/index.html"
     }
   ]
 }
