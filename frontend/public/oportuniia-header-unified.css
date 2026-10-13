@@ -39,3 +39,26 @@ header .menu .navitem>a:focus-visible{color:#4ac1e6!important;-webkit-text-fill-
  align-self:center!important;
  justify-self:center!important;
 }
+
+/* FIX: home #hdr overrides and unified geometric center across layouts */
+@media(min-width:1051px){
+ body header .wrap,body #hdr .wrap{width:100%!important;max-width:1600px!important;margin-left:auto!important;margin-right:auto!important}
+ body header .nav,body #hdr .nav{position:relative!important;width:100%!important;max-width:none!important;justify-content:space-between!important}
+ body header nav.menu,body #hdr nav.menu,body header .nav>.menu{
+ position:absolute!important;left:50%!important;right:auto!important;top:50%!important;
+ transform:translate(-50%,-50%)!important;display:flex!important;flex-direction:row!important;
+ justify-content:center!important;align-items:center!important;gap:clamp(8px,1.15vw,20px)!important;
+ width:max-content!important;max-width:calc(100% - 290px)!important;
+ margin:0!important;padding:0!important;float:none!important
+ }
+ body header .nav>.brand,body #hdr .nav>.brand{margin-right:auto!important}
+ body header .nav>.actions,body header .nav>.login,body #hdr .nav>.actions{margin-left:auto!important}
+}
+html body #hdr .menu .navitem>a:hover,
+html body #hdr .menu .navitem:hover>a,
+html body #hdr .menu .navitem>a:focus-visible,
+html body #hdr.sc .menu .navitem>a:hover,
+html body header:not(.sc) .navitem>a:hover{
+ color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important;
+ text-shadow:0 0 12px rgba(74,193,230,.36)!important
+}
