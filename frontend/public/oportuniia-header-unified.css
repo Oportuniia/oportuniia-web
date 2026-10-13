@@ -113,3 +113,37 @@ html body header .navitem:hover>a,html body #hdr nav.menu a:hover,
 html body header nav.menu a:focus-visible{
  color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important
 }
+
+/* Final visual normalization: shared button, brand, section contrast */
+html body header .login,html body header .actions>a.btn,html body header .actions .btn{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ min-height:48px!important;min-width:158px!important;padding:12px 18px!important;
+ border-radius:5px!important;font-size:13px!important;font-weight:700!important;
+ background:#071c2c!important;border:1px solid #25526a!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ white-space:nowrap!important;text-decoration:none!important
+}
+html body header .login:hover,html body header .actions .btn:hover{
+ background:#164c67!important;box-shadow:0 8px 24px rgba(35,149,192,.25)!important
+}
+html body header.opp-over-light .brand img,html body header.opp-over-light .brand-logo-img{
+ filter:none!important
+}
+html body header:not(.opp-over-light) .brand img,html body header:not(.opp-over-light) .brand-logo-img{
+ filter:brightness(0) invert(1)!important
+}
+html body header nav.menu a.active:not(.opp-current),html body header nav.menu a[aria-current]:not(.opp-current){font-weight:600!important}
+html body header nav.menu a.opp-current{color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important;font-weight:800!important}
+@media(min-width:1051px){
+ html body header .nav{max-width:1600px!important;padding-left:clamp(24px,4.5vw,90px)!important;padding-right:clamp(24px,4.5vw,90px)!important;box-sizing:border-box!important;margin:auto!important}
+ html body header .brand{flex:0 0 auto!important;min-width:160px!important}
+ html body header .login,html body header .actions{flex:0 0 auto!important}
+}
+#producto .opp-product-label{margin-bottom:28px!important;text-align:center!important;width:100%!important}
+#producto .opp-product-label + h2,#producto .opp-product-label + .section-title{margin-top:12px!important}
+body:has(#producto) #producto{scroll-margin-top:130px!important}
+body:has(#producto) #producto .product-inner{padding-top:28px!important}
+body:has(.hero h1) main>.wrap>.hero h1{font-size:clamp(56px,6.2vw,104px)}
+body:has(.hero h1) main>.wrap>.hero h1 strong{font-weight:800}
+body:has(.hero h1) main>.wrap>.hero{padding-top:clamp(92px,9vw,150px)}
+@media(max-width:700px){body:has(.hero h1) main>.wrap>.hero h1{font-size:clamp(38px,9vw,66px)}}
