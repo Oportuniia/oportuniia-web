@@ -62,3 +62,27 @@ html body header:not(.sc) .navitem>a:hover{
  color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important;
  text-shadow:0 0 12px rgba(74,193,230,.36)!important
 }
+
+/* Adaptive header contrast, using sections beneath the fixed header */
+html body header.opp-over-light,html body header.opp-over-light.sc,html body #hdr.opp-over-light{
+ background:rgba(250,252,253,.88)!important;border-bottom-color:rgba(13,45,65,.15)!important
+}
+html body header.opp-over-light .menu a,html body header.opp-over-light .navitem>a{
+ color:#15384c!important;-webkit-text-fill-color:#15384c!important;text-shadow:none!important
+}
+html body header.opp-over-light .brand img,html body header.opp-over-light .brand-logo-img{filter:none!important}
+html body header.opp-over-light .burger{color:#15384c!important}
+html body header.opp-over-light .burger span{background:#15384c!important}
+html body header.opp-over-light .menu a:hover,html body header.opp-over-light .navitem>a:hover,html body header.opp-over-light .navitem:hover>a,
+html body #hdr.opp-over-light .menu .navitem>a:hover{color:#1683a9!important;-webkit-text-fill-color:#1683a9!important}
+html body header .login,html body header .actions .btn{
+ background:#091c2c!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+ border:1px solid rgba(88,186,220,.3)!important;
+ box-shadow:0 5px 18px rgba(0,0,0,.12)!important;
+ transition:transform .24s ease,background .24s ease,box-shadow .24s ease!important
+}
+html body header .login:hover,html body header .login:focus-visible,
+html body header .actions .btn:hover,html body header .actions .btn:focus-visible{
+ background:#123f59!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+ transform:translateY(-2px)!important;box-shadow:0 9px 24px rgba(32,135,178,.34)!important
+}
