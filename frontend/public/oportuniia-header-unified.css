@@ -1,0 +1,14 @@
+/* Shared navigation identity — OPORTUNIIA, 2026-10-13 */
+header,header.sc,header.opp-scrolled,#header,#header.sc{background:rgba(7,22,35,.18)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;border-bottom:1px solid rgba(117,171,198,.24)!important}
+header .nav{min-height:78px!important;display:flex!important;align-items:center!important}
+header .brand,header .brand img,header .brand-logo-img{display:inline-flex!important;align-items:center!important}
+header .brand img,header .brand-logo-img{height:48px!important;width:auto!important;max-width:180px!important;object-fit:contain!important;filter:brightness(0) invert(1)!important;transition:transform .3s ease!important}
+header .brand:hover img,header .brand:focus-visible img{transform:rotate(-5deg)!important}
+header .menu a,header .navitem>a{color:#fff!important;font-family:Poppins,sans-serif!important;font-size:13px!important;font-weight:600!important;text-decoration:none!important;transition:color .25s ease!important}
+header .menu a:hover,header .navitem:hover>a,header .menu a:focus-visible,header .navitem>a:focus-visible{color:#4ac1e6!important}
+header .menu a.active,header .menu a[aria-current=page]{font-weight:800!important}
+header .login,header .actions .btn{font-family:Poppins,sans-serif!important}
+header .burger{color:#fff!important}
+header .burger span{background:#fff!important}
+@media(max-width:1050px){header .brand img,header .brand-logo-img{height:42px!important}}
+@media(prefers-reduced-motion:reduce){header .brand img,header .brand-logo-img,header .menu a{transition:none!important}}
