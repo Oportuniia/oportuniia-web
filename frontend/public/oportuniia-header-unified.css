@@ -86,3 +86,30 @@ html body header .actions .btn:hover,html body header .actions .btn:focus-visibl
  background:#123f59!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
  transform:translateY(-2px)!important;box-shadow:0 9px 24px rgba(32,135,178,.34)!important
 }
+
+/* Definitive contrast states, matched to header background rather than page text */
+html body header.opp-over-light,html body #hdr.opp-over-light,html body #header.opp-over-light,
+html body header.opp-over-light.sc,html body #hdr.opp-over-light.sc{
+ background:rgba(250,252,253,.96)!important;
+ border-bottom:1px solid rgba(8,32,48,.14)!important;
+}
+html body header:not(.opp-over-light),html body #hdr:not(.opp-over-light),html body #header:not(.opp-over-light){
+ background:rgba(7,22,35,.92)!important;
+}
+html body header:not(.opp-over-light) nav.menu a,html body #hdr:not(.opp-over-light) nav.menu a,
+html body header:not(.opp-over-light) .navitem>a{
+ color:#f4f9fc!important;-webkit-text-fill-color:#f4f9fc!important
+}
+html body header.opp-over-light nav.menu a,html body #hdr.opp-over-light nav.menu a,
+html body header.opp-over-light .navitem>a{
+ color:#15384c!important;-webkit-text-fill-color:#15384c!important
+}
+html body header nav.menu a.opp-current,html body header .navitem>a.opp-current,
+html body #hdr nav.menu a.opp-current,html body header nav.menu a[aria-current=page]{
+ color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important;font-weight:800!important
+}
+html body header nav.menu a:hover,html body header .navitem>a:hover,
+html body header .navitem:hover>a,html body #hdr nav.menu a:hover,
+html body header nav.menu a:focus-visible{
+ color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important
+}
