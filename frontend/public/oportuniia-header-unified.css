@@ -26,3 +26,16 @@ header .burger span{background:#fff!important}
 header .menu .navitem:hover>a,header .menu .navitem>a:hover,
 header .menu a:hover,header .menu a:focus-visible,
 header .menu .navitem>a:focus-visible{color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important}
+
+/* Center the opportunities section kicker over its headline */
+#producto .opp-product-label,
+#producto .eyebrow.opp-product-label{
+ display:block!important;
+ width:100%!important;
+ max-width:none!important;
+ margin-left:auto!important;
+ margin-right:auto!important;
+ text-align:center!important;
+ align-self:center!important;
+ justify-self:center!important;
+}
