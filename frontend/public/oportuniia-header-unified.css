@@ -12,3 +12,17 @@ header .burger{color:#fff!important}
 header .burger span{background:#fff!important}
 @media(max-width:1050px){header .brand img,header .brand-logo-img{height:42px!important}}
 @media(prefers-reduced-motion:reduce){header .brand img,header .brand-logo-img,header .menu a{transition:none!important}}
+
+/* 2026-10-13 · fixed, centered navigation on every desktop page */
+@media(min-width:1051px){
+ header .nav{position:relative!important;justify-content:space-between!important;width:100%!important}
+ header .menu{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:clamp(9px,1.25vw,22px)!important;width:max-content!important;max-width:calc(100% - 300px)!important;margin:0!important;padding:0!important}
+ header .menu .navitem{margin:0!important}
+ header .menu a,header .navitem>a{white-space:nowrap!important}
+ header .brand{margin-right:auto!important;position:relative!important;z-index:2!important}
+ header .login,header .actions{margin-left:auto!important;position:relative!important;z-index:2!important}
+}
+/* Home has separate .navitem links: override its earlier hover specificity */
+header .menu .navitem:hover>a,header .menu .navitem>a:hover,
+header .menu a:hover,header .menu a:focus-visible,
+header .menu .navitem>a:focus-visible{color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important}
