@@ -1,17 +1,18 @@
-import { useMemo, useState } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "@/App.css";
 
-const plans = {
-  monthly: { name: "Premium mensual", price: "1.000 €", detail: "+ impuestos / mes", duration: "1 mes", code: "PREMIUM_MONTHLY" },
-  annual: { name: "Premium anual", price: "10.000 €", detail: "+ impuestos / 12 meses", duration: "12 meses desde la activación", code: "PREMIUM_ANNUAL" },
-};
-
-const BrandHeader = () => <header className="brand-header">
-  <a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" /></a>
-  <nav><a href="/nuestra-filosofia">Nuestra filosofía</a><a href="/como-funciona">Cómo funciona</a><a href="/oportunidades">Oportunidades</a><a href="/tecnologia">Tecnología</a><a href="/grupo-oportuniia">Grupo OPORTUNIIA</a><a href="/contacto">Contacto</a><a href="/servicers">Canal profesional</a></nav>
-  <a className="account-link" href="/mi-oportuniia">MI OPORTUNIIA</a>
-</header>;
+const publicLinks = [["/nuestra-filosofia","Nuestra filosofía"],["/como-funciona","Cómo funciona"],["/oportunidades#producto","Oportunidades"],["/grupo-oportuniia","Grupo OPORTUNIIA"],["/tecnologia","Tecnología"],["/contacto","Contacto"],["/servicers","Canal profesional"]];
+function BrandHeader() {
+  const [open,setOpen] = useState(false);
+  return <header className="brand-header">
+    <a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" /></a>
+    <nav aria-label="Navegación principal">{publicLinks.map(([href,label])=><a key={href} href={href} aria-current={window.location.pathname===href?"page":undefined}>{label}</a>)}</nav>
+    <a className="account-link" href="/acceso">Login / Registro</a>
+    <button className="public-mobile-toggle" type="button" aria-label={open?"Cerrar menú":"Abrir menú"} aria-expanded={open} aria-controls="react-mobile-menu" onClick={()=>setOpen(!open)}>☰</button>
+    {open && <nav id="react-mobile-menu" aria-label="Navegación móvil" onKeyDown={e=>{if(e.key==="Escape")setOpen(false)}}>{publicLinks.map(([href,label])=><a key={href} href={href}>{label}</a>)}<a href="/premium">Premium</a></nav>}
+  </header>;
+}
 
 function Home() {
   window.location.replace("/web2.html");
@@ -85,83 +86,10 @@ function PremiumCheckout() {
   </div>;
 }
 
-const privateDeals = [
-  {code:"NPL", city:"Madrid", title:"Residencial con garantía hipotecaria", roi:"31,8%", term:"9 meses", status:"Judicial", img:"https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1000&q=80"},
-  {code:"CDR", city:"Barcelona", title:"Activo residencial · cesión de remate", roi:"26,4%", term:"6 meses", status:"Cesión", img:"https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1000&q=80"},
-  {code:"REO", city:"Valencia", title:"Local comercial en zona consolidada", roi:"21,7%", term:"12 meses", status:"Disponible", img:"https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1000&q=80"},
-  {code:"NPL", city:"Málaga", title:"Residencial con estrategia de acuerdo", roi:"34,1%", term:"8 meses", status:"Acuerdo", img:"https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80"},
-];
-
-function DealCard({deal}) {
-  return <article className="private-deal">
-    <div className="private-deal-media"><img src={deal.img} alt="" /><span className="private-tag">{deal.code}</span><button className="favorite" aria-label="Añadir a favoritos">♡</button></div>
-    <div className="private-deal-body"><div className="private-city">{deal.city}</div><h3>{deal.title}</h3>
-      <div className="private-kpis"><div><span>ROI</span><b>{deal.roi}</b></div><div><span>Plazo</span><b>{deal.term}</b></div><div><span>Estado</span><b>{deal.status}</b></div></div>
-      <div className="private-actions"><button>Añadir a Mis operaciones</button><a href="/oportunidades">Ver operación →</a></div>
-    </div>
-  </article>
-}
-
 function MiOportuniia() {
-  const [section,setSection] = useState("Oportunidades");
-  const [search,setSearch] = useState("");
-  const [product,setProduct] = useState("Todos");
-  const [situation,setSituation] = useState("Todas");
-  const [location,setLocation] = useState("España");
-  const [universe,setUniverse] = useState("Ejecuciones Judiciales");
-  const filteredDeals = privateDeals.filter(d => (product === "Todos" || d.code === product) && (situation === "Todas" || d.status === situation) && (location === "España" || d.city === location) && (!search || (d.city+" "+d.title+" "+d.code).toLocaleLowerCase("es").includes(search.toLocaleLowerCase("es"))) && (universe === "Universo Acuerdos" ? d.status === "Acuerdo" : d.status !== "Acuerdo"));
-  const sections=["Oportunidades","Mis operaciones","Favoritos y búsquedas","Documentación","Secretaría","PBC / Compliance","Comunicaciones","IA","LEGAL","Ofertas / reservas","Visitas","Premium"];
-  return <div className="private-app">
-    <header className="private-topbar"><a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA"/></a><div className="private-user"><span>MI OPORTUNIIA</span><span>VISTA DEMO · SIN SESIÓN REAL</span></div></header>
-    <div className="private-shell">
-      <aside className="private-sidebar">
-        <div className="private-side-k">ÁREA PRIVADA</div>
-        {sections.map(x=><button key={x} className={section===x?"active":""} onClick={()=>setSection(x)}>{x}</button>)}
-        <a href="/" className="private-back">← Volver a la web</a>
-      </aside>
-      <main className="private-main">
-        {section==="Oportunidades" ? <>
-          <div className="private-head"><div><span className="private-eyebrow">OPORTUNIDADES</span><h1>El mismo catálogo.<br/><em>Más capacidad.</em></h1><p>Busca, filtra, guarda y sigue oportunidades sin perder la experiencia visual de OPORTUNIIA.</p></div>
-          <div className="private-head-actions"><button>Guardar búsqueda</button><button className="primary-private">Crear perímetro</button></div></div>
-          <div className="private-catalog">
-            <aside className="private-filters">
-              <input aria-label="Buscar oportunidades" value={search} onChange={e=>setSearch(e.target.value)} placeholder="Buscar por ubicación, operación..." />
-              <label>Producto<select value={product} onChange={e=>setProduct(e.target.value)}><option>Todos</option><option>NPL</option><option>CDR</option><option>REO</option></select></label>
-              <label>Situación<select value={situation} onChange={e=>setSituation(e.target.value)}><option>Todas</option><option>Judicial</option><option>Acuerdo</option><option>Cesión</option><option>Disponible</option></select></label>
-              <label>Ubicación<select value={location} onChange={e=>setLocation(e.target.value)}><option>España</option><option>Madrid</option><option>Barcelona</option><option>Valencia</option><option>Málaga</option></select></label>
-              <label>ROI mínimo<input type="range" min="0" max="40" defaultValue="15"/></label>
-              <label>Precio / inversión<select><option>Cualquier rango</option><option>Hasta 100.000 €</option><option>100.000–250.000 €</option><option>+250.000 €</option></select></label>
-              <button className="filter-save">Guardar filtros</button>
-            </aside>
-            <section className="private-results"><div className="private-results-head"><span>{filteredDeals.length} oportunidades de demostración · sin datos reales</span><div><button onClick={()=>setUniverse("Ejecuciones Judiciales")} className={"universe "+(universe==="Ejecuciones Judiciales"?"active":"")}>Ejecuciones Judiciales</button><button onClick={()=>setUniverse("Universo Acuerdos")} className={"universe "+(universe==="Universo Acuerdos"?"active":"")}>Universo Acuerdos</button></div></div>
-              <div className="private-grid">{filteredDeals.map((d,i)=><DealCard deal={d} key={i}/>)}{filteredDeals.length===0 && <p>No hay oportunidades de demostración con estos filtros.</p>}</div>
-            </section>
-          </div>
-        </> : <PrivateSection title={section}/>}
-      </main>
-    </div>
-  </div>
+  window.location.replace("/mi-oportuniia.html?demo=1");
+  return null;
 }
-
-function PrivateSection({title}) {
-  const copy={
-    "Mis operaciones":"Seguimiento privado de las operaciones que has incorporado a tu perímetro.",
-    "Favoritos y búsquedas":"Tus favoritos, búsquedas guardadas y perímetros personalizados en un solo lugar.",
-    "Documentación":"Documentación ampliada organizada por usuario y por operación.",
-    "Secretaría":"Preparación, actualización y subsanación documental desde Secretaría MI OPORTUNIIA.",
-    "PBC / Compliance":"Estado documental y de cumplimiento asociado a tu perfil y a cada operación.",
-    "Comunicaciones":"Historial de comunicaciones y trazabilidad operativa.",
-    "IA":"Asistencia de IA OPORTUNIIA aplicada a análisis, organización y apoyo operativo.",
-    "LEGAL":"Acceso al circuito legal cuando proceda para la operación.",
-    "Ofertas / reservas":"Preparación y seguimiento de ofertas y reservas dentro de los circuitos habilitados.",
-    "Visitas":"Solicitudes de visitas y comprobaciones de campo cuando estén disponibles.",
-    "Premium":"Servicios Premium disponibles para ampliar el acceso y la profundidad de trabajo."
-  };
-  return <section className="private-section"><span className="private-eyebrow">MI OPORTUNIIA</span><h1>{title}</h1><p>{copy[title]}</p>
-    <div className="private-placeholder-grid"><div><b>Estado</b><span>Preparado para integración con datos reales.</span></div><div><b>Trazabilidad</b><span>La capa visual queda separada de la autoridad backend existente.</span></div><div><b>M2M</b><span>Sin tráfico real abierto. Válvulas permanecen cerradas.</span></div></div>
-  </section>
-}
-
 
 function AccessForm({kind}) {
   const isLogin = kind === "login";
@@ -197,5 +125,7 @@ export default function App() {
     <Route path="/login" element={<AccessForm kind="login" />} />
     <Route path="/registro" element={<AccessForm kind="inversor" />} />
     <Route path="/solicitar-colaboracion" element={<AccessForm kind="colaborador" />} />
+    <Route path="*" element={<><BrandHeader/><main className="shell"><h1>Página no encontrada</h1><p><a href="/">Volver a OPORTUNIIA</a></p></main></>} />
   </Routes></BrowserRouter></div>;
 }
+
