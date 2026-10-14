@@ -14,7 +14,7 @@ Estado de la misión integral: **PENDIENTE**. Existe una versión Preview revisa
 ## Recuperación y conservación
 Se compararon árboles de main, professional-engine, favorites-saved-searches, consolidacion-segura, visual-remix, web-oportuniiapp-control, presentation-web-consumer y m2m-master. Se leyeron la arquitectura de producto y el estándar M2M. Se revisaron README de los ocho repositorios relacionados; los README de LEGAL, VISUAL, LIVING y PRESENTACIÓN LEGACY no describen sus contratos, por lo que su revisión profunda sigue pendiente.
 
-Se preservaron contenidos corporativos, imágenes y lógica pública de la base, precios, modalidades A/B/C/D y recursos originales. Se sustituyó la implementación privada provisional por módulos separados de interfaz, catálogo y estilos. Se centralizó la cabecera pública y se añadió menú móvil a las rutas React. La ruta /mi-oportuniia converge en la misma DEMO. Se conserva el logo horizontal existente; **la implantación y validación de los nueve PNG aportados no está cerrada**.
+Se preservaron contenidos corporativos, imágenes y lógica pública de la base, precios, modalidades A/B/C/D y recursos originales. Se sustituyó la implementación privada provisional por módulos separados de interfaz, catálogo y estilos. Se centralizó la cabecera pública y se añadió menú móvil a las rutas React. La ruta /mi-oportuniia converge en la misma DEMO. Se conserva el logo horizontal existente; los nueve PNG aportados están implantados y validados byte a byte mediante SHA-256.
 
 ## Inventario público comprobado
 Chromium, escritorio 1440×1000 y móvil 390×844. Todas las rutas siguientes: HTTP 200, siete enlaces principales coherentes, menú móvil operativo, sin desbordamiento horizontal ni errores JavaScript detectados. Esto no demuestra envíos de formularios ni integraciones externas.
@@ -60,7 +60,7 @@ El inventario de destinos y acciones de todos los enlaces y formularios público
 | Autenticación y persistencia real de usuario | PENDIENTE | No se conectaron cuentas, datos ni APIs de producción |
 | PRESENTACIÓN PC/RE/IC/RF | PENDIENTE | Se revisó propietario/contrato; no se genera un motor alternativo |
 | CORE / OPORTUNIIAPP / M2M | PENDIENTE | Sin cambios en los sistemas ni pruebas de transporte real |
-| LIVING, vídeo y fullscreen con sonido | PENDIENTE | Se conservó el enlace existente; no se validó su reproductor |
+| LIVING | COMPLETADO EN ALCANCE WEB | PNG original enlazado a https://living.oportuniia.com/. El resto pertenece a otro hilo y queda fuera de esta misión. |
 | Páginas legales y todos los formularios externos | PENDIENTE | Requieren revisión completa y destinos autorizados |
 
 ## Pruebas privadas ejecutadas
@@ -88,4 +88,15 @@ Cero errores JavaScript en esa suite. Se corrigió un fallo real de cierre del m
 Instalar Playwright en un entorno de pruebas y ejecutar `node tests/private-e2e.cjs` con BASE_URL del Preview. SHARE_URL, cuando sea necesario, es temporal y se proporciona por entorno; nunca se guarda en código. PHOTO_PATH permite utilizar una imagen de prueba local. El resultado se escribe en /tmp/opp-private-e2e.json.
 
 ## Pendientes para cerrar la misión
-Validar e implantar todos los logos aportados; cerrar inventario interactivo público, formularios y páginas legales; revisar contratos profundos de los sistemas cuyo README es genérico; comprobar LIVING; conectar y probar las APIs sandbox autorizadas con autenticación, permisos, trazabilidad y fallos; completar verificación visual móvil y Safari/iOS. No promover ni fusionar a main sin autorización expresa.
+Aprobar textos legales definitivos; conectar y probar APIs sandbox con autenticación real, permisos y trazabilidad; completar Safari/iOS en dispositivos físicos. Los formularios permanecen honestamente identificados como DEMO o preparación de correo. No promover ni fusionar a main sin autorización expresa.
+
+## Cierre adicional de Preview · 14/10/2026
+Código de correcciones: b0702a3f13e70d527f2d67d527e20f111a64d1a2.
+- 29 pruebas de backend y contratos pasan: ingreso/publicación PRESENTACIÓN, contrato M2M, motor privado, control OPORTUNIIAPP y cuatro regresiones de búsqueda. Son pruebas con dependencias simuladas, no transporte entre sistemas reales.
+- Auditoría Playwright de 16 rutas públicas, incluida información legal y detalle: HTTP 200, footer común, menú móvil, sin desbordamientos ni fragmentos inexistentes. Cero errores JavaScript. La corrección CSS se inyectó sobre el Preview anterior antes del despliegue para probarla.
+- Nueve PNG originales con SHA-256 coincidente; seis logos tecnológicos decodificados, tres del grupo, diálogo Robotics, acceso directo DEMO, registro de sesión guardar/recuperar/eliminar y contacto mailto comprobados. Ningún mensaje enviado.
+- Información legal ofrece un estado de revisión explícito; no se presenta como política definitiva.
+- El buscador backend ahora aplica q al resultado y a facetas, con normalización de acentos y mayúsculas, combinación AND y filtros existentes.
+- La suite privada de 16 comprobaciones pasó también sobre 6a9eaff; no se modificó su interfaz en la corrección posterior.
+
+Las secciones iniciales documentan comprobaciones previas; este cierre actualiza sus pendientes de logos y revisión pública. La misión de integración real sigue abierta. Producción no autorizada.
