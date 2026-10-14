@@ -24,6 +24,12 @@ from presentation_ingress import register_routes as register_presentation_routes
 from presentation_publish import register_publish_routes as register_presentation_publish_routes
 from presentation_e2e import run_presentation_e2e_if_enabled
 from investor_access import register_investor_routes, authenticated_subject, future
+from web_identity import register_identity_routes, ensure_indexes as ensure_identity_indexes, enabled as identity_enabled
+from web_workspace import register_workspace_routes
+from web_security import BodyLimitMiddleware
+from web_secondfactor import register_secondfactor_routes
+from web_review import register_review_routes
+from web_payments import register_payment_routes
 from private_area import register_private_area_routes
 
 
@@ -37,13 +43,21 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+app.state.web_db = db
+app.add_middleware(BodyLimitMiddleware)
+
+@app.on_event("startup")
+async def _identity_indexes():
+    if identity_enabled():
+        await ensure_identity_indexes(db)
 
 @app.middleware("http")
 async def _private_investor_cache_policy(request: Request, call_next):
     response = await call_next(request)
-    if request.url.path.startswith("/api/investor/"):
+    if request.url.path.startswith(("/api/investor/", "/api/account/")):
         response.headers["Cache-Control"] = "private, no-store"
-        response.headers["Vary"] = "Authorization"
+        response.headers["Vary"] = "Cookie, Authorization"
+        response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["X-Content-Type-Options"] = "nosniff"
     return response
 
@@ -624,6 +638,11 @@ async def interest_signal(slug: str):
 
 
 # Register sovereign PRESENTACIÓN → WEB M2M ingress/publication routes.
+register_identity_routes(api_router, db)
+register_secondfactor_routes(api_router, db)
+register_review_routes(api_router, db)
+register_payment_routes(api_router, db)
+register_workspace_routes(api_router, db)
 register_investor_routes(api_router, db)
 register_presentation_routes(api_router, db)
 register_presentation_publish_routes(api_router, db)
@@ -778,7 +797,7 @@ async def oportunidad_detalle(request: Request, slug: str):
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=[origin.strip() for origin in os.environ.get('CORS_ORIGINS', '').split(',') if origin.strip() and origin.strip() != '*'],
     allow_methods=["*"],
     allow_headers=["*"],
 )

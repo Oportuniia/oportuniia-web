@@ -47,6 +47,14 @@ def _jwks(url):
 
 
 async def authenticated_subject(request: Request) -> str:
+    if os.getenv("WEB_IDENTITY_MODE") == "web_sessions":
+        from web_identity import resolve_session
+        db = getattr(request.app.state, "web_db", None)
+        if db is None: fail("identity_database_not_configured", 503)
+        user, session = await resolve_session(request, db)
+        if os.getenv("WEB_REQUIRE_MFA", "true") == "true" and (not user.get("mfa_enabled") or not session.get("mfa_verified")):
+            fail("second_factor_setup_required", 403)
+        return user["subject_id"]
     issuer, audience, jwks = (os.getenv(k, "").strip() for k in ("WEB_AUTH_ISSUER", "WEB_AUTH_AUDIENCE", "WEB_AUTH_JWKS_URL"))
     if not issuer or not audience or urlparse(jwks).scheme != "https":
         fail("identity_provider_not_configured", 503)
@@ -82,6 +90,9 @@ def access_stage(review: dict) -> int:
 
 async def context(db, subject: str, op_ref: str | None = None):
     review = await db.web_access_reviews.find_one({"subject_id": subject}, {"_id": 0}) or {}
+    if review.get("profile_revision"):
+        current = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0, "revision": 1}) or {}
+        if current.get("revision") != review["profile_revision"]: review["revoked"] = True
     entitlement = await db.web_entitlements.find_one({"subject_id": subject, "product": "PREMIUM", "active": True}, {"_id": 0}) or {}
     result = {"subject": subject, "review": review, "stage": access_stage(review),
               "premium": future(entitlement.get("valid_until")), "grant": {}}
@@ -208,6 +219,11 @@ class TeamReply(BaseModel):
     body: str = Field(min_length=1, max_length=4000)
 
 
+class PremiumCheckout(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    plan: str = "monthly"
+
+
 class CheckoutDraft(BaseModel):
     model_config = ConfigDict(extra="forbid")
     modality: str
@@ -242,15 +258,20 @@ def register_investor_routes(router: APIRouter, db):
         return {"items": items, "total": len(items), "universe": universe}
 
     @router.post("/investor/profile-draft")
-    async def profile(payload: ProfileDraft, subject: str = Depends(authenticated_subject)):
+    async def profile(payload: ProfileDraft, request: Request, subject: str = Depends(authenticated_subject)):
         if payload.account_kind not in {"inversor", "colaborador"} or payload.subject_type not in {"PF", "PJ"}:
             fail("invalid_profile_type", 422)
         if payload.account_kind == "inversor" and payload.collaborator_model:
             fail("investor_has_no_permanent_modality", 422)
         if payload.account_kind == "colaborador" and payload.collaborator_model not in {"A", "B"}:
             fail("collaborator_model_required", 422)
+        if os.getenv("WEB_IDENTITY_MODE") == "web_sessions":
+            owner = request.state.web_user
+            if payload.email.lower() != owner["email"] or payload.account_kind != owner["account_kind"]: fail("account_identity_mismatch", 422)
+        # Editing the profile cannot retain an approval of an older identity snapshot.
+        await db.web_access_reviews.update_one({"subject_id": subject}, {"$set": {"revoked": True, "identity_status": "PENDING", "dossier_status": "PENDING"}})
         await db.web_profile_drafts.update_one({"subject_id": subject}, {"$set": {"subject_id": subject, "profile": payload.model_dump(),
-            "state": "PENDING_REVIEW", "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
+            "state": "PENDING_REVIEW", "revision": str(uuid.uuid4()), "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
         return {"saved": True, "state": "PENDING_REVIEW", "access_granted": False}
 
     @router.get("/investor/operations/{op_ref}/documents")
@@ -324,15 +345,17 @@ def register_investor_routes(router: APIRouter, db):
         readiness = await db.operation_readiness_snapshots.find_one({"operation_id": op_ref, "investor_id": subject, "modality": payload.modality}, {"_id": 0}, sort=[("received_at", -1)])
         if not readiness or not readiness.get("can_contract") or not future(readiness.get("valid_until")):
             fail("authoritative_readiness_required")
-        # The commercial reservation amount and provider remain unapproved. Never fabricate a checkout.
-        fail("payment_gateway_not_activated", 503)
+        from web_payments import create_checkout
+        return await create_checkout(db, subject, "RESERVATION", op_ref=op_ref, modality=payload.modality)
 
 
     @router.post("/investor/premium/checkout")
-    async def premium_checkout(subject: str = Depends(authenticated_subject)):
+    async def premium_checkout(payload: PremiumCheckout = PremiumCheckout(), subject: str = Depends(authenticated_subject)):
         ctx = await context(db, subject)
         if not (await contracting_eligibility(db, ctx))["can_contract"]: fail("complete_and_verified_profile_required")
-        fail("payment_gateway_not_activated", 503)
+        if ctx["premium"]: fail("premium_already_active", 409)
+        from web_payments import create_checkout
+        return await create_checkout(db, subject, "PREMIUM", plan=payload.plan)
 
     @router.get("/investor/messages")
     async def messages(subject: str = Depends(authenticated_subject)):
@@ -370,6 +393,7 @@ def register_investor_routes(router: APIRouter, db):
                 if not raced or raced.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
         now = datetime.now(timezone.utc).isoformat()
         await db.web_message_threads.update_one({"thread_id": payload.thread_id, "messages.event_id": {"$ne": payload.event_id}}, {"$push": {"messages": {"event_id": payload.event_id, "sender": "OPORTUNIIA", "body": payload.body.strip(), "at": now}}, "$set": {"state": "TEAM_REPLIED", "updated_at": now}})
+        await db.web_notifications.update_one({"id": payload.event_id, "subject_id": thread["subject_id"]}, {"$setOnInsert": {"id": payload.event_id, "subject_id": thread["subject_id"], "title": "Tienes una respuesta de OPORTUNIIA", "body": "Consulta la respuesta en tu área privada.", "read": False, "created_at": now}}, upsert=True)
         await db.web_email_outbox.update_one({"_id": payload.event_id}, {"$setOnInsert": {"event_id": payload.event_id, "subject_id": thread["subject_id"], "thread_id": payload.thread_id,
             "purpose": "OPERATIONAL_ONLY", "state": "PENDING_EMAIL_PROVIDER", "email_sent": False, "created_at": now}}, upsert=True)
         return {"saved": True, "idempotent": bool(existing), "email_sent": False, "delivery_state": "PENDING_EMAIL_PROVIDER"}

@@ -185,7 +185,7 @@ def complete_profile(kind='inversor', subject_type='PF'):
 
 def approve_contracting_fixture(db, kind='inversor', subject_type='PF'):
     # Authorized review is seeded ONLY in the isolated test DB; no public approval API.
-    db.db.web_access_reviews.update_one({'subject_id':'investor-a'},{'$set':{'profile_version':'qa-reviewed-1','profile_complete':True,'documents_complete':True}})
+    db.db.web_access_reviews.update_one({'subject_id':'investor-a'},{'$set':{'profile_version':'qa-reviewed-1','profile_complete':True,'documents_complete':True,'revoked':False,'identity_status':'VERIFIED','dossier_status':'APPROVED'}})
     db.db.web_verified_profiles.update_one({'subject_id':'investor-a','version':'qa-reviewed-1'},{'$set':{'profile':complete_profile(kind,subject_type)}},upsert=True)
 
 
@@ -206,8 +206,8 @@ def test_complete_journey_pending_review_verified_snapshot_premium_and_reservati
     # A pending edit cannot overwrite approved prefilled data or grant new rights.
     payload['full_name']='EDITADO SIN VERIFICAR';c.post('/api/investor/profile-draft',json=payload)
     db.db.web_operation_grants.update_one({}, {'$push':{'permissions':'PREPARE_OFFER'}})
-    draft=c.get('/api/investor/operations/OP-123/offer-draft').json()
-    assert draft['applicant']['full_name']=='Persona Ficticia QA' and draft['signed'] is False
+    assert c.get('/api/investor/operations/OP-123/offer-draft').status_code==403
+    assert db.db.web_verified_profiles.find_one({'subject_id':'investor-a'})['profile']['full_name']=='Persona Ficticia QA'
     db.db.web_access_reviews.update_one({}, {'$set':{'documents_complete':False}})
     assert c.post('/api/investor/premium/checkout').status_code==403
     assert c.post('/api/investor/operations/OP-123/checkout',json={'modality':'D'}).status_code==403
