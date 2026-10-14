@@ -1368,7 +1368,26 @@ body.acuerdos #producto .uni-card:hover .uni-tag{background:rgba(46,154,198,.28)
 #hdr .menu a.active,#hdr .menu a[aria-current="page"]{color:#62cdec!important;font-weight:800!important}
 #hdr .brand-logo-img{filter:brightness(0) invert(1)!important}
 @media(max-width:850px){#quienes .q-human{grid-template-columns:1fr!important;gap:28px!important}#quienes .q-human .q-title{font-size:clamp(34px,7vw,54px)!important}}
-</style><link rel="stylesheet" href="/oportuniia-header-unified.css?v=20261013-final3"><link rel="stylesheet" href="/oportuniia-public.css"></head>
+</style><link rel="stylesheet" href="/oportuniia-header-unified.css?v=20261013-final3"><link rel="stylesheet" href="/oportuniia-public.css"><style id="progressive-trust-layout">
+/* Progressive trust: spacious editorial copy and three stacked steps. */
+.access-explanation{position:relative;isolation:isolate;overflow:hidden;margin-top:52px;padding:clamp(26px,4.5vw,64px);border:1px solid #365b70;border-radius:22px;background:#0f2535;color:#f4fbfe;box-shadow:0 22px 70px #03101c33}
+.access-explanation::before{content:"";position:absolute;inset:-50% -30%;z-index:-1;pointer-events:none;background:linear-gradient(110deg,transparent 36%,#85d6ff03 43%,#85d6ff24 49%,#85d6ff03 55%,transparent 63%);animation:trustBeam 11s ease-in-out infinite}
+.access-explanation .trust-heading{position:static;background:transparent!important;border:0!important;backdrop-filter:none!important;margin-bottom:38px}
+.access-explanation .eyebrow{color:#80d0df;line-height:1.8}
+.access-explanation h3{font-size:clamp(27px,3.2vw,46px);line-height:1.18;letter-spacing:-.035em;margin:18px 0 0;color:#f4fbfe}
+.access-explanation h3 span{display:block}
+.trust-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(32px,5vw,76px);align-items:start}
+.trust-copy p{color:#c5d6e0;font-size:clamp(14px,1.1vw,16px);line-height:1.9;margin:0 0 24px;max-width:none}
+.trust-copy .btn{margin-top:8px;white-space:normal;text-align:center}
+.access-explanation .trust-steps{display:grid;grid-template-columns:1fr;gap:16px;list-style:none;padding:0;margin:0;color:#e8f3fa}
+.trust-steps li{border:1px solid #365b70;background:#102c3e;border-radius:14px;padding:23px 25px;transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease,background .3s ease;transform-origin:center}
+.trust-steps li b{display:block;font-size:16px;color:#edf7fc;line-height:1.5}
+.trust-steps li p{font-size:13px;line-height:1.75;color:#bcd1df;margin:9px 0 0}
+.trust-steps li:hover{transform:scale(1.025);background:#173a4e;border-color:#7bcce5;box-shadow:0 8px 30px #57c6e41f}
+@keyframes trustBeam{0%,12%{transform:translateX(-80%) skewX(-12deg);opacity:0}20%{opacity:1}42%,100%{transform:translateX(95%) skewX(-12deg);opacity:0}}
+@media(max-width:850px){.trust-layout{grid-template-columns:1fr;gap:30px}.access-explanation .trust-heading{margin-bottom:28px}.trust-steps li{padding:21px}.trust-copy p{line-height:1.8}}
+@media(prefers-reduced-motion:reduce){.access-explanation::before{animation:none;display:none}.trust-steps li{transition:none}.trust-steps li:hover{transform:none}}
+</style></head>
 <body data-testid="v03-body">
 <div class="atmos" aria-hidden="true"></div>
 
@@ -1646,7 +1665,10 @@ body.acuerdos #producto .uni-card:hover .uni-tag{background:rgba(46,154,198,.28)
         <p class="vip-fine">Acceso sujeto a validación profesional.</p>
       </div>
     </div>
-    <section class="access-explanation" aria-labelledby="protected-opportunities" style="margin-top:38px;padding:clamp(24px,4vw,48px);border:1px solid rgba(87,198,228,.3);border-radius:18px;background:#0f2535;color:#f4fbfe"><div class="eyebrow" style="color:#80d0df">INFORMACIÓN PROTEGIDA · CONFIANZA PROGRESIVA</div><h3 id="protected-opportunities" style="font-size:clamp(25px,3vw,38px);line-height:1.25;margin:16px 0">Primero nos conocemos. Después, avanzamos juntos.</h3><p style="color:#c5d6e0;line-height:1.8">Las operaciones, cifras e imágenes de este escaparate son ficticias y demostrativas. No representan expedientes reales disponibles para contratar.</p><p style="color:#c5d6e0;line-height:1.8;margin-top:16px">La documentación de una operación real puede contener datos personales, deudas y actuaciones judiciales. Registrarte con un nombre y un email inicia el proceso: el acceso se amplía según la identidad y documentación verificadas y el permiso específico para cada operación.</p><p style="color:#c5d6e0;line-height:1.8;margin-top:16px">Premium añade servicios y acceso al Universo Acuerdos para perfiles autorizados. Pagar o subir archivos no sustituye la revisión ni concede acceso automático a documentación sensible.</p><ol class="trust-steps" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:20px;list-style:none;padding:0;margin:28px 0;color:#e8f3fa"><li><b>01 · Nos presentamos</b><p style="color:#c5d6e0;margin-top:8px">Nos cuentas quién eres, si inviertes o colaboras y qué buscas. El registro inicia nuestra relación.</p></li><li><b>02 · Verificamos tu perfil</b><p style="color:#c5d6e0;margin-top:8px">Revisamos tu identidad, representación y la documentación que corresponda a tu caso. Te indicamos qué falta y por qué lo necesitamos.</p></li><li><b>03 · Avanzamos por operación</b><p style="color:#c5d6e0;margin-top:8px">Con tu perfil verificado y los permisos correspondientes, ampliamos la información disponible de cada oportunidad. Los documentos sensibles requieren autorización específica.</p></li></ol><a class="btn" href="/acceso#registro" style="margin-top:22px">Conocer el proceso y completar mi perfil</a></section>
+    <section class="access-explanation" aria-labelledby="protected-opportunities">
+      <header class="trust-heading"><div class="eyebrow">INFORMACIÓN PROTEGIDA · CONFIANZA PROGRESIVA</div><h3 id="protected-opportunities"><span>Primero nos conocemos.</span><span>Después, avanzamos juntos.</span></h3></header>
+      <div class="trust-layout"><div class="trust-copy"><p>Las operaciones, cifras e imágenes de este escaparate son ficticias y demostrativas. No representan expedientes reales disponibles para contratar.</p><p>La documentación de una operación real puede contener datos personales, deudas y actuaciones judiciales. Registrarte con un nombre y un email inicia el proceso: el acceso se amplía según la identidad y documentación verificadas y el permiso específico para cada operación.</p><p>Premium añade servicios y acceso al Universo Acuerdos para perfiles autorizados. Pagar o subir archivos no sustituye la revisión ni concede acceso automático a documentación sensible.</p><a class="btn" href="/acceso#registro">Conocer el proceso y completar mi perfil</a></div><ol class="trust-steps" aria-label="Cómo avanzamos juntos"><li><b>01 · Nos presentamos</b><p>Nos cuentas quién eres, si inviertes o colaboras y qué buscas. El registro inicia nuestra relación.</p></li><li><b>02 · Verificamos tu perfil</b><p>Revisamos tu identidad, representación y la documentación que corresponda a tu caso. Te indicamos qué falta y por qué lo necesitamos.</p></li><li><b>03 · Avanzamos por operación</b><p>Con tu perfil verificado y los permisos correspondientes, ampliamos la información disponible de cada oportunidad. Los documentos sensibles requieren autorización específica.</p></li></ol></div>
+    </section>
   </div>
 </section>
 
