@@ -156,14 +156,24 @@ class ProfileDraft(BaseModel):
     fiscal_address: str = Field(default="", max_length=180)
     municipality: str = Field(default="", max_length=100)
     region: str = Field(default="", max_length=100)
+    province: str = Field(default="", max_length=180)
+    fiscal_address_number: str = Field(default="", max_length=80)
+    fiscal_address_unit: str = Field(default="", max_length=80)
+    fiscal_address_postal_code: str = Field(default="", max_length=80)
+    address_number: str = Field(default="", max_length=80)
+    address_unit: str = Field(default="", max_length=80)
+    address_postal_code: str = Field(default="", max_length=80)
+    registered_address_number: str = Field(default="", max_length=80)
+    registered_address_unit: str = Field(default="", max_length=80)
+    registered_address_postal_code: str = Field(default="", max_length=80)
     professional_activity: str = Field(default="", max_length=180)
     consents: dict[str, bool] = Field(default_factory=dict)
 
 
 def missing_profile_fields(profile):
-    required = ["account_kind", "subject_type", "full_name", "email", "tax_id", "fiscal_address", "municipality", "region", "country"]
-    required += (["company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position"] if profile.get("subject_type") == "PJ" else ["birth_date"])
-    if profile.get("account_kind") == "inversor": required += ["address", "nationality", "professional_activity"]
+    required = ["account_kind", "subject_type", "full_name", "email", "tax_id", "fiscal_address", "fiscal_address_number", "municipality", "province", "region", "country"]
+    required += (["company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position", "registered_address_number"] if profile.get("subject_type") == "PJ" else ["birth_date"])
+    if profile.get("account_kind") == "inversor": required += ["address", "address_number", "nationality", "professional_activity"]
     else: required += ["collaborator_model"]
     missing = [k for k in required if not str(profile.get(k, "")).strip()]
     consents = ["privacy", "confidentiality", "ethics"] if profile.get("account_kind") == "colaborador" else ["privacy", "truthfulness", "no_commitment", "terms"]
@@ -372,6 +382,6 @@ def register_investor_routes(router: APIRouter, db):
         if not version: fail("verified_profile_snapshot_required", 409)
         profile = await db.web_verified_profiles.find_one({"subject_id": subject, "version": version}, {"_id": 0})
         if not profile: fail("verified_profile_snapshot_required", 409)
-        allowed = ("account_kind", "subject_type", "full_name", "email", "phone", "tax_id", "fiscal_address", "municipality", "region", "country", "company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position")
+        allowed = ("account_kind", "subject_type", "full_name", "email", "phone", "tax_id", "fiscal_address", "municipality", "province", "region", "country", "fiscal_address_number", "fiscal_address_unit", "fiscal_address_postal_code", "address_number", "address_unit", "address_postal_code", "registered_address_number", "registered_address_unit", "registered_address_postal_code", "address", "fiscal_address", "company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position")
         return {"op_ref": op_ref, "applicant": {k: profile.get("profile", {}).get(k, "") for k in allowed},
                 "state": "DATA_DRAFT_ONLY", "template_approved": False, "signed": False, "submitted_to_provider": False}
