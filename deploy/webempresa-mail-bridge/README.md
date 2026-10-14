@@ -11,4 +11,4 @@ El backend gratuito de Render bloquea SMTP 25/465/587. Este puente permite reuti
 5. Probar una solicitud firmada, su rechazo sin firma y el rechazo de la misma firma/nonce repetidos. Comprobar recepción real y autenticación del remitente. `mail()` solo acredita aceptación por el MTA, no entrega.
 6. Configurar `WEB_MAIL_BRIDGE_URL` con la URL HTTPS exacta, sin redirecciones. Activar solo después de la prueba autorizada. Dejar SMTP directo desactivado en Render Free.
 
-No se han contratado recursos de correo, enviado emails ni modificado el hosting existente. El despliegue requiere acceso a Webempresa. PHP 8.1+; pendiente de lint y prueba en el hosting si el entorno local no dispone de PHP.
+No se han contratado recursos de correo, enviado emails ni modificado el hosting existente. El despliegue requiere acceso a Webempresa. PHP 8.1+; lint y pruebas HTTP locales de firma/replay/límites superados con MTA simulado. Pendiente la prueba de entrega en el hosting.

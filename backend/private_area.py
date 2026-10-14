@@ -120,7 +120,7 @@ def register_private_area_routes(app, templates):
         ctx = _context(request, universo, tipo, activo, ccaa, provincia, municipio, precio_min,
                        precio_max, roi_min, plazo_max, procedimiento, fase, posesion,
                        fase_principal, orden, q)
-        return templates.TemplateResponse("mi_oportuniia_oportunidades.html", ctx)
+        return templates.TemplateResponse(request=request, name="mi_oportuniia_oportunidades.html", context=ctx)
 
     @app.get("/mi-oportuniia/perimetros", response_class=HTMLResponse)
     async def mi_oportuniia_perimetros(
@@ -144,14 +144,14 @@ def register_private_area_routes(app, templates):
         ctx = _context(request, universo, tipo, activo, ccaa, provincia, municipio, precio_min,
                        precio_max, roi_min, plazo_max, procedimiento, fase, posesion,
                        fase_principal, "recientes", q)
-        return templates.TemplateResponse("mi_oportuniia_perimetros.html", ctx)
+        return templates.TemplateResponse(request=request, name="mi_oportuniia_perimetros.html", context=ctx)
 
     @app.get("/mi-oportuniia/oportunidades/{slug}", response_class=HTMLResponse)
     async def mi_oportuniia_detalle(request: Request, slug: str):
         o = cat.get_by_slug(slug)
         if not o:
             return HTMLResponse("Operación no encontrada", status_code=404)
-        return templates.TemplateResponse("mi_oportuniia_detalle.html", {
+        return templates.TemplateResponse(request=request, name="mi_oportuniia_detalle.html", context={
             "request": request,
             "o": o,
             "docs": cat.documentation_for(o),

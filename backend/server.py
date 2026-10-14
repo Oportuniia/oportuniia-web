@@ -38,7 +38,7 @@ load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(mongo_url, tz_aware=True)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
@@ -767,7 +767,7 @@ async def oportunidades(request: Request, universo: str = "judicial",
         "municipios_cur": cat.municipios_of(ccaa, provincia) if (ccaa and provincia) else [],
         "f": f, "orden": orden, "q": q,
     }
-    resp = templates.TemplateResponse("catalogo.html", ctx)
+    resp = templates.TemplateResponse(request=request, name="catalogo.html", context=ctx)
     _ensure_sid(request, resp)
     return resp
 
@@ -785,7 +785,7 @@ async def oportunidad_detalle(request: Request, slug: str):
     vip = await _vip_active(request)
     locked = (o["universe"] == "acuerdos" and not vip)
     interest = await _interest_signal(slug)
-    resp = templates.TemplateResponse("detalle.html", {
+    resp = templates.TemplateResponse(request=request, name="detalle.html", context={
         "request": request, "base_url": _public_base(request), "o": o,
         "interest": interest, "locked": locked, "vip_active": vip,
         "docs": cat.documentation_for(o), "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",

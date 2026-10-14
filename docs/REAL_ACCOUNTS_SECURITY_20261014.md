@@ -40,8 +40,15 @@ Render Free bloquea SMTP 25/465/587. `deploy/webempresa-mail-bridge/` prepara un
 
 ## Validación
 
-37 pruebas de identidad/gateway/servicios superadas con dependencias actuales fijadas en requirements-private.txt. Incluyen falsificación de roles, CSRF, caducidad, revocación, aislamiento, enlace de un solo uso, MFA/recovery, cuarentena, revisión, versión de perfil, precio de servidor, webhook/firma/replay, cola operativa y límites de cuerpo. Mongo simulado (mongomock) se usa solo en tests; no sustituye Atlas en el despliegue.
+55 pruebas backend superadas, incluidas 37 de identidad/gateway/servicios, con dependencias actuales fijadas en requirements-private.txt. Incluyen falsificación de roles, CSRF, caducidad, revocación, aislamiento, enlace de un solo uso, MFA/recovery, cuarentena, revisión, versión de perfil, precio de servidor, webhook/firma/replay, cola operativa y límites de cuerpo. Mongo simulado (mongomock) se usa solo en tests; no sustituye Atlas en el despliegue.
 
 Recorrido Playwright sobre HTTPS local y datos sintéticos: alta → email simulado → MFA/autenticador y recuperación → sesión servidor → perfil guardar/recargar → consulta guardar/recargar → móvil 390/768 → logout. Sin correos reales, cobros ni documentos personales reales.
 
 No es certificación externa, auditoría de penetración ni prueba de entrega SMTP/Atlas/S3/Stripe reales. La recepción/escaneo real, la matriz operativa final, las políticas definitivas y la puesta en producción permanecen pendientes de configuración y validación.
+
+
+Verificación de regresión final: 55 tests backend locales seleccionados (las suites HTTP externas backend_test.py y test_filter_contract_v1.py necesitan su endpoint/configuración y no se incluyen). Las plantillas legacy se adaptaron a la API actual de Starlette; tz_aware se habilitó para las fechas de sesiones. En Preview se probaron de nuevo 16 rutas públicas, nueve assets originales por SHA-256 y las cuatro variantes de perfil DEMO. El flujo real con MFA también pasó con las dependencias actuales.
+
+Puente PHP validado con php -l y ocho comprobaciones HTTP locales: solicitud válida, replay, firma falsa, expiración, JSON inválido, tamaño y dos inyecciones de cabecera/destinatario. El MTA se sustituyó por /bin/true; no se envió correo. Falta su prueba de entrega en Webempresa.
+
+Handshake del despliegue: Render staging LIVE y Preview READY; /api/account/config devuelve identity_enabled=false y registration_enabled=false con no-store y require_mfa=true. Sin base configurada, las rutas privadas devuelven 503. Esta respuesta cerrada es intencional; no acredita una cuenta real activada.
