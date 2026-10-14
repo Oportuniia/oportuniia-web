@@ -90,6 +90,7 @@ async def context(db, subject: str, op_ref: str | None = None):
         grant = await db.web_operation_grants.find_one({"subject_id": subject, "op_ref": op_ref}, {"_id": 0}) or {}
         if future(grant.get("valid_until")) and not grant.get("revoked"):
             result["grant"] = grant
+    result["premium"] = result["premium"] and (await contracting_eligibility(db, result))["can_contract"]
     return result
 
 
@@ -142,6 +143,47 @@ class ProfileDraft(BaseModel):
     representative: str = Field(default="", max_length=150)
     collaborator_model: str = ""
 
+    email: str = Field(default="", max_length=180)
+    phone: str = Field(default="", max_length=80)
+    birth_date: str = Field(default="", max_length=20)
+    address: str = Field(default="", max_length=180)
+    nationality: str = Field(default="", max_length=100)
+    tax_id: str = Field(default="", max_length=80)
+    company_tax_id: str = Field(default="", max_length=80)
+    registered_address: str = Field(default="", max_length=180)
+    representative_id: str = Field(default="", max_length=80)
+    representative_position: str = Field(default="", max_length=100)
+    fiscal_address: str = Field(default="", max_length=180)
+    municipality: str = Field(default="", max_length=100)
+    region: str = Field(default="", max_length=100)
+    professional_activity: str = Field(default="", max_length=180)
+    consents: dict[str, bool] = Field(default_factory=dict)
+
+
+def missing_profile_fields(profile):
+    required = ["account_kind", "subject_type", "full_name", "email", "tax_id", "fiscal_address", "municipality", "region", "country"]
+    required += (["company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position"] if profile.get("subject_type") == "PJ" else ["birth_date"])
+    if profile.get("account_kind") == "inversor": required += ["address", "nationality", "professional_activity"]
+    else: required += ["collaborator_model"]
+    missing = [k for k in required if not str(profile.get(k, "")).strip()]
+    consents = ["privacy", "confidentiality", "ethics"] if profile.get("account_kind") == "colaborador" else ["privacy", "truthfulness", "no_commitment", "terms"]
+    missing += ["consent_"+k for k in consents if profile.get("consents", {}).get(k) is not True]
+    if profile.get("account_kind") not in {"inversor", "colaborador"}: missing.append("valid_account_kind")
+    if profile.get("subject_type") not in {"PF", "PJ"}: missing.append("valid_subject_type")
+    if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", str(profile.get("email", ""))): missing.append("valid_email")
+    if profile.get("account_kind") == "colaborador" and profile.get("collaborator_model") not in {"A", "B"}: missing.append("valid_collaborator_model")
+    return sorted(set(missing))
+
+
+async def contracting_eligibility(db, ctx):
+    review = ctx["review"]
+    version = review.get("profile_version")
+    snapshot = await db.web_verified_profiles.find_one({"subject_id": ctx["subject"], "version": version}, {"_id": 0}) if version else None
+    missing = missing_profile_fields((snapshot or {}).get("profile", {}))
+    approved = ctx["stage"] >= 2 and review.get("profile_complete") is True and review.get("documents_complete") is True and snapshot is not None and not missing
+    return {"can_contract": approved, "profile_complete": not missing, "documents_verified": review.get("documents_complete") is True and ctx["stage"] >= 2,
+            "verified": approved, "reason": "VERIFIED_PROFILE" if approved else "COMPLETE_AND_VERIFIED_PROFILE_REQUIRED"}
+
 
 class MessageDraft(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -167,7 +209,7 @@ def register_investor_routes(router: APIRouter, db):
         ctx = await context(db, subject)
         return {"stage": ctx["stage"], "premium": ctx["premium"], "identity_status": ctx["review"].get("identity_status", "PENDING"),
                 "dossier_status": ctx["review"].get("dossier_status", "PENDING"), "pbc_status": ctx["review"].get("pbc_status", "PENDING"),
-                "rule": "UPLOADING_AND_PAYMENT_DO_NOT_GRANT_ACCESS"}
+                "contracting": await contracting_eligibility(db, ctx), "rule": "UPLOADING_AND_PAYMENT_DO_NOT_GRANT_ACCESS"}
 
     @router.get("/investor/opportunities")
     async def opportunities(universe: str = "judicial", subject: str = Depends(authenticated_subject)):
@@ -266,6 +308,7 @@ def register_investor_routes(router: APIRouter, db):
     async def checkout(op_ref: str, payload: CheckoutDraft, subject: str = Depends(authenticated_subject)):
         if payload.modality not in {"A", "B", "C", "D"}: fail("invalid_modality", 422)
         ctx = await context(db, subject, op_ref)
+        if not (await contracting_eligibility(db, ctx))["can_contract"]: fail("complete_and_verified_profile_required")
         if ctx["stage"] < 2 or ctx["review"].get("pbc_status") != "CLEARED" or not ctx["grant"].get("can_reserve"):
             fail("operation_readiness_required")
         readiness = await db.operation_readiness_snapshots.find_one({"operation_id": op_ref, "investor_id": subject, "modality": payload.modality}, {"_id": 0}, sort=[("received_at", -1)])
@@ -274,6 +317,12 @@ def register_investor_routes(router: APIRouter, db):
         # The commercial reservation amount and provider remain unapproved. Never fabricate a checkout.
         fail("payment_gateway_not_activated", 503)
 
+
+    @router.post("/investor/premium/checkout")
+    async def premium_checkout(subject: str = Depends(authenticated_subject)):
+        ctx = await context(db, subject)
+        if not (await contracting_eligibility(db, ctx))["can_contract"]: fail("complete_and_verified_profile_required")
+        fail("payment_gateway_not_activated", 503)
 
     @router.get("/investor/messages")
     async def messages(subject: str = Depends(authenticated_subject)):
@@ -323,6 +372,6 @@ def register_investor_routes(router: APIRouter, db):
         if not version: fail("verified_profile_snapshot_required", 409)
         profile = await db.web_verified_profiles.find_one({"subject_id": subject, "version": version}, {"_id": 0})
         if not profile: fail("verified_profile_snapshot_required", 409)
-        allowed = ("account_kind", "subject_type", "full_name", "company_name", "legal_form", "representative", "country")
+        allowed = ("account_kind", "subject_type", "full_name", "email", "phone", "tax_id", "fiscal_address", "municipality", "region", "country", "company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position")
         return {"op_ref": op_ref, "applicant": {k: profile.get("profile", {}).get(k, "") for k in allowed},
                 "state": "DATA_DRAFT_ONLY", "template_approved": False, "signed": False, "submitted_to_provider": False}

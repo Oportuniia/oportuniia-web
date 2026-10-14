@@ -15,7 +15,10 @@ Implementación de revisión en `feat/ultima-milla-consolidacion-20261014`. Prod
 - Secretaría Premium: PDF digital, PDF escaneado e imágenes PNG/JPG/WebP; extracción de texto y OCR español/inglés; sugerencias de categoría; detección orientativa de fechas de caducidad explícitas; revisión obligatoria; separación por páginas completas; generación de PDF individuales y ZIP con índice. Procesamiento en navegador y recursos del mismo origen; sin envío de documentos a un servidor o modelo externo. Los originales, texto y resultados no se guardan en localStorage. Se borran de memoria al salir del módulo.
 - Máximos operativos: 10 archivos, 20 MB totales, 30 páginas, 18 megapíxeles por imagen. No se recortan dos documentos que estén dentro de una sola página. No hay aprendizaje histórico inventado ni validación de identidad/PBC por OCR.
 
-## Formularios originales
+## Actualización tras capturas y regla aprobada
+Las cuatro capturas de inversor/colaborador y la confirmación física/jurídica permiten integrar el perfil original en Mi OPORTUNIIA. La regla definitiva exige 100% y verificación previa para Premium/reservas. Véase `PRIVATE_JOURNEY_SIMULATION_20261014.md`; esta actualización sustituye la propuesta provisional descrita arriba.
+
+## Formularios originales (incidencia histórica de lectura de URLs)
 `https://registro.oportuniia.com/inversores` y `/colaboradores`: lectura web no disponible, navegador ERR_BLOCKED_BY_CLIENT, lectura del entorno de pruebas HTTP 403. No se enviaron formularios ni se intentó crear cuentas. Se mantienen enlaces y se marca la nueva propuesta como no contrastada con todos los campos originales. Falta el inventario autorizado del formulario original para afirmar equivalencia.
 
 ## Gateway privado implementado y probado en sandbox

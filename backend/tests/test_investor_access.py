@@ -47,7 +47,7 @@ def test_absent_auth_provider_is_closed_even_with_forged_role(monkeypatch):
 
 def test_pending_identity_and_premium_payment_do_not_unlock_documents():
     c,db=setup_client();seed(db,stage=0,premium=True)
-    assert c.get('/api/investor/access').json()['premium'] is True
+    assert c.get('/api/investor/access').json()['premium'] is False
     assert c.get('/api/investor/operations/OP-123/documents').json()['items']==[]
     assert c.get('/api/investor/operations/OP-123/documents/doc-1').status_code==403
 
@@ -61,6 +61,7 @@ def test_profile_submission_never_validates_or_sets_investor_modality():
 def test_album_requires_both_verified_dossier_and_separate_premium():
     c,db=setup_client();seed(db,'RF',stage=2,premium=False)
     assert c.get('/api/investor/operations/OP-123/documents/doc-1').status_code==403
+    approve_contracting_fixture(db)
     db.db.web_entitlements.insert_one({'subject_id':'investor-a','product':'PREMIUM','active':True,'valid_until':FUTURE})
     result=c.get('/api/investor/operations/OP-123/documents').json();assert len(result['items'])==1
     assert 'storage_key' not in str(result) and 'provider-secret' not in str(result)
@@ -98,6 +99,7 @@ def test_document_from_wrong_owner_is_never_listed():
 def test_reservation_is_closed_without_readiness_and_without_payment_provider():
     c,db=setup_client();seed(db)
     assert c.post('/api/investor/operations/OP-123/checkout',json={'modality':'A'}).status_code==403
+    approve_contracting_fixture(db)
     db.db.operation_readiness_snapshots.insert_one({'investor_id':'investor-a','operation_id':'OP-123','modality':'A','can_contract':True,'received_at':'2026-10-14','valid_until':FUTURE})
     assert c.post('/api/investor/operations/OP-123/checkout',json={'modality':'A'}).json()['detail']['code']=='payment_gateway_not_activated'
     assert c.post('/api/investor/operations/OP-123/checkout',json={'modality':'A','price':1,'pbc_cleared':True}).status_code==422
@@ -175,3 +177,48 @@ def test_private_catalogue_requires_review_and_returns_only_assigned_public_refe
     assert c.get('/api/investor/opportunities?universe=acuerdos').status_code==403
     db.db.web_access_reviews.update_one({}, {'$set':{'identity_status':'PENDING'}})
     assert c.get('/api/investor/opportunities').status_code==403
+
+
+def complete_profile(kind='inversor', subject_type='PF'):
+    return {'account_kind':kind,'subject_type':subject_type,'full_name':'Persona Ficticia QA','email':'qa@example.invalid','birth_date':'1980-01-01','address':'Direccion ficticia','nationality':'Ficticia','tax_id':'QA-IDENTITY','fiscal_address':'Fiscal ficticia','municipality':'Municipio QA','region':'Region QA','country':'Pais QA','professional_activity':'Actividad QA','company_name':'SOCIEDAD FICTICIA QA','company_tax_id':'QA-COMPANY','registered_address':'Sede ficticia','representative':'Representante QA','representative_id':'QA-REP','representative_position':'Administrador','collaborator_model':'B' if kind=='colaborador' else '', 'consents':{k:True for k in ['privacy','truthfulness','no_commitment','terms','confidentiality','ethics']}}
+
+
+def approve_contracting_fixture(db, kind='inversor', subject_type='PF'):
+    # Authorized review is seeded ONLY in the isolated test DB; no public approval API.
+    db.db.web_access_reviews.update_one({'subject_id':'investor-a'},{'$set':{'profile_version':'qa-reviewed-1','profile_complete':True,'documents_complete':True}})
+    db.db.web_verified_profiles.update_one({'subject_id':'investor-a','version':'qa-reviewed-1'},{'$set':{'profile':complete_profile(kind,subject_type)}},upsert=True)
+
+
+@pytest.mark.parametrize('kind,subject_type',[('inversor','PF'),('inversor','PJ'),('colaborador','PF'),('colaborador','PJ')])
+def test_complete_journey_pending_review_verified_snapshot_premium_and_reservation(kind,subject_type):
+    c,db=setup_client();seed(db)
+    payload=complete_profile(kind,subject_type)
+    assert c.post('/api/investor/profile-draft',json=payload).status_code==200
+    assert c.get('/api/investor/access').json()['contracting']['can_contract'] is False
+    assert c.post('/api/investor/premium/checkout').status_code==403
+    assert c.post('/api/investor/operations/OP-123/checkout',json={'modality':'D'}).status_code==403
+    approve_contracting_fixture(db,kind,subject_type)
+    access=c.get('/api/investor/access').json();assert access['contracting']['can_contract'] is True
+    assert c.post('/api/investor/premium/checkout').json()['detail']['code']=='payment_gateway_not_activated'
+    assert c.post('/api/investor/operations/OP-123/checkout',json={'modality':'D'}).json()['detail']['code']=='authoritative_readiness_required'
+    db.db.operation_readiness_snapshots.insert_one({'investor_id':'investor-a','operation_id':'OP-123','modality':'D','can_contract':True,'received_at':'2026-10-14','valid_until':FUTURE})
+    assert c.post('/api/investor/operations/OP-123/checkout',json={'modality':'D'}).json()['detail']['code']=='payment_gateway_not_activated'
+    # A pending edit cannot overwrite approved prefilled data or grant new rights.
+    payload['full_name']='EDITADO SIN VERIFICAR';c.post('/api/investor/profile-draft',json=payload)
+    db.db.web_operation_grants.update_one({}, {'$push':{'permissions':'PREPARE_OFFER'}})
+    draft=c.get('/api/investor/operations/OP-123/offer-draft').json()
+    assert draft['applicant']['full_name']=='Persona Ficticia QA' and draft['signed'] is False
+    db.db.web_access_reviews.update_one({}, {'$set':{'documents_complete':False}})
+    assert c.post('/api/investor/premium/checkout').status_code==403
+    assert c.post('/api/investor/operations/OP-123/checkout',json={'modality':'D'}).status_code==403
+    assert db.db.web_entitlements.count_documents({})==0
+
+
+def test_incomplete_snapshot_or_expired_review_never_contracts_even_with_flags():
+    c,db=setup_client();seed(db);approve_contracting_fixture(db)
+    db.db.web_verified_profiles.update_one({}, {'$unset':{'profile.tax_id':''}})
+    assert c.post('/api/investor/premium/checkout').status_code==403
+    approve_contracting_fixture(db)
+    db.db.web_access_reviews.update_one({}, {'$set':{'valid_until':PAST}})
+    assert c.post('/api/investor/premium/checkout').status_code==403
+    assert c.post('/api/investor/profile-draft',json={**complete_profile(),'profile_complete':True,'documents_complete':True}).status_code==422
