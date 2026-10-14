@@ -34,6 +34,12 @@
 })();
 const p=location.pathname.replace(/\/$/,'')||'/';document.querySelectorAll('a[href]').forEach(a=>{try{const u=new URL(a.href,location.origin);if(u.origin===location.origin&&u.pathname.replace(/\/$/,'')===p)a.classList.add('active')}catch(e){}});document.querySelectorAll('.deal[data-href],.card[data-href],.entry[data-href]').forEach(el=>{el.tabIndex=0;const go=()=>{if(el.dataset.href)location.href=el.dataset.href};el.addEventListener('click',e=>{if(e.target.closest('a,button,input,select,textarea'))return;go()});el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}})});document.querySelectorAll('[data-premium-gate]').forEach(el=>el.addEventListener('click',e=>{e.preventDefault();const g=document.getElementById('opp-premium-gate');if(g)g.classList.add('open')}));const g=document.getElementById('opp-premium-gate');if(g){g.addEventListener('click',e=>{if(e.target===g||e.target.closest('[data-close-gate]'))g.classList.remove('open')});addEventListener('keydown',e=>{if(e.key==='Escape')g.classList.remove('open')})}
 
+const trustTemplate=document.getElementById('opportunities-trust-template');
+if(trustTemplate){
+ if(p==='/oportunidades')trustTemplate.replaceWith(trustTemplate.content);
+ else trustTemplate.remove();
+}
+
 if(p==='/oportunidades'){
  document.body.classList.add('catalog-page');
  document.querySelectorAll('body>section').forEach(s=>{if(s.id!=='producto')s.hidden=true});
