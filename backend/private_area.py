@@ -65,6 +65,7 @@ def _context(request: Request, universo: str, tipo: List[str], activo: List[str]
         phases=fase,
         possessions=posesion,
         phases_principal=fase_principal,
+        q=q,
     )
     opps = cat.filter_opportunities(f, order=orden)
     counts = cat.facet_counts(f)
