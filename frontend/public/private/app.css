@@ -37,3 +37,5 @@ body dialog.premium-dialog .premium-benefits li{background:#0a1b2a;color:#fff;bo
 body dialog.premium-dialog .premium-benefits li:hover{transform:scale(1.025);border-color:#70c3dc;box-shadow:0 0 22px #70c3dc33}
 body dialog.premium-dialog .button{background:#183b50;color:white;border-color:#70c3dc}
 @media(prefers-reduced-motion:reduce){body dialog.premium-dialog .premium-benefits li:hover{transform:none}}
+
+#notification-button{position:relative;overflow:visible}.notification-bell{width:23px;height:23px;display:block}#unread:not([hidden]){position:absolute;top:-7px;right:-7px;min-width:21px;height:21px;padding:0 5px;border-radius:999px;background:#70c3dc;color:#081827;border:2px solid #0a1b2a;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center}.avatar>svg{width:25px;height:25px}.avatar img{width:100%;height:100%;object-fit:cover}
