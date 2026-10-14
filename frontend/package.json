@@ -62,7 +62,7 @@
   },
   "scripts": {
     "start": "craco start",
-    "build": "craco build",
+    "build": "node scripts/build-secretary.cjs && craco build",
     "test": "craco test"
   },
   "browserslist": {
