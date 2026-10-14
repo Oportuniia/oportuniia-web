@@ -1371,7 +1371,8 @@ body.acuerdos #producto .uni-card:hover .uni-tag{background:rgba(46,154,198,.28)
 </style><link rel="stylesheet" href="/oportuniia-header-unified.css?v=20261013-final3"><link rel="stylesheet" href="/oportuniia-public.css"><style id="progressive-trust-layout">
 /* Progressive trust: spacious editorial copy and three stacked steps. */
 .access-explanation{position:relative;isolation:isolate;overflow:visible;margin-top:64px;padding:0;border:0;border-radius:0;background:transparent;color:#f4fbfe;box-shadow:none}
-.access-explanation::before{content:none}
+.access-explanation::before{content:"";position:absolute;inset:-18px -12px;z-index:-1;pointer-events:none;background:linear-gradient(108deg,transparent 15%,rgba(87,198,228,.025) 36%,rgba(133,214,255,.14) 49%,rgba(87,198,228,.025) 62%,transparent 85%);clip-path:inset(0 100% 0 0);animation:trustOpenLight 10s ease-in-out infinite}
+@keyframes trustOpenLight{0%,8%{clip-path:inset(0 100% 0 0);opacity:0}16%{opacity:1}35%{clip-path:inset(0 0 0 0);opacity:1}48%,100%{clip-path:inset(0 0 0 100%);opacity:0}}
 .access-explanation .trust-heading{position:static;background:transparent!important;border:0!important;backdrop-filter:none!important;margin-bottom:38px}
 .access-explanation .eyebrow{color:#80d0df;line-height:1.8}
 .access-explanation h3{font-size:clamp(27px,3.2vw,46px);line-height:1.18;letter-spacing:-.035em;margin:0;color:#f4fbfe}
