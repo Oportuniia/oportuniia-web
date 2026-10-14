@@ -24,3 +24,16 @@ body.private-dark .avatar{background:#1f6588}
 body.private-dark .deal-main-link{background:transparent;border:0}
 
 .address-fields{min-width:0;margin:8px 0;padding:20px;border:1px solid var(--line);border-radius:12px}.address-fields legend{font-size:13px;font-weight:600;padding:0 8px}.address-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(80px,.7fr) minmax(90px,1fr) minmax(90px,.8fr);gap:14px;margin-bottom:14px}.street-results{display:grid;gap:8px}.street-results .button{justify-content:flex-start;text-align:left;white-space:normal}.street-status{margin:10px 0;font-size:12px}.onboarding-card+.profile-layout{margin-top:24px}@media(max-width:1050px){.address-grid{grid-template-columns:1fr 1fr}.address-grid .street-field{grid-column:1/-1}}@media(max-width:520px){.address-grid{grid-template-columns:1fr}.address-fields{padding:16px}.address-grid .street-field{grid-column:auto}}
+
+/* Reviewed Premium navigation and completion state. */
+.nav-group,.premium-nav summary{font-weight:800;color:#70c3dc}
+.premium-nav{border:0;margin:0;padding:0}.premium-nav summary{cursor:pointer;display:flex;justify-content:space-between;list-style:none}.premium-nav summary::-webkit-details-marker{display:none}
+.sidebar .brand img{filter:none!important;width:218px;height:76px;object-fit:contain;background:#f7fafc;border-radius:10px;padding:4px;max-width:100%}
+body .access-stages .completion-card.is-complete{background:#fff!important;border-color:#fff!important;color:#0a1622!important}
+body .access-stages .completion-card.is-complete b,body .access-stages .completion-card.is-complete small{color:#0a1622!important}
+body dialog.premium-dialog,body.universe-judicial dialog.premium-dialog,body.universe-agreements dialog.premium-dialog{background:#0f2535;color:#fff;border:1px solid #426578}
+body dialog.premium-dialog p,body dialog.premium-dialog small{color:#b7cbd7}
+body dialog.premium-dialog .premium-benefits li{background:#0a1b2a;color:#fff;border:1px solid #355064;transition:transform .2s,box-shadow .2s,border-color .2s}
+body dialog.premium-dialog .premium-benefits li:hover{transform:scale(1.025);border-color:#70c3dc;box-shadow:0 0 22px #70c3dc33}
+body dialog.premium-dialog .button{background:#183b50;color:white;border-color:#70c3dc}
+@media(prefers-reduced-motion:reduce){body dialog.premium-dialog .premium-benefits li:hover{transform:none}}

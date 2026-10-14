@@ -1,3 +1,4 @@
+import {phaseStages,judicialMilestones} from './judicial-taxonomy.js';
 const regions={Sevilla:['Andalucía','Sevilla','Sevilla'],Alicante:['Comunidad Valenciana','Alicante','Alicante'],Zaragoza:['Aragón','Zaragoza','Zaragoza'],Marbella:['Andalucía','Málaga','Marbella'],Valencia:['Comunidad Valenciana','Valencia','Valencia'],Madrid:['Comunidad de Madrid','Madrid','Madrid'],Barcelona:['Cataluña','Barcelona','Barcelona'],Bilbao:['País Vasco','Bizkaia','Bilbao'],Málaga:['Andalucía','Málaga','Málaga'],Valladolid:['Castilla y León','Valladolid','Valladolid'],Murcia:['Región de Murcia','Murcia','Murcia'],Granada:['Andalucía','Granada','Granada']};
 const photos=['https://images.unsplash.com/photo-1755441067629-8755d974a90b?crop=entropy&cs=srgb&fm=jpg&q=85&w=900','https://images.unsplash.com/photo-1663293761246-56a9b0693052?crop=entropy&cs=srgb&fm=jpg&q=85&w=900','https://images.unsplash.com/photo-1758789667762-56175fe4601c?crop=entropy&cs=srgb&fm=jpg&q=85&w=900','https://images.pexels.com/photos/8134745/pexels-photo-8134745.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940','https://images.pexels.com/photos/8649799/pexels-photo-8649799.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'];
 const specs=[
@@ -14,6 +15,8 @@ const specs=[
 ['NPL','Nave de distribución','Murcia','Industrial',270000,32,26,'Ejecuciones Judiciales','Ejecución hipotecaria','Certificación de cargas','Certificación registral','En tramitación','Ocupado'],
 ['CDR','Vivienda con terraza','Granada','Residencial',148000,23,15,'Universo Acuerdos','Cesión negociada','Acuerdo preliminar','Firma pendiente','Negociación avanzada','Libre']
 ];
+const fixtureMilestones={0:'subasta_convocada',1:'decreto_adjudicacion',2:'inscripcion_adjudicacion',5:'despacho_ejecucion',7:'oposicion_tramitacion',8:'subasta_finalizada',10:'certificacion_cargas'};
 const originalData=specs.map((a,i)=>({id:'OP-DEMO-'+String(i+1).padStart(3,'0'),type:a[0],title:a[1],place:a[2],asset:a[3],price:a[4],roi:a[5],term:a[6],universe:a[7],procedure:a[8],phase:a[9],milestone:a[10],judicial:a[11],occupancy:a[12],ccaa:regions[a[2]][0],province:regions[a[2]][1],city:regions[a[2]][2],img:photos[i%photos.length]}));
+originalData.forEach((d,i)=>{if(d.universe!=='Ejecuciones Judiciales')return;const h=judicialMilestones.find(x=>x.code===fixtureMilestones[i]);d.originalPhase=d.phase;d.originalMilestone=d.milestone;d.phaseCode=h.code;d.phaseStage=h.stage;d.phase=phaseStages.find(x=>x.code===h.stage).name;d.milestone=h.name;});
 
 export const data=[...originalData,...originalData.map((d,i)=>({...d,id:"OP-DEMO-"+String(i+13).padStart(3,"0"),title:d.title+" · alternativa",price:d.price+25000,roi:Math.round((d.roi-2)*10)/10,term:d.term+3,occupancy:i%2?"Libre":"Arrendado"}))];
