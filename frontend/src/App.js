@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "@/App.css";
+import PublicFooter from "@/components/PublicFooter";
 
 const publicLinks = [["/nuestra-filosofia","Nuestra filosofía"],["/como-funciona","Cómo funciona"],["/oportunidades#producto","Oportunidades"],["/grupo-oportuniia","Grupo OPORTUNIIA"],["/tecnologia","Tecnología"],["/contacto","Contacto"],["/servicers","Canal profesional"]];
 function BrandHeader() {
@@ -92,28 +93,11 @@ function MiOportuniia() {
 }
 
 function AccessForm({kind}) {
-  const isLogin = kind === "login";
-  const isCollab = kind === "colaborador";
-  const title = isLogin ? "Acceder a MI OPORTUNIIA" : isCollab ? "Solicitud de colaboración" : "Registro de inversor";
-  const [notice,setNotice] = useState("");
-  function handleSubmit(e) {
-    e.preventDefault();
-    setNotice("Formulario en preparación. No se han enviado ni almacenado tus datos. El alta real se habilitará tras validar la conexión segura.");
-  }
-  return <><BrandHeader/><main className="shell"><section className="checkout" style={{maxWidth:700,margin:"3rem auto"}}>
-    <p className="eyebrow">OPORTUNIIA · ACCESO PROFESIONAL</p><h1>{title}</h1>
-    <p className="lead">{isLogin ? "Acceso reservado a usuarios autorizados." : "Facilítanos tus datos cuando el circuito de alta esté habilitado."}</p>
-    <form onSubmit={handleSubmit} style={{display:"grid",gap:16}}>
-      {!isLogin && <label>Nombre y apellidos<input required autoComplete="name" type="text" placeholder="Nombre y apellidos" style={{display:"block",width:"100%",padding:14}}/></label>}
-      {isCollab && <label>Empresa o actividad profesional<input required type="text" placeholder="Empresa o actividad" style={{display:"block",width:"100%",padding:14}}/></label>}
-      <label>Correo electrónico<input required autoComplete="email" type="email" placeholder="tu@empresa.com" style={{display:"block",width:"100%",padding:14}}/></label>
-      {isLogin && <label>Contraseña<input required autoComplete="current-password" type="password" placeholder="Contraseña" style={{display:"block",width:"100%",padding:14}}/></label>}
-      <button className="pay" type="submit">{isLogin ? "Acceder" : "Continuar"}</button>
-      {notice && <p role="status" className="closed">{notice}</p>}
-      <p className="closed">ENTORNO DE PRUEBAS · Sin autenticación ni envío de datos reales.</p>
-    </form>
-    <p style={{marginTop:20}}><a href="/acceso">← Volver a las opciones de acceso</a></p>
-  </section></main></>;
+  useEffect(()=>{
+    const profile=kind==="colaborador"?"Colaborador":"Inversor";
+    window.location.replace(kind==="login"?"/acceso":"/acceso?perfil="+encodeURIComponent(profile)+"#registro");
+  },[kind]);
+  return <p role="status">Abriendo las opciones de acceso…</p>;
 }
 
 export default function App() {
@@ -126,6 +110,6 @@ export default function App() {
     <Route path="/registro" element={<AccessForm kind="inversor" />} />
     <Route path="/solicitar-colaboracion" element={<AccessForm kind="colaborador" />} />
     <Route path="*" element={<><BrandHeader/><main className="shell"><h1>Página no encontrada</h1><p><a href="/">Volver a OPORTUNIIA</a></p></main></>} />
-  </Routes></BrowserRouter></div>;
+  </Routes><PublicFooter/></BrowserRouter></div>;
 }
 

@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/informacion-legal",
+      "destination": "/informacion-legal.html"
+    },
+    {
       "source": "/mi-oportuniia/:path*",
       "destination": "/mi-oportuniia.html"
     },
