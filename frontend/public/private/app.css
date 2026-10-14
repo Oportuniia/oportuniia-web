@@ -28,7 +28,7 @@ body.private-dark .deal-main-link{background:transparent;border:0}
 /* Reviewed Premium navigation and completion state. */
 .nav-group,.premium-nav summary{font-weight:800;color:#70c3dc}
 .premium-nav{border:0;margin:0;padding:0}.premium-nav summary{cursor:pointer;display:flex;justify-content:space-between;list-style:none}.premium-nav summary::-webkit-details-marker{display:none}
-.sidebar .brand img{filter:none!important;width:218px;height:76px;object-fit:contain;background:#f7fafc;border-radius:10px;padding:4px;max-width:100%}
+.sidebar .brand{display:flex;justify-content:center}.sidebar .brand img{filter:none!important;width:132px;height:153px;object-fit:contain;background:transparent;border-radius:0;padding:0;max-width:100%}
 body .access-stages .completion-card.is-complete{background:#fff!important;border-color:#fff!important;color:#0a1622!important}
 body .access-stages .completion-card.is-complete b,body .access-stages .completion-card.is-complete small{color:#0a1622!important}
 body dialog.premium-dialog,body.universe-judicial dialog.premium-dialog,body.universe-agreements dialog.premium-dialog{background:#0f2535;color:#fff;border:1px solid #426578}
