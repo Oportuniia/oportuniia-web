@@ -49,4 +49,4 @@ body dialog.premium-dialog .button{background:#183b50;color:white;border-color:#
 /* Brand navy and natural casing for navigation chapter headings. */
 .sidebar .sidebar-label,.sidebar .nav-group,.sidebar .premium-nav>summary,.sidebar .premium-nav .premium-paid-label{color:#1f6588!important;text-transform:none;letter-spacing:.01em;font-weight:800}
 
-.sidebar .side-link[data-view="resumen"]{color:#1f6588;font-weight:800;text-transform:none}
+.sidebar .side-link[data-view="resumen"]{color:#fff;font-weight:800;text-transform:none}
