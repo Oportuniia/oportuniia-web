@@ -59,7 +59,7 @@ function PremiumCheckout() {
         <div className="premium-intro">
           <span className="premium-kicker">OPORTUNIIA <span>·</span> EXPERIENCIA PREMIUM</span>
           <h1>Una perspectiva<br/><em>más profunda.</em></h1>
-          <p>Accede a una experiencia de inversión diseñada para quienes necesitan más información, mayor control y una visión completa de cada oportunidad.</p>
+          <p>Accede a una experiencia de inversión diseñada para quienes necesitan más información, mayor control y una visión completa de cada oportunidad. Premium ofrece la posibilidad de contratar encargos adicionales, con presupuesto independiente y ejecución no incluida en la cuota.</p>
           <div className="premium-highlights"><span>Universo Acuerdos</span><span>Información ampliada</span><span>Atención profesional</span></div>
         </div>
         <section className="premium-feature" aria-label="Ventajas Premium">
