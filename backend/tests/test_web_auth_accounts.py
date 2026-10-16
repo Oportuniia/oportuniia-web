@@ -103,15 +103,14 @@ def test_private_area_denies_missing_session(monkeypatch):
 def test_login_accepts_username_and_email_and_rejects_wrong_password(monkeypatch):
     client, _ = make_client(monkeypatch)
     with client:
-        denied = client.get("/mi-oportuniia")
-        assert denied.status_code == 200
-        assert denied.json()["role"] == "USER"
-        client.post("/api/auth/logout")
         wrong = client.post("/api/auth/login", json={"identifier": "RafaMaster", "password": "wrong"})
         assert wrong.status_code == 401
         username_login = client.post("/api/auth/login", json={"identifier": "RafaMaster", "password": "Master-passphrase-test-123"})
         assert username_login.status_code == 200
         assert username_login.json()["user"]["role"] == "ADMIN"
+        protected = client.get("/mi-oportuniia")
+        assert protected.status_code == 200
+        assert protected.json() == {"username": "RafaMaster", "role": "ADMIN"}
         client.post("/api/auth/logout")
         email_login = client.post("/api/auth/login", json={"identifier": "shared@example.test", "password": "Master-passphrase-test-123"})
         # Shared recovery email intentionally cannot identify which account is being recovered or logged into.
@@ -119,6 +118,9 @@ def test_login_accepts_username_and_email_and_rejects_wrong_password(monkeypatch
         standard = client.post("/api/auth/login", json={"identifier": "rafa.querol", "password": "Standard-passphrase-test-123"})
         assert standard.status_code == 200
         assert standard.json()["user"]["role"] == "USER"
+        protected_standard = client.get("/mi-oportuniia")
+        assert protected_standard.status_code == 200
+        assert protected_standard.json()["role"] == "USER"
 
 
 def test_password_reset_is_single_use_and_invalidates_old_password(monkeypatch):
