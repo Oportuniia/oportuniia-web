@@ -24,6 +24,7 @@ from presentation_ingress import register_routes as register_presentation_routes
 from presentation_publish import register_publish_routes as register_presentation_publish_routes
 from presentation_e2e import run_presentation_e2e_if_enabled
 from private_area import register_private_area_routes
+from web_auth import register_web_auth
 
 
 ROOT_DIR = Path(__file__).parent
@@ -36,6 +37,7 @@ db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+register_web_auth(app, db)
 
 
 @app.on_event("startup")
