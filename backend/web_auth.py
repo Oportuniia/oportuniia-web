@@ -146,7 +146,13 @@ def register_web_auth(app: FastAPI, db):
         return {"username": account["username"], "role": account["role"]}
 
     @app.post("/api/auth/password-reset/request")
-    async def request_reset(body: ResetRequest):
+    async def request_reset(body: ResetRequest, request: Request):
+        ip = request.client.host if request.client else "unknown"
+        now = datetime.now(timezone.utc).timestamp()
+        recent = [t for t in _failed.get("reset:" + ip, []) if now - t < 900]
+        if len(recent) >= 5:
+            return {"ok": True, "message": "Si los datos corresponden a una cuenta, enviaremos instrucciones al correo de recuperación."}
+        _failed["reset:" + ip] = recent + [now]
         ident = body.identifier.strip()
         rows = await db.web_auth_users.find({"$or": [{"username_norm": ident.casefold()}, {"email_norm": ident.lower()}], "email_norm": body.recovery_email.strip().lower(), "is_active": True}, {"_id": 0}).limit(2).to_list(2)
         # Always return the same response to avoid account enumeration.
