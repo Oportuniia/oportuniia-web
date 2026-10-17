@@ -6,13 +6,15 @@ import asyncio
 import hashlib
 import os
 import uuid
+import httpx
 from datetime import datetime, timezone
 
 from fastapi import Request
+from pydantic import BaseModel, ConfigDict, Field
 from pymongo import ReturnDocument
 
 from investor_access import fail, future
-from web_identity import public_origin
+from web_identity import public_origin, resolve_session
 
 
 def plain(value):
@@ -118,7 +120,110 @@ async def confirm_intent(db, client, intent, *, payment_received_at=None):
     return True
 
 
+
+class FinanceCloseConfirmation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    checkout_request_id: str = Field(min_length=1, max_length=120)
+    report_id: str = Field(min_length=1, max_length=120)
+    signed_at: str = Field(min_length=1, max_length=80)
+    closed_at: str = Field(min_length=1, max_length=80)
+
+
+async def _finance_closer(request, db):
+    user, session = await resolve_session(request, db)
+    allowed = {v.strip() for v in os.getenv("WEB_FINANCE_CLOSER_SUBJECT_IDS", "").split(",") if v.strip()}
+    if not allowed or user.get("subject_id") not in allowed or not user.get("mfa_enabled") or not session.get("mfa_verified"):
+        fail("finance_closer_authorization_required", 403)
+    return user["subject_id"]
+
+
+
 def register_payment_routes(router, db):
+    @router.post("/staff/operations/{op_ref}/finance-close")
+    async def confirm_signed_operation_finance(op_ref: str, payload: FinanceCloseConfirmation, request: Request):
+        actor = await _finance_closer(request, db)
+        if not op_ref or len(op_ref) > 160:
+            fail("invalid_operation_reference", 422)
+        try:
+            signed_at = datetime.fromisoformat(payload.signed_at.replace("Z", "+00:00"))
+            closed_at = datetime.fromisoformat(payload.closed_at.replace("Z", "+00:00"))
+            if signed_at.tzinfo is None or closed_at.tzinfo is None or closed_at < signed_at:
+                raise ValueError()
+        except ValueError:
+            fail("invalid_signature_or_close_timestamp", 422)
+
+        reservation = await db.web_reservations.find_one({
+            "checkout_request_id": payload.checkout_request_id,
+            "op_ref": op_ref,
+            "state": "PAID_PENDING_OPERATION_REVIEW",
+        }, {"_id": 0})
+        if not reservation:
+            fail("paid_operation_reservation_not_found", 404)
+        if not reservation.get("payment_reference") or not reservation.get("payment_received_at") or reservation.get("currency") != "EUR":
+            fail("settled_payment_details_missing", 409)
+        amount_minor = reservation.get("amount_received_minor")
+        if not isinstance(amount_minor, int) or amount_minor <= 0:
+            fail("invalid_settled_payment_amount", 409)
+
+        sync_url = os.getenv("OPORTUNIIAPP_FINANCE_SYNC_URL", "").strip()
+        sync_key = os.getenv("OPORTUNIIAPP_WEB_FINANCE_M2M_KEY", "").strip()
+        if not sync_url.startswith("https://") or not sync_key:
+            fail("finance_sync_not_configured", 503)
+
+        payment_reference = str(reservation["payment_reference"])
+        event_id = "stripe:" + payment_reference + ":signed-operation"
+        record = await db.web_operation_finance_closures.find_one({"checkout_request_id": payload.checkout_request_id}, {"_id": 0})
+        if record and (record.get("op_ref") != op_ref or record.get("report_id") != payload.report_id):
+            fail("finance_close_already_linked_differently", 409)
+
+        confirmation = {
+            "event_id": event_id,
+            "report_id": payload.report_id,
+            "op_ref": op_ref,
+            "generated_income": round(amount_minor / 100.0, 2),
+            "payment_reference": payment_reference,
+            "payment_received_at": reservation["payment_received_at"],
+            "signed_at": signed_at.astimezone(timezone.utc).isoformat(),
+            "currency": "EUR",
+            "closed_at": closed_at.astimezone(timezone.utc).isoformat(),
+        }
+        await db.web_operation_finance_closures.update_one(
+            {"checkout_request_id": payload.checkout_request_id},
+            {"$setOnInsert": {
+                "checkout_request_id": payload.checkout_request_id,
+                "event_id": event_id,
+                "op_ref": op_ref,
+                "report_id": payload.report_id,
+                "confirmed_by": actor,
+                "created_at": datetime.now(timezone.utc).isoformat(),
+            }, "$set": {"sync_state": "PENDING", "confirmation": confirmation}},
+            upsert=True,
+        )
+        try:
+            async with httpx.AsyncClient(timeout=12, follow_redirects=False) as client:
+                response = await client.post(
+                    sync_url,
+                    json=confirmation,
+                    headers={"X-Oportuniia-Web-Finance-M2M-Key": sync_key},
+                )
+        except httpx.HTTPError:
+            await db.web_operation_finance_closures.update_one(
+                {"checkout_request_id": payload.checkout_request_id},
+                {"$set": {"sync_state": "RETRY_REQUIRED", "last_attempt_at": datetime.now(timezone.utc).isoformat()}},
+            )
+            fail("finance_sync_unavailable_retry", 502)
+        if response.status_code < 200 or response.status_code >= 300:
+            await db.web_operation_finance_closures.update_one(
+                {"checkout_request_id": payload.checkout_request_id},
+                {"$set": {"sync_state": "RETRY_REQUIRED", "last_http_status": response.status_code, "last_attempt_at": datetime.now(timezone.utc).isoformat()}},
+            )
+            fail("finance_sync_rejected_retry", 502)
+        await db.web_operation_finance_closures.update_one(
+            {"checkout_request_id": payload.checkout_request_id},
+            {"$set": {"sync_state": "SYNCED", "synced_at": datetime.now(timezone.utc).isoformat(), "last_http_status": response.status_code}},
+        )
+        return {"confirmed": True, "finance_sync": "SYNCED", "event_id": event_id}
+
     @router.post("/payments/stripe/webhook")
     async def webhook(request: Request):
         import stripe
