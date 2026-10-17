@@ -73,7 +73,7 @@ async def create_checkout(db, subject, kind, *, plan="monthly", op_ref="", modal
     return {"url": url}
 
 
-async def confirm_intent(db, client, intent):
+async def confirm_intent(db, client, intent, *, payment_received_at=None):
     try:
         checkout = await asyncio.to_thread(client.v1.checkout.sessions.retrieve, intent["session_id"])
     except Exception: fail("payment_provider_unavailable", 503)
@@ -95,8 +95,25 @@ async def confirm_intent(db, client, intent):
         await db.web_entitlements.update_one({"subject_id": intent["subject_id"], "product": "PREMIUM"}, {"$set": {"subject_id": intent["subject_id"], "product": "PREMIUM", "active": True,
             "valid_until": expiry, "provider": "STRIPE", "subscription_id": checkout.subscription, "customer_id": checkout.customer}}, upsert=True)
     else:
-        await db.web_reservations.update_one({"checkout_request_id": intent["request_id"]}, {"$setOnInsert": {"subject_id": intent["subject_id"], "op_ref": intent["op_ref"], "modality": intent["modality"],
-            "checkout_request_id": intent["request_id"], "state": "PAID_PENDING_OPERATION_REVIEW", "terms_version": intent["terms_version"]}}, upsert=True)
+        payment_intent = checkout.payment_intent
+        payment_reference = payment_intent.get("id") if isinstance(payment_intent, dict) else payment_intent
+        amount_total = checkout.amount_total
+        currency = str(checkout.currency or "").lower()
+        if not isinstance(amount_total, int) or amount_total <= 0 or currency != "eur" or not payment_reference:
+            fail("invalid_settled_reservation_payment", 409)
+        if isinstance(payment_received_at, (int, float)):
+            received_at = datetime.fromtimestamp(payment_received_at, timezone.utc)
+        elif isinstance(payment_received_at, str):
+            received_at = datetime.fromisoformat(payment_received_at.replace("Z", "+00:00"))
+        else:
+            received_at = datetime.fromtimestamp(checkout.created, timezone.utc)
+        if received_at.tzinfo is None:
+            fail("invalid_payment_received_at", 409)
+        await db.web_reservations.update_one({"checkout_request_id": intent["request_id"]}, {
+            "$setOnInsert": {"subject_id": intent["subject_id"], "op_ref": intent["op_ref"], "modality": intent["modality"],
+                "checkout_request_id": intent["request_id"], "state": "PAID_PENDING_OPERATION_REVIEW", "terms_version": intent["terms_version"]},
+            "$set": {"payment_reference": str(payment_reference), "amount_received_minor": amount_total, "currency": "EUR",
+                "payment_received_at": received_at.astimezone(timezone.utc).isoformat(), "payment_provider": "STRIPE"}}, upsert=True)
     await db.web_checkout_intents.update_one({"_id": intent["_id"]}, {"$set": {"state": "PAID", "customer_id": checkout.customer, "subscription_id": checkout.subscription}})
     return True
 
@@ -120,7 +137,7 @@ def register_payment_routes(router, db):
         obj = event["data"]["object"]
         if event["type"] in {"checkout.session.completed", "checkout.session.async_payment_succeeded"}:
             intent = await db.web_checkout_intents.find_one({"session_id": obj["id"]})
-            if intent: await confirm_intent(db, client, intent)
+            if intent: await confirm_intent(db, client, intent, payment_received_at=event.get("created"))
         elif event["type"] in {"customer.subscription.deleted", "customer.subscription.updated", "invoice.payment_failed", "charge.refunded", "charge.dispute.created"}:
             # Fail closed on cancellation/non-active state, payment failure or dispute.
             if event["type"] != "customer.subscription.updated" or obj.get("status") != "active":
