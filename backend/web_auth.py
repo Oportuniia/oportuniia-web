@@ -9,8 +9,9 @@ import uuid
 
 import bcrypt
 import jwt
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse, RedirectResponse, HTMLResponse
+from pathlib import Path
 from pydantic import BaseModel, Field
 
 COOKIE = "web_session"
@@ -38,7 +39,7 @@ def _hash_password(value):
 def _send_reset_email(to, username, token):
     host = os.getenv("SMTP_HOST")
     sender = os.getenv("SMTP_FROM")
-    if not host or not sender:
+    if host not in {"smtp.gmail.com", "smtp-relay.gmail.com"} or not sender:
         raise RuntimeError("Recovery email is not configured")
     msg = EmailMessage()
     msg["Subject"] = "Restablecimiento de contraseña · OPORTUNIIA WEB"
@@ -91,6 +92,8 @@ def register_web_auth(app: FastAPI, db):
                 "username_norm": username.casefold(), "email": email,
                 "email_norm": email, "role": role,
                 "password_hash": _hash_password(password), "token_version": 0,
+                "must_change_password": True,
+                "temporary_password_expires_at": datetime.now(timezone.utc) + timedelta(hours=24),
                 "is_active": True, "created_at": datetime.now(timezone.utc),
             }
             await db.web_auth_users.insert_one(doc)
@@ -101,6 +104,8 @@ def register_web_auth(app: FastAPI, db):
             account = await get_session(request.cookies.get(COOKIE))
             if not account:
                 return RedirectResponse("/acceso?next=" + request.url.path, status_code=303)
+            if account.get("must_change_password"):
+                return RedirectResponse("/cuenta/contrasena", status_code=303)
             request.state.web_user = {"id": account["id"], "username": account["username"], "role": account["role"]}
         return await call_next(request)
 
@@ -126,9 +131,11 @@ def register_web_auth(app: FastAPI, db):
         if not valid:
             _failed[ip] = fails + [now]
             return JSONResponse({"detail": "Usuario/correo o contraseña incorrectos"}, status_code=401)
+        from local_accounts import check_initial_expiry
+        check_initial_expiry(account)
         _failed.pop(ip, None)
         token = jwt.encode({"sub": account["id"], "tv": account["token_version"], "exp": datetime.now(timezone.utc) + timedelta(hours=8)}, secret, algorithm="HS256")
-        response = JSONResponse({"ok": True, "user": {"username": account["username"], "role": account["role"]}})
+        response = JSONResponse({"ok": True, "user": {"username": account["username"], "role": account["role"], "must_change_password": account.get("must_change_password", False)}})
         response.set_cookie(COOKIE, token, httponly=True, secure=True, samesite="lax", max_age=28800, path="/")
         return response
 
@@ -172,10 +179,48 @@ def register_web_auth(app: FastAPI, db):
     @app.post("/api/auth/password-reset/confirm")
     async def confirm_reset(body: ResetConfirm):
         token_hash = hashlib.sha256(body.token.encode()).hexdigest()
-        reset = await db.web_auth_resets.find_one({"token_hash": token_hash, "expires_at": {"$gt": datetime.now(timezone.utc)}})
+        from local_accounts import password_valid
+        password_valid(body.new_password)
+        reset = await db.web_auth_resets.find_one_and_delete({"token_hash": token_hash, "expires_at": {"$gt": datetime.now(timezone.utc)}})
         if not reset:
             return JSONResponse({"detail": "Enlace inválido o caducado"}, status_code=400)
-        await db.web_auth_users.update_one({"id": reset["user_id"]}, {"$set": {"password_hash": _hash_password(body.new_password)}, "$inc": {"token_version": 1}})
+        await db.web_auth_users.update_one({"id": reset["user_id"], "is_active": True}, {"$set": {"password_hash": _hash_password(body.new_password), "must_change_password": False}, "$unset": {"temporary_password_expires_at": ""}, "$inc": {"token_version": 1}})
         await db.web_auth_resets.delete_one({"token_hash": token_hash})
         return {"ok": True}
 
+
+
+    # Cookie identity and account persistence stay local to WEB.
+    from local_accounts import build_accounts_router, ensure_account_indexes, require_password_change
+    class AccountsDB:
+        users = db.web_auth_users
+        def __getattr__(self, name):
+            return getattr(db, name)
+    account_db = AccountsDB()
+    async def account_user(request: Request):
+        account = await get_session(request.cookies.get(COOKIE))
+        if not account:
+            raise HTTPException(401, "Sesión no válida")
+        origin = request.headers.get("origin")
+        allowed = {str(request.base_url).rstrip("/"), os.environ.get("WEB_PUBLIC_URL", "").rstrip("/")}
+        if request.method not in {"GET", "HEAD", "OPTIONS"} and origin and origin not in allowed:
+            raise HTTPException(403, "Origen no permitido")
+        require_password_change(account, request.url.path)
+        account.pop("password_hash", None)
+        return account
+    def verify(plain, hashed):
+        try:
+            return bcrypt.checkpw(plain.encode(), hashed.encode())
+        except (ValueError, TypeError):
+            return False
+    app.include_router(build_accounts_router(account_db, account_user, _hash_password, verify,
+        roles=("ADMIN", "USER"), admin_role="ADMIN", active_field="is_active"))
+    @app.on_event("startup")
+    async def account_indexes():
+        await ensure_account_indexes(account_db)
+    @app.get("/cuenta/{page}", response_class=HTMLResponse)
+    async def account_page(page: str):
+        if page not in {"usuarios", "contrasena", "recuperar"}:
+            raise HTTPException(404, "Página no encontrada")
+        content = Path(__file__).parent.parent / "frontend" / "public" / "cuenta.html"
+        return HTMLResponse(content.read_text(encoding="utf-8"))
