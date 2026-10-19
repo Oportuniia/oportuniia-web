@@ -1,14 +1,17 @@
 import asyncio
 from datetime import timedelta
 
+from fastapi import APIRouter
 import web_identity as identity
 import web_accounts
 from test_web_identity import system, login, PASSWORD
 
 
 def routes(c, db):
-    identity.register_password_change_routes(c.app.router, db)
-    web_accounts.register_account_admin_routes(c.app.router, db)
+    router = APIRouter(prefix="/api")
+    identity.register_password_change_routes(router, db)
+    web_accounts.register_account_admin_routes(router, db)
+    c.app.include_router(router)
 
 
 def test_username_login_and_forced_change_restricts_private_data(system):

@@ -252,7 +252,7 @@ class Reset(LinkToken):
 def register_identity_routes(router: APIRouter, db):
     @router.get("/account/config")
     async def config():
-        return {"identity_enabled": enabled(), "registration_enabled": registration_ready(), "require_mfa": os.getenv("WEB_REQUIRE_MFA", "true") == "true", "mode": "web_sessions" if enabled() else "unavailable"}
+        return {"identity_enabled": enabled(), "recovery_enabled": enabled() and mail_ready(), "registration_enabled": registration_ready(), "require_mfa": os.getenv("WEB_REQUIRE_MFA", "true") == "true", "mode": "web_sessions" if enabled() else "unavailable"}
 
     @router.post("/account/register", status_code=202)
     async def register(payload: Signup, request: Request):
