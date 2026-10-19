@@ -176,7 +176,9 @@ def test_private_catalogue_requires_review_and_returns_only_assigned_public_refe
     assert 'PROVIDER-SECRET' not in str(result) and 'source_output_id' not in str(result) and 'documents' not in str(result)
     assert c.get('/api/investor/opportunities?universe=acuerdos').status_code==403
     db.db.web_access_reviews.update_one({}, {'$set':{'identity_status':'PENDING'}})
-    assert c.get('/api/investor/opportunities').status_code==403
+    preview=c.get('/api/investor/opportunities').json()
+    assert preview['preview'] is True and preview['items'][0]['locked'] is True
+    assert 'Approved synthetic title' not in str(preview) and 'PROVIDER-SECRET' not in str(preview)
 
 
 def complete_profile(kind='inversor', subject_type='PF'):
@@ -222,3 +224,22 @@ def test_incomplete_snapshot_or_expired_review_never_contracts_even_with_flags()
     db.db.web_access_reviews.update_one({}, {'$set':{'valid_until':PAST}})
     assert c.post('/api/investor/premium/checkout').status_code==403
     assert c.post('/api/investor/profile-draft',json={**complete_profile(),'profile_complete':True,'documents_complete':True}).status_code==422
+
+
+def test_unverified_catalog_preview_contains_only_safe_summary_and_cannot_unlock_dossier():
+    c,db=setup_client();seed(db,stage=0)
+    db.db.web_operation_bindings.insert_one({'public_ref':'OP-123','internal_id':'SECRET-FUND','publication_approved':True,'catalog_reference_safe':True})
+    db.db.presentation_web_published.insert_one({'internal_id':'SECRET-FUND','publication_state':'PUBLISHED','item':{'universe':'judicial','municipio_name':'Barcelona','roi':'19%','phase':'subasta_en_curso','title':'SECRET ADDRESS','price':99999,'documents':{'secret':'secret.pdf'},'debtor':'SECRET PERSON'}})
+    result=c.get('/api/investor/opportunities')
+    assert result.status_code==200
+    data=result.json();row=data['items'][0]
+    assert set(row)=={'op_ref','municipio_name','roi','phase','locked'}
+    assert row['municipio_name']=='Barcelona' and row['roi']=='19%' and row['locked'] is True
+    assert row['phase']=='Subasta abierta / en curso'
+    assert 'SECRET' not in result.text and '99999' not in result.text and 'secret.pdf' not in result.text
+    assert c.get('/api/investor/operations/OP-123/documents').json()['items']==[]
+    assert c.get('/api/investor/operations/OP-123/documents/doc-1').status_code==403
+    db.db.web_operation_bindings.update_one({}, {'$set':{'publication_approved':False}})
+    assert c.get('/api/investor/opportunities').json()['items']==[]
+    db.db.web_operation_bindings.update_one({}, {'$set':{'publication_approved':True,'catalog_reference_safe':False}})
+    assert c.get('/api/investor/opportunities').json()['items']==[]

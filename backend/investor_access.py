@@ -241,7 +241,25 @@ def register_investor_routes(router: APIRouter, db):
     async def opportunities(universe: str = "judicial", subject: str = Depends(authenticated_subject)):
         if universe not in {"judicial", "acuerdos"}: fail("invalid_universe", 422)
         ctx = await context(db, subject)
-        if ctx["stage"] < 2: fail("verified_dossier_required")
+        if ctx["stage"] < 2:
+            # Only publication-approved safe catalog bindings. No protected bytes or
+            # hidden fields are sent to the browser, even behind a visual blur.
+            bindings = await db.web_operation_bindings.find(
+                {"publication_approved": True, "catalog_reference_safe": True}, {"_id": 0}).to_list(500)
+            previews = []
+            for binding in bindings:
+                op = binding.get("public_ref", "")
+                if not OP_RE.fullmatch(op): continue
+                published = await db.presentation_web_published.find_one(
+                    {"internal_id": binding.get("internal_id"), "publication_state": "PUBLISHED"}, {"_id": 0})
+                item = (published or {}).get("item") or {}
+                if item.get("universe") != universe: continue
+                import catalog_data
+                phase = item.get("phase")
+                previews.append({"op_ref": op, "municipio_name": item.get("municipio_name"),
+                    "roi": item.get("roi"), "phase": catalog_data.phase_name(phase) if phase else None,
+                    "locked": True})
+            return {"items": previews, "total": len(previews), "universe": universe, "preview": True}
         if universe == "acuerdos" and not ctx["premium"]: fail("premium_required")
         grants = await db.web_operation_grants.find({"subject_id": subject}, {"_id": 0}).to_list(500)
         items = []
@@ -253,7 +271,7 @@ def register_investor_routes(router: APIRouter, db):
             published = await db.presentation_web_published.find_one({"internal_id": binding.get("internal_id"), "publication_state": "PUBLISHED"}, {"_id": 0})
             item = (published or {}).get("item") or {}
             if item.get("universe") != universe: continue
-            allowed = ("product", "universe", "title", "asset_type", "category", "ccaa_name", "provincia_name", "municipio_name", "price", "roi", "timeframe")
+            allowed = ("product", "universe", "title", "asset_type", "category", "ccaa_name", "provincia_name", "municipio_name", "price", "roi", "timeframe", "phase")
             items.append({"op_ref": op, **{k: item.get(k) for k in allowed}})
         return {"items": items, "total": len(items), "universe": universe}
 
