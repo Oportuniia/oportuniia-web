@@ -55,6 +55,10 @@ class Code(BaseModel):
     code: str = Field(min_length=6, max_length=80)
 
 
+class Disable(Code):
+    password: str = Field(min_length=1, max_length=72)
+
+
 class Complete(Code):
     challenge: str = Field(min_length=32, max_length=200)
 
@@ -88,6 +92,25 @@ def register_secondfactor_routes(router, db):
         await db.web_sessions.update_many({"subject_id": user["subject_id"]}, {"$set": {"revoked": True}})
         await audit(db, user["subject_id"], "MFA_ENABLED_SESSIONS_REVOKED")
         return {"enabled": True, "recovery_codes": recovery, "sign_in_required": True}
+
+    @router.post("/account/second-factor/disable")
+    async def disable(payload: Disable, request: Request):
+        import bcrypt
+        user, _ = await resolve_session(request, db)
+        if user.get("role") == "superadmin": denied("administrator_mfa_required", 403)
+        await rate_limit(db, request, "mfa-disable", user["email"])
+        if not user.get("mfa_enabled"): denied("second_factor_not_enabled", 409)
+        password = payload.password.encode("utf-8")
+        if len(password) > 72 or not bcrypt.checkpw(password, user["password_hash"].encode()):
+            denied("invalid_credentials", 401)
+        if not await verify_factor(db, user, payload.code.strip()): denied("invalid_second_factor", 401)
+        updated = await db.web_users.update_one(
+            {"subject_id": user["subject_id"], "session_version": user.get("session_version", 0), "mfa_enabled": True, "role": {"$ne": "superadmin"}},
+            {"$set": {"mfa_enabled": False}, "$unset": {"mfa_secret": "", "mfa_pending": "", "mfa_pending_until": "", "mfa_last_counter": "", "mfa_recovery_hashes": ""}, "$inc": {"session_version": 1}})
+        if not updated.matched_count: denied("factor_enrollment_conflict", 409)
+        await db.web_sessions.update_many({"subject_id": user["subject_id"]}, {"$set": {"revoked": True}})
+        await audit(db, user["subject_id"], "MFA_DISABLED_SESSIONS_REVOKED")
+        return {"enabled": False, "sign_in_required": True}
 
     @router.post("/account/second-factor/complete")
     async def complete(payload: Complete, request: Request, response: Response):

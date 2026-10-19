@@ -86,3 +86,34 @@ def test_bootstrap_never_replaces_an_existing_account(system, monkeypatch):
     unchanged = db.raw.web_users.find_one({'subject_id': original['subject_id']})
     assert unchanged['password_hash'] == original['password_hash']
     assert unchanged.get('role') == original.get('role')
+
+
+def test_optional_mfa_disable_needs_password_and_factor_and_blocks_admin(system, monkeypatch):
+    import pyotp
+    from cryptography.fernet import Fernet
+    c, db, mail = system
+    login(c, mail)
+    monkeypatch.setenv("WEB_FACTOR_ENCRYPTION_KEY", Fernet.generate_key().decode())
+    enrolled = c.post("/api/account/second-factor/enroll", json={}).json()
+    assert c.post("/api/account/second-factor/confirm", json={"code": pyotp.TOTP(enrolled["secret"]).now()}).status_code == 200
+    # Sign in with one single-use recovery code, then use another to authorize disabling.
+    codes = db.raw.web_users.find_one({})["mfa_recovery_hashes"]
+    # Replace only the test fixture recovery hashes with known test-only values.
+    recovery = "test-recovery-code-123456"
+    db.raw.web_users.update_one({}, {"$set": {"mfa_recovery_hashes": [identity.digest(recovery)]}})
+    challenge = c.post("/api/account/login", json={"email": "one@example.com", "password": PASSWORD}).json()["challenge"]
+    assert c.post("/api/account/second-factor/complete", json={"challenge": challenge, "code": recovery}).status_code == 200
+    c.headers["X-CSRF-Token"] = c.cookies.get(identity.CSRF_COOKIE)
+    db.raw.web_users.update_one({}, {"$set": {"mfa_recovery_hashes": [identity.digest(recovery)]}})
+    endpoint = "/api/account/second-factor/disable"
+    assert c.post(endpoint, json={"password": "wrong", "code": recovery}).status_code == 401
+    assert c.post(endpoint, json={"password": PASSWORD, "code": "00000000"}).status_code == 401
+    db.raw.web_users.update_one({}, {"$set": {"role": "superadmin"}})
+    assert c.post(endpoint, json={"password": PASSWORD, "code": recovery}).status_code == 403
+    db.raw.web_users.update_one({}, {"$set": {"role": "user"}})
+    assert c.post(endpoint, json={"password": PASSWORD, "code": recovery}).status_code == 200
+    user = db.raw.web_users.find_one({})
+    assert not user["mfa_enabled"] and "mfa_secret" not in user and "mfa_recovery_hashes" not in user
+    assert c.get("/api/account/session").status_code == 401
+    result = c.post("/api/account/login", json={"email": "one@example.com", "password": PASSWORD})
+    assert result.status_code == 200 and not result.json().get("second_factor_required")
