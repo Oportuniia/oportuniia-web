@@ -52,7 +52,7 @@ async def authenticated_subject(request: Request) -> str:
         db = getattr(request.app.state, "web_db", None)
         if db is None: fail("identity_database_not_configured", 503)
         user, session = await resolve_session(request, db)
-        if os.getenv("WEB_REQUIRE_MFA", "true") == "true" and (not user.get("mfa_enabled") or not session.get("mfa_verified")):
+        if user.get("role") == "superadmin" and (not user.get("mfa_enabled") or not session.get("mfa_verified")):
             fail("second_factor_setup_required", 403)
         return user["subject_id"]
     issuer, audience, jwks = (os.getenv(k, "").strip() for k in ("WEB_AUTH_ISSUER", "WEB_AUTH_AUDIENCE", "WEB_AUTH_JWKS_URL"))
@@ -409,3 +409,4 @@ def register_investor_routes(router: APIRouter, db):
         allowed = ("account_kind", "subject_type", "full_name", "email", "phone", "tax_id", "fiscal_address", "municipality", "province", "region", "country", "fiscal_address_number", "fiscal_address_unit", "fiscal_address_postal_code", "address_number", "address_unit", "address_postal_code", "registered_address_number", "registered_address_unit", "registered_address_postal_code", "address", "fiscal_address", "company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position")
         return {"op_ref": op_ref, "applicant": {k: profile.get("profile", {}).get(k, "") for k in allowed},
                 "state": "DATA_DRAFT_ONLY", "template_approved": False, "signed": False, "submitted_to_provider": False}
+

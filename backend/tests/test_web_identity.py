@@ -182,10 +182,15 @@ def test_mfa_enrollment_required_replay_and_single_use_recovery(system, monkeypa
     c, db, mail = system; login(c, mail)
     monkeypatch.setenv("WEB_REQUIRE_MFA", "true")
     monkeypatch.setenv("WEB_FACTOR_ENCRYPTION_KEY", Fernet.generate_key().decode())
+    assert c.get("/api/investor/workspace").status_code == 200
+    db.raw.web_users.update_one({}, {"$set": {"role": "superadmin"}})
     assert c.get("/api/investor/workspace").status_code == 403
     enroll = c.post("/api/account/second-factor/enroll", json={})
     assert enroll.status_code == 200, enroll.text
     secret = enroll.json()["secret"]
+    assert "<svg" in enroll.json()["qr_svg"]
+    assert "otpauth://" not in enroll.json()["qr_svg"]
+    assert c.get("/api/account/config").json()["require_mfa"] is False
     assert secret not in str(db.raw.web_users.find_one({}))
     totp = pyotp.TOTP(secret)
     confirmed = c.post("/api/account/second-factor/confirm", json={"code": totp.now()})
@@ -214,3 +219,4 @@ def test_mfa_attempt_limit_and_challenge_expiry(system, monkeypatch):
     for _ in range(5): assert c.post("/api/account/second-factor/complete", json={"challenge": challenge, "code": "invalid"}).status_code == 401
     assert db.raw.web_login_challenges.find_one({})["attempts"] == 5
     assert c.post("/api/account/second-factor/complete", json={"challenge": challenge, "code": "invalid"}).status_code == 401
+

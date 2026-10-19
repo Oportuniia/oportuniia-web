@@ -7,6 +7,8 @@ import secrets
 from datetime import timedelta
 
 import pyotp
+import qrcode
+import qrcode.image.svg
 from cryptography.fernet import Fernet
 from pymongo import ReturnDocument
 from pydantic import BaseModel, ConfigDict, Field
@@ -66,7 +68,9 @@ def register_secondfactor_routes(router, db):
         secret = pyotp.random_base32()
         encrypted = cipher().encrypt(secret.encode()).decode()
         await db.web_users.update_one({"subject_id": user["subject_id"], "mfa_enabled": {"$ne": True}}, {"$set": {"mfa_pending": encrypted, "mfa_pending_until": now()+timedelta(minutes=10)}})
-        return {"secret": secret, "uri": pyotp.TOTP(secret).provisioning_uri(name=user["email"], issuer_name="OPORTUNIIA")}
+        uri = pyotp.TOTP(secret).provisioning_uri(name=user["email"], issuer_name="OPORTUNIIA")
+        qr = qrcode.make(uri, image_factory=qrcode.image.svg.SvgPathFillImage, border=4)
+        return {"secret": secret, "uri": uri, "qr_svg": qr.to_string(encoding="unicode")}
 
     @router.post("/account/second-factor/confirm")
     async def confirm(payload: Code, request: Request):
@@ -98,3 +102,4 @@ def register_secondfactor_routes(router, db):
         if not result.modified_count: denied("invalid_or_expired_link", 401)
         await issue_session(db, user, response, mfa_verified=True)
         return {"user": safe_user(user)}
+
