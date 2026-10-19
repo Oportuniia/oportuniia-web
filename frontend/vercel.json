@@ -41,10 +41,6 @@
       "destination": "/como-funciona.html"
     },
     {
-      "source": "/acceso",
-      "destination": "/acceso.html"
-    },
-    {
       "source": "/grupo-oportuniia",
       "destination": "/grupo-oportuniia.html"
     },
@@ -67,14 +63,6 @@
     {
       "source": "/mi-oportuniia",
       "destination": "/mi-oportuniia.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/index.html"
-    },
-    {
-      "source": "/registro",
-      "destination": "/index.html"
     },
     {
       "source": "/solicitar-colaboracion",
@@ -195,6 +183,38 @@
           "value": "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/acceso",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/acceso.html",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/login",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/registro",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/demo",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/demo.html",
+      "destination": "/cuenta",
+      "permanent": false
     }
   ]
 }
