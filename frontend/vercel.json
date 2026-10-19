@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/gestion-usuarios",
+      "destination": "/gestion-usuarios.html"
+    },
+    {
       "source": "/api/account/:path*",
       "destination": "https://oportuniia-web-private-staging.onrender.com/api/account/:path*"
     },

@@ -80,12 +80,13 @@ def registration_ready():
 
 
 def safe_user(user):
-    return {k: user.get(k) for k in ("subject_id", "name", "email", "email_verified", "account_kind", "mfa_enabled")}
+    return {k: user.get(k) for k in ("subject_id", "name", "email", "email_verified", "account_kind", "mfa_enabled", "username", "role", "must_change_password")}
 
 
 async def ensure_indexes(db):
     await db.web_users.create_index("email", unique=True, partialFilterExpression={"email": {"$type": "string"}})
     await db.web_users.create_index("subject_id", unique=True, partialFilterExpression={"subject_id": {"$type": "string"}})
+    await db.web_users.create_index("username", unique=True, partialFilterExpression={"username": {"$type": "string"}})
     await db.web_sessions.create_index("token_hash", unique=True)
     await db.web_sessions.create_index("expires_at", expireAfterSeconds=0)
     await db.web_identity_tokens.create_index("token_hash", unique=True)
@@ -161,7 +162,7 @@ async def mail_token(db, user, purpose):
     # Fragment tokens do not enter HTTP access logs or referrer headers.
     link = public_origin()+"/cuenta#"+purpose+"="+raw
     title = "Confirma tu correo" if purpose == "verify" else "Restablece tu contraseña"
-    await send_transactional(user["email"], title+" · OPORTUNIIA", title+" en este enlace de un solo uso (30 minutos):\n\n"+link+"\n\nSi no lo has solicitado, ignora este mensaje.")
+    await send_transactional(user.get("recovery_email") or user["email"], title+" · OPORTUNIIA", title+" en este enlace de un solo uso (30 minutos):\n\n"+link+"\n\nSi no lo has solicitado, ignora este mensaje.")
 
 
 async def consume_token(db, raw, purpose):
@@ -173,8 +174,8 @@ async def consume_token(db, raw, purpose):
 
 def validate_password(password):
     # Existing ecosystem uses bcrypt. Reject its truncation boundary explicitly.
-    if len(password) < 12 or len(password.encode("utf-8")) > 72:
-        denied("password_requires_12_characters_maximum_72_bytes", 422)
+    if len(password) < 11 or len(password.encode("utf-8")) > 72:
+        denied("password_requires_11_characters_maximum_72_bytes", 422)
 
 
 async def hash_password(password):
@@ -195,6 +196,8 @@ async def resolve_session(request: Request, db, *, check_csrf=True):
     user = await db.web_users.find_one({"subject_id": session["subject_id"], "active": True, "email_verified": True})
     if not user or user.get("session_version", 0) != session.get("version", 0):
         denied("session_revoked", 401)
+    if user.get("must_change_password") and request.url.path not in {"/api/account/change-password", "/api/account/logout", "/api/account/session"}:
+        denied("initial_password_change_required", 403)
     if check_csrf and request.method not in {"GET", "HEAD", "OPTIONS"}:
         # Content type is validated by each endpoint; uploads remain multipart.
         if request.headers.get("origin") != public_origin():
@@ -220,11 +223,12 @@ async def issue_session(db, user, response, mfa_verified=False):
 
 class Credentials(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    email: EmailStr = Field(max_length=180)
+    email: str = Field(min_length=1, max_length=180)
     password: str = Field(min_length=1, max_length=200)
 
 
 class Signup(Credentials):
+    email: EmailStr = Field(max_length=180)
     name: str = Field(min_length=1, max_length=180)
     account_kind: str
     accept_privacy: bool
@@ -233,7 +237,7 @@ class Signup(Credentials):
 
 class MailRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    email: EmailStr = Field(max_length=180)
+    email: str = Field(max_length=180)
 
 
 class LinkToken(BaseModel):
@@ -242,7 +246,7 @@ class LinkToken(BaseModel):
 
 
 class Reset(LinkToken):
-    password: str = Field(min_length=12, max_length=200)
+    password: str = Field(min_length=11, max_length=200)
 
 
 def register_identity_routes(router: APIRouter, db):
@@ -257,7 +261,7 @@ def register_identity_routes(router: APIRouter, db):
             denied("registration_not_activated", 503)
         if payload.account_kind not in {"inversor", "colaborador"} or not payload.accept_privacy or not payload.accept_terms:
             denied("registration_requirements_missing", 422)
-        email = str(payload.email).lower()
+        email = str(payload.email).strip().lower()
         await rate_limit(db, request, "register", email)
         hashed = await hash_password(payload.password)
         user = {"subject_id": str(uuid.uuid4()), "email": email, "name": payload.name.strip(), "password_hash": hashed, "account_kind": payload.account_kind,
@@ -285,7 +289,7 @@ def register_identity_routes(router: APIRouter, db):
     async def resend(payload: MailRequest, request: Request):
         require_origin(request)
         if not registration_ready(): denied("registration_not_activated", 503)
-        email = str(payload.email).lower()
+        email = str(payload.email).strip().lower()
         await rate_limit(db, request, "verify-mail", email)
         user = await db.web_users.find_one({"email": email, "active": True, "email_verified": False})
         if user: await mail_token(db, user, "verify")
@@ -295,14 +299,16 @@ def register_identity_routes(router: APIRouter, db):
     async def login(payload: Credentials, request: Request, response: Response):
         require_origin(request)
         if not enabled(): denied("web_identity_not_activated", 503)
-        email = str(payload.email).lower()
+        email = str(payload.email).strip().lower()
         await rate_limit(db, request, "login", email)
-        user = await db.web_users.find_one({"email": email})
+        user = await db.web_users.find_one({"$or": [{"email": email}, {"username": email}]})
         candidate = payload.password.encode()
         try: valid = len(candidate) <= 72 and await asyncio.to_thread(bcrypt.checkpw, candidate, (user or {}).get("password_hash", _DUMMY_HASH.decode()).encode())
         except (ValueError, TypeError): valid = False
         if not valid or not user or not user.get("active") or not user.get("email_verified"):
             denied("invalid_credentials_or_unverified_email", 401)
+        if user.get("must_change_password") and user.get("initial_password_expires_at", now()) <= now():
+            denied("initial_password_expired", 401)
         if user.get("mfa_enabled"):
             from web_secondfactor import challenge
             return await challenge(db, user)
@@ -326,9 +332,9 @@ def register_identity_routes(router: APIRouter, db):
     async def forgot(payload: MailRequest, request: Request):
         require_origin(request)
         if not enabled() or not mail_ready(): denied("account_recovery_not_activated", 503)
-        email = str(payload.email).lower()
+        email = str(payload.email).strip().lower()
         await rate_limit(db, request, "forgot", email)
-        user = await db.web_users.find_one({"email": email, "active": True, "email_verified": True})
+        user = await db.web_users.find_one({"$or": [{"email": email}, {"username": email}], "active": True, "email_verified": True})
         if user: await mail_token(db, user, "reset")
         return GENERIC_MAIL
 
@@ -339,8 +345,35 @@ def register_identity_routes(router: APIRouter, db):
         await rate_limit(db, request, "reset")
         hashed = await hash_password(payload.password)
         token = await consume_token(db, payload.token, "reset")
-        result = await db.web_users.update_one({"subject_id": token["subject_id"], "active": True, "session_version": token["version"]}, {"$set": {"password_hash": hashed, "password_changed_at": now()}, "$inc": {"session_version": 1}})
+        result = await db.web_users.update_one({"subject_id": token["subject_id"], "active": True, "session_version": token["version"]}, {"$set": {"password_hash": hashed, "password_changed_at": now(), "must_change_password": False}, "$inc": {"session_version": 1}})
         if not result.matched_count: denied("invalid_or_expired_link", 400)
         await db.web_sessions.update_many({"subject_id": token["subject_id"]}, {"$set": {"revoked": True}})
         await audit(db, token["subject_id"], "PASSWORD_RESET_ALL_SESSIONS_REVOKED")
+        return {"changed": True, "sign_in_required": True}
+
+
+
+class PasswordChange(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    current_password: str = Field(min_length=1, max_length=200)
+    new_password: str = Field(min_length=11, max_length=200)
+
+
+def register_password_change_routes(router, db):
+    @router.post("/account/change-password")
+    async def change(payload: PasswordChange, request: Request):
+        user, _ = await resolve_session(request, db)
+        await rate_limit(db, request, "change-password", user["subject_id"])
+        candidate = payload.current_password.encode()
+        try:
+            valid = len(candidate) <= 72 and await asyncio.to_thread(bcrypt.checkpw, candidate, user["password_hash"].encode())
+        except (ValueError, TypeError):
+            valid = False
+        if not valid: denied("invalid_current_password", 401)
+        if hmac.compare_digest(payload.current_password.encode(), payload.new_password.encode()): denied("new_password_must_differ", 422)
+        hashed = await hash_password(payload.new_password)
+        result = await db.web_users.update_one({"subject_id": user["subject_id"], "session_version": user.get("session_version", 0)}, {"$set": {"password_hash": hashed, "password_changed_at": now(), "must_change_password": False}, "$unset": {"initial_password_expires_at": ""}, "$inc": {"session_version": 1}})
+        if not result.matched_count: denied("session_revoked", 401)
+        await db.web_sessions.update_many({"subject_id": user["subject_id"]}, {"$set": {"revoked": True}})
+        await audit(db, user["subject_id"], "PASSWORD_CHANGED_ALL_SESSIONS_REVOKED")
         return {"changed": True, "sign_in_required": True}

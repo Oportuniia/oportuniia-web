@@ -14,6 +14,8 @@ load_dotenv(Path(__file__).parent / ".env")
 
 from investor_access import register_investor_routes
 from web_identity import register_identity_routes, ensure_indexes, enabled, public_origin
+from web_accounts import bootstrap_accounts, register_account_admin_routes
+from web_identity import register_password_change_routes
 from web_secondfactor import register_secondfactor_routes, cipher
 from web_workspace import register_workspace_routes
 from web_security import BodyLimitMiddleware
@@ -37,6 +39,7 @@ async def lifespan(app):
         if os.getenv("WEB_REQUIRE_MFA", "true") == "true": cipher()
         await db.command("ping")
         await ensure_indexes(db)
+        await bootstrap_accounts(db)
     yield
     if client: client.close()
 
@@ -71,6 +74,8 @@ async def ready():
 
 router = APIRouter(prefix="/api")
 register_identity_routes(router, db)
+register_password_change_routes(router, db)
+register_account_admin_routes(router, db)
 register_secondfactor_routes(router, db)
 register_investor_routes(router, db)
 register_workspace_routes(router, db)
@@ -78,3 +83,4 @@ register_review_routes(router, db)
 register_payment_routes(router, db)
 register_worker_routes(router, db)
 app.include_router(router)
+
