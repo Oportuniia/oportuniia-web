@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
         with:
           python-version: '3.12'
-      - run: pip install -r backend/requirements-private.txt pytest pytest-asyncio mongomock httpx
+      - run: pip install -r backend/requirements-private.txt pytest pytest-asyncio pytest-xdist mongomock httpx
       - run: python -m compileall -q backend
       - run: python -m pytest backend/tests/test_web_identity.py backend/tests/test_web_services.py backend/tests/test_investor_access.py backend/tests/test_private_area_engine.py backend/tests/test_free_text_query.py -q
         env:
