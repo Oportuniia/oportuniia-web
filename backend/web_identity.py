@@ -252,7 +252,16 @@ class Reset(LinkToken):
 def register_identity_routes(router: APIRouter, db):
     @router.get("/account/config")
     async def config():
-        return {"identity_enabled": enabled(), "recovery_enabled": enabled() and mail_ready(), "registration_enabled": registration_ready(), "require_mfa": False, "mfa_required_roles": ["superadmin"], "mode": "web_sessions" if enabled() else "unavailable"}
+        catalog_state = "error"
+        if db is not None:
+            try:
+                ids = await db.web_operation_bindings.distinct("internal_id", {"publication_approved": True, "catalog_reference_safe": True})
+                published = await db.presentation_web_published.find_one({"internal_id": {"$in": ids}, "publication_state": "PUBLISHED"}, {"_id": 1}) if ids else None
+                catalog_state = "available" if published else "empty"
+            except Exception:
+                # A database failure is never presented as an empty catalogue.
+                catalog_state = "error"
+        return {"catalog_state": catalog_state,"early_access": os.getenv("WEB_EARLY_ACCESS", "true").strip().lower() in {"1", "true", "yes", "on"}, "identity_enabled": enabled(), "recovery_enabled": enabled() and mail_ready(), "registration_enabled": registration_ready(), "require_mfa": False, "mfa_required_roles": ["superadmin"], "mode": "web_sessions" if enabled() else "unavailable"}
 
     @router.post("/account/register", status_code=202)
     async def register(payload: Signup, request: Request):
@@ -377,3 +386,4 @@ def register_password_change_routes(router, db):
         await db.web_sessions.update_many({"subject_id": user["subject_id"]}, {"$set": {"revoked": True}})
         await audit(db, user["subject_id"], "PASSWORD_CHANGED_ALL_SESSIONS_REVOKED")
         return {"changed": True, "sign_in_required": True}
+
