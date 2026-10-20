@@ -1,10 +1,220 @@
 {
   "rewrites": [
-    {"source": "/como-funciona", "destination": "/como-funciona.html"},
-    {"source": "/acceso", "destination": "/acceso.html"},
-    {"source": "/grupo-oportuniia", "destination": "/grupo-oportuniia.html"},
-    {"source": "/nuestra-filosofia", "destination": "/nuestra-filosofia.html"},
-    {"source": "/contacto", "destination": "/contacto.html"},
-    {"source": "/servicers", "destination": "/servicers.html"}
+    {
+      "source": "/gestion-usuarios",
+      "destination": "/gestion-usuarios.html"
+    },
+    {
+      "source": "/api/account/:path*",
+      "destination": "https://oportuniia-web-private-staging.onrender.com/api/account/:path*"
+    },
+    {
+      "source": "/api/investor/:path*",
+      "destination": "https://oportuniia-web-private-staging.onrender.com/api/investor/:path*"
+    },
+    {
+      "source": "/api/staff/:path*",
+      "destination": "https://oportuniia-web-private-staging.onrender.com/api/staff/:path*"
+    },
+    {
+      "source": "/api/payments/stripe/webhook",
+      "destination": "https://oportuniia-web-private-staging.onrender.com/api/payments/stripe/webhook"
+    },
+    {
+      "source": "/cuenta",
+      "destination": "/cuenta.html"
+    },
+    {
+      "source": "/revision-cuentas",
+      "destination": "/revision-cuentas.html"
+    },
+    {
+      "source": "/informacion-legal",
+      "destination": "/informacion-legal.html"
+    },
+    {
+      "source": "/mi-oportuniia/:path*",
+      "destination": "/mi-oportuniia.html"
+    },
+    {
+      "source": "/como-funciona",
+      "destination": "/como-funciona.html"
+    },
+    {
+      "source": "/grupo-oportuniia",
+      "destination": "/grupo-oportuniia.html"
+    },
+    {
+      "source": "/nuestra-filosofia",
+      "destination": "/nuestra-filosofia.html"
+    },
+    {
+      "source": "/contacto",
+      "destination": "/contacto.html"
+    },
+    {
+      "source": "/servicers",
+      "destination": "/servicers.html"
+    },
+    {
+      "source": "/oportunidades",
+      "destination": "/web2.html"
+    },
+    {
+      "source": "/mi-oportuniia",
+      "destination": "/mi-oportuniia.html"
+    },
+    {
+      "source": "/solicitar-colaboracion",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/premium",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/inversor",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/tecnologia",
+      "destination": "/tecnologia.html"
+    },
+    {
+      "source": "/oportunidad",
+      "destination": "/oportunidad.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/private/:path*",
+      "headers": [
+        {
+          "key": "X-Robots-Tag",
+          "value": "noindex, nofollow"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    },
+    {
+      "source": "/api/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        }
+      ]
+    },
+    {
+      "source": "/cuenta",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/cuenta.html",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/revision-cuentas",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+        }
+      ]
+    },
+    {
+      "source": "/revision-cuentas.html",
+      "headers": [
+        {
+          "key": "Referrer-Policy",
+          "value": "no-referrer"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; img-src 'self' data:; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/acceso",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/acceso.html",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/login",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/registro",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/demo",
+      "destination": "/cuenta",
+      "permanent": false
+    },
+    {
+      "source": "/demo.html",
+      "destination": "/cuenta",
+      "permanent": false
+    }
   ]
 }

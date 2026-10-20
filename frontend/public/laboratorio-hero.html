@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OPORTUNIIA · Prueba capítulo 17</title><link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+*{box-sizing:border-box}body{margin:0;background:#071522;color:#f4f8fa;font-family:Poppins,Arial,sans-serif}.bar{padding:18px clamp(16px,4vw,56px);display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;border-bottom:1px solid #254054}.brand{font-weight:700;letter-spacing:.13em}.muted{color:#a9c1d0;font-size:12px}.intro{padding:25px clamp(16px,4vw,56px) 10px}.intro h1{font-size:clamp(23px,3vw,37px);margin:0 0 7px}.intro p{color:#b7c8d4;margin:0;font-size:14px;max-width:780px}.controls{display:flex;gap:10px;flex-wrap:wrap;padding:22px clamp(16px,4vw,56px)}button{font:600 13px Poppins;border:1px solid #55758c;background:#112b40;color:white;padding:12px 18px;border-radius:8px;cursor:pointer}button.active{background:#22779f;border-color:#56b0da}button:focus-visible{outline:3px solid #9bdaff}.stage{margin:0 clamp(16px,4vw,56px);border:1px solid #35546b;border-radius:12px;overflow:hidden;background:white;position:relative}.stage iframe{display:block;width:100%;height:760px;border:0;background:white}.stage.mobile{max-width:390px;margin-left:auto;margin-right:auto}.stage.mobile iframe{height:780px}.foot{padding:20px clamp(16px,4vw,56px) 35px;color:#b7c8d4;font-size:12px}.foot strong{color:#fff}
+</style></head><body>
+<header class="bar"><div class="brand">OPORTUNIIA <span class="muted">/ LABORATORIO VISUAL</span></div><span class="muted">Capítulo 17 · Comparativa B / C · Sin cambios en producción</span></header>
+<div class="intro"><h1>La primera impresión, en movimiento.</h1><p>Ambas opciones utilizan la HOME real de esta rama. Cambia entre las animaciones, repítelas y comprueba la adaptación móvil. El resto de la web no se modifica.</p></div>
+<div class="controls"><button id="b" class="active" type="button">B · Cinematográfica</button><button id="c" type="button">C · Premium navy</button><button id="replay" type="button">↻ Repetir entrada</button><button id="desktop" class="active" type="button">Ordenador</button><button id="mobile" type="button">Móvil</button></div>
+<div id="stage" class="stage"><iframe id="preview" title="Vista real de OPORTUNIIA, animación B" src="/web2.html" loading="eager"></iframe></div>
+<div class="foot"><strong>Prueba visual, no publicación.</strong> B enfatiza iluminación y profundidad; B y C usan exactamente el mismo fondo navy. C cambia únicamente el ritmo de la animación. Las animaciones respetan la preferencia de movimiento reducido del dispositivo. Para navegar por la web completa, abre la HOME normal.</div>
+<script>
+let mode='b',device='desktop';const frame=document.getElementById('preview');const stage=document.getElementById('stage');
+function cssFor(m){const common=`
+html{scroll-behavior:auto!important}
+.hero{isolation:isolate}
+.hero .wrap{position:relative;z-index:2}
+.hero h1 .l{overflow:visible!important}
+.hero h1 .l span{transform:none!important;transition:none!important}
+.hero .hero-bottom{position:relative}
+@media(prefers-reduced-motion:reduce){.hero,.hero *{animation:none!important;transition:none!important;transform:none!important}}
+`;
+const b=`
+.hero{background:radial-gradient(ellipse 70% 65% at 78% 26%,rgba(34,125,177,.19),transparent 72%),linear-gradient(130deg,#071726 0%,#0a2234 58%,#102b3c 100%)!important;color:#fff!important;min-height:640px}
+.hero::before{content:"";position:absolute;inset:-30% -20%;pointer-events:none;background:linear-gradient(110deg,transparent 31%,rgba(104,189,232,.02) 40%,rgba(133,214,255,.20) 48%,rgba(104,189,232,.03) 54%,transparent 64%);transform:translateX(-90%) skewX(-12deg);animation:opBeam 2.6s cubic-bezier(.2,.65,.2,1) .2s both}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 80% 44%,rgba(80,168,219,.17),transparent 40%);animation:opGlow 3.2s ease-in-out both}
+.hero h1,.hero h1 em{color:#fff!important;text-shadow:0 9px 48px rgba(26,145,213,.18)}
+.hero h1 em{color:#65b8e2!important}
+.hero .hero-lead{color:#d0e0e9!important}
+.hero h1 .l{opacity:0;animation:opRise 1.25s cubic-bezier(.16,1,.3,1) .15s forwards}
+.hero h1 .l:nth-child(2){animation-delay:.34s}
+.hero .hero-bottom{opacity:0;animation:opRise 1.05s cubic-bezier(.16,1,.3,1) .7s forwards}
+@keyframes opRise{from{opacity:0;transform:translateY(46px);filter:blur(9px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes opBeam{from{transform:translateX(-90%) skewX(-12deg);opacity:0}35%{opacity:1}to{transform:translateX(110%) skewX(-12deg);opacity:0}}
+@keyframes opGlow{from{opacity:0}to{opacity:1}}
+`;
+const c=`
+/* Variante C: MISMO fondo oscuro y legibilidad que B; solo cambia el movimiento */
+.hero::before{animation-duration:3.4s;opacity:.55}
+.hero h1{color:#fff!important}.hero h1 em{color:#75c5eb!important}.hero .hero-lead{color:#d0dfe9!important}
+.hero .hero-cta .btn.line{color:#e9f4fa!important;border-color:rgba(206,232,246,.5)!important}
+.hero h1 .l{opacity:0;animation:opCalm 1.05s cubic-bezier(.22,.61,.36,1) .1s forwards}
+.hero h1 .l:nth-child(2){animation-delay:.24s}
+.hero .hero-bottom{opacity:0;animation:opCalm .9s cubic-bezier(.22,.61,.36,1) .52s forwards}
+@keyframes opCalm{from{opacity:0;transform:translateY(23px)}to{opacity:1;transform:translateY(0)}}
+`;
+return common+b+(m==='b'?'':c)}
+function inject(){try{const doc=frame.contentDocument;if(!doc)return;doc.getElementById('op-lab-style')?.remove();const st=doc.createElement('style');st.id='op-lab-style';st.textContent=cssFor(mode);doc.head.appendChild(st);const hero=doc.querySelector('.hero');if(hero){hero.style.setProperty('background','linear-gradient(135deg,#071726 0%,#0a2234 58%,#102b3c 100%)','important');hero.style.setProperty('color','#ffffff','important');}frame.title='OPORTUNIIA · Variante '+mode.toUpperCase();}catch(e){document.querySelector('.foot').textContent='No se ha podido cargar la vista de la HOME en este entorno.'}}
+function select(m){mode=m;document.getElementById('b').classList.toggle('active',m==='b');document.getElementById('c').classList.toggle('active',m==='c');frame.src='/web2.html?laboratorio='+m+'&replay='+Date.now()}
+document.getElementById('b').onclick=()=>select('b');document.getElementById('c').onclick=()=>select('c');document.getElementById('replay').onclick=()=>select(mode);document.getElementById('desktop').onclick=()=>{device='desktop';stage.classList.remove('mobile');document.getElementById('desktop').classList.add('active');document.getElementById('mobile').classList.remove('active');frame.src='/web2.html?laboratorio='+mode+'&device=desktop'};document.getElementById('mobile').onclick=()=>{device='mobile';stage.classList.add('mobile');document.getElementById('mobile').classList.add('active');document.getElementById('desktop').classList.remove('active');frame.src='/web2.html?laboratorio='+mode+'&device=mobile'};
+frame.addEventListener('load',inject);
+</script></body></html>

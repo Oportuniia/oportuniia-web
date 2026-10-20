@@ -1145,8 +1145,250 @@ body.acuerdos .vip-cta-mod{
 /* V14 · Footer: logo oficial a color, igual que cabecera */
 .footer-brand-logo{width:min(270px,100%);height:auto;display:block;object-fit:contain;object-position:left center;filter:none!important}
 .foot-brand .b{min-height:58px}
+
+/* Universo Acuerdos: interactive hover */
+.acu-value .av-vars li{transition:transform .22s ease,background .22s ease,border-color .22s ease,box-shadow .22s ease}
+.acu-value .av-vars li:hover{transform:translateY(-4px);background:rgba(87,198,228,.16)!important;border-color:#57c6e4!important;box-shadow:0 12px 25px rgba(0,0,0,.14)}
+.deal[data-href]{cursor:pointer}
+.deal[data-href]:focus-visible{outline:3px solid #57c6e4;outline-offset:4px}
+
+
+/* Botones de selección: estado visual fijo incluso al pasar el cursor */
+.modeswitch .ms-btn:hover,.modeswitch .ms-btn:focus-visible{transform:none!important;filter:none!important;box-shadow:none!important}
+.modeswitch .ms-btn.on:hover,.modeswitch .ms-btn.on:focus-visible{background:#247da2!important;color:#fff!important}
+.modeswitch .ms-btn:not(.on):hover,.modeswitch .ms-btn:not(.on):focus-visible{background:transparent!important;color:#c5d5df!important}
+/* Selector de universos: hover no cambia la selección ni el color de Acuerdos */
+.modeswitch .ms-btn[data-mode="acuerdos"]:not(.on):hover,
+body.acuerdos .modeswitch .ms-btn[data-mode="acuerdos"]:not(.on):hover{background:transparent!important;color:inherit!important;box-shadow:none!important;transform:none!important}
+.modeswitch .ms-btn[data-mode="judicial"]:not(.on):hover{background:transparent!important;box-shadow:none!important;transform:none!important}
+
+/* CAPÍTULO 17 · HERO CINEMATOGRÁFICO B APROBADO · SOLO PREVIEW */
+.hero{isolation:isolate;background:radial-gradient(ellipse 70% 65% at 78% 26%,rgba(34,125,177,.19),transparent 72%),linear-gradient(130deg,#071726 0%,#0a2234 58%,#102b3c 100%)!important;color:#fff!important}
+.hero::before{content:"";position:absolute;inset:-30% -20%;pointer-events:none;background:linear-gradient(110deg,transparent 31%,rgba(104,189,232,.02) 40%,rgba(133,214,255,.20) 48%,rgba(104,189,232,.03) 54%,transparent 64%);transform:translateX(-90%) skewX(-12deg);animation:oppHeroBeam 2.6s cubic-bezier(.2,.65,.2,1) .2s both;z-index:1}
+.hero::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle at 80% 44%,rgba(80,168,219,.17),transparent 40%);animation:oppHeroGlow 3.2s ease-in-out both;z-index:0}
+.hero>.wrap{position:relative;z-index:2}
+.hero h1{color:#fff!important;text-shadow:0 9px 48px rgba(26,145,213,.18)}
+.hero h1 em{color:#65b8e2!important}
+.hero .hero-lead{color:#d0e0e9!important}
+.hero .hero-cta .btn.line{color:#fff!important;border-color:rgba(206,232,246,.55)!important}
+.hero h1 .l span{transform:none!important;transition:none!important}
+.hero h1 .l{opacity:0;animation:oppHeroRise 1.25s cubic-bezier(.16,1,.3,1) .15s forwards}
+.hero h1 .l:nth-child(2){animation-delay:.34s}
+.hero .hero-bottom{opacity:0;animation:oppHeroRise 1.05s cubic-bezier(.16,1,.3,1) .7s forwards}
+@keyframes oppHeroRise{from{opacity:0;transform:translateY(46px);filter:blur(9px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+@keyframes oppHeroBeam{from{transform:translateX(-90%) skewX(-12deg);opacity:0}35%{opacity:1}to{transform:translateX(110%) skewX(-12deg);opacity:0}}
+@keyframes oppHeroGlow{from{opacity:0}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.hero::before,.hero::after,.hero h1 .l,.hero .hero-bottom{animation:none!important;opacity:1!important;filter:none!important;transform:none!important}}
+
+/* CIERRE VISUAL CAP.22 · Navy dominante, excepciones aprobadas */
+body:not(.acuerdos){--bg:#091b2b;--bg2:#0e2638;--surface:#122e42;--panel:#122e42;--ink:#edf6fa;--ink2:#c1d5e0;--faint:#96b2c3;--line:rgba(170,210,231,.18);--line-2:rgba(170,210,231,.10);--brand:#57afd6;--brand-2:#75c7e9;--brand-tint:rgba(74,172,216,.12);--brand-line:rgba(93,185,222,.35)}
+header,header.sc{background:rgba(255,255,255,.97)!important;border-bottom:1px solid rgba(12,40,60,.12)!important;backdrop-filter:blur(18px)}
+header .navitem>a,header .ghost{font-weight:700!important;color:#18384e!important}header .navitem>a:hover,header .navitem>a.active{color:#1f6588!important}header .burger span,header .burger span::before,header .burger span::after{background:#18384e!important}
+/* Los dos universos conservan sus estilos independientes y aprobados. */
+@media(prefers-reduced-motion:reduce){.deal,.card,.entry{transition:none!important}}
+
+/* QA móvil · selector sin cambios de color, tamaño ni sombra al hover */
+#producto .modeswitch .ms-btn:hover,#producto .modeswitch .ms-btn:focus-visible{transform:none!important;filter:none!important;box-shadow:none!important}
+#producto .modeswitch .ms-btn:not(.on):hover,#producto .modeswitch .ms-btn:not(.on):focus-visible{background:transparent!important;color:#c5d5df!important}
+#producto .modeswitch .ms-btn.on:hover,#producto .modeswitch .ms-btn.on:focus-visible{background:#247da2!important;color:#fff!important}
+/* Modalidades alineadas por fila dentro de las tarjetas */
+#acceso .access-final .entry{display:flex!important;flex-direction:column!important}
+#acceso .access-final .entry>.access-badges{display:flex!important;align-items:center!important;gap:10px!important;flex-wrap:nowrap!important;margin-top:22px!important;min-height:48px!important}
+#acceso .access-final .entry>.access-badges span{width:clamp(32px,3.5vw,46px)!important;height:clamp(32px,3.5vw,46px)!important;flex:0 0 auto!important;font-size:clamp(14px,1.4vw,18px)!important}
+#acceso .access-final .entry>.access-detail{flex:1!important}
+@media(max-width:800px){#acceso .access-final .entry>.access-badges{gap:8px!important}}
 </style>
-</head>
+<link rel="stylesheet" href="/oportuniia-remix.css?v=20261011-remix">
+<style id="rafa-final-home-fixes">
+/* Evidencias visuales 2026-10-11: composición compacta, no Frankenstein */
+#producto .prod-hero{padding-top:32px!important;padding-bottom:22px!important}
+#producto .opp-product-heading{display:flex!important;justify-content:center!important;text-align:center!important;max-width:100%!important;margin:0 auto!important}
+#producto .opp-product-heading>.reveal{width:min(100%,980px)!important;max-width:980px!important}
+#producto .opp-product-heading h2{white-space:nowrap!important;text-align:center!important;font-size:clamp(34px,5vw,74px)!important;line-height:1.12!important;margin:8px 0 18px!important}
+#producto .opp-product-label{display:block!important;width:fit-content!important;margin:0 0 8px 0!important;text-align:left!important}
+#producto .opp-product-heading .side{max-width:600px!important;width:100%!important;margin:0 auto!important;text-align:center!important;line-height:1.65!important}
+#producto .types-explain{margin-top:20px!important}
+#quienes .q-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:clamp(32px,6vw,100px)!important}
+#quienes .q-grid>.reveal{display:contents}
+#quienes .q-grid .eyebrow,#quienes .q-grid .q-title{grid-column:1}
+#quienes .q-grid .q-body{grid-column:2;grid-row:1/span 2;align-self:center}
+#quienes .q-grid .q-title{margin-top:35px}
+#flow-remix{background:#f6f3ed!important;color:#0b1a28!important}
+#flow-remix .opp-centered-copy{text-align:left!important}
+#flow-remix .opp-centered-copy .side{margin-left:0!important;text-align:left!important}
+#acceso .entry-grid .entry{background:#0b2636!important;color:#f4f9fc!important;border-color:rgba(87,198,228,.24)!important}
+#acceso .entry-grid .entry h3,#acceso .entry-grid .entry p{color:#f4f9fc!important}
+#acceso .entry-grid .entry .opts-note,#acceso .entry-grid .entry .en{color:#9bbacb!important}
+#acceso .entry-grid .entry .ecta{background:#1f789f!important;color:#fff!important}
+#acceso .entry-grid .entry:hover{transform:translateY(-5px) scale(1.012)!important;border-color:#57c6e4!important;box-shadow:0 20px 38px rgba(0,0,0,.17)!important}
+@media(max-width:760px){#producto .opp-product-heading h2{font-size:clamp(30px,7vw,52px)!important}#quienes .q-grid{display:block!important}#quienes .q-grid>.reveal{display:block}#quienes .q-grid .q-body{margin-top:22px}}
+</style>
+<style id="rafa-evidence-fixes">
+/* Header position and identity must not change on scroll */
+#hdr,#hdr.sc{transform:none!important;top:0!important}
+#hdr .actions{flex-shrink:0!important}
+#producto .uni-card{transition:box-shadow .32s ease,transform .32s ease,filter .32s ease!important}
+#producto .uni-card:hover{transform:scale(1.008)!important;filter:brightness(1.035)!important;box-shadow:0 0 18px rgba(87,198,228,.12)!important}
+#producto .uni-card:hover,#producto .uni-card:hover *{background-color:unset}
+.home-servicers{padding:clamp(65px,8vw,115px) 0!important}
+.home-servicers .hs-grid{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:center!important;gap:clamp(28px,4vw,70px)!important}
+.home-servicers .hs-copy{max-width:590px}
+.home-servicers .hs-copy h2{font-size:clamp(34px,3.6vw,56px)!important;line-height:1.15!important}
+.home-servicers .hs-copy p{max-width:490px!important;line-height:1.7!important}
+.home-servicers .hs-copy .btn{margin-top:22px}
+.portfolio-preview{background:#091b29;color:#eef7fa;border:1px solid rgba(87,198,228,.45);border-radius:15px;padding:24px;box-shadow:0 20px 55px rgba(0,0,0,.2);min-width:0}
+.portfolio-top{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:22px}.portfolio-top span{font-size:11px;letter-spacing:.14em;color:#57c6e4}
+.portfolio-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.portfolio-stats>div{background:#142633;border:1px solid #29404c;padding:16px 12px;border-radius:10px}.portfolio-stats small{display:block;color:#8daab9;font-size:10px;letter-spacing:.08em}.portfolio-stats b{display:block;color:#fff;font-size:26px;margin-top:7px}
+.portfolio-chart{height:110px;display:flex;align-items:end;gap:7px;border-bottom:1px solid #365160;margin:22px 0}.portfolio-chart i{display:block;flex:1;background:linear-gradient(#55c8e4,#16729b);border-radius:4px 4px 0 0}
+.portfolio-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #213746;font-size:12px}.portfolio-row b{color:#55c8e4}.portfolio-row span{flex:1;color:#bacbd5}.portfolio-row em{font-style:normal;font-size:10px;color:#9ce4f4;background:#173b4a;border-radius:20px;padding:6px}
+.portfolio-disclaimer{display:block;color:#7794a4;margin-top:15px;font-size:11px}
+#flow-remix .opp-centered-copy h2{font-size:clamp(38px,4.5vw,72px)!important;line-height:1.13!important}
+#flow-remix .opp-centered-copy .side{max-width:720px!important}
+#flow-remix .flow-action{display:inline-flex;background:#2686a9!important;color:white!important;margin:20px 0 0}
+#flow-remix .flow-premium .card h3{color:#57c6e4!important}
+#flow-remix .flow-premium .card .dot{background:#123d56!important;color:white!important;border-color:#57c6e4!important}
+#flow-remix .flow-premium .card .connector:after{content:"";position:absolute;right:-4px;top:-5px;border-left:9px solid #57c6e4;border-top:5px solid transparent;border-bottom:5px solid transparent}
+#tecnologia .grid3{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;margin-top:48px!important;border:1px solid #304b5c;border-radius:12px;overflow:hidden}
+#tecnologia .grid3>.card{background:#102738!important;border-radius:0!important;border:0!important;border-right:1px solid #304b5c!important;padding:28px!important;transition:background .25s,color .25s,transform .25s}
+#tecnologia .grid3>.card:hover{background:#f6f3ed!important;transform:none!important}
+#tecnologia .grid3>.card:hover h3,#tecnologia .grid3>.card:hover p,#tecnologia .grid3>.card:hover .kicker{color:#0b1a28!important}
+@media(max-width:800px){.home-servicers .hs-grid{grid-template-columns:1fr!important}#tecnologia .grid3{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+@media(max-width:500px){#tecnologia .grid3{grid-template-columns:1fr!important}.portfolio-row{flex-wrap:wrap}}
+</style><style id="rafa-exact-visual-corrections">
+/* Universo: no hover ni inversión de color en las dos cajas, ni de sus descendientes */
+#producto .uni-card,#producto .uni-card:hover,#producto .uni-card:focus-within,
+body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
+ transform:none!important;filter:none!important;box-shadow:none!important;transition:none!important;
+}
+#producto .uni-card:hover *,#producto .uni-card:focus-within *{transform:none!important;filter:none!important}
+#producto .uni-card:not(.uni-hi),#producto .uni-card:not(.uni-hi):hover{background:rgba(255,255,255,.04)!important;color:#fff!important}
+#producto .uni-card.uni-hi,#producto .uni-card.uni-hi:hover{background:#f7f5f0!important;color:#0c1d28!important}
+#producto .uni-card.uni-hi p,#producto .uni-card.uni-hi:hover p{color:#243748!important}
+#producto .uni-card.uni-hi .uni-k,#producto .uni-card.uni-hi:hover .uni-k{color:#0c1d28!important}
+#producto .uni-card:not(.uni-hi) p,#producto .uni-card:not(.uni-hi):hover p{color:#c6d6e0!important}
+#quienes .q-grid{display:block!important}
+#quienes .q-grid>.reveal{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:clamp(45px,6vw,100px)!important;align-items:start!important}
+#quienes .q-grid .eyebrow,#quienes .q-grid .q-title{grid-column:1!important;grid-row:auto!important}
+#quienes .q-grid .q-title{margin-top:24px!important;font-size:clamp(37px,3.9vw,61px)!important;line-height:1.12!important}
+#quienes .q-grid .q-body{grid-column:2!important;grid-row:1/span 2!important;margin-top:12px!important;align-self:center!important}
+#flow-remix .opp-centered-copy{width:100%!important;max-width:none!important;text-align:left!important;margin:0 0 55px!important;padding:0!important}
+#flow-remix .opp-centered-copy h2{width:100%!important;max-width:none!important;font-size:clamp(38px,4.8vw,82px)!important;line-height:1.07!important;letter-spacing:-.045em!important;margin:0!important;text-align:left!important}
+#flow-remix .opp-centered-copy .eyebrow{margin-left:0!important}
+#flow-remix .opp-centered-copy .side{max-width:800px!important;margin:20px 0 0!important}
+#flow-remix .flow-action{background:#2686a9!important;color:#fff!important;margin-top:24px!important}
+#flow-remix .flow-premium .card:hover{background:#f6f3ed!important}
+#flow-remix .flow-premium .card:hover h3{color:#102738!important}
+#flow-remix .flow-premium .card:hover p{color:#263d4b!important}
+#flow-remix .flow-premium .card:hover .dot{background:#102738!important;color:white!important}
+#flow-remix .flow-premium .card .connector{position:absolute!important;top:25px!important;left:55px!important;right:0!important;height:2px!important;background:#57c6e4!important}
+#flow-remix .flow-premium .card .connector:after{right:0!important;top:-4px!important}
+#flow-remix .flow-premium .card:last-child:before{content:"";position:absolute;top:25px;left:55px;right:0;height:2px;background:#57c6e4}
+#flow-remix .flow-premium .card:last-child:after{content:"";position:absolute;top:21px;right:0;border-left:9px solid #57c6e4;border-top:5px solid transparent;border-bottom:5px solid transparent}
+#tecnologia .grid3>.card:hover h3,#tecnologia .grid3>.card:hover p{color:#102738!important}
+#tecnologia .grid3>.card:hover .kicker{color:#102738!important}
+#tecnologia .grid3>.card h3{color:#fff!important}
+#tecnologia .grid3>.card p{color:#a6bac6!important}
+#acceso .access-final{gap:26px!important}
+#acceso .access-final .entry{background:#0b2130!important;border:1px solid #235268!important;border-radius:17px!important;padding:40px!important;min-height:580px!important;display:flex!important;flex-direction:column!important}
+#acceso .access-final .entry .ei{color:#57c6e4!important;background:#17394b!important;border:1px solid #296078!important;width:65px!important;height:65px!important}
+#acceso .access-final .entry .en{color:#57c6e4!important;margin-top:10px!important}
+#acceso .access-final .entry h3{color:white!important;font-size:29px!important}
+#acceso .access-final .entry p{color:#b9ccd7!important;font-size:15px!important;line-height:1.7!important}
+#acceso .access-badges{display:flex;gap:14px;min-height:54px;margin-top:30px}
+#acceso .access-badges span{display:grid;place-items:center;width:52px;height:52px;border-radius:10px;background:#173d50;color:#57c6e4;font-weight:700;font-size:20px}
+#acceso .access-detail{margin-top:18px;color:#d5e2ea;line-height:1.65;font-size:14px;flex:1}
+#acceso .access-final .ecta{margin-top:25px!important;min-height:66px!important;background:#246c90!important;color:#fff!important}
+#acceso .access-final .inversor .ecta{background:#57c6e4!important;color:#092333!important}
+#acceso .access-final .entry:hover{transform:translateY(-5px)!important;box-shadow:0 24px 45px rgba(0,0,0,.16)!important}
+@media(max-width:800px){#quienes .q-grid>.reveal{display:block!important}#quienes .q-grid .q-body{margin-top:30px!important}#flow-remix .flow-premium{grid-template-columns:1fr 1fr!important}#acceso .access-final{grid-template-columns:1fr!important}}
+@media(max-width:520px){#flow-remix .flow-premium{grid-template-columns:1fr!important}#acceso .access-final .entry{min-height:0!important}}
+</style>
+<style id="rafa-static-universe-and-philosophy-20261011">
+/* Approved reference: three-line philosophy heading and stable editorial proportions. */
+@media(min-width:901px){
+#quienes .q-grid>.reveal{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;column-gap:clamp(54px,5vw,96px)!important}
+#quienes .q-grid .q-title{font-size:clamp(38px,3.15vw,60px)!important;line-height:1.075!important;letter-spacing:-.035em!important;margin-top:24px!important}
+}
+@media(max-width:900px){#quienes .philosophy-desktop-break{display:none!important}}
+/* The two universe description cards are NEVER interactive; the switch below is independent. */
+#producto .uni-card,#producto .uni-card:hover,#producto .uni-card:focus,#producto .uni-card:focus-within,
+body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{
+ transform:none!important;filter:none!important;box-shadow:none!important;
+ transition:none!important;animation:none!important;cursor:default!important;
+}
+#producto .uni-card:not(.uni-hi),#producto .uni-card:not(.uni-hi):hover,#producto .uni-card:not(.uni-hi):focus-within{background:#14212d!important;border-color:#2b3b4b!important}
+#producto .uni-card.uni-hi,#producto .uni-card.uni-hi:hover,#producto .uni-card.uni-hi:focus-within{background:#0b2e40!important;border-color:#20799d!important}
+#producto .uni-card *,#producto .uni-card:hover *,#producto .uni-card:focus-within *{transform:none!important;filter:none!important;transition:none!important;animation:none!important}
+#producto .uni-card:not(.uni-hi) .uni-k,#producto .uni-card:not(.uni-hi):hover .uni-k{color:#9bbacb!important}
+#producto .uni-card.uni-hi .uni-k,#producto .uni-card.uni-hi:hover .uni-k{color:#57c6e4!important}
+#producto .uni-card p,#producto .uni-card:hover p{color:#c6d6e0!important}
+</style>
+<style id="rafa-final-layout-contrast-20261011">
+@media(min-width:901px){
+#quienes .q-grid{display:block!important}
+#quienes .q-grid>.reveal{display:grid!important;grid-template-columns:minmax(0,1.28fr) minmax(0,.72fr)!important;column-gap:clamp(30px,3vw,58px)!important;align-items:start!important}
+#quienes .q-grid .q-title{font-size:clamp(29px,2.65vw,43px)!important;line-height:1.12!important;letter-spacing:-.035em!important;max-width:none!important;width:100%!important;grid-column:1!important}
+#quienes .q-grid .q-body{grid-column:2!important;grid-row:1/span 2!important}
+}
+#producto .uni-card,#producto .uni-card:hover,body.acuerdos #producto .uni-card,body.acuerdos #producto .uni-card:hover{color:#e9f2f7!important;transition:none!important;transform:none!important;animation:none!important}
+#producto .uni-card p,body.acuerdos #producto .uni-card p,#producto .uni-card:hover p,body.acuerdos #producto .uni-card:hover p{color:#d5e4ee!important;opacity:1!important;-webkit-text-fill-color:#d5e4ee!important}
+#producto .uni-card .uni-k,body.acuerdos #producto .uni-card .uni-k{color:#78cde6!important;-webkit-text-fill-color:#78cde6!important}
+#producto .uni-card .uni-tag,body.acuerdos #producto .uni-card .uni-tag{color:#fff!important;-webkit-text-fill-color:#fff!important}
+</style>
+<style id="rafa-philosophy-wide-right-20261011">
+@media(min-width:901px){
+#quienes .q-grid{display:block!important;width:100%!important;max-width:none!important}
+#quienes .q-grid>.reveal{display:grid!important;grid-template-columns:minmax(0,46%) minmax(0,54%)!important;column-gap:0!important;width:100%!important;align-items:center!important}
+#quienes .q-grid .eyebrow,#quienes .q-grid .q-title{grid-column:1!important}
+#quienes .q-grid .q-title{font-size:clamp(29px,2.65vw,43px)!important;max-width:none!important}
+#quienes .q-grid .q-body{grid-column:2!important;grid-row:1/span 2!important;width:100%!important;max-width:none!important;padding-left:clamp(20px,2vw,38px)!important;margin-left:0!important;justify-self:stretch!important;align-self:center!important}
+#quienes .q-grid .q-body p{max-width:none!important;width:100%!important}
+}
+</style>
+<style id="rafa-philosophy-heading-up-larger-20261011">
+@media(min-width:901px){
+#quienes .q-grid>.reveal{align-items:start!important}
+#quienes .q-grid .q-title{align-self:start!important;margin-top:clamp(42px,4.5vw,82px)!important;font-size:clamp(34px,3.05vw,52px)!important;line-height:1.08!important;letter-spacing:-.04em!important}
+#quienes .q-grid .q-body{align-self:start!important;margin-top:0!important}
+}
+</style>
+<style id="opp-unified-menu">header,header.sc,header.opp-scrolled{background:rgba(7,22,35,.12)!important;border-bottom:1px solid rgba(117,171,198,.27)!important;backdrop-filter:blur(12px)!important;-webkit-backdrop-filter:blur(12px)!important}header .brand img,header .brand-logo-img,header .nav img{filter:brightness(0) invert(1)!important}header .menu a,header .navitem>a,header .back{color:#e5edf3!important;font-weight:600!important}header .menu a.active,header .navitem>a.active,header .mobile a.active{color:#4ac1e6!important;font-weight:800!important;text-decoration:none!important}header .burger{color:#fff!important}header .burger span,header .burger span::before,header .burger span::after{background:#fff!important}header .mobile a{font-weight:600!important}header .mobile a.active{font-weight:800!important;color:#4ac1e6!important}</style><style id="opp-deal-click-fix">.uni-tag,.uni-tag:hover{transform:none!important;filter:none!important;box-shadow:none!important;transition:none!important} .deal[data-href]{cursor:pointer}</style><style id="opp-final-polish-20261013">
+/* Home philosophy: align editorial heading with copy, without altering the approved text */
+#quienes .q-human{align-items:start!important}
+#quienes .q-human>div:first-child{align-self:start!important}
+#quienes .q-human .eyebrow{margin-bottom:18px!important}
+#quienes .q-human .q-title{margin-top:0!important;font-size:clamp(38px,4vw,64px)!important;line-height:1.04!important;letter-spacing:-.045em!important}
+#quienes .q-human .q-body{margin-top:0!important}
+#quienes .q-human .q-body p{font-size:clamp(16px,1.25vw,20px)!important}
+#producto .uni-card .uni-tag,#producto .uni-card:hover .uni-tag{transform:none!important;filter:none!important;box-shadow:none!important;transition:none!important}
+#producto .uni-card:hover .uni-tag{background:rgba(46,154,198,.28)!important;color:#fff!important}
+body.acuerdos #producto .uni-card:hover .uni-tag{background:rgba(46,154,198,.28)!important}
+#producto .modeswitch .ms-btn:hover{transform:none!important;box-shadow:none!important;filter:none!important}
+#hdr .menu a{color:#f2f8fb!important;font-weight:600!important;text-shadow:0 1px 6px rgba(0,0,0,.3)}
+#hdr .menu a.active,#hdr .menu a[aria-current="page"]{color:#62cdec!important;font-weight:800!important}
+#hdr .brand-logo-img{filter:brightness(0) invert(1)!important}
+@media(max-width:850px){#quienes .q-human{grid-template-columns:1fr!important;gap:28px!important}#quienes .q-human .q-title{font-size:clamp(34px,7vw,54px)!important}}
+</style><link rel="stylesheet" href="/oportuniia-header-unified.css?v=20261013-final3"><link rel="stylesheet" href="/oportuniia-public.css"><style id="progressive-trust-layout">
+/* Progressive trust: spacious editorial copy and three stacked steps. */
+.access-explanation{position:relative;isolation:isolate;overflow:visible;margin-top:64px;padding:0;border:0;border-radius:0;background:transparent;color:#f4fbfe;box-shadow:none}
+.access-explanation::before{content:"";position:absolute;inset:-18px -12px;z-index:-1;pointer-events:none;background:linear-gradient(108deg,transparent 15%,rgba(87,198,228,.025) 36%,rgba(133,214,255,.14) 49%,rgba(87,198,228,.025) 62%,transparent 85%);clip-path:inset(0 100% 0 0);animation:trustOpenLight 10s ease-in-out infinite}
+@keyframes trustOpenLight{0%,8%{clip-path:inset(0 100% 0 0);opacity:0}16%{opacity:1}35%{clip-path:inset(0 0 0 0);opacity:1}48%,100%{clip-path:inset(0 0 0 100%);opacity:0}}
+.access-explanation .trust-heading{position:static;background:transparent!important;border:0!important;backdrop-filter:none!important;margin-bottom:38px}
+.access-explanation .eyebrow{color:#80d0df;line-height:1.8}
+.access-explanation h3{font-size:clamp(27px,3.2vw,46px);line-height:1.18;letter-spacing:-.035em;margin:0;color:#f4fbfe}
+.access-explanation h3 span{display:block}
+.trust-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:clamp(32px,5vw,76px);align-items:start}
+.trust-copy p{color:#c5d6e0;font-size:clamp(14px,1.1vw,16px);line-height:1.9;margin:0 0 24px;max-width:none}
+.trust-copy .btn{margin-top:8px;white-space:normal;text-align:center}
+.access-explanation .trust-steps{display:grid;grid-template-columns:1fr;gap:16px;list-style:none;padding:0;margin:0;color:#e8f3fa}
+.trust-steps li{border:1px solid #365b70;background:#102c3e;border-radius:14px;padding:23px 25px;transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease,background .3s ease;transform-origin:center}
+.trust-steps li b{display:block;font-size:16px;color:#edf7fc;line-height:1.5}
+.trust-steps li p{font-size:13px;line-height:1.75;color:#bcd1df;margin:9px 0 0}
+.trust-steps li:hover{transform:scale(1.025);background:#173a4e;border-color:#7bcce5;box-shadow:0 8px 30px #57c6e41f}
+@keyframes trustBeam{0%,12%{transform:translateX(-80%) skewX(-12deg);opacity:0}20%{opacity:1}42%,100%{transform:translateX(95%) skewX(-12deg);opacity:0}}
+@media(max-width:850px){.trust-layout{grid-template-columns:1fr;gap:30px}.access-explanation .trust-heading{margin-bottom:28px}.trust-steps li{padding:21px}.trust-copy p{line-height:1.8}}
+@media(prefers-reduced-motion:reduce){.access-explanation::before{animation:none;display:none}.trust-steps li{transition:none}.trust-steps li:hover{transform:none}}
+</style><link rel="stylesheet" href="/early-access.css"></head>
 <body data-testid="v03-body">
 <div class="atmos" aria-hidden="true"></div>
 
@@ -1154,16 +1396,18 @@ body.acuerdos .vip-cta-mod{
 <header id="hdr" data-testid="site-header">
   <div class="wrap">
     <div class="nav">
-      <a href="#top" class="brand" data-testid="brand-logo">
+      <a href="/" class="brand" data-testid="brand-logo">
         <img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" class="brand-logo-img">
       </a>
       <nav class="menu" data-testid="main-nav">
         <div class="navitem"><a href="/nuestra-filosofia">Nuestra filosofía</a></div>
         <div class="navitem"><a href="/como-funciona">Cómo funciona</a></div>
-        <div class="navitem"><a href="/oportunidades">Oportunidades</a></div>
+        <div class="navitem"><a href="/oportunidades#producto">Oportunidades</a></div>
+        <div class="navitem"><a href="/tecnologia">Tecnología</a></div>
         <div class="navitem"><a href="/grupo-oportuniia">Grupo OPORTUNIIA</a></div>
+        
         <div class="navitem"><a href="/contacto">Contacto</a></div>
-        <div class="navitem"><a href="/servicers">Servicers</a></div>
+        <div class="navitem"><a href="/servicers">Canal profesional</a></div>
       </nav>
       <div class="actions">
         <a href="/acceso" class="btn" data-testid="nav-register">Login / Registro <i data-lucide="log-in" style="width:16px;height:16px"></i></a>
@@ -1177,17 +1421,19 @@ body.acuerdos .vip-cta-mod{
 <div class="mmenu" id="mmenu" data-testid="mobile-menu">
   <a href="/nuestra-filosofia">Nuestra filosofía</a>
   <a href="/como-funciona">Cómo funciona</a>
-  <a href="/oportunidades">Oportunidades</a>
+  <a href="/oportunidades#producto">Oportunidades</a>
+  <a href="/tecnologia">Tecnología</a>
   <a href="/grupo-oportuniia">Grupo OPORTUNIIA</a>
+  
   <a href="/contacto">Contacto</a>
-  <a href="/servicers">Servicers</a>
+  <a href="/servicers">Canal profesional</a>
   <a href="/acceso" class="btn">Login / Registro</a>
 </div>
 
 <span id="top"></span>
 
 <!-- ================= HERO ================= -->
-<section class="hero" id="hero" data-testid="hero">
+<section class="hero opp-centered" id="hero" data-testid="hero">
   <div class="wrap">
     <div class="hero-grid">
       <div>
@@ -1198,7 +1444,7 @@ body.acuerdos .vip-cta-mod{
         <div class="hero-bottom">
           <p class="hero-lead">Seleccionamos, analizamos y estructuramos oportunidades de inversión en deuda e inmuebles, tanto en ejecuciones judiciales como mediante acuerdos.</p>
           <div class="hero-cta">
-            <a href="/oportunidades" class="btn" data-testid="hero-cta-primary">Ver oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
+            <a href="/oportunidades#producto" class="btn" data-testid="hero-cta-primary">Ver oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
             <a href="/nuestra-filosofia" class="btn line" data-testid="hero-cta-secondary">Conocer OPORTUNIIA</a>
           </div>
         </div>
@@ -1222,15 +1468,15 @@ body.acuerdos .vip-cta-mod{
 </section>
 
 <!-- ================= OPORTUNIDADES ================= -->
-<section class="sec" id="producto" data-testid="producto">
+<section class="sec opp-compact" id="producto" data-testid="producto">
   <div class="prod-hero">
     <div class="wrap">
-      <div class="sec-head">
+      <div class="sec-head opp-product-heading">
         <div class="reveal">
-          <div class="eyebrow" style="margin-bottom:22px">Oportunidades</div>
+          <div class="eyebrow opp-product-label" style="margin-bottom:18px;text-align:center;width:100%">Oportunidades</div>
           <h2>NPL, CDR y REO<span class="dot">.</span></h2>
+          <div class="side reveal d1">Tres formas de entrar en una operación.<br>Mostramos lo necesario para entenderla; el detalle completo se facilita con acceso profesional.</div>
         </div>
-        <div class="side reveal d1">Tres formas de entrar en una operación. Mostramos lo necesario para entenderla; el detalle completo se facilita con acceso profesional.</div>
       </div>
     </div>
   </div>
@@ -1253,7 +1499,7 @@ body.acuerdos .vip-cta-mod{
       </div>
     </div>
     <div class="universe-intro reveal" data-testid="universe-intro">
-      <h3>Dos universos.<br class="d-break"> Una diferencia importante.</h3>
+      <h3>Dos vías de actuación.<br class="d-break"> Una diferencia importante.</h3>
       <div class="uni-grid">
         <div class="uni-card" data-testid="uni-judicial">
           <span class="uni-k">Ejecuciones Judiciales</span>
@@ -1266,10 +1512,6 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
     </div>
-    <div class="universe-cta reveal d1" data-testid="universe-cta">
-      <a href="/oportunidades" class="btn universe-go">Explorar oportunidades <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-      <span>Consulta el catálogo completo y filtra por producto, fase, ubicación y estado.</span>
-    </div>
     <div class="modeswitch reveal d1" id="acuerdos" data-testid="mode-switch">
       <span class="ms-cue" data-testid="ms-cue">Explora los dos universos</span>
       <div class="ms-pill ms-obvious" data-testid="mode-indicator">
@@ -1279,9 +1521,10 @@ body.acuerdos .vip-cta-mod{
       <span class="ms-help">Selecciona el universo que quieres explorar</span>
     </div>
     <div class="acu-surface" data-testid="acu-surface">
-    <div class="deal-grid grid-rec">
+    <div id="early-catalog-status" role="status" aria-live="polite"><p>Consultando las oportunidades publicadas…</p></div>
+    <div class="deal-grid grid-rec" hidden data-illustrative-catalog>
       <!-- NPL -->
-      <div class="deal reveal d1" data-testid="deal-npl">
+      <div class="deal reveal d1" data-testid="deal-npl" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1755441067629-8755d974a90b?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Edificio de viviendas" loading="lazy">
           <span class="deal-tag">NPL</span>
@@ -1301,7 +1544,7 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
       <!-- CDR · CESIÓN DE REMATE -->
-      <div class="deal reveal d2" data-testid="deal-cdr">
+      <div class="deal reveal d2" data-testid="deal-cdr" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1663293761246-56a9b0693052?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Apartamentos turísticos" loading="lazy">
           <span class="deal-tag">CDR</span>
@@ -1321,7 +1564,7 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
       <!-- REO · ACTIVO ADJUDICADO -->
-      <div class="deal reveal d3" data-testid="deal-reo">
+      <div class="deal reveal d3" data-testid="deal-reo" data-href="/acceso">
         <div class="deal-media">
           <img src="https://images.unsplash.com/photo-1758789667762-56175fe4601c?crop=entropy&cs=srgb&fm=jpg&q=85&w=900" alt="Nave logística" loading="lazy">
           <span class="deal-tag">REO</span>
@@ -1341,7 +1584,7 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
     </div>
-    <div class="deal-grid grid-acu">
+    <div class="deal-grid grid-acu" hidden data-illustrative-catalog>
       <!-- REO · VIVIENDA CON ACUERDO -->
       <div class="deal" data-testid="deal-acu-reo">
         <div class="deal-media">
@@ -1424,25 +1667,25 @@ body.acuerdos .vip-cta-mod{
         <p class="vip-fine">Acceso sujeto a validación profesional.</p>
       </div>
     </div>
-    <p class="deal-note reveal d2" style="margin-top:30px;font-size:11px;opacity:.6">* Datos demostrativos.</p>
+    <template id="opportunities-trust-template">
+    <section class="access-explanation" aria-labelledby="protected-opportunities">
+      <div class="eyebrow" style="margin-bottom:18px">INFORMACIÓN PROTEGIDA · CONFIANZA PROGRESIVA</div>
+      <div class="trust-layout"><div class="trust-copy"><header class="trust-heading"><h3 id="protected-opportunities"><span>Primero nos conocemos.</span><span>Después, avanzamos juntos.</span></h3></header><p>Las operaciones, cifras e imágenes de este escaparate son ficticias y demostrativas. No representan expedientes reales disponibles para contratar.</p><p>La documentación de una operación real puede contener datos personales, deudas y actuaciones judiciales. Registrarte con un nombre y un email inicia el proceso: el acceso se amplía según la identidad y documentación verificadas y el permiso específico para cada operación.</p><p>Para contratar Premium o reservar, tu perfil debe estar completo al 100% y verificado y contrastado por OPORTUNIIA. Premium añade servicios y acceso al Universo Acuerdos para perfiles autorizados. Pagar o subir archivos no sustituye la revisión ni concede acceso automático a documentación sensible.</p><a class="btn" href="/acceso#registro">Conocer el proceso y completar mi perfil</a></div><ol class="trust-steps" aria-label="Cómo avanzamos juntos"><li><b>01 · Nos presentamos</b><p>Nos cuentas quién eres, si inviertes o colaboras y qué buscas. El registro inicia nuestra relación.</p></li><li><b>02 · Verificamos tu perfil</b><p>Revisamos tu identidad, representación y la documentación que corresponda a tu caso. Te indicamos qué falta y por qué lo necesitamos.</p></li><li><b>03 · Avanzamos por operación</b><p>Con tu perfil verificado y los permisos correspondientes, ampliamos la información disponible de cada oportunidad. Los documentos sensibles requieren autorización específica.</p></li></ol></div>
+    </section>
+    </template>
   </div>
 </section>
 
+
 <!-- ================= FONDOS & SERVICERS · HOME ================= -->
-<section class="home-servicers" data-testid="home-servicers">
-  <div class="wrap">
-    <div class="hs-grid reveal">
-      <div>
-        <div class="eyebrow" style="margin-bottom:18px">Fondos & Servicers</div>
-        <h2>Producto, seguimiento y una entrada directa al ecosistema.</h2>
-        <p>Un espacio específico para organizaciones que aportan cartera y necesitan entender cómo avanza cada operación, qué información requiere y qué salida alcanza.</p>
-      </div>
-      <div class="hs-actions">
-        <a href="/servicers" class="btn">Conocer el espacio Servicers <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-      </div>
-    </div>
-  </div>
-</section>
+<section class="home-servicers" data-testid="home-servicers"><div class="wrap"><div class="hs-grid reveal"><div class="hs-copy"><div class="eyebrow" style="margin-bottom:18px">Carteras · Producto · Seguimiento</div><h2>Una infraestructura para convertir cartera en oportunidades.</h2><p>Producto, contexto y seguimiento para entender cada operación y valorar su mejor salida.</p><a href="/servicers" class="btn">Conocer el canal profesional <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a></div><div class="portfolio-preview" aria-label="Vista ilustrativa del panel de cartera">
+<div class="portfolio-top"><strong>Panel de cartera</strong><span>● EN VIVO</span></div>
+<div class="portfolio-stats"><div><small>EN CARTERA</small><b>128</b></div><div><small>EN ANÁLISIS</small><b>34</b></div><div><small>ACUERDOS</small><b>46</b></div></div>
+<div class="portfolio-chart" aria-hidden="true"><i style="height:38%"></i><i style="height:51%"></i><i style="height:46%"></i><i style="height:64%"></i><i style="height:57%"></i><i style="height:78%"></i><i style="height:69%"></i><i style="height:88%"></i><i style="height:82%"></i><i style="height:100%"></i></div>
+<div class="portfolio-row"><b>OP-1042</b><span>Residencial · garantía hipotecaria</span><em>EN CURSO</em></div>
+<div class="portfolio-row"><b>OP-1039</b><span>Comercial · cesión de remate</span><em>ACUERDO</em></div>
+<div class="portfolio-row"><b>OP-1028</b><span>Industrial · activo adjudicado</span><em>EN REVISIÓN</em></div>
+<small class="portfolio-disclaimer">Vista ilustrativa de la interfaz · datos no reales.</small></div></div></div></section>
 
 <!-- ================= QUIÉNES SOMOS ================= -->
 <section class="sec quienes" id="quienes" data-testid="quienes">
@@ -1450,7 +1693,7 @@ body.acuerdos .vip-cta-mod{
     <div class="q-grid q-human">
       <div class="reveal">
         <div class="eyebrow" style="margin-bottom:24px">Nuestra filosofía</div>
-        <h2 class="q-title">Detrás de cada deuda hay una solución que merece ser explorada.</h2>
+        <h2 class="q-title">Detrás de cada deuda hay<br class="philosophy-desktop-break"> una solución que merece<br class="philosophy-desktop-break"> ser explorada.</h2>
         <div class="q-body">
           <p>Antes de asumir que el recorrido debe ser judicial, buscamos entender la operación, las circunstancias y las alternativas posibles. Siempre que existe una vía razonable de acuerdo, <b>trabajamos para impulsarla</b>.</p>
           <p>Porque resolver antes, reducir incertidumbre y encontrar un punto de encuentro puede generar más valor para todas las partes.</p>
@@ -1459,6 +1702,27 @@ body.acuerdos .vip-cta-mod{
         </div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+
+<!-- ================= TECNOLOGÍA · HOME REMIX ================= -->
+<section class="sec" id="tecnologia" data-testid="home-technology-remix" style="background:#0A1622;color:#eef6fa">
+  <div class="wrap">
+    <div class="hs-grid reveal">
+      <div>
+        <div class="eyebrow" style="margin-bottom:18px;color:#57C6E4">Tecnología propia</div>
+        <h2 style="font-size:clamp(34px,4.4vw,58px);color:#fff">Tecnología que nos ayuda<br>a tomar mejores decisiones.</h2>
+        <div class="editorial-copy" style="margin-top:18px;color:#B9CDD8;max-width:720px"><p>Hemos desarrollado herramientas propias para analizar, estructurar, contrastar y presentar cada operación.</p><p><strong style="color:#fff">La tecnología al servicio de la operación.</strong></p></div>
+      </div>
+      <div class="hs-actions"><a href="/tecnologia" class="btn">Conoce nuestra tecnología <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a></div>
+    </div>
+    <div class="grid3" style="grid-template-columns:repeat(4,1fr);gap:14px;margin-top:34px">
+      <div class="card opp-dark"><div class="kicker">01</div><h3>Analizar</h3><p>Leer y ordenar la información para entender cada operación a fondo.</p></div>
+      <div class="card opp-dark"><div class="kicker">02</div><h3>Estructurar</h3><p>Dar forma jurídica y financiera a cada operación sobre una base sólida.</p></div>
+      <div class="card opp-dark"><div class="kicker">03</div><h3>Contrastar</h3><p>Comparar escenarios y posibles salidas antes de decidir la mejor vía.</p></div>
+      <div class="card opp-dark"><div class="kicker">04</div><h3>Presentar</h3><p>Mostrar cada oportunidad con claridad, para decidir con criterio y agilidad.</p></div>
     </div>
   </div>
 </section>
@@ -1474,40 +1738,24 @@ body.acuerdos .vip-cta-mod{
       <div class="side reveal d1">Inversor, colaborador o suscriptor. Tres formas distintas de relacionarte con OPORTUNIIA.</div>
     </div>
 
-    <div class="entry-grid">
-      <div class="entry feat reveal d1" data-testid="entry-inversor">
-        <span class="ei"><i data-lucide="trending-up"></i></span>
-        <div class="en">Para invertir</div>
-        <h3>Inversor</h3>
-        <p>Elige cómo quieres participar en cada oportunidad.</p>
-        <ul class="opts">
-          <li><span class="ob">A</span><span><b>Compra directa</b> — adquieres la oportunidad y continúas la operación por tu cuenta.</span></li>
-          <li><span class="ob">B</span><span><b>Compra + acompañamiento jurídico</b> — adquieres la oportunidad y puedes contar con acompañamiento jurídico durante el proceso.</span></li>
-          <li><span class="ob">C</span><span><b>Compra + comercialización posterior</b> — adquieres la oportunidad y OPORTUNIIA coordina la comercialización posterior conforme a sus condiciones.</span></li>
-          <li><span class="ob">D</span><span><b>Integral</b> — compra + acompañamiento jurídico + comercialización posterior, sujetos a las condiciones de cada servicio.</span></li>
-        </ul>
-        <a href="/acceso" class="ecta" data-testid="entry-inversor-cta">Darse de alta <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+    <div class="entry-grid access-final">
+      <div class="entry reveal inversor" data-testid="entry-inversor">
+        <span class="ei"><i data-lucide="trending-up"></i></span><div class="en">Para invertir</div><h3>Inversor</h3>
+        <p>Creas tu cuenta y participas en las operaciones que elijas.</p><div class="access-badges"><span>A</span><span>B</span><span>C</span><span>D</span></div>
+        <div class="access-detail">Como inversor eliges la modalidad <strong>operación a operación</strong>, no al registrarte ni de forma permanente. Podrás elegir la modalidad que mejor encaje contigo en cada oportunidad.</div>
+        <a href="/registro?rol=inversor" class="ecta">Darse de alta <i data-lucide="arrow-up-right"></i></a>
       </div>
-
-      <div class="entry reveal d2" data-testid="entry-colaborador">
-        <span class="ei"><i data-lucide="handshake"></i></span>
-        <div class="en">Para colaborar</div>
-        <h3>Colaborador</h3>
-        <p>Encuentra la oportunidad adecuada para tu cliente y elige cómo quieres estructurar la operación.</p>
-        <ul class="opts">
-          <li><span class="ob">A</span><span><b>Resultado compartido</b> — la operación se trabaja conjuntamente y la participación económica se estructura según las condiciones aplicables.</span></li>
-          <li><span class="ob">B</span><span><b>Mantienes a tu cliente</b> — conservas íntegramente tu relación comercial y OPORTUNIIA participa en la estructura y ejecución según corresponda.</span></li>
-        </ul>
-        <a href="/contacto" class="ecta" data-testid="entry-colaborador-cta">Quiero colaborar <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+      <div class="entry reveal colaborador" data-testid="entry-colaborador">
+        <span class="ei"><i data-lucide="handshake"></i></span><div class="en">Para colaborar</div><h3>Colaborador</h3>
+        <p>Aportas oportunidades o clientes. La colaboración no es un alta automática: se solicita y OPORTUNIIA la revisa antes de continuar.</p><div class="access-badges"><span>A</span><span>B</span></div>
+        <div class="access-detail">Las modalidades de colaboración A/B se determinan en el momento de formalizar el contrato de colaboración, de acuerdo con las condiciones aplicables.</div>
+        <a href="/solicitar-colaboracion" class="ecta">Solicitar colaboración <i data-lucide="arrow-up-right"></i></a>
       </div>
-
-      <div class="entry reveal d3" data-testid="entry-suscriptor">
-        <span class="ei"><i data-lucide="key-round"></i></span>
-        <div class="en">Ya formas parte</div>
-        <h3>Suscriptor</h3>
-        <p>Ya formas parte de OPORTUNIIA. Accede a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p>
-        <div class="opts-note">Tu acceso puede incluir oportunidades, documentación y servicios disponibles para tu perfil.</div>
-        <a href="/acceso" class="ecta" data-testid="entry-suscriptor-cta">Entrar <i data-lucide="arrow-up-right" style="width:15px;height:15px"></i></a>
+      <div class="entry reveal suscriptor" data-testid="entry-suscriptor">
+        <span class="ei"><i data-lucide="key-round"></i></span><div class="en">Ya formas parte</div><h3>Suscriptor</h3>
+        <p>Ya formas parte de OPORTUNIIA. Accede con tu código a tu entorno, tus operaciones y al contenido disponible según tus permisos.</p><div class="access-badges access-empty"></div>
+        <div class="access-detail"></div>
+        <a href="/login" class="ecta">Entrar con mi código <i data-lucide="arrow-up-right"></i></a>
       </div>
     </div>
 
@@ -1521,53 +1769,16 @@ body.acuerdos .vip-cta-mod{
         <div><i data-lucide="layers-3"></i><span><b>Universo Acuerdos</b><small>Acceso al universo de operaciones estructuradas disponible para perfiles Premium autorizados.</small></span></div>
         <div><i data-lucide="scan-search"></i><span><b>Perímetros personalizados</b><small>Define zonas, tipologías, productos y criterios para trabajar sobre un perímetro propio.</small></span></div>
         <div><i data-lucide="sliders-horizontal"></i><span><b>Screening avanzado</b><small>Filtra y acota oportunidades con mayor profundidad según tus preferencias.</small></span></div>
-        <div><i data-lucide="message-square-plus"></i><span><b>Peticiones a la carta</b><small>Solicita profundización, documentación o análisis adicional sobre oportunidades existentes cuando esté disponible y autorizado.</small></span></div>
+        <div><i data-lucide="message-square-plus"></i><span><b>Peticiones a la carta</b><small>Posibilidad de contratar encargos adicionales, sujetos a disponibilidad y autorización. Su ejecución se presupuesta aparte y no está incluida en la cuota Premium.</small></span></div>
         <div><i data-lucide="file-search"></i><span><b>Más documentación</b><small>Acceso a contenidos ampliados y reportajes disponibles para tu perfil y para cada operación.</small></span></div>
       </div>
       <div class="premium-action">
         <a href="/acceso" class="premium-btn">ACTIVAR PREMIUM <i data-lucide="arrow-right"></i></a>
-        <p>Acceso sujeto a validación profesional y disponibilidad del servicio.</p>
+        <p>Acceso sujeto a validación profesional. Los encargos adicionales requieren presupuesto y contratación independientes.</p>
       </div>
     </section>
 
-    <div class="register-cta reveal d3">
-      <div>
-        <span class="register-k">OPORTUNIIA</span>
-        <h3>Regístrate. Descubre cómo quieres participar.</h3>
-        <p>Accede a oportunidades, define tu perfil y empieza a construir tu propia forma de trabajar con OPORTUNIIA.</p>
-      </div>
-      <a href="/acceso" class="btn">Login / Registro <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a>
-    </div>
 
-    <p class="access-foot reveal d3">Inversores y colaboradores, sujetos a verificación profesional.</p>
-  </div>
-</section>
-
-<!-- ================= GRUPO OPORTUNIIA (último bloque editorial) ================= -->
-<section class="grupo sec" id="grupo" data-testid="grupo">
-  <div class="wrap">
-    <div class="sec-head">
-      <div class="reveal">
-        <div class="eyebrow" style="margin-bottom:20px">El grupo</div>
-        <h2>Grupo OPORTUNIIA.</h2>
-      </div>
-    </div>
-    <div class="grupo-grid">
-      <a href="#" class="gcard reveal d1" data-testid="grupo-living">
-        <div class="logo"><img src="/grupo/living.webp" alt="LIVING EXPERIENCE" loading="lazy"></div>
-        <div class="meta"><span><span class="t">LIVING EXPERIENCE</span><span class="s">La compra de Obra Nueva se convierte en experiencia</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
-      </a>
-      <a href="https://oportuniia.com" target="_blank" rel="noopener" class="gcard reveal d2" data-testid="grupo-oportuniia">
-        <div class="logo"><img src="/grupo/oportuniia.webp" alt="OPORTUNIIA" loading="lazy"></div>
-        <div class="meta"><span><span class="t">OPORTUNIIA</span><span class="s">Humanizamos la deuda.</span></span><span class="go"><i data-lucide="arrow-up-right"></i></span></div>
-      </a>
-      <div class="gcard soon reveal d3" data-testid="grupo-robotics">
-        <span class="gsoon">Próximamente</span>
-        <div class="logo"><img src="/grupo/robotics.webp" alt="ROBOTICS" loading="lazy"></div>
-        <div class="meta"><span><span class="t">ROBOTICS</span><span class="s">Optimizamos recursos para que las personas lleguen más lejos</span></span><span class="go"><i data-lucide="clock"></i></span></div>
-      </div>
-    </div>
-    <div class="home-more reveal"><a href="/grupo-oportuniia" class="btn line" style="color:#fff;border-color:rgba(255,255,255,.28)">Conocer Grupo OPORTUNIIA <i data-lucide="arrow-right" style="width:16px;height:16px"></i></a></div>
   </div>
 </section>
 
@@ -1583,15 +1794,8 @@ body.acuerdos .vip-cta-mod{
         <h4>OPORTUNIIA</h4>
         <a href="/nuestra-filosofia">Nuestra filosofía</a>
         <a href="/como-funciona">Cómo funciona</a>
-        <a href="/oportunidades">Oportunidades</a>
-        <a href="/servicers">Servicers</a>
-                <a href="/acceso">Acceso profesional</a>
-      </div>
-      <div class="foot-col">
-        <h4>Grupo OPORTUNIIA</h4>
-        <a href="/grupo-oportuniia">OPORTUNIIA</a>
-        <a href="/grupo-oportuniia">LIVING EXPERIENCE</a>
-        <span class="soon">ROBOTICS · Próximamente</span>
+        <a href="/oportunidades#producto">Oportunidades</a>
+        <a href="/servicers">Canal profesional</a><a href="/contacto">Contacto</a><a href="/acceso">Acceso profesional</a>
       </div>
       <div class="foot-col">
         <h4>Legal</h4>
@@ -1642,5 +1846,8 @@ body.acuerdos .vip-cta-mod{
   setMode(false);
 </script>
 <script src="https://link.msgsndr.com/js/form_embed.js" type="text/javascript"></script>
-</body>
+<script src="/oportuniia-remix.js?v=20261011-remix"></script><script>(function(){document.querySelectorAll('#producto .deal').forEach(function(card){var link=card.querySelector('a.deal-go[href]');if(!link)return;card.style.cursor='pointer';card.setAttribute('role','link');card.setAttribute('tabindex','0');card.setAttribute('aria-label','Acceder a Premium para ver la operación');function openDeal(){window.location.assign(link.href)}card.addEventListener('click',function(e){if(e.target.closest('a,button,input,select,textarea'))return;openDeal()});card.addEventListener('keydown',function(e){if((e.key==='Enter'||e.key===' ')&&e.target===card){e.preventDefault();openDeal()}})});})();</script><script defer src="/oportuniia-header-adaptive.js?v=20261013-final3"></script><script src="/oportuniia-navigation.js" defer></script><script type="module" src="/early-access.js"></script></body>
 </html>
+
+
+

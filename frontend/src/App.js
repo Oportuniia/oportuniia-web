@@ -1,13 +1,19 @@
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "@/App.css";
+import PublicFooter from "@/components/PublicFooter";
 
-const BrandHeader = () => <header className="brand-header"><a href="/web2.html"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" /></a><nav><a href="/web2.html">Inicio</a><a href="/oportunidades">Oportunidades</a><a href="/acceso">Login / Registro</a></nav></header>;
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
-
-const plans = {
-  monthly: { name: "Premium mensual", price: "1.000 €", detail: "+ impuestos / mes", duration: "1 mes", code: "PREMIUM_MONTHLY" },
-  annual: { name: "Premium anual", price: "10.000 €", detail: "+ impuestos / 12 meses", duration: "12 meses desde la activación", code: "PREMIUM_ANNUAL" },
-};
+const publicLinks = [["/nuestra-filosofia","Nuestra filosofía"],["/como-funciona","Cómo funciona"],["/oportunidades#producto","Oportunidades"],["/grupo-oportuniia","Grupo OPORTUNIIA"],["/tecnologia","Tecnología"],["/contacto","Contacto"],["/servicers","Canal profesional"]];
+function BrandHeader() {
+  const [open,setOpen] = useState(false);
+  return <header className="brand-header">
+    <a href="/"><img src="/oportuniia-logo.webp?v=20260929-web1" alt="OPORTUNIIA" /></a>
+    <nav aria-label="Navegación principal">{publicLinks.map(([href,label])=><a key={href} href={href} aria-current={window.location.pathname===href?"page":undefined}>{label}</a>)}</nav>
+    <a className="account-link" href="/acceso">Login / Registro</a>
+    <button className="public-mobile-toggle" type="button" aria-label={open?"Cerrar menú":"Abrir menú"} aria-expanded={open} aria-controls="react-mobile-menu" onClick={()=>setOpen(!open)}>☰</button>
+    {open && <nav id="react-mobile-menu" aria-label="Navegación móvil" onKeyDown={e=>{if(e.key==="Escape")setOpen(false)}}>{publicLinks.map(([href,label])=><a key={href} href={href}>{label}</a>)}<a href="/premium">Premium</a></nav>}
+  </header>;
+}
 
 function Home() {
   window.location.replace("/web2.html");
@@ -37,70 +43,73 @@ function Investor() {
       <p><strong>Siempre:</strong> Condiciones Marco del Inversor + Condiciones Particulares de la operación A/B/C/D.</p>
       <p><strong>Modalidad B:</strong> se añade el Anexo de Servicio Jurídico B/D.</p>
       <p><strong>Modalidad C:</strong> se añade el Anexo de Comercialización Posterior C/D.</p>
-      <p><strong>Modalidad D:</strong> se añaden ambos anexos: Servicio Jurídico B/D y Comercialización Posterior C/D.</p>
-      <p>La documentación PBC, privacidad y retención se incorpora cuando corresponda al expediente. Cada aceptación queda vinculada a su versión y evidencia electrónica.</p>
+      <p><strong>Modalidad D:</strong> se añaden ambos anexos.</p>
+      <p>La documentación PBC, privacidad y retención se incorpora cuando corresponda al expediente.</p>
     </section>
     <div className="summary"><div><span>Modalidad elegida</span><strong>{investorModes[mode].title}</strong></div></div>
   </section></main></>;
 }
 
 function PremiumCheckout() {
-  const [plan, setPlan] = useState("annual");
-  const [accepted, setAccepted] = useState(false);
-  const [early, setEarly] = useState(false);
-  const selected = useMemo(() => plans[plan], [plan]);
-
-  const prepare = (event) => {
-    event.preventDefault();
-    if (!accepted) return;
-    window.alert("Checkout preparado en sandbox. No se realizará ningún cargo mientras la pasarela permanezca cerrada.");
-  };
-
-  return <><BrandHeader /><main className="shell">
-    <section className="checkout">
-      <p className="eyebrow">OPORTUNIIA · PREMIUM</p>
-      <h1>Contratar Experiencia Premium</h1>
-      <p className="lead">Elige modalidad. El plan anual dura 12 meses completos desde su activación; el 31 de diciembre no altera su vigencia.</p>
-      <div className="plans" role="radiogroup" aria-label="Modalidad Premium">
-        {Object.entries(plans).map(([key, p]) => <label className={"plan "+(plan===key?"selected":"")} key={key}>
-          <input type="radio" name="plan" value={key} checked={plan===key} onChange={() => setPlan(key)} />
-          <span><strong>{p.name}</strong><b>{p.price}</b><small>{p.detail}</small><small>{p.duration}</small></span>
-        </label>)}
+  const [interest,setInterest] = useState("inversor");
+  return <div className="premium-experience"><BrandHeader />
+    <main className="premium-main">
+      <div className="premium-ambient" aria-hidden="true" />
+      <div className="premium-wrap">
+        <div className="premium-intro">
+          <span className="premium-kicker">OPORTUNIIA <span>·</span> EXPERIENCIA PREMIUM</span>
+          <h1>Una perspectiva<br/><em>más profunda.</em></h1>
+          <p>Accede a una experiencia de inversión diseñada para quienes necesitan más información, mayor control y una visión completa de cada oportunidad. Premium ofrece la posibilidad de contratar encargos adicionales, con presupuesto independiente y ejecución no incluida en la cuota.</p>
+          <div className="premium-highlights"><span>Universo Acuerdos</span><span>Información ampliada</span><span>Atención profesional</span></div>
+        </div>
+        <section className="premium-feature" aria-label="Ventajas Premium">
+          <div className="premium-feature-top"><span>01 / ACCESO DIFERENCIAL</span><span>UNIVERSO ACUERDOS</span></div>
+          <h2>Más control.<br/>Menos incertidumbre.</h2>
+          <p>Operaciones estructuradas con visibilidad sobre capital, horizonte temporal y resultado económico previsto, sujetas al análisis y documentación de cada operación.</p>
+          <div className="premium-benefit-grid">
+            <div><b>01</b><strong>Oportunidades</strong><span>Exploración de NPL, CDR, REO y Universo Acuerdos.</span></div>
+            <div><b>02</b><strong>Perímetros a medida</strong><span>Filtros, seguimiento y selección de activos.</span></div>
+            <div><b>03</b><strong>Documentación</strong><span>Mayor profundidad documental según perfil y operación.</span></div>
+            <div><b>04</b><strong>MI OPORTUNIIA</strong><span>Un entorno de trabajo conectado a tu actividad.</span></div>
+          </div>
+        </section>
+        <section className="premium-interest">
+          <div><span className="premium-kicker">ACCESO PROFESIONAL</span><h2>El siguiente paso empieza aquí.</h2><p>El acceso Premium está sujeto a validación. En esta versión de pruebas no se realizan pagos ni se recogen solicitudes.</p></div>
+          <div className="premium-interest-actions">
+            <label htmlFor="premium-profile">Perfil profesional</label>
+            <select id="premium-profile" value={interest} onChange={e=>setInterest(e.target.value)}><option value="inversor">Inversor</option><option value="colaborador">Colaborador</option></select>
+            <a className="premium-action" href={interest==="inversor"?"/registro?rol=inversor":"/solicitar-colaboracion"}>Solicitar acceso <span aria-hidden="true">↗</span></a>
+            <small>Sin contratación ni cargos en esta fase.</small>
+          </div>
+        </section>
       </div>
-      <section className="legal premium-benefits">
-        <h2>Ventajas de OPORTUNIIA Premium</h2>
-        <p>Premium amplía el acceso a herramientas, información y coordinación operativa de OPORTUNIIA. Las prestaciones se aplican según el perfil, la operación y las condiciones particulares.</p>
-        <ul>
-          <li><strong>Universo Acuerdos:</strong> acceso para perfiles autorizados a oportunidades y acuerdos disponibles en este entorno.</li>
-          <li><strong>Perímetros personalizados y actualizados:</strong> preparación y seguimiento de perímetros adaptados a los criterios del cliente.</li>
-          <li><strong>Análisis avanzado:</strong> herramientas de filtrado, análisis y apoyo a la evaluación de oportunidades, sin garantía de resultado o rentabilidad.</li>
-          <li><strong>Peticiones a la carta:</strong> posibilidad de solicitar búsquedas, documentación o actuaciones específicas dentro del alcance disponible.</li>
-          <li><strong>Documentación y reportajes ampliados:</strong> acceso a información, evidencias y materiales adicionales cuando existan y puedan facilitarse.</li>
-          <li><strong>MI OPORTUNIIA:</strong> espacio privado para organizar documentación, operaciones, comunicaciones y seguimiento.</li>
-          <li><strong>Recordatorios y seguimiento:</strong> apoyo para mantener al día hitos, documentación y actuaciones vinculadas a las operaciones.</li>
-          <li><strong>Motor de IA OPORTUNIIA:</strong> asistencia tecnológica para análisis, organización y apoyo operativo; sus resultados no sustituyen validaciones profesionales exigibles.</li>
-          <li><strong>Apoyo jurídico cuando proceda:</strong> acceso y coordinación con profesionales o despachos externos e independientes, sujeto a modalidad, encargo, disponibilidad y condiciones aplicables.</li>
-          <li><strong>Secretaría MI OPORTUNIIA:</strong> apoyo en preparación, actualización, organización y subsanación documental, sin sustituir Compliance ni conceder validaciones.</li>
-          <li><strong>Ofertas y reservas:</strong> preparación y coordinación ágil de ofertas y reservas dentro de los circuitos habilitados.</li>
-          <li><strong>Visitas y comprobaciones de campo:</strong> posibilidad de solicitar actuaciones presenciales cuando estén disponibles, autorizadas y sean viables.</li>
-        </ul>
-        <p><strong>Alcance:</strong> determinadas prestaciones son bajo petición o están sujetas a disponibilidad, autorización, viabilidad, territorio, modalidad de operación y cumplimiento normativo. Premium no garantiza adjudicación, rentabilidad, financiación, aceptación de ofertas ni resultado jurídico o comercial.</p>
-      </section>
-      <section className="legal">
-        <h2>Antes de contratar</h2>
-        <p>Precio seleccionado: <strong>{selected.price} {selected.detail}</strong>. No existe permanencia adicional ni renovación obligatoria. Una nueva contratación al finalizar requiere una nueva decisión del cliente.</p>
-        <p>Antes del pago deben ponerse a disposición del cliente la información precontractual y una copia descargable de las condiciones aplicables, identificadas por versión y huella documental.</p>
-        <p>Si actúas como consumidor, se aplicarán los derechos imperativos que correspondan, incluido el desistimiento cuando sea aplicable. Si solicitas que el servicio comience durante ese plazo, esa petición debe quedar registrada expresamente y se aplicará, cuando corresponda, el régimen legal de ejecución anticipada y pago proporcional.</p>
-        <label className="check"><input type="checkbox" checked={early} onChange={e=>setEarly(e.target.checked)} /> Solicito expresamente que, una vez confirmado el pago, el servicio pueda comenzar antes de finalizar el plazo de desistimiento, cuando éste resulte aplicable.</label>
-        <label className="check required"><input type="checkbox" checked={accepted} onChange={e=>setAccepted(e.target.checked)} /> He leído y acepto expresamente las condiciones de Premium y la información precontractual aplicable. Entiendo que el siguiente paso implica una obligación de pago.</label>
-      </section>
-      <div className="summary"><div><span>Modalidad</span><strong>{selected.name}</strong></div><div><span>Importe</span><strong>{selected.price} {selected.detail}</strong></div><div><span>Vigencia</span><strong>{selected.duration}</strong></div></div>
-      <button className="pay" disabled={!accepted} onClick={prepare}>Contratar Premium y pagar {selected.price} + impuestos</button>
-      <p className="closed">PASARELA DE COBRO: CERRADA · SANDBOX · ningún cargo real</p>
-    </section>
-  </main></>;
+    </main>
+  </div>;
+}
+
+function MiOportuniia() {
+  window.location.replace("/mi-oportuniia.html?demo=1");
+  return null;
+}
+
+function AccessForm({kind}) {
+  useEffect(()=>{
+    const profile=kind==="colaborador"?"Colaborador":"Inversor";
+    window.location.replace(kind==="login"?"/acceso":"/acceso?perfil="+encodeURIComponent(profile)+"#registro");
+  },[kind]);
+  return <p role="status">Abriendo las opciones de acceso…</p>;
 }
 
 export default function App() {
-  return <div className="App"><BrowserRouter><Routes><Route path="/" element={<Home />} /><Route path="/inversor" element={<Investor />} /><Route path="/premium" element={<PremiumCheckout />} /></Routes></BrowserRouter></div>;
+  return <div className="App"><BrowserRouter><Routes>
+    <Route path="/" element={<Home />} />
+    <Route path="/inversor" element={<Investor />} />
+    <Route path="/premium" element={<PremiumCheckout />} />
+    <Route path="/mi-oportuniia" element={<MiOportuniia />} />
+    <Route path="/login" element={<AccessForm kind="login" />} />
+    <Route path="/registro" element={<AccessForm kind="inversor" />} />
+    <Route path="/solicitar-colaboracion" element={<AccessForm kind="colaborador" />} />
+    <Route path="*" element={<><BrandHeader/><main className="shell"><h1>Página no encontrada</h1><p><a href="/">Volver a OPORTUNIIA</a></p></main></>} />
+  </Routes><PublicFooter/></BrowserRouter></div>;
 }
+

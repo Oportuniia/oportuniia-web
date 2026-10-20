@@ -1,0 +1,1 @@
+const registration=document.getElementById('registro');if(registration){const p=document.createElement('p');p.className='opp-form-status';p.innerHTML='Después del alta completarás los datos y documentos en <a href="/mi-oportuniia.html?demo=1#perfil">Mi OPORTUNIIA</a>. Premium y reservas requieren perfil al 100% y verificado por OPORTUNIIA.';registration.append(p)}

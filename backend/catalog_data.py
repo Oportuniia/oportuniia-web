@@ -539,6 +539,15 @@ def _as_list(v):
 
 def _match(o, f, skip=None):
     """f = active filter dict. skip = facet name to ignore (for faceted counts)."""
+    query = f.get("q", "").strip()
+    if query:
+        import unicodedata
+        def normalize_text(value):
+            return "".join(c for c in unicodedata.normalize("NFKD", str(value)) if not unicodedata.combining(c)).casefold()
+        fields = ("title", "summary", "category", "slug", "product", "ccaa", "provincia", "municipio", "ccaa_name", "provincia_name", "municipio_name", "strategy", "situation", "occupancy")
+        haystack = normalize_text(" ".join(str(o.get(key, "")) for key in fields))
+        if not all(term in haystack for term in normalize_text(query).split()):
+            return False
     if o["universe"] != f["universe"]:
         return False
     if skip != "product" and f.get("products") and o["product"] not in f["products"]:
@@ -574,7 +583,7 @@ def _match(o, f, skip=None):
 def normalize_filters(universe="judicial", products=None, assets=None, ccaa=None,
                       provincia=None, municipio=None, price_min=None, price_max=None,
                       roi_min=None, term_max=None, procedures=None, phases=None,
-                      possessions=None, phases_principal=None):
+                      possessions=None, phases_principal=None, q=""):
     return {
         "universe": universe if universe in ("judicial", "acuerdos") else "judicial",
         "products": _as_list(products), "assets": _as_list(assets),
@@ -584,6 +593,7 @@ def normalize_filters(universe="judicial", products=None, assets=None, ccaa=None
         "procedures": _as_list(procedures), "phases": _as_list(phases),
         "phases_principal": _as_list(phases_principal),
         "possessions": _as_list(possessions),
+        "q": q or "",
     }
 
 

@@ -23,6 +23,13 @@ import catalog_data as cat
 from presentation_ingress import register_routes as register_presentation_routes
 from presentation_publish import register_publish_routes as register_presentation_publish_routes
 from presentation_e2e import run_presentation_e2e_if_enabled
+from investor_access import register_investor_routes, authenticated_subject, future
+from web_identity import register_identity_routes, ensure_indexes as ensure_identity_indexes, enabled as identity_enabled
+from web_workspace import register_workspace_routes
+from web_security import BodyLimitMiddleware
+from web_secondfactor import register_secondfactor_routes
+from web_review import register_review_routes
+from web_payments import register_payment_routes
 from private_area import register_private_area_routes
 
 
@@ -31,11 +38,29 @@ load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
+client = AsyncIOMotorClient(mongo_url, tz_aware=True)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
 app = FastAPI()
+app.state.web_db = db
+app.add_middleware(BodyLimitMiddleware)
+
+@app.on_event("startup")
+async def _identity_indexes():
+    if identity_enabled():
+        await ensure_identity_indexes(db)
+
+@app.middleware("http")
+async def _private_investor_cache_policy(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith(("/api/investor/", "/api/account/")):
+        response.headers["Cache-Control"] = "private, no-store"
+        response.headers["Vary"] = "Cookie, Authorization"
+        response.headers["Referrer-Policy"] = "no-referrer"
+        response.headers["X-Content-Type-Options"] = "nosniff"
+    return response
+
 
 
 @app.on_event("startup")
@@ -353,6 +378,7 @@ class OperationReadinessSyncIn(BaseModel):
     blockers: List[str] = []
     authoritative: bool
     source: str = "OPORTUNIIAPP_M2M"
+    valid_until: str
 
 
 # ==== APIs FUNCIONALES ====
@@ -390,7 +416,7 @@ async def api_opportunities(request: Request, universo: str = "judicial",
                               roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max),
                               procedures=procedimiento, phases=fase, possessions=posesion,
                               phases_principal=fase_principal)
-    published = await _published_catalog_items()
+    published = []  # Public showcase is synthetic; no real dossiers without verified access.
     items = cat.filter_opportunities(f, order=orden, extra=published)
     return {"universe": universo, "locked": False, "items": items, "total": len(items),
             "counts": cat.facet_counts(f, extra=published)}
@@ -405,7 +431,7 @@ async def geo_meta():
 @api_router.get("/opportunities/compare")
 async def api_compare(request: Request, ids: str = ""):
     vip = await _vip_active(request)
-    published = await _published_catalog_items()
+    published = []  # Public showcase is synthetic; no real dossiers without verified access.
     out = []
     for slug in [s for s in ids.split(",") if s][:3]:
         o = cat.get_by_slug(slug, extra=published)
@@ -436,7 +462,7 @@ async def get_favorites(request: Request):
 @api_router.post("/favorites/toggle")
 async def toggle_favorite(payload: FavoriteToggle, request: Request, response: Response):
     sid = _ensure_sid(request, response)
-    published = await _published_catalog_items()
+    published = []  # Public showcase is synthetic; no real dossiers without verified access.
     if not cat.get_by_slug(payload.slug, extra=published):
         return JSONResponse({"error": "unknown slug"}, status_code=404)
     doc = await db.demo_favorites.find_one({"session_id": sid})
@@ -471,7 +497,7 @@ async def operation_intent(payload: OperationIntentIn, request: Request, respons
     sid = _ensure_sid(request, response)
     if payload.action not in ("reservar", "comprar"):
         return JSONResponse({"error": "invalid action"}, status_code=400)
-    published = await _published_catalog_items()
+    published = []  # Public showcase is synthetic; no real dossiers without verified access.
     if not cat.get_by_slug(payload.slug, extra=published):
         return JSONResponse({"error": "unknown slug"}, status_code=404)
     if payload.modality not in ("A", "B", "C", "D"):
@@ -514,11 +540,16 @@ async def operation_intent(payload: OperationIntentIn, request: Request, respons
 @api_router.post("/operations/readiness-sync")
 async def operation_readiness_sync(payload: OperationReadinessSyncIn, request: Request):
     # Server/M2M ingress only. Never trust a browser session as compliance authority.
-    m2m_marker = request.headers.get("X-OPORTUNIIA-M2M", "")
-    if m2m_marker != "authoritative":
-        return JSONResponse({"error": "authoritative M2M required"}, status_code=403)
+    expected_key = os.environ.get("WEB_READINESS_M2M_KEY", "").strip()
+    supplied_key = request.headers.get("X-OPORTUNIIA-Readiness-Key", "").strip()
+    if not expected_key:
+        return JSONResponse({"error": "readiness authority not configured"}, status_code=503)
+    if not supplied_key or not secrets.compare_digest(supplied_key, expected_key):
+        return JSONResponse({"error": "authoritative M2M required"}, status_code=401)
     if not payload.authoritative or payload.source != "OPORTUNIIAPP_M2M":
         return JSONResponse({"error": "invalid readiness authority"}, status_code=422)
+    if not future(payload.valid_until):
+        return JSONResponse({"error": "readiness expiry required"}, status_code=422)
     if payload.modality not in ("A", "B", "C", "D"):
         return JSONResponse({"error": "invalid modality"}, status_code=422)
     computed = (payload.documentation_current and payload.pbc_cleared and
@@ -534,9 +565,10 @@ async def operation_readiness_sync(payload: OperationReadinessSyncIn, request: R
             "can_contract": computed, "blockers": payload.blockers}
 
 @api_router.get("/operations/{operation_id}/readiness")
-async def operation_readiness(operation_id: str):
+async def operation_readiness(operation_id: str, request: Request):
+    subject = await authenticated_subject(request)
     row = await db.operation_readiness_snapshots.find_one(
-        {"operation_id": operation_id}, {"_id": 0}, sort=[("received_at", -1)])
+        {"operation_id": operation_id, "investor_id": subject}, {"_id": 0}, sort=[("received_at", -1)])
     if not row:
         return {"operation_id": operation_id, "can_contract": False,
                 "state": "AUTHORITATIVE_READINESS_PENDING",
@@ -598,7 +630,7 @@ async def match_preview(request: Request):
 
 @api_router.get("/interest-signals/{slug}")
 async def interest_signal(slug: str):
-    published = await _published_catalog_items()
+    published = []  # Public showcase is synthetic; no real dossiers without verified access.
     if not cat.get_by_slug(slug, extra=published):
         return JSONResponse({"error": "unknown slug"}, status_code=404)
     sig = await _interest_signal(slug)
@@ -606,6 +638,12 @@ async def interest_signal(slug: str):
 
 
 # Register sovereign PRESENTACIÓN → WEB M2M ingress/publication routes.
+register_identity_routes(api_router, db)
+register_secondfactor_routes(api_router, db)
+register_review_routes(api_router, db)
+register_payment_routes(api_router, db)
+register_workspace_routes(api_router, db)
+register_investor_routes(api_router, db)
 register_presentation_routes(api_router, db)
 register_presentation_publish_routes(api_router, db)
 
@@ -676,7 +714,7 @@ async def oportunidades(request: Request, universo: str = "judicial",
                               roi_min=_to_int_or_none(roi_min), term_max=_to_int_or_none(plazo_max),
                               procedures=procedimiento, phases=fase, possessions=posesion,
                               phases_principal=fase_principal)
-    published = await _published_catalog_items()
+    published = []  # Public showcase is synthetic; no real dossiers without verified access.
     opps = cat.filter_opportunities(f, order=orden, extra=published)
     total = len(opps)
     counts = cat.facet_counts(f, extra=published)
@@ -729,14 +767,14 @@ async def oportunidades(request: Request, universo: str = "judicial",
         "municipios_cur": cat.municipios_of(ccaa, provincia) if (ccaa and provincia) else [],
         "f": f, "orden": orden, "q": q,
     }
-    resp = templates.TemplateResponse("catalogo.html", ctx)
+    resp = templates.TemplateResponse(request=request, name="catalogo.html", context=ctx)
     _ensure_sid(request, resp)
     return resp
 
 
 @app.get("/oportunidades/{slug}", response_class=HTMLResponse)
 async def oportunidad_detalle(request: Request, slug: str):
-    published = await _published_catalog_items()
+    published = []  # Public showcase is synthetic; no real dossiers without verified access.
     o = cat.get_by_slug(slug, extra=published)
     if not o:
         return HTMLResponse(
@@ -747,7 +785,7 @@ async def oportunidad_detalle(request: Request, slug: str):
     vip = await _vip_active(request)
     locked = (o["universe"] == "acuerdos" and not vip)
     interest = await _interest_signal(slug)
-    resp = templates.TemplateResponse("detalle.html", {
+    resp = templates.TemplateResponse(request=request, name="detalle.html", context={
         "request": request, "base_url": _public_base(request), "o": o,
         "interest": interest, "locked": locked, "vip_active": vip,
         "docs": cat.documentation_for(o), "concursal_pending": cat.CONCURSAL_PHASE_TAXONOMY == "PENDING_SOVEREIGN_SOURCE",
@@ -759,7 +797,7 @@ async def oportunidad_detalle(request: Request, slug: str):
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=[origin.strip() for origin in os.environ.get('CORS_ORIGINS', '').split(',') if origin.strip() and origin.strip() != '*'],
     allow_methods=["*"],
     allow_headers=["*"],
 )
