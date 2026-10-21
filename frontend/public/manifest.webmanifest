@@ -9,9 +9,22 @@
   "theme_color": "#0B1A28",
   "icons": [
     {
-      "src": "/oportuniia-logo.png?v=20260929-web1",
+      "src": "/brand/icons/web-192-117b5bab7f.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/brand/icons/web-512-d6c3c31bc3.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/brand/icons/web-maskable-512-55d9eebef6.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }

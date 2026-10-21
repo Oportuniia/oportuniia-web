@@ -1,0 +1,22 @@
+{
+  "title": "WEB · OPORTUNIIA",
+  "repo": "oportuniia-web",
+  "theme": "#0B1A28",
+  "source": "oportuniia-presentacion/frontend/public/brand/oportuniia-marca.png",
+  "source_sha256": "0ba9d9b069c39376024be4443d10cc1fd861e6cbf6e7c5e4f9370999d56d4792",
+  "crop": [
+    250,
+    0,
+    1070,
+    930
+  ],
+  "icons": {
+    "16": "/brand/icons/web-16-e48ede05e6.png",
+    "32": "/brand/icons/web-32-f2e1a9394f.png",
+    "64": "/brand/icons/web-64-35c498ce5b.png",
+    "180": "/brand/icons/web-180-348bdd2fec.png",
+    "192": "/brand/icons/web-192-117b5bab7f.png",
+    "512": "/brand/icons/web-512-d6c3c31bc3.png",
+    "maskable": "/brand/icons/web-maskable-512-55d9eebef6.png"
+  }
+}

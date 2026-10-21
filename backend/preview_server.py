@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request, Query
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 from typing import List, Optional
 import catalog_data as cat
@@ -9,6 +10,8 @@ ROOT = Path(__file__).parent
 PUBLIC = ROOT.parent / "frontend" / "public"
 templates = Jinja2Templates(directory=str(ROOT / "templates"))
 app = FastAPI()
+app.mount("/vendor", StaticFiles(directory=str(PUBLIC / "vendor")), name="vendor")
+app.mount("/brand", StaticFiles(directory=str(PUBLIC / "brand")), name="brand")
 
 def _base(request: Request) -> str:
     proto = request.headers.get("x-forwarded-proto", request.url.scheme)

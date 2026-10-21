@@ -3,7 +3,7 @@
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = function (app) {
-  const target = 'http://localhost:8001';
+  const target = process.env.REACT_APP_BACKEND_URL || 'http://127.0.0.1:8001';
 
   const shouldProxy = (pathname) => {
     if (pathname === '/') return true;                       // HOME V54 (SSR)

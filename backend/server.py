@@ -1,6 +1,7 @@
 from fastapi import FastAPI, APIRouter, Request, Response, Query
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -618,6 +619,8 @@ templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 register_private_area_routes(app, templates)
 HOME_HTML = ROOT_DIR.parent / "frontend" / "public" / "web2.html"
 PUBLIC_DIR = ROOT_DIR.parent / "frontend" / "public"
+app.mount("/vendor", StaticFiles(directory=str(PUBLIC_DIR / "vendor")), name="vendor")
+app.mount("/brand", StaticFiles(directory=str(PUBLIC_DIR / "brand")), name="brand")
 
 def _public_html(name: str) -> HTMLResponse:
     return HTMLResponse((PUBLIC_DIR / name).read_text(encoding="utf-8"))
