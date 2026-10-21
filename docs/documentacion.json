@@ -1,0 +1,159 @@
+{
+  "canonical": "MANUAL.md",
+  "sources": [
+    {
+      "source": "README.md",
+      "source_sha256": "4d98a881426d611841978ecdc7192d83446a2191081b08776b94c39019ccda1f",
+      "manual": "MANUAL.md",
+      "anchor": "doc-001",
+      "consolidated_sha256": "b0fcc41508df25f1c93bed9e3654da0ecb166d876edc15aeaa54f462b5f689f7",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/ARQUITECTURA_M2M_MASTER_v1.md",
+      "source_sha256": "a4bf98534cba47d27a88191c1f7be485c4b7f55372a1a33a7b3f164cd4caf88b",
+      "manual": "MANUAL.md",
+      "anchor": "doc-002",
+      "consolidated_sha256": "4fe724698ded270071d6adb8fb43fdb5474acfbea82ef6651a0b879d2be09217",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/BASE_CONTRACTUAL_FUNCIONAL_20261004.md",
+      "source_sha256": "bb4d95a7b0b437d8c634ce2120785fe28e95f94c56cffd707f65dcc4004be075",
+      "manual": "MANUAL.md",
+      "anchor": "doc-003",
+      "consolidated_sha256": "bb4d95a7b0b437d8c634ce2120785fe28e95f94c56cffd707f65dcc4004be075",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/CONTRACTUAL_MASTER_FINAL_GATE_20261005.md",
+      "source_sha256": "029db51a63ddc7d1ac6bb1de3bfc11aedc05e5e56c812dac34e8616db3e5a14c",
+      "manual": "MANUAL.md",
+      "anchor": "doc-004",
+      "consolidated_sha256": "eb1a659db4a5b8c4422c222b421ef6994efabe6f09fa01e8cf5a4cf71d2ea3f9",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/FINAL_CANONICAL_CONTRACT_PACKAGE_20261005.md",
+      "source_sha256": "7b060c78f339055798a72cb423b82cc28579733648a50f38b8594b88cf201ba4",
+      "manual": "MANUAL.md",
+      "anchor": "doc-005",
+      "consolidated_sha256": "e24a0b772a6f5a31f47e1510a7fc8b3d0297e42ce2d511376af2acc596c11465",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/FINAL_CONTRACT_PACKAGE_MANIFEST_20261005.md",
+      "source_sha256": "7ac48e96b60347508014f439a61eef54cdf974b962d61c6a8864ddf2f880fa3a",
+      "manual": "MANUAL.md",
+      "anchor": "doc-006",
+      "consolidated_sha256": "84331841f8be9e22ded04c579ef4c151e325b07fbf75b649bbea24fe5a26c187",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/IMPLEMENTATION_CONTRACT_CORRESPONDENCE_MATRIX_20261005.md",
+      "source_sha256": "f16e9a6bb74f46685949bc1c142158602d6c723baa5e3796625fd9c04a11a456",
+      "manual": "MANUAL.md",
+      "anchor": "doc-007",
+      "consolidated_sha256": "33eb9055e9954214465149168d604b6a708eeb5d172e3df423e8dfb2437d5dd0",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/INDICE_CONTRACTUAL_OPERATIVO_20261005.md",
+      "source_sha256": "57c335221f301a26707c61f8f9429ab904f38ff5eb5e6e75a88885b44cf6e616",
+      "manual": "MANUAL.md",
+      "anchor": "doc-008",
+      "consolidated_sha256": "a80b20dc38f9f61fd5322ae6c9c8051771a941c6ada77c3fa07a4f9412b0b38c",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/LEGALLAB_FINAL_GATE_REQUEST_20261005.md",
+      "source_sha256": "c7cac69d1240005adfb909ed362f79c4cbdb7422bb3c6205244f098c2cbb3827",
+      "manual": "MANUAL.md",
+      "anchor": "doc-009",
+      "consolidated_sha256": "4a4f974cccc2492319aabc1753214ae8e95ef176dc723b5d063e9a2a22d7937e",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/LEGALLAB_POST_IMPLEMENTATION_CORRESPONDENCE_REQUEST_20261005.md",
+      "source_sha256": "81662110e22c94120efa418f186fb7eefbdd08287779a0eff944550fe5520016",
+      "manual": "MANUAL.md",
+      "anchor": "doc-010",
+      "consolidated_sha256": "7295b5a1ec4aeddf891197daae9f647314d01dfd4838952cfe11e8e86d05e3d3",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/LEGAL_BLOCKERS_CLOSURE_20261004.md",
+      "source_sha256": "bfcc8e8f9c6c21f403071b650de37398ad10363ca66eddc010289935d5651b70",
+      "manual": "MANUAL.md",
+      "anchor": "doc-011",
+      "consolidated_sha256": "b3b75954a25d9ae62f81eb52586b47f64480f8af61f71608fe99497806ddccad",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/LEGAL_FINAL_GATE_IMPLEMENTATION_ACCEPTANCE_20261005.md",
+      "source_sha256": "8911fe0a314027bbc8c7f56a6a1aa4bab718c10551e0ba8fd8356ada2dd0aea6",
+      "manual": "MANUAL.md",
+      "anchor": "doc-012",
+      "consolidated_sha256": "c15db886a495eb7caff690ed8254b2fc61842ece6a8513f9b7f712725ac33500",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/LEGAL_PARTNER_SERVICE_MODEL_20261005.md",
+      "source_sha256": "36b277caec6f8d19c7ebc2b6408f64a219ea6def7b2fee6b4c12d6057f8b6c6e",
+      "manual": "MANUAL.md",
+      "anchor": "doc-013",
+      "consolidated_sha256": "ef3651a1e20a95320e1cbaca5539da98ed03446ba3ebb97e29a19fc339d78fcb",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/M2M_TRANSPORT_MASTER_v1.md",
+      "source_sha256": "3292b3ac238e6cd6b44b25a6adc13a350126461ab77ebdb360a6ecf2c330a036",
+      "manual": "MANUAL.md",
+      "anchor": "doc-014",
+      "consolidated_sha256": "23f1804e80b5dfb6886f42045eb98b1b8714f88e767f951ba5aa340a15d89c6e",
+      "retained_for_compatibility": [
+        ".github/workflows/m2m-master-contract-gate.yml"
+      ]
+    },
+    {
+      "source": "docs/MASTER_OPERATION_MODALITIES_PBC_TRAINING_20261004.md",
+      "source_sha256": "a8438cfeb9cc2e24322674ec654478d4b2ab3f211455434abfb2a09217d6bb0e",
+      "manual": "MANUAL.md",
+      "anchor": "doc-015",
+      "consolidated_sha256": "eec8b71d2ec9eeadb4dd327ec11caf5d4517deff8869c95613119b1b3914feaf",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/PREMIUM_B2C_CLOSURE_20261004.md",
+      "source_sha256": "b1fa138b82293e8278a432ee902881c52b0c62de48844f1a4981ea8781b65737",
+      "manual": "MANUAL.md",
+      "anchor": "doc-016",
+      "consolidated_sha256": "ae81f7246fea87c3d8a6711c0dd130acf534d59a0f0869570eab2a1876db111f",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/PRIVACY_OPERATIONAL_ONLY_20261004.md",
+      "source_sha256": "d35c0a041a2c8afa26df1467e191b47ae02254c8b52cf26e0d8a68a0211a51d4",
+      "manual": "MANUAL.md",
+      "anchor": "doc-017",
+      "consolidated_sha256": "06caa6dc3ad9fafadd2040d314d634f3a73716c828155e13427377e64ab1af65",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "docs/SECRETARIA_PBC_EXPERIENCE_MODEL_20261005.md",
+      "source_sha256": "7faa57afbf05c521f2215160753e8a6946fae7dbac390a2b73fcb4de596b45e4",
+      "manual": "MANUAL.md",
+      "anchor": "doc-018",
+      "consolidated_sha256": "c32458ff6c994efc3c26f030b4cc74eb0e22daee3637d88c522ae85523d72251",
+      "retained_for_compatibility": []
+    },
+    {
+      "source": "frontend/README.md",
+      "source_sha256": "70eafbc7a5fd466aa3213b5a7e1b2a41383cbe5d4e6fc5f4582efc58bdb509d1",
+      "manual": "MANUAL.md",
+      "anchor": "doc-019",
+      "consolidated_sha256": "df013079a7139e6b012809bb0a3a3db83f185bb6c71a008b7a819ce8470a2acf",
+      "retained_for_compatibility": []
+    }
+  ]
+}
