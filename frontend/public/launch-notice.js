@@ -2,7 +2,7 @@
 (() => {
   if (document.getElementById('launch-notice')) return;
   const style = document.createElement('style');
-  style.textContent = '.launch-notice{box-sizing:border-box;position:relative;z-index:30;width:100%;padding:14px 24px;background:#0b1a28;color:#fff;text-align:center;font:400 14px/1.6 Poppins,Arial,sans-serif;border-bottom:2px solid #33a9bb}.launch-notice strong{display:inline-block;margin-right:12px;color:#8de0d7;font-weight:600;letter-spacing:.04em}.launch-notice span{display:inline}@media(max-width:600px){.launch-notice{padding:12px 18px;font-size:12px}.launch-notice strong{display:block;margin:0 0 3px}}';
+  style.textContent = '.launch-notice{box-sizing:border-box;position:relative;z-index:110;width:100%;padding:14px 24px;background:#0b1a28;color:#fff;text-align:center;font:400 14px/1.6 Poppins,Arial,sans-serif;border-bottom:2px solid #33a9bb}.launch-notice strong{display:inline-block;margin-right:12px;color:#8de0d7;font-weight:600;letter-spacing:.04em}.launch-notice span{display:inline}@media(max-width:600px){.launch-notice{padding:12px 18px;font-size:12px}.launch-notice strong{display:block;margin:0 0 3px}}';
   document.head.appendChild(style);
   const notice = document.createElement('aside');
   notice.id = 'launch-notice';
@@ -14,4 +14,11 @@
   message.textContent = 'Estamos preparando OPORTUNIIA. La plataforma estará operativa próximamente. Anunciaremos aquí la fecha de apertura.';
   notice.append(title, message);
   document.body.prepend(notice);
+  const header = document.querySelector("header");
+  const placeHeader = () => {
+    if (header && getComputedStyle(header).position === "fixed") header.style.top = `${Math.max(0, notice.getBoundingClientRect().bottom)}px`;
+  };
+  new ResizeObserver(placeHeader).observe(notice);
+  window.addEventListener("scroll", placeHeader, { passive: true });
+  placeHeader();
 })();
