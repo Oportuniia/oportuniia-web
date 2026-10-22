@@ -1,0 +1,74 @@
+[
+  {
+    "id": "core",
+    "source": "CORE.png",
+    "path": "/brand/ecosystem/core.png",
+    "sha256": "1742c24b0bfbf93ed60387b9e89059c977f6b1bf0c128562bf22b83ec0e7b1d6",
+    "bytes": 1403837,
+    "unchanged": true
+  },
+  {
+    "id": "ia",
+    "source": "IA .png",
+    "path": "/brand/ecosystem/ia.png",
+    "sha256": "8345d98a15f39920b0877f77e0ff38a06648fce17df10372e7e361b74d4073c8",
+    "bytes": 1429288,
+    "unchanged": true
+  },
+  {
+    "id": "legal",
+    "source": "LEGAL.png",
+    "path": "/brand/ecosystem/legal.png",
+    "sha256": "f747c781f261ff7a00b89a52807dec5ce580f2f9f61911b6d993067a5dbc3b26",
+    "bytes": 1397334,
+    "unchanged": true
+  },
+  {
+    "id": "presentacion",
+    "source": "PRESENTACION.png",
+    "path": "/brand/ecosystem/presentacion.png",
+    "sha256": "061069439bcc7f57a476952464650b6104acde7e9e15f5ec75d204b75c9a43a1",
+    "bytes": 1342714,
+    "unchanged": true
+  },
+  {
+    "id": "visual",
+    "source": "VISUAL.png",
+    "path": "/brand/ecosystem/visual.png",
+    "sha256": "e8d2b245c4343693afdbb94852e8d85274e4f89b54691123161a58d350ea7ef5",
+    "bytes": 1037903,
+    "unchanged": true
+  },
+  {
+    "id": "app",
+    "source": "OPORTUNIIAPP.png",
+    "path": "/brand/ecosystem/app.png",
+    "sha256": "3b762b21543a7694e275a4ceb8f2e1d72b15489b569afa2a207ebbbffa910de6",
+    "bytes": 987471,
+    "unchanged": true
+  },
+  {
+    "id": "oportuniia",
+    "source": "OPORTUNIIA(2).png",
+    "path": "/brand/ecosystem/oportuniia.png",
+    "sha256": "8666b90c0eb37c4a8cbe06da67e8f5d6f07dfbb5ca207c0be33c80b87e214ca5",
+    "bytes": 952547,
+    "unchanged": true
+  },
+  {
+    "id": "living",
+    "source": "LIVING SIN FONDO.png",
+    "path": "/brand/ecosystem/living.png",
+    "sha256": "0a25a0d187025e4980210f620cfd4a3689fb1a80eb31e79b8c218fe964ed331c",
+    "bytes": 1388507,
+    "unchanged": true
+  },
+  {
+    "id": "robotics",
+    "source": "ROBOTICS SIN FONDO.png",
+    "path": "/brand/ecosystem/robotics.png",
+    "sha256": "dd0b26ca48758676ab3651f23b91d29bcacde446a92130ae940234d73cb1bc78",
+    "bytes": 1329161,
+    "unchanged": true
+  }
+]
