@@ -72,6 +72,9 @@ def login(c, mail, email="one@example.com"):
 def test_signup_verify_login_logout_and_cookie_policy(system):
     c, db, mail = system
     token = signup(c, mail)
+    assert mail[-1][1] == "Confirma tu correo y prepara tu acceso a OPORTUNIIA"
+    assert "Crear tu cuenta es gratuito" in mail[-1][2]
+    assert "Humanizamos la deuda." in mail[-1][2]
     assert c.post("/api/account/login", json={"email": "one@example.com", "password": PASSWORD}).status_code == 401
     assert c.post("/api/account/verify-email", json={"token": token}).json()["identity_verified"] is False
     assert c.post("/api/account/verify-email", json={"token": token}).status_code == 400
