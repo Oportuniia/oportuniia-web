@@ -8,6 +8,7 @@
     .launch-notice.paused .launch-track,.launch-notice:hover .launch-track,.launch-notice:focus-within .launch-track{animation-play-state:paused}
     @keyframes launch-slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     .launch-registration-warning{padding:20px;margin:0 0 22px;border:2px solid #b42318;border-radius:10px;background:#fff0ef;color:#8c1d18;font:500 16px/1.6 Poppins,Arial,sans-serif}.launch-registration-warning strong{display:block;font-size:19px;margin-bottom:6px}
+    .account-page .launch-registration-warning strong{color:#14532d}.account-page .launch-registration-warning p{color:#29352e;font-size:16px;line-height:1.7;opacity:1;margin:0}
     @media(max-width:600px){.launch-notice{font-size:14px;padding:12px;gap:8px}.launch-pause{font-size:11px}}
     @media(prefers-reduced-motion:reduce){.launch-track{animation:none;width:auto}.launch-track span{white-space:normal;padding:0}.launch-track span+span{display:none}.launch-pause{display:none}}
   `;
