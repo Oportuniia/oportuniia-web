@@ -177,6 +177,8 @@ class ProfileDraft(BaseModel):
     registered_address_number: str = Field(default="", max_length=80)
     registered_address_unit: str = Field(default="", max_length=80)
     registered_address_postal_code: str = Field(default="", max_length=80)
+    registered_address_unit: str = Field(default="", max_length=80)
+    registered_address_postal_code: str = Field(default="", max_length=80)
     professional_activity: str = Field(default="", max_length=180)
     consents: dict[str, bool] = Field(default_factory=dict)
 

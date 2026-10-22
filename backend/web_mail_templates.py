@@ -26,6 +26,9 @@ def registration_confirmation(name: str, link: str) -> tuple[str, str]:
         "Este enlace es de un solo uso y caduca en 30 minutos.\n\n"
         "Estamos preparando el lanzamiento de la plataforma. Crear tu cuenta es gratuito "
         "y no activa ninguna suscripción de pago ni genera cargos.\n\n"
+        "Después de confirmar el correo, podrás completar tu perfil y aportar tu DNI si eres persona física, "
+        "o el CIF / NIF de la empresa y el DNI de su administrador o de un socio si eres persona jurídica. "
+        "El alta definitiva está sujeta a la revisión de la documentación y aprobación de OPORTUNIIA.\n\n"
         "Si no has solicitado este registro, puedes ignorar este mensaje.\n\n"
         "Equipo OPORTUNIIA\nHumanizamos la deuda."
     )

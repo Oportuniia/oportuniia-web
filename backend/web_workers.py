@@ -65,9 +65,8 @@ async def scan_document_once(db):
     row = await db.web_personal_documents.find_one_and_update({"scan_state": "QUARANTINED"}, {"$set": {"scan_state": "SCANNING"}}, return_document=ReturnDocument.AFTER)
     if not row: return {"processed": False}
     try:
-        obj = await asyncio.to_thread(s3_client().get_object, Bucket=os.environ["WEB_PERSONAL_BUCKET"], Key=row["storage_key"])
-        data = await asyncio.to_thread(obj["Body"].read, MAX_BYTES+1)
-        if len(data) > MAX_BYTES or hashlib.sha256(data).hexdigest() != row["sha256"]: raise ValueError("integrity")
+        from web_personal_storage import read
+        data = await asyncio.to_thread(read, row)
         state = await asyncio.to_thread(scan_bytes, data)
     except Exception: state = "SCAN_FAILED"
     await db.web_personal_documents.update_one({"_id": row["_id"], "scan_state": "SCANNING"}, {"$set": {"scan_state": state, "scanned_at": datetime.now(timezone.utc)}})

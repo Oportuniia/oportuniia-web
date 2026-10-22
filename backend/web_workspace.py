@@ -17,16 +17,11 @@ from pydantic import BaseModel, ConfigDict, Field
 from investor_access import authenticated_subject, context, fail
 
 MAX_BYTES = 20 * 1024 * 1024
-CATEGORIES = {"identity", "representative_identity", "company_representation"}
+CATEGORIES = {"identity", "representative_identity", "company_representation", "company_tax_document"}
 
 
-def storage_ready():
-    return os.getenv("WEB_PERSONAL_UPLOADS_ENABLED") == "true" and all(os.getenv(k, "").strip() for k in ("WEB_PERSONAL_BUCKET", "WEB_PERSONAL_KMS_KEY_ID"))
-
-
-def s3_client():
-    import boto3
-    return boto3.client("s3")
+from web_personal_storage import ready as storage_ready, client as s3_client
+import web_personal_storage
 
 
 def file_type(data):
@@ -110,16 +105,15 @@ def register_workspace_routes(router, db):
         if file.content_type != mime: fail("document_type_mismatch", 415)
         ident = str(uuid.uuid4())
         # Server-chosen key, no user-supplied storage paths or original filenames.
-        key = "quarantine/" + subject + "/" + ident + "." + suffix
+        key = "web-personal/quarantine/" + subject + "/" + ident + "." + suffix
         checksum = hashlib.sha256(data).hexdigest()
+        row = {"document_id": ident, "subject_id": subject, "category": category, "name": "Documento " + category + "." + suffix,
+            "size": size, "mime": mime, "storage_key": key, "sha256": checksum, "scan_state": "QUARANTINED", "review_state": "PENDING", "created_at": datetime.now(timezone.utc)}
         try:
-            await asyncio.to_thread(s3_client().put_object, Bucket=os.environ["WEB_PERSONAL_BUCKET"], Key=key, Body=data,
-                ContentType=mime, ServerSideEncryption="aws:kms", SSEKMSKeyId=os.environ["WEB_PERSONAL_KMS_KEY_ID"],
-                ChecksumSHA256=base64.b64encode(hashlib.sha256(data).digest()).decode())
+            await asyncio.to_thread(web_personal_storage.write, data, row)
         except Exception:
             fail("private_document_storage_unavailable", 503)
-        await db.web_personal_documents.insert_one({"document_id": ident, "subject_id": subject, "category": category, "name": "Documento " + category + "." + suffix,
-            "size": size, "mime": mime, "storage_key": key, "sha256": checksum, "scan_state": "QUARANTINED", "review_state": "PENDING", "created_at": datetime.now(timezone.utc)})
+        await db.web_personal_documents.insert_one(row)
         return {"document_id": ident, "category": category, "size": size, "scan_state": "QUARANTINED", "review_state": "PENDING", "access_granted": False}
 
     @router.get("/investor/personal-documents/{document_id}")
@@ -133,9 +127,7 @@ async def stream_personal_document(db, subject, document_id, actor):
     if row.get("scan_state") != "CLEAN": fail("document_awaiting_security_scan", 409)
     if not storage_ready(): fail("private_document_storage_not_activated", 503)
     try:
-        obj = await asyncio.to_thread(s3_client().get_object, Bucket=os.environ["WEB_PERSONAL_BUCKET"], Key=row["storage_key"])
-        data = await asyncio.to_thread(obj["Body"].read, MAX_BYTES+1)
-        if len(data) > MAX_BYTES or hashlib.sha256(data).hexdigest() != row["sha256"]: raise ValueError()
+        data = await asyncio.to_thread(web_personal_storage.read, row)
     except Exception:
         fail("document_integrity_or_storage_error", 502)
     await db.web_security_audit.insert_one({"subject_id": subject, "actor_subject_id": actor, "event": "PERSONAL_DOCUMENT_READ", "document_id": document_id, "at": datetime.now(timezone.utc)})

@@ -112,7 +112,7 @@ def test_mail_preferences_and_scanning_do_not_approve_identity(system, monkeypat
     for k, v in {'WEB_PERSONAL_UPLOADS_ENABLED': 'true', 'WEB_PERSONAL_BUCKET': 'test', 'WEB_PERSONAL_KMS_KEY_ID': 'test', 'WEB_CLAMAV_PRIVATE_HOST': 'private-scanner'}.items(): monkeypatch.setenv(k, v)
     data = b'%PDF-1.4 FICTICIO'
     db.raw.web_personal_documents.insert_one({'subject_id': subject, 'document_id': 'd', 'storage_key': 'test', 'scan_state': 'QUARANTINED', 'sha256': hashlib.sha256(data).hexdigest()})
-    monkeypatch.setattr(web_workers, 's3_client', lambda: SimpleNamespace(get_object=lambda **kw: {'Body': io.BytesIO(data)}))
+    monkeypatch.setattr(__import__('web_personal_storage'), 'client', lambda *args: SimpleNamespace(get_object=lambda **kw: {'Body': io.BytesIO(data)}))
     monkeypatch.setattr(web_workers, 'scan_bytes', lambda data: 'CLEAN')
     assert asyncio.run(web_workers.scan_document_once(db))['scan_state'] == 'CLEAN'
     assert c.get('/api/investor/access').json()['stage'] == 0 and db.raw.web_access_reviews.count_documents({}) == 0

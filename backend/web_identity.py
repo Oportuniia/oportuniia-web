@@ -30,6 +30,7 @@ SESSION_COOKIE = "__Host-opp_session"
 CSRF_COOKIE = "__Host-opp_csrf"
 SESSION_HOURS = 12
 IDLE_MINUTES = 30
+REGISTRATION_MAIL = {"accepted": True, "message": "Te hemos enviado un correo para confirmar tu dirección. Revisa también la carpeta de spam. Después podrás completar tu perfil y aportar los documentos. El alta definitiva quedará pendiente de revisión y aprobación por OPORTUNIIA."}
 GENERIC_MAIL = {"accepted": True, "message": "Si procede, recibirás instrucciones en tu correo."}
 # A constant-cost unsuccessful password check; not a credential or seeded user.
 _DUMMY_HASH = bcrypt.hashpw(secrets.token_bytes(32), bcrypt.gensalt(rounds=12))
@@ -292,10 +293,18 @@ def register_identity_routes(router: APIRouter, db):
         try:
             await db.web_users.insert_one(user)
         except DuplicateKeyError:
-            return GENERIC_MAIL
+            existing = await db.web_users.find_one({"email": email})
+            if existing and existing.get("active") and not existing.get("email_verified"):
+                await mail_token(db, existing, "verify")
+            else:
+                await send_transactional(email, "Tu solicitud de acceso a OPORTUNIIA",
+                    "Hemos recibido tu solicitud. Si ya confirmaste tu correo, puedes iniciar sesión en "
+                    + public_origin() + "/cuenta. Si necesitas ayuda con tu acceso, contacta con OPORTUNIIA. "
+                    "El alta definitiva requiere revisión y aprobación de tu documentación.")
+            return REGISTRATION_MAIL
         await audit(db, user["subject_id"], "ACCOUNT_CREATED_PENDING_EMAIL")
         await mail_token(db, user, "verify")
-        return GENERIC_MAIL
+        return REGISTRATION_MAIL
 
     @router.post("/account/verify-email")
     async def verify(payload: LinkToken, request: Request):
