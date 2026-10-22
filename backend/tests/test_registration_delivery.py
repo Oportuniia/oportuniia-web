@@ -1,6 +1,26 @@
 """Registration always attempts delivery; it never approves identity."""
 from test_web_identity import system, signup, PASSWORD
 import web_identity
+import pytest
+from test_web_identity import login
+from test_investor_access import complete_profile
+
+
+@pytest.mark.parametrize('subject_type', ['PF', 'PJ'])
+def test_authenticated_profile_accepts_full_address_without_granting_access(system, subject_type):
+    client, db, mail = system
+    login(client, mail)
+    user = client.get('/api/account/session').json()['user']
+    profile = complete_profile(subject_type=subject_type)
+    profile.update(email=user['email'], registered_address_unit='Bajo ficticio',
+                   registered_address_postal_code='08840')
+    response = client.post('/api/investor/profile-draft', json=profile)
+    assert response.status_code == 200, response.text
+    assert response.json()['access_granted'] is False
+    stored = db.raw.web_profile_drafts.find_one({'subject_id': user['subject_id']})
+    assert stored['profile']['registered_address_unit'] == 'Bajo ficticio'
+    assert stored['profile']['registered_address_postal_code'] == '08840'
+    assert client.get('/api/investor/access').json()['stage'] == 0
 
 
 def payload():
