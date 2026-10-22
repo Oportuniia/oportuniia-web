@@ -6,7 +6,7 @@
     .launch-notice{position:fixed;inset:0 0 auto;z-index:110;display:flex;align-items:center;gap:16px;box-sizing:border-box;padding:14px 18px;background:linear-gradient(100deg,#006a80,#13b8bf);color:#fff;box-shadow:0 3px 14px #001a3655;font:600 16px/1.5 Poppins,Arial,sans-serif}
     .launch-window{overflow:hidden;flex:1;min-width:0}.launch-track{display:flex;width:max-content;animation:launch-slide 32s linear infinite}.launch-track span{padding-right:70px;white-space:nowrap}.launch-pause{flex:none;border:1px solid #fff9;border-radius:6px;background:#004957;color:white;padding:7px 10px;font:inherit;font-size:12px;cursor:pointer}
     .launch-notice.paused .launch-track,.launch-notice:hover .launch-track,.launch-notice:focus-within .launch-track{animation-play-state:paused}
-    @keyframes launch-slide{from{transform:translateX(-50%)}to{transform:translateX(0)}}
+    @keyframes launch-slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     .launch-registration-warning{padding:20px;margin:0 0 22px;border:2px solid #b42318;border-radius:10px;background:#fff0ef;color:#8c1d18;font:500 16px/1.6 Poppins,Arial,sans-serif}.launch-registration-warning strong{display:block;font-size:19px;margin-bottom:6px}
     @media(max-width:600px){.launch-notice{font-size:14px;padding:12px;gap:8px}.launch-pause{font-size:11px}}
     @media(prefers-reduced-motion:reduce){.launch-track{animation:none;width:auto}.launch-track span{white-space:normal;padding:0}.launch-track span+span{display:none}.launch-pause{display:none}}
