@@ -9,6 +9,7 @@
     @keyframes launch-slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
     .launch-registration-warning{padding:20px;margin:0 0 22px;border:2px solid #b42318;border-radius:10px;background:#fff0ef;color:#8c1d18;font:500 16px/1.6 Poppins,Arial,sans-serif}.launch-registration-warning strong{display:block;font-size:19px;margin-bottom:6px}
     .account-page .launch-registration-warning strong{color:#14532d}.account-page .launch-registration-warning p{color:#29352e;font-size:16px;line-height:1.7;opacity:1;margin:0}
+    header .mobile.open{max-height:calc(100dvh - var(--launch-height,60px) - 82px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;box-sizing:border-box}
     @media(max-width:600px){.launch-notice{font-size:14px;padding:12px;gap:8px}.launch-pause{font-size:11px}}
     @media(prefers-reduced-motion:reduce){.launch-track{animation:none;width:auto}.launch-track span{white-space:normal;padding:0}.launch-track span+span{display:none}.launch-pause{display:none}}
   `;
@@ -26,7 +27,7 @@
   notice.append(viewport,pause);document.body.prepend(notice);
   const spacer=document.createElement('div');spacer.setAttribute('aria-hidden','true');notice.after(spacer);
   const header=document.querySelector('header');
-  const layout=()=>{const height=notice.getBoundingClientRect().height;spacer.style.height=`${height}px`;if(header&&['fixed','sticky'].includes(getComputedStyle(header).position))header.style.top=`${height}px`;};
+  const layout=()=>{const height=notice.getBoundingClientRect().height;spacer.style.height=`${height}px`;document.documentElement.style.setProperty("--launch-height",`${height}px`);if(header&&['fixed','sticky'].includes(getComputedStyle(header).position))header.style.top=`${height}px`;};
   new ResizeObserver(layout).observe(notice);layout();
   const status=document.getElementById('reg-status');
   if(status){const form=status.closest('form');const warning=document.createElement('aside');warning.className='launch-registration-warning';warning.setAttribute('aria-label','Aviso de lanzamiento');const title=document.createElement('strong');title.textContent='La plataforma todavía no está abierta';const message=document.createElement('span');message.textContent='Estamos preparando el lanzamiento. El registro de cuentas aún no está habilitado. No se guardarán datos ni se activarán servicios desde este formulario.';warning.append(title,message);form.before(warning);}
