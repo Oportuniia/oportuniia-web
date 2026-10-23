@@ -3,7 +3,8 @@ It can be deployed before credentials exist, but cannot open accounts or access.
 No public demo catalog, CORE roles or producer credentials are exposed here.
 """
 import os
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -41,8 +42,16 @@ async def lifespan(app):
         await db.command("ping")
         await ensure_indexes(db)
         await bootstrap_accounts(db)
-    yield
-    if client: client.close()
+    from web_quarantine import configured, quarantine_worker
+    task = asyncio.create_task(quarantine_worker(db)) if db is not None and configured() else None
+    try:
+        yield
+    finally:
+        if task:
+            task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+        if client: client.close()
 
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)

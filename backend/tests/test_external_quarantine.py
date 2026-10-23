@@ -99,3 +99,17 @@ def test_routes_keep_subject_and_scan_authority_on_server(system,monkeypatch):
     monkeypatch.setattr(q,'promote',lambda row:pytest.fail('infected document must not be promoted'))
     assert c.post(f'/api/investor/personal-documents/{ident}/scan-status',json={}).json()['scan_state']=='INFECTED'
     assert db.raw.web_access_reviews.count_documents({})==0
+
+
+def test_background_reconciliation_continues_after_one_failure(monkeypatch):
+    import asyncio
+    from unittest.mock import AsyncMock
+    rows = [{'document_id':'broken'}, {'document_id':'next'}]
+    cursor = SimpleNamespace(to_list=AsyncMock(return_value=rows))
+    query = SimpleNamespace(sort=lambda *args: cursor)
+    collection = SimpleNamespace(find=lambda filters: query)
+    db = SimpleNamespace(web_personal_documents=collection)
+    reconcile = AsyncMock(side_effect=[RuntimeError('transient'), {'scan_state':'CLEAN'}])
+    monkeypatch.setattr(q, 'reconcile_document', reconcile)
+    assert asyncio.run(q.reconcile_pending(db)) == 2
+    assert reconcile.await_count == 2

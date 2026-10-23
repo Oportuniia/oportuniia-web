@@ -123,35 +123,64 @@ def register_quarantine_routes(router, db):
         if not configured(): fail("external_quarantine_not_configured", 503)
         row = await db.web_personal_documents.find_one({"document_id": document_id, "subject_id": subject, "deleted": {"$ne": True}})
         if not row or row.get("scan_provider") != "AWS_GUARDDUTY": fail("document_not_found", 404)
-        if row["scan_state"] in {"CLEAN", "INFECTED", "REJECTED", "SCAN_FAILED"}:
-            return {"document_id": document_id, "scan_state": row["scan_state"], "review_state": "PENDING"}
-        try:
-            version, state = await asyncio.to_thread(inspect_scan, row)
-        except Exception:
-            # Missing upload and transient AWS failures never grant access.
+        return await reconcile_document(db, row)
+
+
+async def reconcile_document(db, row):
+    document_id = row["document_id"]
+    await db.web_personal_documents.update_one({"_id": row["_id"]}, {"$set": {"scan_checked_at": datetime.now(timezone.utc)}})
+    if row["scan_state"] in {"CLEAN", "INFECTED", "REJECTED", "SCAN_FAILED"}:
+        return {"document_id": document_id, "scan_state": row["scan_state"], "review_state": "PENDING"}
+    try:
+        version, state = await asyncio.to_thread(inspect_scan, row)
+    except Exception:
+        # Missing upload and transient AWS failures never grant access.
+        return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
+    if not row.get("quarantine_version"):
+        await db.web_personal_documents.update_one({"_id": row["_id"], "quarantine_version": {"$exists": False}}, {"$set": {"quarantine_version": version}})
+        row = await db.web_personal_documents.find_one({"_id": row["_id"]})
+        if row["quarantine_version"] != version:
             return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
-        if not row.get("quarantine_version"):
-            await db.web_personal_documents.update_one({"_id": row["_id"], "quarantine_version": {"$exists": False}}, {"$set": {"quarantine_version": version}})
-            row = await db.web_personal_documents.find_one({"_id": row["_id"]})
-            if row["quarantine_version"] != version:
-                return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
-        if state == "CLEAN":
-            stamp, claim = datetime.now(timezone.utc), str(uuid.uuid4())
-            claimed = await db.web_personal_documents.find_one_and_update({"_id": row["_id"], "$or": [
-                {"scan_state": "QUARANTINED"}, {"scan_state": "PROMOTING", "promotion_until": {"$lt": stamp}}]},
-                {"$set": {"scan_state": "PROMOTING", "promotion_claim": claim, "promotion_until": stamp + timedelta(minutes=5)}},
-                return_document=ReturnDocument.AFTER)
-            if not claimed: return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
-            try:
-                promoted = await asyncio.to_thread(promote, claimed)
-            except Exception:
-                await db.web_personal_documents.update_one({"_id": row["_id"], "promotion_claim": claim}, {"$set": {"scan_state": "QUARANTINED"}})
-                return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
-            values = {k: promoted[k] for k in ("storage_backend", "storage_bucket", "encryption_key_id") if k in promoted}
-            values.update(scan_state="CLEAN", scanned_at=stamp)
-            saved = await db.web_personal_documents.update_one({"_id": row["_id"], "promotion_claim": claim}, {"$set": values})
-            if not saved.matched_count:
-                return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
-        elif state != "QUARANTINED":
-            await db.web_personal_documents.update_one({"_id": row["_id"], "scan_state": "QUARANTINED"}, {"$set": {"scan_state": state}})
-        return {"document_id": document_id, "scan_state": state, "review_state": "PENDING"}
+    if state == "CLEAN":
+        stamp, claim = datetime.now(timezone.utc), str(uuid.uuid4())
+        claimed = await db.web_personal_documents.find_one_and_update({"_id": row["_id"], "$or": [
+            {"scan_state": "QUARANTINED"}, {"scan_state": "PROMOTING", "promotion_until": {"$lt": stamp}}]},
+            {"$set": {"scan_state": "PROMOTING", "promotion_claim": claim, "promotion_until": stamp + timedelta(minutes=5)}},
+            return_document=ReturnDocument.AFTER)
+        if not claimed: return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
+        try:
+            promoted = await asyncio.to_thread(promote, claimed)
+        except Exception:
+            await db.web_personal_documents.update_one({"_id": row["_id"], "promotion_claim": claim}, {"$set": {"scan_state": "QUARANTINED"}})
+            return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
+        values = {k: promoted[k] for k in ("storage_backend", "storage_bucket", "encryption_key_id") if k in promoted}
+        values.update(scan_state="CLEAN", scanned_at=stamp)
+        saved = await db.web_personal_documents.update_one({"_id": row["_id"], "promotion_claim": claim}, {"$set": values})
+        if not saved.matched_count:
+            return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
+    elif state != "QUARANTINED":
+        await db.web_personal_documents.update_one({"_id": row["_id"], "scan_state": "QUARANTINED"}, {"$set": {"scan_state": state}})
+    return {"document_id": document_id, "scan_state": state, "review_state": "PENDING"}
+
+
+async def reconcile_pending(db):
+    rows = await db.web_personal_documents.find({
+        "scan_provider": "AWS_GUARDDUTY", "deleted": {"$ne": True},
+        "scan_state": {"$in": ["QUARANTINED", "PROMOTING"]},
+    }).sort("scan_checked_at", 1).to_list(50)
+    for row in rows:
+        try:
+            await reconcile_document(db, row)
+        except Exception:
+            # Failure remains pending; a later pass resumes from persisted state.
+            continue
+    return len(rows)
+
+
+async def quarantine_worker(db):
+    while True:
+        try:
+            await reconcile_pending(db)
+        except Exception:
+            pass
+        await asyncio.sleep(30)
