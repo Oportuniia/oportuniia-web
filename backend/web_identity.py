@@ -30,6 +30,7 @@ SESSION_COOKIE = "__Host-opp_session"
 CSRF_COOKIE = "__Host-opp_csrf"
 SESSION_HOURS = 12
 IDLE_MINUTES = 30
+REGISTRATION_MAIL = {"accepted": True, "message": "Te hemos enviado un correo para confirmar tu dirección. Revisa también la carpeta de spam. Después podrás completar tu perfil y aportar los documentos. El alta definitiva quedará pendiente de revisión y aprobación por OPORTUNIIA."}
 GENERIC_MAIL = {"accepted": True, "message": "Si procede, recibirás instrucciones en tu correo."}
 # A constant-cost unsuccessful password check; not a credential or seeded user.
 _DUMMY_HASH = bcrypt.hashpw(secrets.token_bytes(32), bcrypt.gensalt(rounds=12))
@@ -68,6 +69,9 @@ def require_origin(request):
 
 
 def mail_ready():
+    if os.getenv("WEB_MAIL_TRANSPORT") == "gmail":
+        from web_gmail import ready
+        return ready()
     bridge = os.getenv("WEB_MAIL_BRIDGE_URL", "")
     if bridge:
         return urlparse(bridge).scheme == "https" and len(os.getenv("WEB_MAIL_BRIDGE_KEY", "")) >= 40
@@ -122,6 +126,10 @@ async def send_transactional(recipient, subject, body):
     if not mail_ready():
         denied("transactional_mail_not_configured", 503)
     def deliver():
+        if os.getenv("WEB_MAIL_TRANSPORT") == "gmail":
+            from web_gmail import deliver as gmail_deliver
+            gmail_deliver(recipient, subject, body)
+            return
         bridge = os.getenv("WEB_MAIL_BRIDGE_URL", "")
         if bridge:
             import requests
@@ -136,6 +144,8 @@ async def send_transactional(recipient, subject, body):
         message["To"] = recipient
         message["Subject"] = subject
         message.set_content(body)
+        from web_mail_templates import html_alternative
+        message.add_alternative(html_alternative(body), subtype="html")
         tls = os.getenv("WEB_SMTP_TLS", "starttls")
         cls = smtplib.SMTP_SSL if tls == "ssl" else smtplib.SMTP
         port = int(os.getenv("WEB_SMTP_PORT", "465" if tls == "ssl" else "587"))
@@ -161,8 +171,13 @@ async def mail_token(db, user, purpose):
         "version": user.get("session_version", 0), "expires_at": timestamp + timedelta(minutes=30), "used": False})
     # Fragment tokens do not enter HTTP access logs or referrer headers.
     link = public_origin()+"/cuenta#"+purpose+"="+raw
-    title = "Confirma tu correo" if purpose == "verify" else "Restablece tu contraseña"
-    await send_transactional(user.get("recovery_email") or user["email"], title+" · OPORTUNIIA", title+" en este enlace de un solo uso (30 minutos):\n\n"+link+"\n\nSi no lo has solicitado, ignora este mensaje.")
+    if purpose == "verify":
+        from web_mail_templates import registration_confirmation
+        title, body = registration_confirmation(user.get("name", ""), link)
+    else:
+        title = "Restablece tu contraseña · OPORTUNIIA"
+        body = "Restablece tu contraseña en este enlace de un solo uso (30 minutos):\n\n"+link+"\n\nSi no lo has solicitado, ignora este mensaje."
+    await send_transactional(user.get("recovery_email") or user["email"], title, body)
 
 
 async def consume_token(db, raw, purpose):
@@ -278,10 +293,18 @@ def register_identity_routes(router: APIRouter, db):
         try:
             await db.web_users.insert_one(user)
         except DuplicateKeyError:
-            return GENERIC_MAIL
+            existing = await db.web_users.find_one({"email": email})
+            if existing and existing.get("active") and not existing.get("email_verified"):
+                await mail_token(db, existing, "verify")
+            else:
+                await send_transactional(email, "Tu solicitud de acceso a OPORTUNIIA",
+                    "Hemos recibido tu solicitud. Si ya confirmaste tu correo, puedes iniciar sesión en "
+                    + public_origin() + "/cuenta. Si necesitas ayuda con tu acceso, contacta con OPORTUNIIA. "
+                    "El alta definitiva requiere revisión y aprobación de tu documentación.")
+            return REGISTRATION_MAIL
         await audit(db, user["subject_id"], "ACCOUNT_CREATED_PENDING_EMAIL")
         await mail_token(db, user, "verify")
-        return GENERIC_MAIL
+        return REGISTRATION_MAIL
 
     @router.post("/account/verify-email")
     async def verify(payload: LinkToken, request: Request):

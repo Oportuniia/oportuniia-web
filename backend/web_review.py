@@ -69,7 +69,7 @@ def register_review_routes(router, db):
         if not target: fail("review_target_account_unavailable", 409)
         profile = draft["profile"]
         categories = {d["category"] for d in docs if d.get("scan_state") == "CLEAN"}
-        required = {"representative_identity", "company_representation"} if profile.get("subject_type") == "PJ" else {"identity"}
+        required = {"representative_identity", "company_tax_document"} if profile.get("subject_type") == "PJ" else {"identity"}
         approved = payload.decision == "APPROVE"
         if approved and (missing_profile_fields(profile) or not required.issubset(categories) or not payload.identity_contrasted or not payload.dossier_contrasted):
             fail("complete_clean_and_contrasted_dossier_required", 409)

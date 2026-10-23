@@ -7,6 +7,9 @@ import ipaddress
 import os
 import socket
 import struct
+import uuid
+import subprocess
+import tempfile
 from datetime import datetime, timedelta, timezone
 
 from pymongo import ReturnDocument
@@ -39,6 +42,20 @@ async def dispatch_email_once(db):
 
 
 def scan_bytes(data):
+    if os.getenv("WEB_SCAN_MODE") == "local-clamscan":
+        # Only the isolated batch container enables this mode. Never trust a
+        # browser-provided verdict or send identity documents to a public API.
+        with tempfile.TemporaryDirectory(prefix="opp-scan-") as directory:
+            path = os.path.join(directory, "document")
+            with open(path, "wb") as stream:
+                stream.write(data)
+            os.chmod(path, 0o600)
+            result = subprocess.run(["clamscan", "--no-summary", "--max-filesize=20M",
+                "--max-scansize=100M", "--alert-exceeds-max=yes", path],
+                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=120)
+            if result.returncode == 0: return "CLEAN"
+            if result.returncode == 1: return "INFECTED"
+            raise RuntimeError("scanner_did_not_confirm_result")
     host = os.getenv("WEB_CLAMAV_PRIVATE_HOST", "")
     if not host: raise RuntimeError("scanner_not_configured")
     addresses = socket.getaddrinfo(host, int(os.getenv("WEB_CLAMAV_PORT", "3310")), type=socket.SOCK_STREAM)
@@ -61,17 +78,30 @@ def scan_bytes(data):
 
 
 async def scan_document_once(db):
-    if not storage_ready() or not os.getenv("WEB_CLAMAV_PRIVATE_HOST"): return {"processed": False, "reason": "SCANNER_OR_STORAGE_NOT_CONFIGURED"}
-    row = await db.web_personal_documents.find_one_and_update({"scan_state": "QUARANTINED"}, {"$set": {"scan_state": "SCANNING"}}, return_document=ReturnDocument.AFTER)
+    if not storage_ready() or not (os.getenv("WEB_CLAMAV_PRIVATE_HOST") or os.getenv("WEB_SCAN_MODE") == "local-clamscan"): return {"processed": False, "reason": "SCANNER_OR_STORAGE_NOT_CONFIGURED"}
+    stamp = datetime.now(timezone.utc)
+    claim = str(uuid.uuid4())
+    row = await db.web_personal_documents.find_one_and_update(
+        {"deleted": {"$ne": True}, "$or": [
+            {"scan_state": "QUARANTINED"},
+            {"scan_state": "SCAN_FAILED", "scan_attempts": {"$lt": 5}, "scan_retry_at": {"$lte": stamp}},
+            {"scan_state": "SCANNING", "scan_lease_until": {"$lte": stamp}},
+        ]},
+        {"$set": {"scan_state": "SCANNING", "scan_claim": claim,
+                  "scan_lease_until": stamp + timedelta(minutes=5)}, "$inc": {"scan_attempts": 1}},
+        return_document=ReturnDocument.AFTER)
     if not row: return {"processed": False}
     try:
-        obj = await asyncio.to_thread(s3_client().get_object, Bucket=os.environ["WEB_PERSONAL_BUCKET"], Key=row["storage_key"])
-        data = await asyncio.to_thread(obj["Body"].read, MAX_BYTES+1)
-        if len(data) > MAX_BYTES or hashlib.sha256(data).hexdigest() != row["sha256"]: raise ValueError("integrity")
+        from web_personal_storage import read
+        data = await asyncio.to_thread(read, row)
         state = await asyncio.to_thread(scan_bytes, data)
     except Exception: state = "SCAN_FAILED"
-    await db.web_personal_documents.update_one({"_id": row["_id"], "scan_state": "SCANNING"}, {"$set": {"scan_state": state, "scanned_at": datetime.now(timezone.utc)}})
-    return {"processed": True, "scan_state": state}
+    result = await db.web_personal_documents.update_one(
+        {"_id": row["_id"], "scan_state": "SCANNING", "scan_claim": claim},
+        {"$set": {"scan_state": state, "scanned_at": datetime.now(timezone.utc),
+                  "scan_retry_at": stamp + timedelta(minutes=5)},
+         "$unset": {"scan_claim": "", "scan_lease_until": ""}})
+    return {"processed": True, "scan_state": state if result.matched_count else "CLAIM_EXPIRED"}
 
 
 def register_worker_routes(router, db):

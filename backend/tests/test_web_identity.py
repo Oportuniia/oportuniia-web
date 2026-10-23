@@ -72,6 +72,9 @@ def login(c, mail, email="one@example.com"):
 def test_signup_verify_login_logout_and_cookie_policy(system):
     c, db, mail = system
     token = signup(c, mail)
+    assert mail[-1][1] == "Confirma tu correo y prepara tu acceso a OPORTUNIIA"
+    assert "Crear tu cuenta es gratuito" in mail[-1][2]
+    assert "Humanizamos la deuda." in mail[-1][2]
     assert c.post("/api/account/login", json={"email": "one@example.com", "password": PASSWORD}).status_code == 401
     assert c.post("/api/account/verify-email", json={"token": token}).json()["identity_verified"] is False
     assert c.post("/api/account/verify-email", json={"token": token}).status_code == 400
@@ -125,9 +128,9 @@ def test_expired_links_and_generic_account_responses(system):
     db.raw.web_identity_tokens.update_one({}, {"$set": {"expires_at": identity.now()-timedelta(minutes=1)}})
     assert c.post("/api/account/verify-email", json={"token": token}).status_code == 400
     payload = {"name": "Otra", "email": "one@example.com", "password": PASSWORD, "account_kind": "inversor", "accept_privacy": True, "accept_terms": True}
-    assert c.post("/api/account/register", json=payload).json() == identity.GENERIC_MAIL
+    assert c.post("/api/account/register", json=payload).json() == identity.REGISTRATION_MAIL
     assert c.post("/api/account/forgot-password", json={"email": "absent@example.com"}).json() == identity.GENERIC_MAIL
-    assert len(mail) == 1
+    assert len(mail) == 2
 
 
 def test_shared_rate_limit_and_password_byte_boundary(system):
@@ -165,7 +168,7 @@ def test_quarantine_uses_private_server_keys_and_does_not_grant_access(system, m
     objects = []
     class Store:
         def put_object(self, **kwargs): objects.append(kwargs)
-    monkeypatch.setattr(web_workspace, "s3_client", lambda: Store())
+    monkeypatch.setattr(web_workspace.web_personal_storage, "client", lambda *args: Store())
     result = c.post("/api/investor/personal-documents", data={"category": "identity"}, files={"file": ("../../SECRET.pdf", b"%PDF-1.4 fake", "application/pdf")})
     assert result.status_code == 200, result.text
     assert objects[0]["ServerSideEncryption"] == "aws:kms" and "SECRET" not in objects[0]["Key"]
