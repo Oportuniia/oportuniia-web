@@ -24,6 +24,13 @@ from web_personal_storage import ready as storage_ready, client as s3_client
 import web_personal_storage
 
 
+def upload_ready():
+    if os.getenv("WEB_SCAN_MODE") == "guardduty-s3":
+        from web_quarantine import configured
+        return bool(configured())
+    return bool(storage_ready())
+
+
 def file_type(data):
     if data.startswith(b"%PDF-"): return "application/pdf", "pdf"
     if data.startswith(b"\x89PNG\r\n\x1a\n"): return "image/png", "png"
@@ -53,7 +60,8 @@ def register_workspace_routes(router, db):
         operations = await db.web_investor_operations.find({"subject_id": subject}, {"_id": 0, "op_ref": 1, "status": 1, "created_at": 1}).to_list(100)
         return {"profile": draft.get("profile", {}), "profile_state": draft.get("state", "DRAFT"), "documents": documents,
             "preferences": {"email_copies": settings.get("email_copies", True), "operation_alerts": settings.get("operation_alerts", True)},
-            "photo": settings.get("photo", ""), "notifications": notifications, "operations": operations, "uploads_enabled": bool(storage_ready())}
+            "photo": settings.get("photo", ""), "notifications": notifications, "operations": operations, "uploads_enabled": upload_ready(),
+            "upload_mode": "external-quarantine" if os.getenv("WEB_SCAN_MODE") == "guardduty-s3" else "legacy"}
 
     @router.post("/investor/preferences")
     async def preferences(payload: Preferences, subject: str = Depends(authenticated_subject)):
@@ -91,6 +99,7 @@ def register_workspace_routes(router, db):
 
     @router.post("/investor/personal-documents")
     async def upload(request: Request, category: str = Form(...), file: UploadFile = File(...), subject: str = Depends(authenticated_subject)):
+        if os.getenv("WEB_SCAN_MODE") == "guardduty-s3": fail("direct_quarantine_upload_required", 409)
         if not storage_ready(): fail("private_document_storage_not_activated", 503)
         from web_identity import rate_limit
         await rate_limit(db, request, "personal-upload")

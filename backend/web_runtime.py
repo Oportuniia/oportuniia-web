@@ -3,7 +3,8 @@ It can be deployed before credentials exist, but cannot open accounts or access.
 No public demo catalog, CORE roles or producer credentials are exposed here.
 """
 import os
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,6 +23,7 @@ from web_security import BodyLimitMiddleware
 from web_review import register_review_routes
 from web_payments import register_payment_routes
 from web_workers import register_worker_routes
+from web_quarantine import register_quarantine_routes
 
 mongo_url, database_name = os.getenv("MONGO_URL", ""), os.getenv("DB_NAME", "")
 client = db = None
@@ -40,8 +42,16 @@ async def lifespan(app):
         await db.command("ping")
         await ensure_indexes(db)
         await bootstrap_accounts(db)
-    yield
-    if client: client.close()
+    from web_quarantine import configured, quarantine_worker
+    task = asyncio.create_task(quarantine_worker(db)) if db is not None and configured() else None
+    try:
+        yield
+    finally:
+        if task:
+            task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+        if client: client.close()
 
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
@@ -82,5 +92,6 @@ register_workspace_routes(router, db)
 register_review_routes(router, db)
 register_payment_routes(router, db)
 register_worker_routes(router, db)
+register_quarantine_routes(router, db)
 app.include_router(router)
 
