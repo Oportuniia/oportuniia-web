@@ -1,0 +1,16 @@
+import {readFile} from 'node:fs/promises';
+import assert from 'node:assert/strict';
+const source=await readFile('frontend/public/private/api.js','utf8');
+const {api}=await import('data:text/javascript;base64,'+Buffer.from(source).toString('base64'));
+globalThis.fetch=async()=>({ok:true,json:async()=>({ok:true})});
+assert.deepEqual(await api('test'),{ok:true});
+globalThis.fetch=async()=>{throw new TypeError('Failed to fetch')};
+await assert.rejects(api('test'),/Comprueba tu conexión/);
+const realTimeout=globalThis.setTimeout;
+globalThis.setTimeout=fn=>realTimeout(fn,1);
+globalThis.fetch=async(url,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('aborted','AbortError'))));
+await assert.rejects(api('test'),/tardando en responder/);
+globalThis.setTimeout=realTimeout;
+globalThis.fetch=async()=>({ok:false,status:401,json:async()=>({detail:{code:'authentication_required'}})});
+await assert.rejects(api('test'),e=>e.status===401&&e.code==='authentication_required');
+console.log('4 passed: success, network error, timeout, authorization unchanged');
