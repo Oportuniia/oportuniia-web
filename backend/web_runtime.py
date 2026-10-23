@@ -22,6 +22,7 @@ from web_security import BodyLimitMiddleware
 from web_review import register_review_routes
 from web_payments import register_payment_routes
 from web_workers import register_worker_routes
+from web_quarantine import register_quarantine_routes
 
 mongo_url, database_name = os.getenv("MONGO_URL", ""), os.getenv("DB_NAME", "")
 client = db = None
@@ -82,5 +83,6 @@ register_workspace_routes(router, db)
 register_review_routes(router, db)
 register_payment_routes(router, db)
 register_worker_routes(router, db)
+register_quarantine_routes(router, db)
 app.include_router(router)
 
