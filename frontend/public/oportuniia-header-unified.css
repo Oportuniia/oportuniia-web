@@ -1,0 +1,149 @@
+/* Shared navigation identity — OPORTUNIIA, 2026-10-13 */
+header,header.sc,header.opp-scrolled,#header,#header.sc{background:rgba(7,22,35,.18)!important;backdrop-filter:blur(16px)!important;-webkit-backdrop-filter:blur(16px)!important;border-bottom:1px solid rgba(117,171,198,.24)!important}
+header .nav{min-height:78px!important;display:flex!important;align-items:center!important}
+header .brand,header .brand img,header .brand-logo-img{display:inline-flex!important;align-items:center!important}
+header .brand img,header .brand-logo-img{height:48px!important;width:auto!important;max-width:180px!important;object-fit:contain!important;filter:brightness(0) invert(1)!important;transition:transform .3s ease!important}
+header .brand:hover img,header .brand:focus-visible img{transform:rotate(-5deg)!important}
+header .menu a,header .navitem>a{color:#fff!important;font-family:Poppins,sans-serif!important;font-size:13px!important;font-weight:600!important;text-decoration:none!important;transition:color .25s ease!important}
+header .menu a:hover,header .navitem:hover>a,header .menu a:focus-visible,header .navitem>a:focus-visible{color:#4ac1e6!important}
+header .menu a.active,header .menu a[aria-current=page]{font-weight:800!important}
+header .login,header .actions .btn{font-family:Poppins,sans-serif!important}
+header .burger{color:#fff!important}
+header .burger span{background:#fff!important}
+@media(max-width:1050px){header .brand img,header .brand-logo-img{height:42px!important}}
+@media(prefers-reduced-motion:reduce){header .brand img,header .brand-logo-img,header .menu a{transition:none!important}}
+
+/* 2026-10-13 · fixed, centered navigation on every desktop page */
+@media(min-width:1051px){
+ header .nav{position:relative!important;justify-content:space-between!important;width:100%!important}
+ header .menu{position:absolute!important;left:50%!important;top:50%!important;transform:translate(-50%,-50%)!important;display:flex!important;align-items:center!important;justify-content:center!important;gap:clamp(9px,1.25vw,22px)!important;width:max-content!important;max-width:calc(100% - 300px)!important;margin:0!important;padding:0!important}
+ header .menu .navitem{margin:0!important}
+ header .menu a,header .navitem>a{white-space:nowrap!important}
+ header .brand{margin-right:auto!important;position:relative!important;z-index:2!important}
+ header .login,header .actions{margin-left:auto!important;position:relative!important;z-index:2!important}
+}
+/* Home has separate .navitem links: override its earlier hover specificity */
+header .menu .navitem:hover>a,header .menu .navitem>a:hover,
+header .menu a:hover,header .menu a:focus-visible,
+header .menu .navitem>a:focus-visible{color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important}
+
+/* Center the opportunities section kicker over its headline */
+#producto .opp-product-label,
+#producto .eyebrow.opp-product-label{
+ display:block!important;
+ width:100%!important;
+ max-width:none!important;
+ margin-left:auto!important;
+ margin-right:auto!important;
+ text-align:center!important;
+ align-self:center!important;
+ justify-self:center!important;
+}
+
+/* FIX: home #hdr overrides and unified geometric center across layouts */
+@media(min-width:1051px){
+ body header .wrap,body #hdr .wrap{width:100%!important;max-width:1600px!important;margin-left:auto!important;margin-right:auto!important}
+ body header .nav,body #hdr .nav{position:relative!important;width:100%!important;max-width:none!important;justify-content:space-between!important}
+ body header nav.menu,body #hdr nav.menu,body header .nav>.menu{
+ position:absolute!important;left:50%!important;right:auto!important;top:50%!important;
+ transform:translate(-50%,-50%)!important;display:flex!important;flex-direction:row!important;
+ justify-content:center!important;align-items:center!important;gap:clamp(8px,1.15vw,20px)!important;
+ width:max-content!important;max-width:calc(100% - 290px)!important;
+ margin:0!important;padding:0!important;float:none!important
+ }
+ body header .nav>.brand,body #hdr .nav>.brand{margin-right:auto!important}
+ body header .nav>.actions,body header .nav>.login,body #hdr .nav>.actions{margin-left:auto!important}
+}
+html body #hdr .menu .navitem>a:hover,
+html body #hdr .menu .navitem:hover>a,
+html body #hdr .menu .navitem>a:focus-visible,
+html body #hdr.sc .menu .navitem>a:hover,
+html body header:not(.sc) .navitem>a:hover{
+ color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important;
+ text-shadow:0 0 12px rgba(74,193,230,.36)!important
+}
+
+/* Adaptive header contrast, using sections beneath the fixed header */
+html body header.opp-over-light,html body header.opp-over-light.sc,html body #hdr.opp-over-light{
+ background:rgba(250,252,253,.88)!important;border-bottom-color:rgba(13,45,65,.15)!important
+}
+html body header.opp-over-light .menu a,html body header.opp-over-light .navitem>a{
+ color:#15384c!important;-webkit-text-fill-color:#15384c!important;text-shadow:none!important
+}
+html body header.opp-over-light .brand img,html body header.opp-over-light .brand-logo-img{filter:none!important}
+html body header.opp-over-light .burger{color:#15384c!important}
+html body header.opp-over-light .burger span{background:#15384c!important}
+html body header.opp-over-light .menu a:hover,html body header.opp-over-light .navitem>a:hover,html body header.opp-over-light .navitem:hover>a,
+html body #hdr.opp-over-light .menu .navitem>a:hover{color:#1683a9!important;-webkit-text-fill-color:#1683a9!important}
+html body header .login,html body header .actions .btn{
+ background:#091c2c!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+ border:1px solid rgba(88,186,220,.3)!important;
+ box-shadow:0 5px 18px rgba(0,0,0,.12)!important;
+ transition:transform .24s ease,background .24s ease,box-shadow .24s ease!important
+}
+html body header .login:hover,html body header .login:focus-visible,
+html body header .actions .btn:hover,html body header .actions .btn:focus-visible{
+ background:#123f59!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+ transform:translateY(-2px)!important;box-shadow:0 9px 24px rgba(32,135,178,.34)!important
+}
+
+/* Definitive contrast states, matched to header background rather than page text */
+html body header.opp-over-light,html body #hdr.opp-over-light,html body #header.opp-over-light,
+html body header.opp-over-light.sc,html body #hdr.opp-over-light.sc{
+ background:rgba(250,252,253,.96)!important;
+ border-bottom:1px solid rgba(8,32,48,.14)!important;
+}
+html body header:not(.opp-over-light),html body #hdr:not(.opp-over-light),html body #header:not(.opp-over-light){
+ background:rgba(7,22,35,.92)!important;
+}
+html body header:not(.opp-over-light) nav.menu a,html body #hdr:not(.opp-over-light) nav.menu a,
+html body header:not(.opp-over-light) .navitem>a{
+ color:#f4f9fc!important;-webkit-text-fill-color:#f4f9fc!important
+}
+html body header.opp-over-light nav.menu a,html body #hdr.opp-over-light nav.menu a,
+html body header.opp-over-light .navitem>a{
+ color:#15384c!important;-webkit-text-fill-color:#15384c!important
+}
+html body header nav.menu a.opp-current,html body header .navitem>a.opp-current,
+html body #hdr nav.menu a.opp-current,html body header nav.menu a[aria-current=page]{
+ color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important;font-weight:800!important
+}
+html body header nav.menu a:hover,html body header .navitem>a:hover,
+html body header .navitem:hover>a,html body #hdr nav.menu a:hover,
+html body header nav.menu a:focus-visible{
+ color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important
+}
+
+/* Final visual normalization: shared button, brand, section contrast */
+html body header .login,html body header .actions>a.btn,html body header .actions .btn{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ min-height:48px!important;min-width:158px!important;padding:12px 18px!important;
+ border-radius:5px!important;font-size:13px!important;font-weight:700!important;
+ background:#071c2c!important;border:1px solid #25526a!important;
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+ white-space:nowrap!important;text-decoration:none!important
+}
+html body header .login:hover,html body header .actions .btn:hover{
+ background:#164c67!important;box-shadow:0 8px 24px rgba(35,149,192,.25)!important
+}
+html body header.opp-over-light .brand img,html body header.opp-over-light .brand-logo-img{
+ filter:none!important
+}
+html body header:not(.opp-over-light) .brand img,html body header:not(.opp-over-light) .brand-logo-img{
+ filter:brightness(0) invert(1)!important
+}
+html body header nav.menu a.active:not(.opp-current),html body header nav.menu a[aria-current]:not(.opp-current){font-weight:600!important}
+html body header nav.menu a.opp-current{color:#4ac1e6!important;-webkit-text-fill-color:#4ac1e6!important;font-weight:800!important}
+@media(min-width:1051px){
+ html body header .nav{max-width:1600px!important;padding-left:clamp(24px,4.5vw,90px)!important;padding-right:clamp(24px,4.5vw,90px)!important;box-sizing:border-box!important;margin:auto!important}
+ html body header .brand{flex:0 0 auto!important;min-width:160px!important}
+ html body header .login,html body header .actions{flex:0 0 auto!important}
+}
+#producto .opp-product-label{margin-bottom:28px!important;text-align:center!important;width:100%!important}
+#producto .opp-product-label + h2,#producto .opp-product-label + .section-title{margin-top:12px!important}
+body:has(#producto) #producto{scroll-margin-top:130px!important}
+body:has(#producto) #producto .product-inner{padding-top:28px!important}
+body:has(.hero h1) main>.wrap>.hero h1{font-size:clamp(56px,6.2vw,104px)}
+body:has(.hero h1) main>.wrap>.hero h1 strong{font-weight:800}
+body:has(.hero h1) main>.wrap>.hero{padding-top:clamp(92px,9vw,150px)}
+@media(max-width:700px){body:has(.hero h1) main>.wrap>.hero h1{font-size:clamp(38px,9vw,66px)}}
