@@ -54,6 +54,7 @@ def test_temporary_expiry_removes_bytes_and_blocks_reconfirmation(system,monkeyp
     from web_dossier import expire_temporary
     c,db=prepare(system)
     db.raw.web_personal_documents.update_one({}, {'$set':{'dossier_state':'TEMPORARY','temporary_until':datetime.now(timezone.utc)-timedelta(days=1),'storage_backend':'r2-aesgcm','storage_bucket':'test-private','storage_key':'test/doc'}})
+    assert c.post('/api/investor/personal-documents/doc/confirm',json=payload()).status_code==404
     calls=[]
     monkeypatch.setattr(web_personal_storage,'client',lambda *a:SimpleNamespace(delete_object=lambda **kw:calls.append(kw)))
     asyncio.run(expire_temporary(db))

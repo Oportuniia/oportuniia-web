@@ -19,6 +19,10 @@ def name_mismatch(expected, detected):
     a, b = set(normalized(expected).split()), set(normalized(detected).split())
     return bool(a and b and a != b)
 
+def expired(row):
+    until = row.get("temporary_until")
+    return row.get("dossier_state") == "EXPIRED" or bool(until and until <= datetime.now(timezone.utc))
+
 class Confirmation(BaseModel):
     model_config = ConfigDict(extra="forbid")
     kinds: list[str] = Field(min_length=1, max_length=6)
@@ -32,7 +36,7 @@ def register_dossier_routes(router, db):
     async def confirm(document_id: str, payload: Confirmation, subject: str = Depends(authenticated_subject)):
         row = await db.web_personal_documents.find_one({"document_id": document_id, "subject_id": subject, "deleted": {"$ne": True}})
         if not row: fail("document_not_found", 404)
-        if row.get("dossier_state") == "EXPIRED": fail("document_not_found", 404)
+        if expired(row): fail("document_not_found", 404)
         if row.get("review_state") == "APPROVED": fail("reviewed_document_cannot_be_reclassified", 409)
         if row.get("scan_state") != "CLEAN": fail("document_not_ready", 409)
         if not payload.confirmed or any(k not in LABELS for k in payload.kinds): fail("document_confirmation_required", 422)

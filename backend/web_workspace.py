@@ -136,7 +136,8 @@ async def stream_personal_document(db, subject, document_id, actor):
     row = await db.web_personal_documents.find_one({"document_id": document_id, "subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0})
     if not row: fail("document_not_found", 404)
     if row.get("scan_state") != "CLEAN": fail("document_awaiting_security_scan", 409)
-    if row.get("dossier_state") == "EXPIRED": fail("document_not_found", 404)
+    from web_dossier import expired
+    if expired(row): fail("document_not_found", 404)
     if not storage_ready(): fail("private_document_storage_not_activated", 503)
     try:
         data = await asyncio.to_thread(web_personal_storage.read, row)
