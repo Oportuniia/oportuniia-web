@@ -30,6 +30,7 @@ class Decision(BaseModel):
     identity_contrasted: bool = False
     dossier_contrasted: bool = False
     pbc_cleared: bool = False
+    discrepancy_resolution: str = Field(default="", max_length=2000)
 
 
 def register_review_routes(router, db):
@@ -45,7 +46,7 @@ def register_review_routes(router, db):
         if actor["subject_id"] == subject: fail("self_review_forbidden")
         draft = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0})
         if not draft: fail("profile_not_found", 404)
-        docs = await db.web_personal_documents.find({"subject_id": subject}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1}).to_list(100)
+        docs = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "dossier_state": 1, "document_kinds": 1, "declared_identity": 1, "identity_discrepancy": 1, "discrepancy_explanation": 1}).to_list(100)
         return {"revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
 
     @router.get("/staff/reviews/{subject}/documents/{document_id}")
@@ -68,9 +69,13 @@ def register_review_routes(router, db):
         target = await db.web_users.find_one({"subject_id": subject, "active": True, "email_verified": True})
         if not target: fail("review_target_account_unavailable", 409)
         profile = draft["profile"]
-        categories = {d["category"] for d in docs if d.get("scan_state") == "CLEAN"}
+        categories = {k for d in docs if d.get("scan_state") == "CLEAN" for k in d.get("document_kinds", [d["category"]])}
         required = {"representative_identity", "company_tax_document"} if profile.get("subject_type") == "PJ" else {"identity"}
         approved = payload.decision == "APPROVE"
+        if approved and any(d.get("dossier_state") not in {None, "FILED", "DISCREPANCY"} for d in docs):
+            fail("documents_require_confirmation_or_discrepancy_resolution", 409)
+        if approved and any(d.get("dossier_state") == "DISCREPANCY" for d in docs) and len(payload.discrepancy_resolution.strip()) < 20:
+            fail("document_discrepancy_resolution_required", 409)
         if approved and (missing_profile_fields(profile) or not required.issubset(categories) or not payload.identity_contrasted or not payload.dossier_contrasted):
             fail("complete_clean_and_contrasted_dossier_required", 409)
         stamp = datetime.now(timezone.utc)
@@ -79,6 +84,8 @@ def register_review_routes(router, db):
         await db.web_review_decisions.insert_one({"decision_id": version, "subject_id": subject, "reviewer_subject_id": actor["subject_id"], **payload.model_dump(), "at": stamp})
         if approved:
             await db.web_verified_profiles.insert_one({"subject_id": subject, "version": version, "profile": profile, "reviewer_subject_id": actor["subject_id"], "created_at": stamp})
+            await db.web_personal_documents.update_many({"subject_id": subject, "document_id": {"$in": payload.reviewed_document_ids}},
+                {"$set": {"review_state": "APPROVED", "dossier_state": "FILED", "operational_evidence": True, "review_decision_id": version}})
         await db.web_access_reviews.update_one({"subject_id": subject}, {"$set": {"subject_id": subject, "profile_version": version if approved else None, "profile_revision": payload.expected_revision,
             "profile_complete": approved, "documents_complete": approved, "identity_status": "VERIFIED" if approved else "REJECTED", "dossier_status": "APPROVED" if approved else "REJECTED",
             "pbc_status": "CLEARED" if approved and payload.pbc_cleared else "PENDING", "revoked": not approved, "reviewer_subject_id": actor["subject_id"],

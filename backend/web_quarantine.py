@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, timezone
 from fastapi import Depends, Request
 from pydantic import BaseModel, ConfigDict, Field
 from pymongo import ReturnDocument
+from pymongo.errors import DuplicateKeyError
 
 from investor_access import authenticated_subject, fail
 import web_personal_storage as storage
@@ -44,6 +45,7 @@ class UploadIntent(BaseModel):
     mime: str
     size: int = Field(gt=0, le=MAX_BYTES)
     sha256: str = Field(pattern=r"^[a-f0-9]{64}$")
+    filename: str = Field(default="", max_length=240)
 
 
 def signed_upload(row):
@@ -104,6 +106,23 @@ def register_quarantine_routes(router, db):
         if payload.category not in CATEGORIES or payload.mime not in MIMES: fail("unsupported_document", 415)
         from web_identity import rate_limit
         await rate_limit(db, request, "personal-upload", subject)
+        from web_dossier import normalized
+        stamp = datetime.now(timezone.utc)
+        # A per-account atomic lease serializes duplicate and quota reservations.
+        try:
+            lease = await db.web_document_leases.find_one_and_update(
+                {"_id": subject, "$or": [{"until": {"$lt": stamp}}, {"until": {"$exists": False}}]},
+                {"$set": {"until": stamp + timedelta(minutes=5)}}, upsert=True, return_document=ReturnDocument.AFTER)
+        except DuplicateKeyError:
+            fail("upload_already_in_progress", 409)
+        if not lease: fail("upload_already_in_progress", 409)
+        existing = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}).to_list(101)
+        filename = normalized(payload.filename)
+        if any(d.get("sha256") == payload.sha256 or (filename and d.get("normalized_filename") == filename) for d in existing):
+            await db.web_document_leases.update_one({"_id": subject}, {"$set": {"until": stamp}})
+            fail("document_already_received", 409)
+        if len(existing) >= 100 or sum(d.get("size", 0) for d in existing) + payload.size > 200 * 1024 * 1024:
+            fail("document_storage_limit", 429)
         pending = await db.web_personal_documents.find({"subject_id": subject, "scan_state": {"$in": ["QUARANTINED", "PROMOTING"]},
             "upload_expires_at": {"$gt": datetime.now(timezone.utc)}}).to_list(10)
         if len(pending) >= 10: fail("too_many_pending_uploads", 429)
@@ -113,9 +132,11 @@ def register_quarantine_routes(router, db):
                "storage_key": "web-personal/approved/" + subject + "/" + ident,
                "quarantine_bucket": os.environ["WEB_QUARANTINE_BUCKET"], "quarantine_key": "incoming/" + ident,
                "scan_state": "QUARANTINED", "review_state": "PENDING", "created_at": stamp,
+               "normalized_filename": filename, "dossier_state": "AWAITING_CONFIRMATION", "operational_evidence": False,
                "upload_expires_at": stamp + timedelta(minutes=5), "scan_provider": "AWS_GUARDDUTY"}
         upload = await asyncio.to_thread(signed_upload, row)
         await db.web_personal_documents.insert_one(row)
+        await db.web_document_leases.update_one({"_id": subject}, {"$set": {"until": stamp}})
         return {"document_id": ident, "upload": upload, "scan_state": "QUARANTINED"}
 
     @router.post("/investor/personal-documents/{document_id}/scan-status")
@@ -181,6 +202,8 @@ async def quarantine_worker(db):
     while True:
         try:
             await reconcile_pending(db)
+            from web_dossier import expire_temporary
+            await expire_temporary(db)
         except Exception:
             pass
         await asyncio.sleep(30)

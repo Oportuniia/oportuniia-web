@@ -51,11 +51,13 @@ class Photo(BaseModel):
 
 
 def register_workspace_routes(router, db):
+    from web_dossier import register_dossier_routes
+    register_dossier_routes(router, db)
     @router.get("/investor/workspace")
     async def workspace(subject: str = Depends(authenticated_subject)):
         draft = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0}) or {}
         settings = await db.web_workspace_settings.find_one({"subject_id": subject}, {"_id": 0}) or {}
-        documents = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "review_state": 1, "size": 1}).to_list(100)
+        documents = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "review_state": 1, "size": 1, "sha256": 1, "dossier_state": 1, "document_kinds": 1, "identity_discrepancy": 1, "temporary_until": 1}).to_list(100)
         notifications = await db.web_notifications.find({"subject_id": subject}, {"_id": 0, "id": 1, "title": 1, "body": 1, "read": 1, "created_at": 1}).sort("created_at", -1).to_list(100)
         operations = await db.web_investor_operations.find({"subject_id": subject}, {"_id": 0, "op_ref": 1, "status": 1, "created_at": 1}).to_list(100)
         return {"profile": draft.get("profile", {}), "profile_state": draft.get("state", "DRAFT"), "documents": documents,
@@ -134,6 +136,7 @@ async def stream_personal_document(db, subject, document_id, actor):
     row = await db.web_personal_documents.find_one({"document_id": document_id, "subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0})
     if not row: fail("document_not_found", 404)
     if row.get("scan_state") != "CLEAN": fail("document_awaiting_security_scan", 409)
+    if row.get("dossier_state") == "EXPIRED": fail("document_not_found", 404)
     if not storage_ready(): fail("private_document_storage_not_activated", 503)
     try:
         data = await asyncio.to_thread(web_personal_storage.read, row)

@@ -91,6 +91,8 @@ def test_routes_keep_subject_and_scan_authority_on_server(system,monkeypatch):
     result=c.post('/api/investor/personal-documents/upload-intent',json=body)
     assert result.status_code==200,result.text
     ident=result.json()['document_id']
+    duplicate=c.post('/api/investor/personal-documents/upload-intent',json={**body,'filename':'renamed.pdf'})
+    assert duplicate.status_code==409 and duplicate.json()['detail']['code']=='document_already_received'
     row=db.raw.web_personal_documents.find_one({'document_id':ident})
     assert row['scan_state']=='QUARANTINED' and row['review_state']=='PENDING'
     db.raw.web_personal_documents.insert_one({**{k:v for k,v in row.items() if k!='_id'},'document_id':'other-doc','subject_id':'other-user'})
@@ -113,3 +115,16 @@ def test_background_reconciliation_continues_after_one_failure(monkeypatch):
     monkeypatch.setattr(q, 'reconcile_document', reconcile)
     assert asyncio.run(q.reconcile_pending(db)) == 2
     assert reconcile.await_count == 2
+
+def test_filename_and_capacity_checked_before_transfer(system,monkeypatch):
+    c,db,mail=system
+    router=APIRouter(prefix='/api');q.register_quarantine_routes(router,db);c.app.include_router(router)
+    monkeypatch.setattr(q,'configured',lambda:True)
+    monkeypatch.setenv('WEB_QUARANTINE_BUCKET','test-private')
+    monkeypatch.setattr(q,'signed_upload',lambda row:{'url':'https://test.invalid','fields':{}})
+    login(c,mail)
+    body={'category':'identity','mime':'application/pdf','size':100,'sha256':'a'*64,'filename':'DNI.pdf'}
+    assert c.post('/api/investor/personal-documents/upload-intent',json=body).status_code==200
+    assert c.post('/api/investor/personal-documents/upload-intent',json={**body,'sha256':'b'*64,'filename':'dni.PDF'}).status_code==409
+    db.raw.web_personal_documents.update_one({}, {'$set':{'size':200*1024*1024}})
+    assert c.post('/api/investor/personal-documents/upload-intent',json={**body,'sha256':'b'*64,'filename':'second.pdf'}).status_code==429
