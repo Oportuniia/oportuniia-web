@@ -1,4 +1,4 @@
-"""Human review authority. Reviewer IDs are server configuration, never UI roles.
+"""Human review authority: configured reviewer IDs or stored superadmin role.
 Requires MFA, forbids self-approval, snapshots reviewed data and records evidence.
 No upload, email confirmation, OCR result or payment can invoke this approval.
 """
@@ -16,7 +16,7 @@ from web_identity import resolve_session
 async def reviewer(request, db):
     user, session = await resolve_session(request, db)
     allowed = {v.strip() for v in os.getenv("WEB_REVIEWER_SUBJECT_IDS", "").split(",") if v.strip()}
-    if user["subject_id"] not in allowed or not user.get("mfa_enabled") or not session.get("mfa_verified"):
+    if (user["subject_id"] not in allowed and user.get("role") != "superadmin") or not user.get("mfa_enabled") or not session.get("mfa_verified"):
         fail("reviewer_authorization_required")
     return user
 
@@ -32,12 +32,43 @@ class Decision(BaseModel):
     pbc_cleared: bool = False
     discrepancy_resolution: str = Field(default="", max_length=2000)
 
+class DocumentReview(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    kind: str
+    legible: bool
+    reason: str = Field(min_length=10, max_length=1000)
+
 
 def register_review_routes(router, db):
+    @router.post("/staff/reviews/{subject}/documents/{document_id}/classify")
+    async def classify_document(subject: str, document_id: str, payload: DocumentReview, request: Request):
+        from web_dossier import LABELS, expired
+        actor = await reviewer(request, db)
+        if actor["subject_id"] == subject: fail("self_review_forbidden")
+        row = await db.web_personal_documents.find_one({"subject_id": subject, "document_id": document_id, "deleted": {"$ne": True}})
+        if not row or expired(row): fail("document_not_found", 404)
+        if row.get("scan_state") != "CLEAN": fail("document_not_ready", 409)
+        if payload.kind not in LABELS or payload.kind == "other": fail("invalid_document_kind", 422)
+        if row.get("review_state") == "APPROVED": fail("reviewed_document_cannot_be_reclassified", 409)
+        stamp = datetime.now(timezone.utc)
+        state = "QUALITY_REJECTED" if not payload.legible else "DISCREPANCY" if row.get("identity_discrepancy") else "FILED"
+        await db.web_document_review_events.insert_one({"subject_id": subject, "document_id": document_id,
+            "reviewer_subject_id": actor["subject_id"], "at": stamp, **payload.model_dump()})
+        saved = await db.web_personal_documents.update_one({"_id": row["_id"], "review_state": {"$ne": "APPROVED"}, "deleted": {"$ne": True}, "dossier_state": {"$ne": "EXPIRED"}}, {"$set": {
+            "document_kinds": [payload.kind], "name": LABELS[payload.kind], "category": payload.kind,
+            "dossier_state": state, "quality": "READABLE" if payload.legible else "UNREADABLE", "analysis_version": 2,
+            "review_state": "PENDING", "operational_evidence": False,
+            "temporary_until": stamp + timedelta(days=7) if not payload.legible else None}})
+        if not saved.matched_count: fail("document_changed_reload", 409)
+        return {"saved": True, "identity_approved": False}
+
     @router.get("/staff/reviews")
     async def queue(request: Request):
         await reviewer(request, db)
         rows = await db.web_profile_drafts.find({"state": "PENDING_REVIEW"}, {"_id": 0, "subject_id": 1, "profile.full_name": 1, "updated_at": 1}).to_list(100)
+        pending = await db.web_review_requests.find({"state": "PENDING"}, {"_id": 0, "subject_id": 1, "updated_at": 1}).to_list(100)
+        known = {r["subject_id"] for r in rows}
+        rows.extend(r for r in pending if r["subject_id"] not in known)
         return {"items": rows}
 
     @router.get("/staff/reviews/{subject}")
@@ -45,8 +76,8 @@ def register_review_routes(router, db):
         actor = await reviewer(request, db)
         if actor["subject_id"] == subject: fail("self_review_forbidden")
         draft = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0})
-        if not draft: fail("profile_not_found", 404)
-        docs = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "dossier_state": 1, "document_kinds": 1, "declared_identity": 1, "identity_discrepancy": 1, "discrepancy_explanation": 1}).to_list(100)
+        if not draft: draft = {"profile": {}, "revision": ""}
+        docs = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "dossier_state": 1, "document_kinds": 1, "declared_identity": 1, "identity_discrepancy": 1, "discrepancy_explanation": 1, "quality": 1, "identity_read_status": 1}).to_list(100)
         return {"revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
 
     @router.get("/staff/reviews/{subject}/documents/{document_id}")
@@ -93,4 +124,5 @@ def register_review_routes(router, db):
         await db.web_profile_drafts.update_one({"subject_id": subject, "revision": payload.expected_revision}, {"$set": {"state": "REVIEWED" if approved else "CHANGES_REQUIRED"}})
         await db.web_notifications.insert_one({"id": version, "subject_id": subject, "title": "Perfil verificado" if approved else "Tu perfil necesita una revisión",
             "body": "Hemos revisado tu expediente. Los permisos de cada operación se autorizan por separado." if approved else "Consulta con el equipo los cambios necesarios para continuar.", "read": False, "created_at": stamp})
+        await db.web_review_requests.update_one({"_id": subject}, {"$set": {"state": "REVIEWED", "decision_id": version}})
         return {"saved": True, "decision_id": version, "approved": approved, "operation_access_granted": False}

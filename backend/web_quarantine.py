@@ -118,7 +118,7 @@ def register_quarantine_routes(router, db):
         if not lease: fail("upload_already_in_progress", 409)
         existing = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}).to_list(101)
         filename = normalized(payload.filename)
-        if any(d.get("sha256") == payload.sha256 or (filename and d.get("normalized_filename") == filename) for d in existing):
+        if any(d.get("sha256") == payload.sha256 or (filename and d.get("normalized_filename") == filename and d.get("dossier_state") != "QUALITY_REJECTED") for d in existing):
             await db.web_document_leases.update_one({"_id": subject}, {"$set": {"until": stamp}})
             fail("document_already_received", 409)
         if len(existing) >= 100 or sum(d.get("size", 0) for d in existing) + payload.size > 200 * 1024 * 1024:
@@ -204,6 +204,9 @@ async def quarantine_worker(db):
             await reconcile_pending(db)
             from web_dossier import expire_temporary
             await expire_temporary(db)
+            from web_review_mail import dispatch, sync_received
+            await sync_received(db)
+            await dispatch(db)
         except Exception:
             pass
         await asyncio.sleep(30)
