@@ -19,6 +19,6 @@ jobs:
         shell: bash
         run: |
           for attempt in 1 2 3; do
-            curl --fail --silent --show-error --retry 2 --max-time 75 https://oportuniia-web-private-staging.onrender.com/api/health > /dev/null
+            curl --fail --silent --show-error --retry 2 --max-time 75 https://oportuniia-web-private-staging.onrender.com/health > /dev/null
             sleep 20
           done
