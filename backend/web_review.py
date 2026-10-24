@@ -39,8 +39,8 @@ class DocumentReview(BaseModel):
     reason: str = Field(min_length=10, max_length=1000)
 
 
-def register_review_routes(router, db):
-    @router.post("/staff/reviews/{subject}/documents/{document_id}/classify")
+def register_review_routes(router, db, prefix="/staff/reviews"):
+    @router.post(prefix + "/{subject}/documents/{document_id}/classify")
     async def classify_document(subject: str, document_id: str, payload: DocumentReview, request: Request):
         from web_dossier import LABELS, expired
         actor = await reviewer(request, db)
@@ -62,7 +62,7 @@ def register_review_routes(router, db):
         if not saved.matched_count: fail("document_changed_reload", 409)
         return {"saved": True, "identity_approved": False}
 
-    @router.get("/staff/reviews")
+    @router.get(prefix)
     async def queue(request: Request):
         await reviewer(request, db)
         rows = await db.web_profile_drafts.find({"state": "PENDING_REVIEW"}, {"_id": 0, "subject_id": 1, "profile.full_name": 1, "updated_at": 1}).to_list(100)
@@ -71,7 +71,7 @@ def register_review_routes(router, db):
         rows.extend(r for r in pending if r["subject_id"] not in known)
         return {"items": rows}
 
-    @router.get("/staff/reviews/{subject}")
+    @router.get(prefix + "/{subject}")
     async def dossier(subject: str, request: Request):
         actor = await reviewer(request, db)
         if actor["subject_id"] == subject: fail("self_review_forbidden")
@@ -80,14 +80,14 @@ def register_review_routes(router, db):
         docs = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "dossier_state": 1, "document_kinds": 1, "declared_identity": 1, "identity_discrepancy": 1, "discrepancy_explanation": 1, "quality": 1, "identity_read_status": 1}).to_list(100)
         return {"revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
 
-    @router.get("/staff/reviews/{subject}/documents/{document_id}")
+    @router.get(prefix + "/{subject}/documents/{document_id}")
     async def review_document(subject: str, document_id: str, request: Request):
         from web_workspace import stream_personal_document
         actor = await reviewer(request, db)
         if actor["subject_id"] == subject: fail("self_review_forbidden")
         return await stream_personal_document(db, subject, document_id, actor["subject_id"])
 
-    @router.post("/staff/reviews/{subject}")
+    @router.post(prefix + "/{subject}")
     async def decide(subject: str, payload: Decision, request: Request):
         actor = await reviewer(request, db)
         if actor["subject_id"] == subject: fail("self_review_forbidden")
@@ -103,6 +103,9 @@ def register_review_routes(router, db):
         categories = {k for d in docs if d.get("scan_state") == "CLEAN" for k in d.get("document_kinds", [d["category"]])}
         required = {"representative_identity", "company_tax_document"} if profile.get("subject_type") == "PJ" else {"identity"}
         approved = payload.decision == "APPROVE"
+        from web_dossier import expired
+        if approved and any(d.get("scan_state") != "CLEAN" or d.get("deleted") or expired(d) for d in docs):
+            fail("complete_clean_and_contrasted_dossier_required", 409)
         if approved and any(d.get("dossier_state") not in {None, "FILED", "DISCREPANCY"} for d in docs):
             fail("documents_require_confirmation_or_discrepancy_resolution", 409)
         if approved and any(d.get("dossier_state") == "DISCREPANCY" for d in docs) and len(payload.discrepancy_resolution.strip()) < 20:

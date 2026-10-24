@@ -73,11 +73,14 @@ def test_superadmin_still_requires_mfa_and_manual_classification_never_approves(
     import web_review
     c,db=prepare(system)
     web_review.register_review_routes(c.app.router,db)
+    web_review.register_review_routes(c.app.router,db,prefix='/account/reviews')
     db.raw.web_users.update_one({}, {'$set':{'role':'superadmin'}})
     assert c.get('/staff/reviews').status_code==403
+    assert c.get('/account/reviews').status_code==403
     db.raw.web_users.update_one({}, {'$set':{'mfa_enabled':True}})
     db.raw.web_sessions.update_many({}, {'$set':{'mfa_verified':True}})
     assert c.get('/staff/reviews').status_code==200
+    assert c.get('/account/reviews').status_code==200
     db.raw.web_personal_documents.update_one({}, {'$set':{'subject_id':'other-account','dossier_state':'READ_ERROR'}})
     r=c.post('/staff/reviews/other-account/documents/doc/classify',json={'kind':'identity','legible':True,'reason':'Original ficticio comprobado durante la prueba.'})
     assert r.status_code==200,r.text
