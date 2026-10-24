@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="/vendor/lucide.min.js"></script>
+<script defer src="/vendor/lucide.min.js"></script>
 <style>
 :root{
   /* ===== MAIN MODE — LIGHT PREMIUM / EDITORIAL ===== */
@@ -1815,7 +1815,7 @@ body.acuerdos #producto .uni-card:hover .uni-tag{background:rgba(46,154,198,.28)
 </footer>
 
 <script>
-  lucide.createIcons();
+  document.addEventListener('DOMContentLoaded',()=>lucide.createIcons(),{once:true});
 
   // header scroll
   const hdr=document.getElementById('hdr');
