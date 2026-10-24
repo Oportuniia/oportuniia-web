@@ -3,7 +3,7 @@ import {esc} from './api.js';
 
 // Only the authenticated download route can release an antivirus-clean file.
 // OCR is an aid to reading, never an approval of identity or an entitlement.
-export function mountDocumentOCR(host, documents=[],onRefresh=()=>{}){
+export function mountDocumentOCR(host, documents=[],onRefresh=()=>{},profileApproved=false){
   let dispose=null,controller=null,destroyed=false;
   host.innerHTML=`<section class="card"><h2>Leer mis documentos mediante OCR</h2><p>El análisis de seguridad debe terminar antes de leer el archivo. La lectura no aprueba tu identidad ni modifica los datos del perfil.</p><button type="button" class="button" id="document-ocr-refresh">Actualizar estado del antivirus</button><div class="row">${documents.map((d,i)=>`<button type="button" class="button" data-read="${i}" ${d.scan_state==='CLEAN'?'':'disabled'}>${esc(d.category==='identity'?'Documento de identidad':d.category==='representative_identity'?'DNI del administrador o socio':d.category==='company_tax_document'?'CIF / NIF de empresa':'Documento')} · ${d.scan_state==='CLEAN'?'Leer documento':'No disponible para OCR'}</button>`).join('')||'<p>Aporta un documento en tu perfil para comenzar.</p>'}</div><p role="status" id="document-ocr-status"></p><div id="document-ocr-reader"></div></section>`;
   const status=host.querySelector('#document-ocr-status'),reader=host.querySelector('#document-ocr-reader');
@@ -22,7 +22,7 @@ export function mountDocumentOCR(host, documents=[],onRefresh=()=>{}){
       if(!['application/pdf','image/png','image/jpeg','image/webp'].includes(blob.type))throw Error('Formato de documento no admitido.');
       if(destroyed)return;
       const file=new File([blob],'documento-personal',{type:blob.type});
-      dispose=mountSecretary(reader,{initialFiles:[file]});
+      dispose=mountSecretary(reader,{initialFiles:[file],profileApproved});
       reader.querySelector('.eyebrow').textContent='LECTURA DE TU DOCUMENTO';
       reader.querySelector('h2').textContent='Comprueba el texto leído antes de usarlo.';
       reader.querySelector('#secretary-files').closest('label').hidden=true;
