@@ -1,0 +1,24 @@
+name: WEB management summaries
+on:
+  schedule:
+    - cron: '15 6,7 * * *'
+  workflow_dispatch:
+  push:
+    paths:
+      - '.github/workflows/web-management-digests.yml'
+permissions: {}
+concurrency:
+  group: web-management-summaries
+  cancel-in-progress: false
+jobs:
+  wake:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Wake private service for its persisted daily and weekly jobs
+        shell: bash
+        run: |
+          for attempt in 1 2 3; do
+            curl --fail --silent --show-error --retry 2 --max-time 75 https://oportuniia-web-private-staging.onrender.com/api/health > /dev/null
+            sleep 20
+          done
