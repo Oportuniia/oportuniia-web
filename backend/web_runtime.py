@@ -44,9 +44,14 @@ async def lifespan(app):
         await bootstrap_accounts(db)
     from web_quarantine import configured, quarantine_worker
     task = asyncio.create_task(quarantine_worker(db)) if db is not None and configured() else None
+    from web_auto_registration import worker
+    registration_task = asyncio.create_task(worker(db)) if db is not None and configured() else None
     try:
         yield
     finally:
+        if registration_task:
+            registration_task.cancel()
+            with suppress(asyncio.CancelledError):await registration_task
         if task:
             task.cancel()
             with suppress(asyncio.CancelledError):

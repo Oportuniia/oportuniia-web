@@ -89,6 +89,8 @@ def access_stage(review: dict) -> int:
 
 
 async def context(db, subject: str, op_ref: str | None = None):
+    owner = await db.web_users.find_one({"subject_id": subject, "active": True}, {"role": 1, "username": 1, "email": 1}) or {}
+    founder = owner.get("role") == "superadmin" and owner.get("username") == "rafamaster" and owner.get("email") == "info@oportuniia.com"
     review = await db.web_access_reviews.find_one({"subject_id": subject}, {"_id": 0}) or {}
     if review.get("profile_revision"):
         current = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0, "revision": 1}) or {}
@@ -96,6 +98,10 @@ async def context(db, subject: str, op_ref: str | None = None):
     entitlement = await db.web_entitlements.find_one({"subject_id": subject, "product": "PREMIUM", "active": True}, {"_id": 0}) or {}
     result = {"subject": subject, "review": review, "stage": access_stage(review),
               "premium": future(entitlement.get("valid_until")), "grant": {}}
+    result["founder_access"] = founder
+    if founder:
+        result.update(stage=2, premium=True)
+        result["review"] = {"identity_status": "ADMINISTRATOR", "dossier_status": "NOT_REQUIRED"}
     if op_ref:
         if not OP_RE.fullmatch(op_ref): fail("invalid_public_reference", 400)
         grant = await db.web_operation_grants.find_one({"subject_id": subject, "op_ref": op_ref}, {"_id": 0}) or {}
@@ -197,6 +203,9 @@ def missing_profile_fields(profile):
 
 
 async def contracting_eligibility(db, ctx):
+    if ctx.get("founder_access"):
+        return {"can_contract": True, "profile_complete": True, "documents_verified": False,
+                "verified": True, "reason": "FOUNDER_ADMINISTRATOR_ACCESS", "verification_basis": "SERVER_ROLE"}
     review = ctx["review"]
     version = review.get("profile_version")
     snapshot = await db.web_verified_profiles.find_one({"subject_id": ctx["subject"], "version": version}, {"_id": 0}) if version else None
@@ -233,7 +242,7 @@ def register_investor_routes(router: APIRouter, db):
     @router.get("/investor/access")
     async def access(subject: str = Depends(authenticated_subject)):
         ctx = await context(db, subject)
-        return {"stage": ctx["stage"], "premium": ctx["premium"], "identity_status": ctx["review"].get("identity_status", "PENDING"),
+        return {"founder_access": ctx.get("founder_access", False), "stage": ctx["stage"], "premium": ctx["premium"], "identity_status": ctx["review"].get("identity_status", "PENDING"),
                 "dossier_status": ctx["review"].get("dossier_status", "PENDING"), "pbc_status": ctx["review"].get("pbc_status", "PENDING"),
                 "contracting": await contracting_eligibility(db, ctx), "rule": "UPLOADING_AND_PAYMENT_DO_NOT_GRANT_ACCESS"}
 

@@ -3,6 +3,7 @@ Requires MFA, forbids self-approval, snapshots reviewed data and records evidenc
 No upload, email confirmation, OCR result or payment can invoke this approval.
 """
 import os
+import re
 import uuid
 from datetime import datetime, timedelta, timezone
 
@@ -63,8 +64,12 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         return {"saved": True, "identity_approved": False}
 
     @router.get(prefix)
-    async def queue(request: Request):
+    async def queue(request: Request, query: str = ""):
         await reviewer(request, db)
+        if query.strip():
+            pattern = re.escape(query.strip()[:100])
+            users = await db.web_users.find({'$or': [{key: {'$regex': pattern, '$options': 'i'}} for key in ('name', 'email', 'username')], 'active': True}, {'_id': 0, 'subject_id': 1, 'name': 1, 'username': 1}).to_list(100)
+            return {'items': [{'subject_id': u['subject_id'], 'profile': {'full_name': u.get('name') or u.get('username') or 'Perfil'}} for u in users]}
         rows = await db.web_profile_drafts.find({"state": "PENDING_REVIEW"}, {"_id": 0, "subject_id": 1, "profile.full_name": 1, "updated_at": 1}).to_list(100)
         pending = await db.web_review_requests.find({"state": "PENDING"}, {"_id": 0, "subject_id": 1, "updated_at": 1}).to_list(100)
         known = {r["subject_id"] for r in rows}

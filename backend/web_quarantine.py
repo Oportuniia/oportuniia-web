@@ -204,9 +204,10 @@ async def quarantine_worker(db):
             await reconcile_pending(db)
             from web_dossier import expire_temporary
             await expire_temporary(db)
-            from web_review_mail import dispatch, sync_received
+            from web_review_mail import sync_received
             await sync_received(db)
-            await dispatch(db)
+            from web_digest import tick
+            await tick(db)
         except Exception:
             pass
         await asyncio.sleep(30)

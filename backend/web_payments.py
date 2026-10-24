@@ -116,7 +116,7 @@ async def confirm_intent(db, client, intent, *, payment_received_at=None):
                 "checkout_request_id": intent["request_id"], "state": "PAID_PENDING_OPERATION_REVIEW", "terms_version": intent["terms_version"]},
             "$set": {"payment_reference": str(payment_reference), "amount_received_minor": amount_total, "currency": "EUR",
                 "payment_received_at": received_at.astimezone(timezone.utc).isoformat(), "payment_provider": "STRIPE"}}, upsert=True)
-    await db.web_checkout_intents.update_one({"_id": intent["_id"]}, {"$set": {"state": "PAID", "customer_id": checkout.customer, "subscription_id": checkout.subscription}})
+    await db.web_checkout_intents.update_one({"_id": intent["_id"]}, {"$set": {"state": "PAID", "paid_at": intent.get("paid_at") or datetime.now(timezone.utc), "customer_id": checkout.customer, "subscription_id": checkout.subscription}})
     return True
 
 
