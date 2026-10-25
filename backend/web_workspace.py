@@ -51,6 +51,8 @@ class Photo(BaseModel):
 
 
 def register_workspace_routes(router, db):
+    from web_perimeters import register_perimeter_routes
+    register_perimeter_routes(router, db)
     from web_dossier import register_dossier_routes
     register_dossier_routes(router, db)
     @router.get("/investor/workspace")
