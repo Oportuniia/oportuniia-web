@@ -5,6 +5,7 @@ Browser declarations can never create the trusted evidence used here.
 import asyncio
 import base64
 import json
+import logging
 import subprocess
 import sys
 import uuid
@@ -34,7 +35,7 @@ def qualifies(results,company):
     identity=any(all(r.get(k) for k in ('identity','name_matches','number_matches','birth_matches','expiry_read_and_valid')) for r in clean)
     return identity and (not company or any(r.get('fiscal') and r.get('company_matches') for r in clean))
 
-async def process_profile(db,draft):
+async def process_profile(db,draft,lease_token=None):
     subject=draft['subject_id'];revision=draft.get('revision');profile=draft.get('profile',{})
     if not revision or missing_profile_fields(profile):return 'WAITING_DETAILS'
     user=await db.web_users.find_one({'subject_id':subject,'active':True,'email_verified':True})
@@ -45,9 +46,11 @@ async def process_profile(db,draft):
     if current.get('revoked') and current.get('automatic_recheck_revision')!=revision:return 'EXCEPTION'
     if current.get('profile_revision')==revision and not current.get('revoked') and current.get('dossier_status')=='APPROVED':return 'ALREADY_APPROVED'
     docs=await db.web_personal_documents.find({'subject_id':subject,'scan_state':'CLEAN','deleted':{'$ne':True}}).sort('created_at',-1).to_list(10)
-    results=[];ids=[]
+    results=[];ids=[];seen=set()
     for doc in docs:
         if expired(doc):continue
+        if doc.get('sha256') in seen:continue
+        seen.add(doc.get('sha256'))
         evidence=doc.get('server_reading',{})
         if evidence.get('profile_revision')!=revision or evidence.get('sha256')!=doc.get('sha256') or evidence.get('reader_version')!=READER_VERSION:
             failures=doc.get('server_read_failures',0) if doc.get('server_read_failure_version')==READER_VERSION else 0
@@ -59,11 +62,14 @@ async def process_profile(db,draft):
             evidence={**result,'profile_revision':revision,'sha256':doc['sha256'],'at':datetime.now(timezone.utc)}
             await db.web_personal_documents.update_one({'_id':doc['_id'],'sha256':doc['sha256']},{'$set':{'server_reading':evidence,'server_read_state':'COMPLETE'}})
         results.append(evidence);ids.append(doc['document_id'])
+        if qualifies(results,profile.get('subject_type')=='PJ'):break
     if not qualifies(results,profile.get('subject_type')=='PJ'):
         from web_registration_feedback import correction_codes
         await db.web_profile_drafts.update_one({'subject_id':subject,'revision':revision},{'$set':{'automatic_state':'NEEDS_CORRECTION_OR_EXCEPTION','automatic_issues':correction_codes(results,profile.get('subject_type')=='PJ')}})
         return 'EXCEPTION'
     stamp=datetime.now(timezone.utc);decision='automatic:'+subject+':'+revision
+    if lease_token and not await db.web_job_leases.find_one({'_id':'automatic-registration','token':lease_token,'until':{'$gt':stamp}}):
+        return 'LEASE_LOST'
     # Stable identity and revision prevent duplicate events. Access checks compare
     # the saved revision on every request, so later edits invalidate this result.
     await db.web_registration_decisions.update_one({'_id':decision},{'$setOnInsert':{'subject_id':subject,'revision':revision,'at':stamp,'basis':'SERVER_DOCUMENT_CONSISTENCY','authenticity_verified':False,'documents':ids}},upsert=True)
@@ -87,27 +93,38 @@ async def process_profile(db,draft):
     await db.web_notifications.update_one({'id':decision},{'$setOnInsert':{'subject_id':subject,'title':'Alta aprobada','body':'La documentación coincide con tu perfil. Tu alta está aprobada. Los permisos de cada operación se gestionan por separado.','read':False,'created_at':stamp}},upsert=True)
     return 'APPROVED'
 
+async def renew_lease(db,token):
+    while True:
+        await asyncio.sleep(30)
+        result=await db.web_job_leases.update_one({'_id':'automatic-registration','token':token},
+            {'$set':{'until':datetime.now(timezone.utc)+timedelta(minutes=3)}})
+        if not result.matched_count:raise RuntimeError('registration_lease_lost')
+
 async def run(db):
     stamp=datetime.now(timezone.utc);token=str(uuid.uuid4())
     try:
-        claimed=await db.web_job_leases.update_one({'_id':'automatic-registration','$or':[{'until':{'$lte':stamp}},{'until':{'$exists':False}}]}, {'$set':{'until':stamp+timedelta(minutes=25),'token':token}},upsert=True)
+        claimed=await db.web_job_leases.update_one({'_id':'automatic-registration','$or':[{'until':{'$lte':stamp}},{'until':{'$exists':False}}]}, {'$set':{'until':stamp+timedelta(minutes=3),'token':token}},upsert=True)
     except DuplicateKeyError:return
     if not (claimed.modified_count or claimed.upserted_id):return
+    heartbeat=asyncio.create_task(renew_lease(db,token))
     try:
         drafts=await db.web_profile_drafts.find({'state':'PENDING_REVIEW'}).sort('auto_checked_at',1).to_list(1)
         for draft in drafts:
             try:
-                result=await process_profile(db,draft)
+                result=await process_profile(db,draft,lease_token=token)
                 status={'auto_last_result':result,'auto_error_type':None}
             except Exception as error:
                 # A malformed old profile must not starve every later account.
                 status={'auto_last_result':'PROCESSING_ERROR','auto_error_type':type(error).__name__}
             await db.web_profile_drafts.update_one({'subject_id':draft['subject_id'],'revision':draft.get('revision')},{'$set':{'auto_checked_at':stamp,**status}})
+            logging.getLogger(__name__).warning('registration_check result=%s reader=%s error=%s',status['auto_last_result'],READER_VERSION,status['auto_error_type'])
     finally:
+        heartbeat.cancel()
+        await asyncio.gather(heartbeat,return_exceptions=True)
         await db.web_job_leases.update_one({'_id':'automatic-registration','token':token},{'$set':{'until':datetime.now(timezone.utc)}})
 
 async def worker(db):
     while True:
         try:await run(db)
-        except Exception:pass
+        except Exception:logging.getLogger(__name__).exception('registration_worker_failed')
         await asyncio.sleep(30)

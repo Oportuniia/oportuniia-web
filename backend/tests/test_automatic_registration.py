@@ -80,7 +80,7 @@ def test_failed_profile_does_not_block_queue(monkeypatch):
     for name in ('bad','good'):
         db.raw.web_profile_drafts.insert_one({'subject_id':name,'revision':'r','state':'PENDING_REVIEW'})
     seen=[]
-    async def process(db,draft):
+    async def process(db,draft,lease_token=None):
         seen.append(draft['subject_id'])
         if draft['subject_id']=='bad':raise ValueError('fixture')
         return 'WAITING_DETAILS'
@@ -88,6 +88,28 @@ def test_failed_profile_does_not_block_queue(monkeypatch):
     asyncio.run(automatic.run(db));asyncio.run(automatic.run(db))
     assert seen==['bad','good']
     assert db.raw.web_profile_drafts.find_one({'subject_id':'bad'})['auto_last_result']=='PROCESSING_ERROR'
+
+def test_lost_worker_lease_cannot_approve(monkeypatch):
+    db=DB();draft={'subject_id':'fixture','revision':'r','state':'PENDING_REVIEW','profile':{'subject_type':'PF'}}
+    db.raw.web_users.insert_one({'subject_id':'fixture','active':True,'email_verified':True})
+    db.raw.web_profile_drafts.insert_one(draft)
+    db.raw.web_personal_documents.insert_one({'subject_id':'fixture','document_id':'d','sha256':'a','scan_state':'CLEAN'})
+    monkeypatch.setattr(automatic,'missing_profile_fields',lambda p:[])
+    monkeypatch.setattr(automatic,'server_read',lambda *args:evidence())
+    assert asyncio.run(automatic.process_profile(db,draft,lease_token='obsolete'))=='LEASE_LOST'
+    assert db.raw.web_access_reviews.count_documents({})==0
+
+def test_duplicate_originals_are_not_read_repeatedly(monkeypatch):
+    db=DB();draft={'subject_id':'fixture','revision':'r','state':'PENDING_REVIEW','profile':{'subject_type':'PF'}}
+    db.raw.web_users.insert_one({'subject_id':'fixture','active':True,'email_verified':True})
+    db.raw.web_profile_drafts.insert_one(draft)
+    for i in range(4):db.raw.web_personal_documents.insert_one({'subject_id':'fixture','document_id':str(i),'sha256':'same','scan_state':'CLEAN'})
+    monkeypatch.setattr(automatic,'missing_profile_fields',lambda p:[])
+    seen=[]
+    def reader(*args):seen.append(1);return {**evidence(),'name_matches':False}
+    monkeypatch.setattr(automatic,'server_read',reader)
+    assert asyncio.run(automatic.process_profile(db,draft))=='EXCEPTION'
+    assert len(seen)==1
 
 
 @pytest.mark.parametrize('hold,expected',[(False,'APPROVED'),(True,'EXCEPTION')])
