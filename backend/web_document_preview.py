@@ -46,8 +46,10 @@ def unseal(value, row):
 
 def prepare(data, row):
     # Separate bounded process; no file is parsed before CLEAN + integrity checks.
-    result=subprocess.run([sys.executable,str(Path(__file__))],input=data,
-        stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=30,check=True)
+    from web_document_processing import document_processing_slot
+    with document_processing_slot:
+        result=subprocess.run([sys.executable,str(Path(__file__))],input=data,
+            stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=30,check=True)
     return seal(result.stdout,row)
 
 if __name__=='__main__':

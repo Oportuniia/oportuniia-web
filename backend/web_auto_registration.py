@@ -16,6 +16,11 @@ from web_dossier import expired
 from web_personal_storage import read
 
 def server_read(row,profile):
+    from web_document_processing import document_processing_slot
+    with document_processing_slot:
+        return _server_read(row,profile)
+
+def _server_read(row,profile):
     raw=read(row)  # decrypt and verify original SHA-256 before any parser
     payload=json.dumps({'data':base64.b64encode(raw).decode(),'profile':profile}).encode()
     result=subprocess.run([sys.executable,str(Path(__file__).with_name('web_document_reader.py'))],input=payload,
