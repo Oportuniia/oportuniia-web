@@ -74,6 +74,10 @@ async def process_profile(db,draft,lease_token=None):
         return 'LEASE_LOST'
     # Stable identity and revision prevent duplicate events. Access checks compare
     # the saved revision on every request, so later edits invalidate this result.
+    if not await db.web_users.find_one({'subject_id': subject, 'active': True, 'purge_started_at': {'$exists': False}}):
+        return 'EXCEPTION'
+    latest=await db.web_profile_drafts.find_one({'subject_id':subject,'revision':revision,'state':'PENDING_REVIEW'})
+    if not latest or await blocked(db,user,profile):return 'EXCEPTION'
     await db.web_registration_decisions.update_one({'_id':decision},{'$setOnInsert':{'subject_id':subject,'revision':revision,'at':stamp,'basis':'SERVER_DOCUMENT_CONSISTENCY','authenticity_verified':False,'documents':ids}},upsert=True)
     await db.web_verified_profiles.update_one({'subject_id':subject,'version':decision},{'$setOnInsert':{'profile':profile,'created_at':stamp,'verification_basis':'SERVER_DOCUMENT_CONSISTENCY'}},upsert=True)
     # Do not overwrite an administrative hold established while OCR was running.

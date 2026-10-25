@@ -170,7 +170,7 @@ async def reconcile_document(db, row):
             return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
     if state == "CLEAN":
         stamp, claim = datetime.now(timezone.utc), str(uuid.uuid4())
-        claimed = await db.web_personal_documents.find_one_and_update({"_id": row["_id"], "$or": [
+        claimed = await db.web_personal_documents.find_one_and_update({"_id": row["_id"], "deleted": {"$ne": True}, "$or": [
             {"scan_state": "QUARANTINED"}, {"scan_state": "PROMOTING", "promotion_until": {"$lt": stamp}}]},
             {"$set": {"scan_state": "PROMOTING", "promotion_claim": claim, "promotion_until": stamp + timedelta(minutes=5)}},
             return_document=ReturnDocument.AFTER)

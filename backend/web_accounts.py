@@ -19,6 +19,8 @@ async def bootstrap_accounts(db):
         ("WEB_USER", "rafa.querol", "rafa.querol77@gmail.com", "user"),
     ):
         password = os.getenv(prefix + "_INITIAL_PASSWORD", "")
+        if await db.web_users.find_one({'bootstrap_username': username, 'purge_completed': True}):
+            continue
         if not password or await db.web_users.find_one({"$or": [{"username": username}, {"email": email}]}):
             continue
         stamp = now()
@@ -62,10 +64,18 @@ def register_account_admin_routes(router, db):
     @router.get("/staff/accounts")
     @router.get("/account/admin-users")
     async def accounts(request: Request):
-        await administrator(request, db)
-        rows = await db.web_users.find({}, {"_id": 0, "subject_id": 1, "name": 1,
+        actor = await administrator(request, db)
+        rows = await db.web_users.find({'purge_completed': {'$ne': True}}, {"_id": 0, "subject_id": 1, "name": 1,
             "username": 1, "email": 1, "recovery_email": 1, "role": 1,
             "active": 1, "must_change_password": 1}).to_list(500)
+        for row in rows:
+            review = await db.web_access_reviews.find_one({'subject_id': row['subject_id']}) or {}
+            draft = await db.web_profile_drafts.find_one({'subject_id': row['subject_id']}) or {}
+            row['profile_state'] = ('MASTER' if row.get('role') == 'superadmin' else
+                'APPROVED' if review.get('dossier_status') == 'APPROVED' and not review.get('revoked') else
+                'CORRECTION' if review.get('dossier_status') == 'REJECTED' else
+                'PENDING' if draft else 'INCOMPLETE')
+            row['is_self'] = row['subject_id'] == actor['subject_id']
         return {"items": rows}
 
     @router.post("/staff/accounts", status_code=201)

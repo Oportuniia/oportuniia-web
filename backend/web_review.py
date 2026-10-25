@@ -65,8 +65,20 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         target = await db.web_users.find_one({'subject_id': subject})
         if not target: fail('account_not_found', 404)
         if actor['subject_id'] == subject or target.get('role') == 'superadmin': fail('protected_account', 403)
-        phrases = {'REMOVE': 'ELIMINAR EXPEDIENTE', 'RESTORE': 'RESTAURAR EXPEDIENTE', 'BLOCK': 'VETAR ACCESO', 'UNBLOCK': 'LEVANTAR VETO'}
+        phrases = {'PURGE': 'ELIMINAR EXPEDIENTE', 'REMOVE': 'ELIMINAR EXPEDIENTE', 'RESTORE': 'RESTAURAR EXPEDIENTE', 'BLOCK': 'VETAR ACCESO', 'UNBLOCK': 'LEVANTAR VETO'}
         if payload.action not in phrases or payload.confirmation != phrases[payload.action]: fail('written_confirmation_required', 422)
+        if target.get('purge_completed'): fail('account_not_found', 404)
+        if target.get('purge_started_at') and payload.action != 'PURGE': fail('permanent_deletion_in_progress', 409)
+        if payload.action == 'PURGE':
+            from web_dossier_purge import purge
+            try:
+                result = await purge(db, subject)
+            except Exception:
+                fail('permanent_deletion_storage_pending', 503)
+            await db.web_account_events.insert_one({'event_id': str(uuid.uuid4()), 'subject_id': subject,
+                'action': 'PURGE', 'reason': payload.reason, 'reviewer_subject_id': actor['subject_id'],
+                'at': datetime.now(timezone.utc)})
+            return result
         draft = await db.web_profile_drafts.find_one({'subject_id': subject}) or {}
         stamp = datetime.now(timezone.utc)
         from web_access_restrictions import identifiers
@@ -146,7 +158,11 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         if not draft: draft = {"profile": {}, "revision": ""}
         docs = await db.web_personal_documents.find({"subject_id": subject, "$or": [{"deleted": {"$ne": True}}, {"removed_by_reviewer": True}]}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "dossier_state": 1, "document_kinds": 1, "declared_identity": 1, "identity_discrepancy": 1, "discrepancy_explanation": 1, "quality": 1, "identity_read_status": 1, "review_state": 1, "deleted": 1}).to_list(100)
         target = await db.web_users.find_one({"subject_id": subject}) or {}
-        return {"account_state": {"removed": bool(target.get("dossier_removed")), "blocked": bool(target.get("access_blocked"))}, "revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
+        if not target or target.get('purge_completed'): fail('account_not_found', 404)
+        approval = await db.web_access_reviews.find_one({'subject_id': subject}) or {}
+        return {"account": {"name": target.get('name'), "email": target.get('email'), "username": target.get('username')},
+            "approval": {"approved": approval.get('dossier_status') == 'APPROVED' and not approval.get('revoked'), "state": approval.get('dossier_status', 'PENDING')},
+            "account_state": {"removed": bool(target.get("dossier_removed")), "blocked": bool(target.get("access_blocked"))}, "revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
 
     @router.get(prefix + "/{subject}/documents/{document_id}")
     async def review_document(subject: str, document_id: str, request: Request, preview: bool = False):
