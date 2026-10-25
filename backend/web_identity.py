@@ -174,6 +174,9 @@ async def mail_token(db, user, purpose):
     if purpose == "verify":
         from web_mail_templates import registration_confirmation
         title, body = registration_confirmation(user.get("name", ""), link)
+        if user.get("acceptance", {}).get("snapshot"):
+            from web_legal_acceptance import receipt_text
+            body += "\n\n" + receipt_text(user["acceptance"])
     else:
         title = "Restablece tu contraseña · OPORTUNIIA"
         body = "Restablece tu contraseña en este enlace de un solo uso (30 minutos):\n\n"+link+"\n\nSi no lo has solicitado, ignora este mensaje."
@@ -252,6 +255,7 @@ class Signup(Credentials):
     account_kind: str
     accept_privacy: bool
     accept_terms: bool
+    legal_bundle_id: str | None = Field(default=None, max_length=64)
 
 
 class MailRequest(BaseModel):
@@ -269,6 +273,17 @@ class Reset(LinkToken):
 
 
 def register_identity_routes(router: APIRouter, db):
+    @router.get("/account/legal-bundle")
+    async def legal_bundle():
+        from web_legal_acceptance import bundle
+        return bundle()
+
+    @router.get("/account/legal-receipt")
+    async def legal_receipt(request: Request):
+        from web_legal_acceptance import receipt_text
+        user, _ = await resolve_session(request, db, check_csrf=False)
+        return {"text": receipt_text(user.get("acceptance", {})), "has_snapshot": bool(user.get("acceptance", {}).get("snapshot"))}
+
     @router.get("/account/config")
     async def config():
         catalog_state = "error"
@@ -289,6 +304,10 @@ def register_identity_routes(router: APIRouter, db):
             denied("registration_not_activated", 503)
         if payload.account_kind not in {"inversor", "colaborador"} or not payload.accept_privacy or not payload.accept_terms:
             denied("registration_requirements_missing", 422)
+        from web_legal_acceptance import bundle
+        legal = bundle()
+        if payload.legal_bundle_id is not None and payload.legal_bundle_id != legal["id"]:
+            denied("legal_version_changed", 409)
         email = str(payload.email).strip().lower()
         await rate_limit(db, request, "register", email)
         from web_access_restrictions import blocked
@@ -296,6 +315,8 @@ def register_identity_routes(router: APIRouter, db):
         hashed = await hash_password(payload.password)
         user = {"subject_id": str(uuid.uuid4()), "email": email, "name": payload.name.strip(), "password_hash": hashed, "account_kind": payload.account_kind,
             "active": True, "email_verified": False, "session_version": 0, "created_at": now(), "acceptance": {"privacy": os.environ["WEB_PRIVACY_VERSION"], "terms": os.environ["WEB_TERMS_VERSION"], "accepted_at": now()}}
+        if payload.legal_bundle_id:
+            user["acceptance"].update({"snapshot": legal, "channel": "web_signup", "privacy_read": True, "terms_accepted": True})
         try:
             await db.web_users.insert_one(user)
         except DuplicateKeyError:
