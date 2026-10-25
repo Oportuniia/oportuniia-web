@@ -89,6 +89,10 @@ def register_fund_routes(router, db):
     @router.get("/account/funds/entities/{entity_id}/portfolio")
     async def portfolio(entity_id: str, request: Request):
         owner = await member_access(request, db, entity_id)
+        if owner.get('is_demo'):
+            await administrator(request,db)
+            return {'demo':True,'entity':{'entity_id':entity_id,'name':owner['name']},'items':[], 'total':0,
+                    'by_phase':{},'checked_at':now()}
         assignments = await db.web_fund_operations.find({"entity_id": entity_id, "active": True}).to_list(1001)
         limited = len(assignments) > 1000
         assignments = assignments[:1000]
@@ -114,6 +118,15 @@ def register_fund_routes(router, db):
         await audit(db, actor["subject_id"], "FUND_ENTITY_CREATED:" + row["entity_id"])
         return {"entity_id": row["entity_id"], "name": row["name"]}
 
+    @router.post('/account/funds/manage/demo')
+    async def demo(request:Request):
+        actor=await administrator(request,db)
+        ident='DEMO-ATLAS'
+        await db.web_fund_entities.update_one({'entity_id':ident},{'$setOnInsert':{
+            'name':'Atlas Capital · Fondo ficticio','active':True,'is_demo':True,
+            'created_at':now(),'created_by':actor['subject_id']}},upsert=True)
+        return {'entity_id':ident,'demo':True}
+
     @router.get("/account/funds/manage/entities/{entity_id}/access")
     async def accesses(entity_id: str, request: Request):
         await administrator(request, db)
@@ -127,7 +140,8 @@ def register_fund_routes(router, db):
     @router.post("/account/funds/manage/entities/{entity_id}/members")
     async def grant(entity_id: str, payload: Member, request: Request):
         actor = await administrator(request, db)
-        await entity(db, entity_id)
+        owner=await entity(db, entity_id)
+        if owner.get('is_demo'):denied('demo_cannot_grant_real_access',409)
         email = str(payload.email).lower()
         target = await db.web_users.find_one({"email": email, "active": True, "email_verified": True})
         if not target:
@@ -153,7 +167,8 @@ def register_fund_routes(router, db):
     @router.post("/account/funds/manage/entities/{entity_id}/operations")
     async def assign(entity_id: str, payload: Operation, request: Request):
         actor = await administrator(request, db)
-        await entity(db, entity_id)
+        owner=await entity(db, entity_id)
+        if owner.get('is_demo'):denied('demo_cannot_receive_real_operations',409)
         if not await published_operation(db, payload.op_ref):
             denied("fund_approved_operation_required", 409)
         from pymongo.errors import DuplicateKeyError

@@ -98,3 +98,15 @@ def test_member_mfa_and_disabled_entity(system):
     db.raw.web_fund_entities.update_one({}, {'$set':{'active':False}})
     assert c.get(f'/api/account/funds/entities/{owner}/portfolio').status_code==404
     assert c.get('/api/account/funds/entities').json()['items']==[]
+
+def test_demo_is_master_only_and_never_receives_real_operations(system):
+    c,db=setup(system)
+    r=c.post('/api/account/funds/manage/demo',json={})
+    assert r.status_code==200,r.text
+    entity=r.json()['entity_id']
+    assert c.get(f'/api/account/funds/entities/{entity}/portfolio').json()['demo'] is True
+    assert c.post(f'/api/account/funds/manage/entities/{entity}/members',json={'email':'one@example.com'}).status_code==409
+    published(db)
+    assert c.post(f'/api/account/funds/manage/entities/{entity}/operations',json={'op_ref':'OP-UNO'}).status_code==409
+    db.raw.web_users.update_one({}, {'$set':{'role':'user'}})
+    assert c.get(f'/api/account/funds/entities/{entity}/portfolio').status_code==403

@@ -25,6 +25,7 @@ from web_payments import register_payment_routes
 from web_workers import register_worker_routes
 from web_quarantine import register_quarantine_routes
 from web_funds import register_fund_routes, ensure_fund_indexes
+from web_reservation_protocol import register_protocol_routes, worker as protocol_worker
 
 mongo_url, database_name = os.getenv("MONGO_URL", ""), os.getenv("DB_NAME", "")
 client = db = None
@@ -48,9 +49,13 @@ async def lifespan(app):
     task = asyncio.create_task(quarantine_worker(db)) if db is not None and configured() else None
     from web_auto_registration import worker
     registration_task = asyncio.create_task(worker(db)) if db is not None and configured() else None
+    protocol_task = asyncio.create_task(protocol_worker(db)) if db is not None and enabled() else None
     try:
         yield
     finally:
+        if protocol_task:
+            protocol_task.cancel()
+            with suppress(asyncio.CancelledError): await protocol_task
         if registration_task:
             registration_task.cancel()
             with suppress(asyncio.CancelledError):await registration_task
@@ -102,5 +107,6 @@ register_payment_routes(router, db)
 register_worker_routes(router, db)
 register_quarantine_routes(router, db)
 register_fund_routes(router, db)
+register_protocol_routes(router, db)
 app.include_router(router)
 
