@@ -204,3 +204,13 @@ def test_td1_expiry_requires_exact_birth_and_valid_check_digits():
     assert not mrz_expiry('350101','1980-01-01')
     expired='200101'
     assert not mrz_expiry(birth+digit(birth)+'M'+expired+digit(expired)+'ESP'+'<'*11+'0','1980-01-01')
+
+
+@pytest.mark.parametrize('prefix', ['X','Y','Z'])
+def test_nie_prefixes_keep_check_digit_validation(prefix):
+    digits='1234567';number=prefix+digits+'TRWAGMYFPDXBNJZSQVHLCKE'[int(str('XYZ'.index(prefix))+digits)%23]
+    profile={'full_name':'Ana Garcia','tax_id':number,'birth_date':'1980-01-01'}
+    text='DNI\nGARCIA<<ANA\n'+number+'\nVALIDEZ 01/01/2090\n01/01/1980'
+    assert evaluate_text(text,.99,profile)['number_matches']
+    profile['tax_id']=number[:-1]+('A' if number[-1]!='A' else 'B')
+    assert not evaluate_text(text,.99,profile)['number_matches']

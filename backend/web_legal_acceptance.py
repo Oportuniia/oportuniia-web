@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 
 def bundle():
-    return json.loads((Path(__file__).parent / "legal/alta-20261025-1.json").read_text(encoding="utf-8"))
+    return json.loads((Path(__file__).parent / "legal/alta-20261025-2.json").read_text(encoding="utf-8"))
 
 def receipt_text(acceptance):
     snapshot = acceptance.get("snapshot")
