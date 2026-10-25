@@ -38,8 +38,8 @@ async def process_profile(db,draft):
     if not revision or missing_profile_fields(profile):return 'WAITING_DETAILS'
     user=await db.web_users.find_one({'subject_id':subject,'active':True,'email_verified':True})
     if not user or user.get('role')=='superadmin':return 'SKIPPED'
-    blocked_keys=[{'subject_id':subject},{'email':user['email']}]+[{'tax_id':value} for value in (profile.get('tax_id'),profile.get('company_tax_id')) if value]
-    if await db.web_registration_blocks.find_one({'$or':blocked_keys, 'active':True}):return 'EXCEPTION'
+    from web_access_restrictions import blocked
+    if await blocked(db,user,profile):return "EXCEPTION"
     current=await db.web_access_reviews.find_one({'subject_id':subject}) or {}
     if current.get('revoked'):return 'EXCEPTION'
     if current.get('profile_revision')==revision and not current.get('revoked') and current.get('dossier_status')=='APPROVED':return 'ALREADY_APPROVED'

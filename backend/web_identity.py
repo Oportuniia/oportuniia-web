@@ -211,6 +211,8 @@ async def resolve_session(request: Request, db, *, check_csrf=True):
     user = await db.web_users.find_one({"subject_id": session["subject_id"], "active": True, "email_verified": True})
     if not user or user.get("session_version", 0) != session.get("version", 0):
         denied("session_revoked", 401)
+    from web_access_restrictions import blocked
+    if await blocked(db, user): denied("account_access_restricted", 403)
     if user.get("must_change_password") and request.url.path not in {"/api/account/change-password", "/api/account/logout", "/api/account/session"}:
         denied("initial_password_change_required", 403)
     if check_csrf and request.method not in {"GET", "HEAD", "OPTIONS"}:
@@ -227,6 +229,8 @@ async def resolve_session(request: Request, db, *, check_csrf=True):
 
 
 async def issue_session(db, user, response, mfa_verified=False):
+    from web_access_restrictions import blocked
+    if not user.get("active") or await blocked(db, user): denied("account_access_restricted", 403)
     token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
     stamp = now()
     await db.web_sessions.insert_one({"token_hash": digest(token), "csrf_hash": digest(csrf), "subject_id": user["subject_id"], "version": user.get("session_version", 0),
@@ -287,6 +291,8 @@ def register_identity_routes(router: APIRouter, db):
             denied("registration_requirements_missing", 422)
         email = str(payload.email).strip().lower()
         await rate_limit(db, request, "register", email)
+        from web_access_restrictions import blocked
+        if await blocked(db, {"email": email}): denied("registration_unavailable_contact_support", 403)
         hashed = await hash_password(payload.password)
         user = {"subject_id": str(uuid.uuid4()), "email": email, "name": payload.name.strip(), "password_hash": hashed, "account_kind": payload.account_kind,
             "active": True, "email_verified": False, "session_version": 0, "created_at": now(), "acceptance": {"privacy": os.environ["WEB_PRIVACY_VERSION"], "terms": os.environ["WEB_TERMS_VERSION"], "accepted_at": now()}}

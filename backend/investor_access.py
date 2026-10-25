@@ -74,6 +74,10 @@ async def authenticated_subject(request: Request) -> str:
     subject = claims.get("sub")
     if not isinstance(subject, str) or not 1 <= len(subject) <= 200:
         fail("invalid_subject", 401)
+    db = getattr(request.app.state, "web_db", None)
+    if db is not None:
+        from web_access_restrictions import blocked
+        if await blocked(db, {"subject_id": subject}): fail("account_access_restricted", 403)
     return subject
 
 
@@ -295,6 +299,8 @@ def register_investor_routes(router: APIRouter, db):
         if os.getenv("WEB_IDENTITY_MODE") == "web_sessions":
             owner = request.state.web_user
             if payload.email.lower() != owner["email"] or payload.account_kind != owner["account_kind"]: fail("account_identity_mismatch", 422)
+        from web_access_restrictions import blocked
+        if await blocked(db, {"subject_id": subject, "email": payload.email}, payload.model_dump()): fail("account_access_restricted", 403)
         # Editing the profile cannot retain an approval of an older identity snapshot.
         await db.web_access_reviews.update_one({"subject_id": subject}, {"$set": {"revoked": True, "identity_status": "PENDING", "dossier_status": "PENDING"}})
         await db.web_profile_drafts.update_one({"subject_id": subject}, {"$set": {"subject_id": subject, "profile": payload.model_dump(),

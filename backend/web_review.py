@@ -45,7 +45,49 @@ class DocumentRemoval(BaseModel):
     reason: str = Field(min_length=10, max_length=1000)
 
 
+class AccountAction(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    action: str
+    confirmation: str
+    reason: str = Field(min_length=20, max_length=2000)
+
+
 def register_review_routes(router, db, prefix="/staff/reviews"):
+    @router.get(prefix + "/history/restrictions")
+    async def restriction_history(request: Request):
+        await reviewer(request, db)
+        rows = await db.web_account_events.find({}, {'_id': 0}).sort('at', -1).to_list(100)
+        return {'items': rows}
+
+    @router.post(prefix + "/{subject}/account-action")
+    async def account_action(subject: str, payload: AccountAction, request: Request):
+        actor = await reviewer(request, db)
+        target = await db.web_users.find_one({'subject_id': subject})
+        if not target: fail('account_not_found', 404)
+        if actor['subject_id'] == subject or target.get('role') == 'superadmin': fail('protected_account', 403)
+        phrases = {'REMOVE': 'ELIMINAR EXPEDIENTE', 'RESTORE': 'RESTAURAR EXPEDIENTE', 'BLOCK': 'VETAR ACCESO', 'UNBLOCK': 'LEVANTAR VETO'}
+        if payload.action not in phrases or payload.confirmation != phrases[payload.action]: fail('written_confirmation_required', 422)
+        draft = await db.web_profile_drafts.find_one({'subject_id': subject}) or {}
+        stamp = datetime.now(timezone.utc)
+        from web_access_restrictions import identifiers
+        # Evidence is retained; deletion here is reversible withdrawal, not a purge.
+        await db.web_account_events.insert_one({'event_id': str(uuid.uuid4()), 'subject_id': subject,
+            'name': target.get('name', ''), 'action': payload.action, 'reason': payload.reason,
+            'reviewer_subject_id': actor['subject_id'], 'at': stamp})
+        if payload.action == 'BLOCK':
+            for key in identifiers(target, draft.get('profile')):
+                await db.web_registration_blocks.update_one({'owner_subject_id': subject, **key},
+                    {'$set': {'active': True, 'reason': payload.reason, 'at': stamp}}, upsert=True)
+        if payload.action == 'UNBLOCK':
+            await db.web_registration_blocks.update_many({'owner_subject_id': subject}, {'$set': {'active': False, 'lifted_at': stamp}})
+        changes = {'dossier_removed': payload.action == 'REMOVE'} if payload.action in {'REMOVE', 'RESTORE'} else {'access_blocked': payload.action == 'BLOCK'}
+        await db.web_users.update_one({'subject_id': subject}, {'$set': changes, '$inc': {'session_version': 1}})
+        await db.web_sessions.update_many({'subject_id': subject}, {'$set': {'revoked': True}})
+        await db.web_access_reviews.update_one({'subject_id': subject}, {'$set': {'revoked': True, 'dossier_status': 'PENDING', 'documents_complete': False}})
+        await db.web_profile_drafts.update_one({'subject_id': subject}, {'$set': {'state': 'WITHDRAWN' if payload.action in {'REMOVE','BLOCK'} else 'PENDING_REVIEW'}})
+        await db.web_review_requests.update_many({'subject_id': subject}, {'$set': {'state': 'WITHDRAWN' if payload.action in {'REMOVE','BLOCK'} else 'PENDING'}})
+        return {'saved': True, 'action': payload.action, 'approval_restored': False}
+
     @router.post(prefix + "/{subject}/documents/{document_id}/removal")
     async def remove_document(subject: str, document_id: str, payload: DocumentRemoval, request: Request):
         actor = await reviewer(request, db)
@@ -103,7 +145,8 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         draft = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0})
         if not draft: draft = {"profile": {}, "revision": ""}
         docs = await db.web_personal_documents.find({"subject_id": subject, "$or": [{"deleted": {"$ne": True}}, {"removed_by_reviewer": True}]}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "dossier_state": 1, "document_kinds": 1, "declared_identity": 1, "identity_discrepancy": 1, "discrepancy_explanation": 1, "quality": 1, "identity_read_status": 1, "review_state": 1, "deleted": 1}).to_list(100)
-        return {"revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
+        target = await db.web_users.find_one({"subject_id": subject}) or {}
+        return {"account_state": {"removed": bool(target.get("dossier_removed")), "blocked": bool(target.get("access_blocked"))}, "revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
 
     @router.get(prefix + "/{subject}/documents/{document_id}")
     async def review_document(subject: str, document_id: str, request: Request, preview: bool = False):
@@ -124,6 +167,8 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         if {d["document_id"] for d in docs} != set(payload.reviewed_document_ids): fail("review_document_ownership_mismatch", 422)
         target = await db.web_users.find_one({"subject_id": subject, "active": True, "email_verified": True})
         if not target: fail("review_target_account_unavailable", 409)
+        from web_access_restrictions import blocked
+        if await blocked(db, target, draft["profile"]): fail("account_access_restricted", 403)
         profile = draft["profile"]
         categories = {k for d in docs if d.get("scan_state") == "CLEAN" for k in d.get("document_kinds", [d["category"]])}
         required = {"representative_identity", "company_tax_document"} if profile.get("subject_type") == "PJ" else {"identity"}
