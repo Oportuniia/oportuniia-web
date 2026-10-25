@@ -46,11 +46,14 @@ def test_administrator_is_server_role_and_mfa_not_username(system):
     routes(c, db)
     db.raw.web_users.update_one({}, {'$set': {'username': 'rafamaster', 'role': 'user'}})
     assert c.get('/api/staff/accounts', headers={'X-Role': 'superadmin'}).status_code == 403
+    assert c.get('/api/account/admin-users', headers={'X-Role': 'superadmin'}).status_code == 403
     db.raw.web_users.update_one({}, {'$set': {'role': 'superadmin'}})
     assert c.get('/api/staff/accounts').status_code == 403
+    assert c.get('/api/account/admin-users').status_code == 403
     db.raw.web_users.update_one({}, {'$set': {'mfa_enabled': True}})
     db.raw.web_sessions.update_many({}, {'$set': {'mfa_verified': True}})
     assert c.get('/api/staff/accounts').status_code == 200
+    assert c.get('/api/account/admin-users').json() == c.get('/api/staff/accounts').json()
     assert 'password_hash' not in c.get('/api/staff/accounts').text
 
 

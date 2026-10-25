@@ -60,6 +60,7 @@ class InitialPassword(BaseModel):
 
 def register_account_admin_routes(router, db):
     @router.get("/staff/accounts")
+    @router.get("/account/admin-users")
     async def accounts(request: Request):
         await administrator(request, db)
         rows = await db.web_users.find({}, {"_id": 0, "subject_id": 1, "name": 1,
@@ -68,6 +69,7 @@ def register_account_admin_routes(router, db):
         return {"items": rows}
 
     @router.post("/staff/accounts", status_code=201)
+    @router.post("/account/admin-users", status_code=201)
     async def create(payload: NewAccount, request: Request):
         actor = await administrator(request, db)
         await rate_limit(db, request, "admin-create", actor["subject_id"])
@@ -88,6 +90,7 @@ def register_account_admin_routes(router, db):
         return {"user": safe_user(user)}
 
     @router.post("/staff/accounts/{subject}/initial-password")
+    @router.post("/account/admin-users/{subject}/initial-password")
     async def reset(subject: str, payload: InitialPassword, request: Request):
         actor = await administrator(request, db)
         await rate_limit(db, request, "admin-reset", actor["subject_id"])
@@ -101,6 +104,7 @@ def register_account_admin_routes(router, db):
         return {"updated": True, "must_change_password": True}
 
     @router.delete("/staff/accounts/{subject}")
+    @router.delete("/account/admin-users/{subject}")
     async def remove(subject: str, request: Request):
         actor = await administrator(request, db)
         if subject == actor["subject_id"]: denied("cannot_delete_own_administrator", 409)
