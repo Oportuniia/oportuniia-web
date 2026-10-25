@@ -1,0 +1,28 @@
+
+.premium-stage{background:#071925;padding:64px 24px 76px;color:white}.premium-stage .wrap{max-width:1180px;margin:auto}
+.premium-home{margin-top:54px;padding:clamp(30px,4vw,54px);border-radius:20px;background:linear-gradient(135deg,#0A1622 0%,#0C2130 58%,#0B2C3D 100%);border:1px solid rgba(87,198,228,.3);color:#EAF3F8;box-shadow:0 34px 80px -44px rgba(10,22,34,.8)}
+.premium-k{display:inline-flex;align-items:center;gap:8px;padding:7px 13px;border-radius:999px;background:rgba(87,198,228,.11);color:#7AD0E9;font-size:10.5px;font-weight:700;letter-spacing:.18em}
+.premium-k svg{width:14px;height:14px}
+.premium-copy h3{font-size:clamp(27px,3.2vw,44px);line-height:1.08;margin-top:18px;color:#fff;max-width:900px}
+.premium-copy p{margin-top:15px;color:#A9C0CC;max-width:760px;font-size:15px}
+.premium-benefits{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:32px}
+.premium-benefits>div{padding:19px 17px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);border-radius:12px;display:flex;gap:12px;align-items:flex-start}
+.premium-benefits svg{width:18px;height:18px;flex:0 0 auto;color:#57C6E4;margin-top:2px}
+.premium-benefits b{display:block;color:#fff;font-size:12.5px}
+.premium-benefits small{display:block;margin-top:7px;color:#8FA9B7;font-size:10.8px;line-height:1.55}
+.premium-action{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:28px}
+.premium-btn{display:inline-flex;align-items:center;gap:9px;padding:15px 24px;border-radius:7px;background:#2E9AC6;color:#fff;font-size:12.5px;font-weight:700;letter-spacing:.08em;transition:.3s}
+.premium-btn:hover{transform:translateY(-2px);background:#57C6E4}
+.premium-btn svg{width:16px;height:16px}
+.premium-action p{font-size:10.5px;color:#6E8795}
+
+.premium-stage .premium-home{margin-top:0}
+.premium-stage .premium-k{background:#f4f8fb;color:#102c3e;font-size:clamp(25px,3.5vw,42px);font-weight:800;letter-spacing:.08em;border-radius:9px;padding:12px 22px;line-height:1.2}
+.premium-stage .premium-k svg{width:28px;height:28px;color:#102c3e}
+.premium-stage .premium-benefits>div{background:#102c3e;color:#fff;border-color:#315567;transition:background-color .2s,color .2s,border-color .2s}
+.premium-stage .premium-benefits b{color:#fff}.premium-stage .premium-benefits small{color:#c2d7e3}
+.premium-stage .premium-benefits>div:hover,.premium-stage .premium-benefits>div:focus-visible{background:#f4f8fb;color:#102c3e;border-color:#f4f8fb;outline:2px solid #57c6e4;outline-offset:3px}
+.premium-stage .premium-benefits>div:hover b,.premium-stage .premium-benefits>div:focus-visible b,.premium-stage .premium-benefits>div:hover small,.premium-stage .premium-benefits>div:focus-visible small,.premium-stage .premium-benefits>div:hover svg,.premium-stage .premium-benefits>div:focus-visible svg{color:#102c3e}
+.premium-stage .premium-action p{color:#b8cdd9}.premium-stage .premium-btn:hover,.premium-stage .premium-btn:focus-visible{background:#fff;color:#102c3e}
+@media(max-width:1100px){.premium-benefits{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.premium-benefits{grid-template-columns:1fr}.premium-action{align-items:stretch;flex-direction:column}.premium-btn{justify-content:center}.premium-stage{padding:32px 16px}.premium-stage .premium-home{padding:26px 20px}}
+@media(prefers-reduced-motion:reduce){.premium-benefits>div,.premium-btn{transition:none}}
