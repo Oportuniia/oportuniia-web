@@ -263,6 +263,13 @@ class MailRequest(BaseModel):
     email: str = Field(max_length=180)
 
 
+class LegalConfirmation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    legal_bundle_id: str = Field(min_length=64, max_length=64)
+    accept_terms: bool
+    accept_privacy: bool
+
+
 class LinkToken(BaseModel):
     model_config = ConfigDict(extra="forbid")
     token: str = Field(min_length=32, max_length=200)
@@ -282,7 +289,34 @@ def register_identity_routes(router: APIRouter, db):
     async def legal_receipt(request: Request):
         from web_legal_acceptance import receipt_text
         user, _ = await resolve_session(request, db, check_csrf=False)
-        return {"text": receipt_text(user.get("acceptance", {})), "has_snapshot": bool(user.get("acceptance", {}).get("snapshot"))}
+        acceptance = user.get("legal_confirmation") or user.get("acceptance", {})
+        return {"text": receipt_text(acceptance), "has_snapshot": bool(acceptance.get("snapshot"))}
+
+    @router.get("/account/legal-status")
+    async def legal_status(request: Request):
+        from web_legal_acceptance import bundle
+        user, _ = await resolve_session(request, db, check_csrf=False)
+        current = bundle()
+        acceptance = user.get("legal_confirmation") or user.get("acceptance", {})
+        return {"pending": acceptance.get("snapshot", {}).get("id") != current["id"], "version": current["version"]}
+
+    @router.post("/account/legal-confirmation")
+    async def legal_confirmation(payload: LegalConfirmation, request: Request):
+        from web_legal_acceptance import bundle
+        user, _ = await resolve_session(request, db)
+        current = bundle()
+        if payload.legal_bundle_id != current["id"]:
+            denied("legal_version_changed", 409)
+        if not payload.accept_terms or not payload.accept_privacy:
+            denied("registration_requirements_missing", 422)
+        acceptance = user.get("legal_confirmation") or user.get("acceptance", {})
+        if acceptance.get("snapshot", {}).get("id") != current["id"]:
+            confirmation = {"snapshot": current, "accepted_at": now(), "channel": "web_existing_account", "privacy_read": True, "terms_accepted": True}
+            await db.web_users.update_one(
+                {"subject_id": user["subject_id"], "active": True, "legal_confirmation.snapshot.id": {"$ne": current["id"]}},
+                {"$set": {"legal_confirmation": confirmation}, "$push": {"legal_confirmation_history": confirmation}},
+            )
+        return {"accepted": True, "version": current["version"]}
 
     @router.get("/account/config")
     async def config():

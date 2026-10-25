@@ -37,3 +37,19 @@ def test_duplicate_registration_preserves_first_acceptance(system):
     before=db.raw.web_users.find_one({'email':'legal@example.com'})['acceptance']
     assert c.post('/api/account/register',json=payload()).status_code==202
     assert db.raw.web_users.find_one({'email':'legal@example.com'})['acceptance']==before
+
+def test_existing_user_confirmation_preserves_original_and_is_idempotent(system):
+    c,db,mail=system; login(c,mail)
+    original=db.raw.web_users.find_one({})['acceptance']
+    assert c.get('/api/account/legal-status').json()['pending'] is True
+    p=dict(legal_bundle_id=bundle()['id'],accept_terms=True,accept_privacy=True)
+    assert c.post('/api/account/legal-confirmation',json=p,headers={'X-CSRF-Token':'wrong'}).status_code==403
+    assert c.post('/api/account/legal-confirmation',json={**p,'accept_terms':False}).status_code==422
+    assert c.post('/api/account/legal-confirmation',json={**p,'legal_bundle_id':'0'*64}).status_code==409
+    assert c.post('/api/account/legal-confirmation',json=p).status_code==200
+    assert c.post('/api/account/legal-confirmation',json=p).status_code==200
+    row=db.raw.web_users.find_one({})
+    assert row['acceptance']==original
+    assert len(row['legal_confirmation_history'])==1
+    assert c.get('/api/account/legal-status').json()['pending'] is False
+    assert c.get('/api/account/legal-receipt').json()['has_snapshot'] is True
