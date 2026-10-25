@@ -172,3 +172,20 @@ def test_new_reader_version_retries_old_failures_but_keeps_current_limit(monkeyp
     assert len(attempts)==2
     assert db.raw.web_personal_documents.find_one({})['server_read_failure_version']==automatic.READER_VERSION
     assert db.raw.web_access_reviews.count_documents({})==0
+
+
+def test_correction_feedback_is_own_account_only_and_clears_on_edit(system):
+    c,db,mail=system;login(c,mail)
+    subject=db.raw.web_users.find_one({})['subject_id']
+    db.raw.web_profile_drafts.insert_one({'subject_id':subject,'automatic_issues':['LEGAL_NAME_MISMATCH','PRIVATE_INTERNAL_REASON']})
+    db.raw.web_profile_drafts.insert_one({'subject_id':'other','automatic_issues':['ID_NUMBER_MISMATCH']})
+    assert c.get('/api/investor/access').json()['automatic_issues']==['LEGAL_NAME_MISMATCH']
+    assert c.post('/api/investor/profile-draft',json={'account_kind':'inversor','subject_type':'PF','full_name':'Prueba','email':'one@example.com'}).status_code==200
+    assert c.get('/api/investor/access').json()['automatic_issues']==[]
+
+
+def test_feedback_distinguishes_company_and_identity_without_raw_data():
+    from web_registration_feedback import correction_codes
+    result={**evidence(),'name_matches':False}
+    assert correction_codes([result],False)==['LEGAL_NAME_MISMATCH']
+    assert correction_codes([result],True)==['LEGAL_NAME_MISMATCH','COMPANY_DOCUMENT_REQUIRED']

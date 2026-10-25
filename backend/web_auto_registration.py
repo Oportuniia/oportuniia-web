@@ -60,7 +60,8 @@ async def process_profile(db,draft):
             await db.web_personal_documents.update_one({'_id':doc['_id'],'sha256':doc['sha256']},{'$set':{'server_reading':evidence,'server_read_state':'COMPLETE'}})
         results.append(evidence);ids.append(doc['document_id'])
     if not qualifies(results,profile.get('subject_type')=='PJ'):
-        await db.web_profile_drafts.update_one({'subject_id':subject,'revision':revision},{'$set':{'automatic_state':'NEEDS_CORRECTION_OR_EXCEPTION'}})
+        from web_registration_feedback import correction_codes
+        await db.web_profile_drafts.update_one({'subject_id':subject,'revision':revision},{'$set':{'automatic_state':'NEEDS_CORRECTION_OR_EXCEPTION','automatic_issues':correction_codes(results,profile.get('subject_type')=='PJ')}})
         return 'EXCEPTION'
     stamp=datetime.now(timezone.utc);decision='automatic:'+subject+':'+revision
     # Stable identity and revision prevent duplicate events. Access checks compare
@@ -76,7 +77,7 @@ async def process_profile(db,draft):
             {'$set':{'profile_version':decision,'profile_revision':revision,'profile_complete':True,'documents_complete':True,'identity_status':'VERIFIED','dossier_status':'APPROVED','pbc_status':'PENDING','revoked':False,'valid_until':(stamp+timedelta(days=90)).isoformat(),'verification_basis':'SERVER_DOCUMENT_CONSISTENCY','authenticity_verified':False},
              '$unset':{'automatic_recheck_revision':''}},upsert=True)
     except DuplicateKeyError:return 'EXCEPTION'
-    await db.web_profile_drafts.update_one({'subject_id':subject,'revision':revision},{'$set':{'state':'REVIEWED','automatic_state':'APPROVED'}})
+    await db.web_profile_drafts.update_one({'subject_id':subject,'revision':revision},{'$set':{'state':'REVIEWED','automatic_state':'APPROVED','automatic_issues':[]}})
     for document_id,evidence in zip(ids,results):
         kinds=[]
         if qualifies([evidence],False):kinds.append('representative_identity' if profile.get('subject_type')=='PJ' else 'identity')

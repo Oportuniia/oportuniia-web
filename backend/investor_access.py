@@ -246,7 +246,10 @@ def register_investor_routes(router: APIRouter, db):
     @router.get("/investor/access")
     async def access(subject: str = Depends(authenticated_subject)):
         ctx = await context(db, subject)
+        from web_registration_feedback import CODES
+        draft = await db.web_profile_drafts.find_one({'subject_id': subject}) or {}
         return {"founder_access": ctx.get("founder_access", False), "stage": ctx["stage"], "premium": ctx["premium"], "identity_status": ctx["review"].get("identity_status", "PENDING"),
+                "automatic_issues": [c for c in draft.get('automatic_issues', []) if c in CODES] if ctx['stage'] < 2 else [],
                 "dossier_status": ctx["review"].get("dossier_status", "PENDING"), "pbc_status": ctx["review"].get("pbc_status", "PENDING"),
                 "contracting": await contracting_eligibility(db, ctx), "rule": "UPLOADING_AND_PAYMENT_DO_NOT_GRANT_ACCESS"}
 
@@ -310,7 +313,7 @@ def register_investor_routes(router: APIRouter, db):
             {"$set": {"revoked": True, "identity_status": "PENDING", "dossier_status": "PENDING",
                       "automatic_recheck_revision": revision}})
         await db.web_profile_drafts.update_one({"subject_id": subject}, {"$set": {"subject_id": subject, "profile": payload.model_dump(),
-            "state": "PENDING_REVIEW", "revision": revision, "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
+            "state": "PENDING_REVIEW", "revision": revision, "automatic_issues": [], "automatic_state": "PENDING", "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
         return {"saved": True, "state": "PENDING_REVIEW", "access_granted": False}
 
     @router.get("/investor/operations/{op_ref}/documents")
