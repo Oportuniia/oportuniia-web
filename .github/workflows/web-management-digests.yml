@@ -1,7 +1,8 @@
-name: WEB management summaries
+name: WEB operational reminders and summaries
 on:
   schedule:
     - cron: '15 6,7 * * *'
+    - cron: '37 * * * *'
   workflow_dispatch:
   push:
     paths:
@@ -12,10 +13,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   wake:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - name: Wake private service for its persisted daily and weekly jobs
+      - name: Wake private service for persisted reservation reminders and summaries
         shell: bash
         run: |
           for attempt in 1 2 3; do
