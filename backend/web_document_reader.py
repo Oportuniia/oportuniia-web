@@ -54,12 +54,22 @@ def evaluate_text(text, confidence, profile):
         'company_matches':bool(company_number and company_name and company_number in compact and company_name in compact),
         'fictitious':fictitious}
 
+def create_engine():
+    from rapidocr import RapidOCR, ModelType, OCRVersion, LangRec
+    # Pin compact models: upstream defaults may change to a larger model.
+    # One crop at a time prevents a batch of long lines exhausting WEB memory.
+    return RapidOCR(params={'Global.log_level':'error','Global.max_side_len':1800,
+        'Det.model_type':ModelType.MOBILE,'Det.ocr_version':OCRVersion.PPOCRV4,
+        'Det.limit_side_len':960,'Det.limit_type':'max',
+        'Rec.model_type':ModelType.MOBILE,'Rec.ocr_version':OCRVersion.PPOCRV5,
+        'Rec.lang_type':LangRec.LATIN,'Rec.rec_batch_num':1,'Cls.cls_batch_num':1,
+        'EngineConfig.onnxruntime.enable_cpu_mem_arena':False,
+        'EngineConfig.onnxruntime.intra_op_num_threads':1,'EngineConfig.onnxruntime.inter_op_num_threads':1})
+
 def read_bytes(data,profile):
     import numpy as np
     from PIL import Image
-    from rapidocr import RapidOCR
-    engine=RapidOCR(params={'Global.log_level':'error','Global.max_side_len':1800,
-        'EngineConfig.onnxruntime.intra_op_num_threads':1,'EngineConfig.onnxruntime.inter_op_num_threads':1})
+    engine=create_engine()
     texts=[];scores=[]
     def scan(image):
         image.thumbnail((1800,1800));result=engine(np.array(image.convert('RGB')))
