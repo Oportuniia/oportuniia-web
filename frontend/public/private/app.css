@@ -57,3 +57,5 @@ body dialog.premium-dialog .button{background:#183b50;color:white;border-color:#
 .nav-crown{color:#e6bd58;font-size:25px;line-height:1;align-self:center}
 .comparison-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.comparison-grid article{min-width:0}.comparison-grid dd{margin:0 0 14px;overflow-wrap:anywhere}.comparison-grid dt{font-size:12px;color:var(--muted)}
 .comparison-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:18px 0}.comparison-grid h3{overflow-wrap:anywhere}
+
+.profile-fold>summary{cursor:pointer;font-size:1.25rem;font-weight:800;color:#63c9ec;padding:12px 0}.profile-fold>summary::marker{color:#63c9ec}.profile-fold[open]>summary{margin-bottom:18px}.dossier-cover{margin-top:24px}.pbc-preparation{border-top:1px solid var(--border,#315568);margin-top:24px;padding-top:20px}.pbc-preparation summary{cursor:pointer;color:#63c9ec;font-weight:700;padding:12px 0}.review-returns{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}.sidebar .premium-section-label,.sidebar .premium-paid-label{color:#63c9ec!important}
