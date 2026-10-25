@@ -59,3 +59,5 @@ body dialog.premium-dialog .button{background:#183b50;color:white;border-color:#
 .comparison-toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:18px 0}.comparison-grid h3{overflow-wrap:anywhere}
 
 .profile-fold>summary{cursor:pointer;font-size:1.25rem;font-weight:800;color:#63c9ec;padding:12px 0}.profile-fold>summary::marker{color:#63c9ec}.profile-fold[open]>summary{margin-bottom:18px}.dossier-cover{margin-top:24px}.pbc-preparation{border-top:1px solid var(--border,#315568);margin-top:24px;padding-top:20px}.pbc-preparation summary{cursor:pointer;color:#63c9ec;font-weight:700;padding:12px 0}.review-returns{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}.sidebar .premium-section-label,.sidebar .premium-paid-label{color:#63c9ec!important}
+
+.button.account-danger{background:#b42332;color:#fff;border-color:#b42332}.button.account-danger:hover{background:#8f1926;color:#fff}
