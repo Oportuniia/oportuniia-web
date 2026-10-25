@@ -1,4 +1,4 @@
-import {mountSecretary} from './secretary.js';
+import {mountSecretary} from './secretary.js?v=20261025-auto2';
 import {esc} from './api.js';
 
 // Only the authenticated download route can release an antivirus-clean file.
