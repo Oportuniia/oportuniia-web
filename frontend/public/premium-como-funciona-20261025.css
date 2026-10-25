@@ -5,7 +5,7 @@
 .premium-k svg{width:14px;height:14px}
 .premium-copy h3{font-size:clamp(27px,3.2vw,44px);line-height:1.08;margin-top:18px;color:#fff;max-width:900px}
 .premium-copy p{margin-top:15px;color:#A9C0CC;max-width:760px;font-size:15px}
-.premium-benefits{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:32px}
+.premium-benefits{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:32px}
 .premium-benefits>div{padding:19px 17px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.035);border-radius:12px;display:flex;gap:12px;align-items:flex-start}
 .premium-benefits svg{width:18px;height:18px;flex:0 0 auto;color:#57C6E4;margin-top:2px}
 .premium-benefits b{display:block;color:#fff;font-size:12.5px}
