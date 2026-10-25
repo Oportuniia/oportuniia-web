@@ -9,7 +9,7 @@ import sys
 import unicodedata
 from datetime import date
 
-READER_VERSION = 3
+READER_VERSION = 4
 
 def norm(value):
     return re.sub(r'[^A-Z0-9]', '', ''.join(c for c in unicodedata.normalize('NFKD', str(value).upper()) if not unicodedata.combining(c)))
@@ -101,14 +101,17 @@ def read_bytes(data,profile):
         with pdfium.PdfDocument(data) as pdf:
             if len(pdf)>10:raise ValueError('page_limit')
             for page in pdf:
-                scale=min(2,3600/max(page.get_size()))
-                bitmap=page.render(scale=scale);original=bitmap.to_pil();scan(original.copy())
+                width,height=page.get_size()
+                bitmap=page.render(scale=min(2,1800/max(width,height)),limit_image_cache=True)
+                image=bitmap.to_pil();scan(image);image.close();bitmap.close()
                 if len(pdf)<=2:
-                    for x in (0, original.width//2):
-                        crop=original.crop((x,0,min(original.width,x+original.width//2),original.height))
-                        result=scan(crop)
+                    for crop in ((0,0,width/2,0),(width/2,0,0,0)):
+                        bitmap=page.render(scale=min(2,1800/max(width/2,height)),crop=crop,limit_image_cache=True)
+                        image=bitmap.to_pil();result=scan(image)
                         alternatives.append(evaluate_text('\n'.join(result.txts or []),sum(result.scores)/len(result.scores) if result.scores is not None and len(result.scores) else 0,profile))
-                bitmap.close();page.close()
+                        del result
+                        image.close();bitmap.close()
+                page.close()
     else:
         with Image.open(io.BytesIO(data)) as image:
             if image.width*image.height>18_000_000:raise ValueError('pixel_limit')
