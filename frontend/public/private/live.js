@@ -4,7 +4,7 @@ import {uploadToQuarantine,refreshQuarantine} from './quarantine-upload.js';
 import {catalogMessage} from '/early-access.js';
 import {mountPaidService} from './paid-services.js';
 import {api,post,esc} from './api.js';
-import {mountSecretary} from './secretary.js?v=20261025-auto2';
+import {mountSecretary} from './secretary.js?v=20261025-judicial3';
 import {mountOnboarding} from './onboarding.js';
 const $=s=>document.querySelector(s),content=$('#content'),dialog=$('#dialog');let user,access,workspace,view='resumen',disposeReader=null,legalPending=false;
 const names={resumen:'Resumen',oportunidades:'Ver oportunidades',operaciones:'Mis operaciones',notificaciones:'Notificaciones',perfil:'Mi perfil',configuracion:'Configuración',perimetros:'Perímetros personalizados',secretaria:'Secretaría',recordatorios:'Recordatorios',ia:'Analizar con IA',legal:'Consultar con LEGAL',peticiones:'Peticiones a la carta',visitas:'Valoración funcional'};
