@@ -16,3 +16,5 @@ function passwordChange(){host.innerHTML='<h2>Cambiar contraseña</h2><p>Si es t
 function passwordEyes(){host.querySelectorAll('input[type=password]').forEach(input=>{if(input.dataset.eye)return;input.dataset.eye='true';const button=document.createElement('button');button.type='button';button.className='button';button.textContent='Mostrar contraseña';button.setAttribute('aria-pressed','false');button.onclick=()=>{const show=input.type==='password';input.type=show?'text':'password';button.textContent=show?'Ocultar contraseña':'Mostrar contraseña';button.setAttribute('aria-pressed',String(show))};input.after(button)})}
 new MutationObserver(passwordEyes).observe(host,{childList:true,subtree:true});passwordEyes();
 
+
+addEventListener('hashchange',()=>{if(new URLSearchParams(location.hash.slice(1)).has('condiciones'))showLegalReceipt(host)});
