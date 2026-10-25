@@ -4,7 +4,10 @@ export function documentViewer(host){
  function close(){generation++;controller?.abort();task?.destroy();task=null;if(objectUrl)URL.revokeObjectURL(objectUrl);objectUrl=null;host.replaceChildren()}
  async function open(url,title='Documento recibido'){
   close();const current=generation;controller=new AbortController();const activeController=controller;
-  host.innerHTML='<section class="card"><h3>Abriendo documento…</h3><p role="status">Preparando la vista del original.</p></section>';host.scrollIntoView({behavior:'smooth',block:'start'});
+  host.innerHTML=`<section class="card"><h3>Abriendo documento…</h3><p role="status">Preparando el original. Mientras tanto, puedes comprobar la vista previa de la primera página.</p><img data-loading-preview src="${esc(url+(url.includes('?')?'&':'?')+'preview=true')}" alt="Vista previa de la primera página" style="display:block;max-width:100%;max-height:420px;object-fit:contain;margin:auto"><button class="button" type="button" data-cancel-open>Cancelar apertura</button></section>`;
+  host.querySelector('[data-loading-preview]').onerror=e=>{e.target.hidden=true};
+  host.querySelector('[data-cancel-open]').onclick=close;
+  host.scrollIntoView({behavior:'smooth',block:'start'});
   const timeout=setTimeout(()=>activeController.abort(),60000);
   try{
    const r=await fetch(url,{credentials:'same-origin',cache:'no-store',signal:controller.signal});
