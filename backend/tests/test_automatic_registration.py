@@ -189,3 +189,18 @@ def test_feedback_distinguishes_company_and_identity_without_raw_data():
     result={**evidence(),'name_matches':False}
     assert correction_codes([result],False)==['LEGAL_NAME_MISMATCH']
     assert correction_codes([result],True)==['LEGAL_NAME_MISMATCH','COMPANY_DOCUMENT_REQUIRED']
+
+
+def test_td1_expiry_requires_exact_birth_and_valid_check_digits():
+    from web_document_reader import mrz_expiry
+    from datetime import date
+    def digit(s):return str(sum(int(c)*[7,3,1][i%3] for i,c in enumerate(s))%10)
+    birth='800101';expiry=f'{(date.today().year+5)%100:02d}0101'
+    line=birth+digit(birth)+'M'+expiry+digit(expiry)+'ESP'+'<'*11+'0'
+    assert mrz_expiry(line,'1980-01-01')
+    assert not mrz_expiry(line,'1981-01-01')
+    assert not mrz_expiry(line[:14]+str((int(line[14])+1)%10)+line[15:],'1980-01-01')
+    assert not mrz_expiry(line[:6]+str((int(line[6])+1)%10)+line[7:],'1980-01-01')
+    assert not mrz_expiry('350101','1980-01-01')
+    expired='200101'
+    assert not mrz_expiry(birth+digit(birth)+'M'+expired+digit(expired)+'ESP'+'<'*11+'0','1980-01-01')

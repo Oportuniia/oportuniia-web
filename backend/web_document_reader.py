@@ -9,10 +9,28 @@ import sys
 import unicodedata
 from datetime import date
 
-READER_VERSION = 2
+READER_VERSION = 3
 
 def norm(value):
     return re.sub(r'[^A-Z0-9]', '', ''.join(c for c in unicodedata.normalize('NFKD', str(value).upper()) if not unicodedata.combining(c)))
+
+def mrz_expiry(text, birth):
+    # TD1 expiry has a defined position and its own check digit. Never guess a date.
+    def check(value):
+        return str(sum((int(c) if c.isdigit() else ord(c)-55 if c.isalpha() else 0)*[7,3,1][i%3] for i,c in enumerate(value))%10)
+    try: expected=date.fromisoformat(birth).strftime('%y%m%d')
+    except (ValueError,TypeError): return False
+    for line in text.upper().splitlines():
+        line=re.sub(r'\s','',line)
+        if not re.fullmatch(r'\d{7}[MF<]\d{7}[A-Z]{3}[A-Z0-9<]{11}\d',line):continue
+        if line[:6]!=expected or check(line[:6])!=line[6] or check(line[8:14])!=line[14]:continue
+        try:
+            yy,mm,dd=int(line[8:10]),int(line[10:12]),int(line[12:14])
+            today=date.today()
+            candidates=[date(c+yy,mm,dd) for c in (1900,2000,2100)]
+            if any(today<=v and (v-today).days<=20*366 for v in candidates):return True
+        except ValueError:continue
+    return False
 
 def evaluate_text(text, confidence, profile):
     compact=norm(text)
@@ -43,6 +61,7 @@ def evaluate_text(text, confidence, profile):
         try:expiry=date(int(m[3]),int(m[2]),int(m[1]))>=date.today()
         except ValueError:pass
     birth=profile.get('birth_date','')
+    if not expiry and not company:expiry=mrz_expiry(text,birth)
     try:
         b=date.fromisoformat(birth);birth_matches=any(v in compact for v in (b.strftime('%d%m%Y'),b.strftime('%Y%m%d'),b.strftime('%y%m%d')))
     except ValueError:birth_matches=False
@@ -72,22 +91,33 @@ def read_bytes(data,profile):
     import numpy as np
     from PIL import Image
     engine=create_engine()
-    texts=[];scores=[]
+    texts=[];scores=[];alternatives=[]
     def scan(image):
         image.thumbnail((1800,1800));result=engine(np.array(image.convert('RGB')))
         texts.extend(result.txts or []);scores.extend(float(s) for s in (result.scores or []))
+        return result
     if data.startswith(b'%PDF-'):
         import pypdfium2 as pdfium
         with pdfium.PdfDocument(data) as pdf:
             if len(pdf)>10:raise ValueError('page_limit')
             for page in pdf:
-                scale=min(2,1800/max(page.get_size()))
-                bitmap=page.render(scale=scale);scan(bitmap.to_pil());bitmap.close();page.close()
+                scale=min(2,3600/max(page.get_size()))
+                bitmap=page.render(scale=scale);original=bitmap.to_pil();scan(original.copy())
+                if len(pdf)<=2:
+                    for x in (0, original.width//2):
+                        crop=original.crop((x,0,min(original.width,x+original.width//2),original.height))
+                        result=scan(crop)
+                        alternatives.append(evaluate_text('\n'.join(result.txts or []),sum(result.scores)/len(result.scores) if result.scores is not None and len(result.scores) else 0,profile))
+                bitmap.close();page.close()
     else:
         with Image.open(io.BytesIO(data)) as image:
             if image.width*image.height>18_000_000:raise ValueError('pixel_limit')
             scan(image)
-    return evaluate_text('\n'.join(texts),sum(scores)/len(scores) if scores else 0,profile)
+    main=evaluate_text('\n'.join(texts),sum(scores)/len(scores) if scores else 0,profile)
+    for candidate in alternatives:
+        if all(candidate.get(k) for k in ('legible','identity','name_matches','number_matches','birth_matches','expiry_read_and_valid')) and not main.get('fictitious'):
+            return candidate
+    return main
 
 if __name__=='__main__':
     payload=json.loads(sys.stdin.buffer.read(30*1024*1024))
