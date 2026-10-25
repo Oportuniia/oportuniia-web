@@ -24,6 +24,7 @@ from web_review import register_review_routes
 from web_payments import register_payment_routes
 from web_workers import register_worker_routes
 from web_quarantine import register_quarantine_routes
+from web_funds import register_fund_routes, ensure_fund_indexes
 
 mongo_url, database_name = os.getenv("MONGO_URL", ""), os.getenv("DB_NAME", "")
 client = db = None
@@ -41,6 +42,7 @@ async def lifespan(app):
         if os.getenv("WEB_REQUIRE_MFA", "true") == "true": cipher()
         await db.command("ping")
         await ensure_indexes(db)
+        await ensure_fund_indexes(db)
         await bootstrap_accounts(db)
     from web_quarantine import configured, quarantine_worker
     task = asyncio.create_task(quarantine_worker(db)) if db is not None and configured() else None
@@ -99,5 +101,6 @@ register_review_routes(router, db, prefix="/account/reviews")
 register_payment_routes(router, db)
 register_worker_routes(router, db)
 register_quarantine_routes(router, db)
+register_fund_routes(router, db)
 app.include_router(router)
 
