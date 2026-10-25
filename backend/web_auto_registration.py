@@ -41,7 +41,7 @@ async def process_profile(db,draft):
     from web_access_restrictions import blocked
     if await blocked(db,user,profile):return "EXCEPTION"
     current=await db.web_access_reviews.find_one({'subject_id':subject}) or {}
-    if current.get('revoked'):return 'EXCEPTION'
+    if current.get('revoked') and current.get('automatic_recheck_revision')!=revision:return 'EXCEPTION'
     if current.get('profile_revision')==revision and not current.get('revoked') and current.get('dossier_status')=='APPROVED':return 'ALREADY_APPROVED'
     docs=await db.web_personal_documents.find({'subject_id':subject,'scan_state':'CLEAN','deleted':{'$ne':True}}).sort('created_at',-1).to_list(10)
     results=[];ids=[]
@@ -65,7 +65,15 @@ async def process_profile(db,draft):
     # the saved revision on every request, so later edits invalidate this result.
     await db.web_registration_decisions.update_one({'_id':decision},{'$setOnInsert':{'subject_id':subject,'revision':revision,'at':stamp,'basis':'SERVER_DOCUMENT_CONSISTENCY','authenticity_verified':False,'documents':ids}},upsert=True)
     await db.web_verified_profiles.update_one({'subject_id':subject,'version':decision},{'$setOnInsert':{'profile':profile,'created_at':stamp,'verification_basis':'SERVER_DOCUMENT_CONSISTENCY'}},upsert=True)
-    await db.web_access_reviews.update_one({'subject_id':subject},{'$set':{'profile_version':decision,'profile_revision':revision,'profile_complete':True,'documents_complete':True,'identity_status':'VERIFIED','dossier_status':'APPROVED','pbc_status':'PENDING','revoked':False,'valid_until':(stamp+timedelta(days=90)).isoformat(),'verification_basis':'SERVER_DOCUMENT_CONSISTENCY','authenticity_verified':False}},upsert=True)
+    # Do not overwrite an administrative hold established while OCR was running.
+    latest=await db.web_profile_drafts.find_one({'subject_id':subject,'revision':revision,'state':'PENDING_REVIEW'})
+    if not latest or await blocked(db,user,profile):return 'EXCEPTION'
+    try:
+        await db.web_access_reviews.update_one({'subject_id':subject,'$or':[
+            {'revoked':{'$ne':True}}, {'automatic_recheck_revision':revision}]},
+            {'$set':{'profile_version':decision,'profile_revision':revision,'profile_complete':True,'documents_complete':True,'identity_status':'VERIFIED','dossier_status':'APPROVED','pbc_status':'PENDING','revoked':False,'valid_until':(stamp+timedelta(days=90)).isoformat(),'verification_basis':'SERVER_DOCUMENT_CONSISTENCY','authenticity_verified':False},
+             '$unset':{'automatic_recheck_revision':''}},upsert=True)
+    except DuplicateKeyError:return 'EXCEPTION'
     await db.web_profile_drafts.update_one({'subject_id':subject,'revision':revision},{'$set':{'state':'REVIEWED','automatic_state':'APPROVED'}})
     for document_id,evidence in zip(ids,results):
         kinds=[]

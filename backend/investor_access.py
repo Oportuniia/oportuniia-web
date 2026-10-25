@@ -302,9 +302,15 @@ def register_investor_routes(router: APIRouter, db):
         from web_access_restrictions import blocked
         if await blocked(db, {"subject_id": subject, "email": payload.email}, payload.model_dump()): fail("account_access_restricted", 403)
         # Editing the profile cannot retain an approval of an older identity snapshot.
-        await db.web_access_reviews.update_one({"subject_id": subject}, {"$set": {"revoked": True, "identity_status": "PENDING", "dossier_status": "PENDING"}})
+        revision = str(uuid.uuid4())
+        # Re-reading an edited profile is allowed only when its previous review
+        # was not administratively revoked. A profile edit must not lift a hold.
+        await db.web_access_reviews.update_one({"subject_id": subject, "$or": [
+            {"revoked": {"$ne": True}}, {"automatic_recheck_revision": {"$exists": True}}]},
+            {"$set": {"revoked": True, "identity_status": "PENDING", "dossier_status": "PENDING",
+                      "automatic_recheck_revision": revision}})
         await db.web_profile_drafts.update_one({"subject_id": subject}, {"$set": {"subject_id": subject, "profile": payload.model_dump(),
-            "state": "PENDING_REVIEW", "revision": str(uuid.uuid4()), "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
+            "state": "PENDING_REVIEW", "revision": revision, "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
         return {"saved": True, "state": "PENDING_REVIEW", "access_granted": False}
 
     @router.get("/investor/operations/{op_ref}/documents")

@@ -83,7 +83,7 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         changes = {'dossier_removed': payload.action == 'REMOVE'} if payload.action in {'REMOVE', 'RESTORE'} else {'access_blocked': payload.action == 'BLOCK'}
         await db.web_users.update_one({'subject_id': subject}, {'$set': changes, '$inc': {'session_version': 1}})
         await db.web_sessions.update_many({'subject_id': subject}, {'$set': {'revoked': True}})
-        await db.web_access_reviews.update_one({'subject_id': subject}, {'$set': {'revoked': True, 'dossier_status': 'PENDING', 'documents_complete': False}})
+        await db.web_access_reviews.update_one({'subject_id': subject}, {'$set': {'revoked': True, 'dossier_status': 'PENDING', 'documents_complete': False}, '$unset': {'automatic_recheck_revision': ''}})
         await db.web_profile_drafts.update_one({'subject_id': subject}, {'$set': {'state': 'WITHDRAWN' if payload.action in {'REMOVE','BLOCK'} else 'PENDING_REVIEW'}})
         await db.web_review_requests.update_many({'subject_id': subject}, {'$set': {'state': 'WITHDRAWN' if payload.action in {'REMOVE','BLOCK'} else 'PENDING'}})
         return {'saved': True, 'action': payload.action, 'approval_restored': False}
@@ -100,7 +100,7 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
             'reviewer_subject_id': actor['subject_id'], 'at': stamp, 'action': 'REMOVE' if payload.removed else 'RESTORE', 'reason': payload.reason})
         await db.web_personal_documents.update_one({'_id': row['_id']}, {'$set': {'deleted': payload.removed, 'removed_by_reviewer': payload.removed, 'removed_at': stamp if payload.removed else None}})
         if payload.removed and row.get('review_state') == 'APPROVED':
-            await db.web_access_reviews.update_one({'subject_id': subject}, {'$set': {'revoked': True, 'dossier_status': 'PENDING', 'documents_complete': False}})
+            await db.web_access_reviews.update_one({'subject_id': subject}, {'$set': {'revoked': True, 'dossier_status': 'PENDING', 'documents_complete': False}, '$unset': {'automatic_recheck_revision': ''}})
         return {'saved': True, 'removed': payload.removed, 'restored_approval': False}
 
     @router.post(prefix + "/{subject}/documents/{document_id}/classify")
@@ -193,7 +193,7 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         await db.web_access_reviews.update_one({"subject_id": subject}, {"$set": {"subject_id": subject, "profile_version": version if approved else None, "profile_revision": payload.expected_revision,
             "profile_complete": approved, "documents_complete": approved, "identity_status": "VERIFIED" if approved else "REJECTED", "dossier_status": "APPROVED" if approved else "REJECTED",
             "pbc_status": "CLEARED" if approved and payload.pbc_cleared else "PENDING", "revoked": not approved, "reviewer_subject_id": actor["subject_id"],
-            "valid_until": (stamp+timedelta(days=90)).isoformat()}}, upsert=True)
+            "valid_until": (stamp+timedelta(days=90)).isoformat()}, "$unset": {"automatic_recheck_revision": ""}}, upsert=True)
         await db.web_profile_drafts.update_one({"subject_id": subject, "revision": payload.expected_revision}, {"$set": {"state": "REVIEWED" if approved else "CHANGES_REQUIRED"}})
         await db.web_notifications.insert_one({"id": version, "subject_id": subject, "title": "Perfil verificado" if approved else "Tu perfil necesita una revisión",
             "body": "Hemos revisado tu expediente. Los permisos de cada operación se autorizan por separado." if approved else "Consulta con el equipo los cambios necesarios para continuar.", "read": False, "created_at": stamp})

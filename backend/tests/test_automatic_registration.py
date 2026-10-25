@@ -88,3 +88,41 @@ def test_failed_profile_does_not_block_queue(monkeypatch):
     asyncio.run(automatic.run(db));asyncio.run(automatic.run(db))
     assert seen==['bad','good']
     assert db.raw.web_profile_drafts.find_one({'subject_id':'bad'})['auto_last_result']=='PROCESSING_ERROR'
+
+
+@pytest.mark.parametrize('hold,expected',[(False,'APPROVED'),(True,'EXCEPTION')])
+def test_profile_edit_rechecks_but_never_lifts_admin_hold(system,monkeypatch,hold,expected):
+    c,db,mail=system;login(c,mail)
+    subject=db.raw.web_users.find_one({})['subject_id']
+    db.raw.web_access_reviews.insert_one({'subject_id':subject,'revoked':hold,'identity_status':'REJECTED' if hold else 'VERIFIED'})
+    payload={'account_kind':'inversor','subject_type':'PF','full_name':'Fixture','email':'one@example.com'}
+    r=c.post('/api/investor/profile-draft',json=payload)
+    assert r.status_code==200,r.text
+    draft=db.raw.web_profile_drafts.find_one({'subject_id':subject})
+    db.raw.web_personal_documents.insert_one({'subject_id':subject,'document_id':'d','sha256':'abc','scan_state':'CLEAN','category':'identity'})
+    monkeypatch.setattr(automatic,'missing_profile_fields',lambda p:[])
+    monkeypatch.setattr(automatic,'server_read',lambda *a:evidence())
+    assert asyncio.run(automatic.process_profile(db,draft))==expected
+    review=db.raw.web_access_reviews.find_one({'subject_id':subject})
+    assert review['revoked'] is hold
+    if not hold:
+        assert review['pbc_status']=='PENDING'
+        assert 'automatic_recheck_revision' not in review
+    assert db.raw.web_operation_grants.count_documents({})==0
+
+
+def test_admin_hold_during_reader_is_not_overwritten(system,monkeypatch):
+    c,db,mail=system;login(c,mail)
+    subject=db.raw.web_users.find_one({})['subject_id']
+    draft={'subject_id':subject,'revision':'new','state':'PENDING_REVIEW','profile':{'subject_type':'PF'}}
+    db.raw.web_profile_drafts.insert_one(draft)
+    db.raw.web_access_reviews.insert_one({'subject_id':subject,'revoked':True,'automatic_recheck_revision':'new'})
+    db.raw.web_personal_documents.insert_one({'subject_id':subject,'document_id':'d','sha256':'abc','scan_state':'CLEAN','category':'identity'})
+    monkeypatch.setattr(automatic,'missing_profile_fields',lambda p:[])
+    def read(*args):
+        db.raw.web_access_reviews.update_one({'subject_id':subject},{'$set':{'revoked':True},'$unset':{'automatic_recheck_revision':''}})
+        return evidence()
+    monkeypatch.setattr(automatic,'server_read',read)
+    assert asyncio.run(automatic.process_profile(db,draft))=='EXCEPTION'
+    assert db.raw.web_access_reviews.find_one({'subject_id':subject})['revoked']
+    assert db.raw.web_notifications.count_documents({'title':'Alta aprobada'})==0

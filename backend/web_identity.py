@@ -96,6 +96,7 @@ async def ensure_indexes(db):
     await db.web_identity_tokens.create_index("token_hash", unique=True)
     await db.web_identity_tokens.create_index("expires_at", expireAfterSeconds=0)
     await db.web_profile_drafts.create_index("subject_id", unique=True)
+    await db.web_access_reviews.create_index("subject_id", unique=True)
     await db.web_verified_profiles.create_index([("subject_id", 1), ("version", 1)], unique=True)
     await db.web_entitlements.create_index([("subject_id", 1), ("product", 1)], unique=True)
     await db.web_notifications.create_index([("subject_id", 1), ("id", 1)], unique=True)
