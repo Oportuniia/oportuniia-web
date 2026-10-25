@@ -106,11 +106,11 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         return {"revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
 
     @router.get(prefix + "/{subject}/documents/{document_id}")
-    async def review_document(subject: str, document_id: str, request: Request):
+    async def review_document(subject: str, document_id: str, request: Request, preview: bool = False):
         from web_workspace import stream_personal_document
         actor = await reviewer(request, db)
         if actor["subject_id"] == subject: fail("self_review_forbidden")
-        return await stream_personal_document(db, subject, document_id, actor["subject_id"])
+        return await stream_personal_document(db, subject, document_id, actor["subject_id"], preview=preview)
 
     @router.post(prefix + "/{subject}")
     async def decide(subject: str, payload: Decision, request: Request):

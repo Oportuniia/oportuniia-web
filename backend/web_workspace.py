@@ -128,17 +128,37 @@ def register_workspace_routes(router, db):
         return {"document_id": ident, "category": category, "size": size, "scan_state": "QUARANTINED", "review_state": "PENDING", "access_granted": False}
 
     @router.get("/investor/personal-documents/{document_id}")
-    async def own_document(document_id: str, subject: str = Depends(authenticated_subject)):
-        return await stream_personal_document(db, subject, document_id, subject)
+    async def own_document(document_id: str, preview: bool = False, subject: str = Depends(authenticated_subject)):
+        return await stream_personal_document(db, subject, document_id, subject, preview=preview)
 
 
-async def stream_personal_document(db, subject, document_id, actor):
+preview_lock = asyncio.Semaphore(1)
+
+async def stream_personal_document(db, subject, document_id, actor, preview=False):
     row = await db.web_personal_documents.find_one({"document_id": document_id, "subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0})
     if not row: fail("document_not_found", 404)
     if row.get("scan_state") != "CLEAN": fail("document_awaiting_security_scan", 409)
     from web_dossier import expired
     if expired(row): fail("document_not_found", 404)
     if not storage_ready(): fail("private_document_storage_not_activated", 503)
+    if preview:
+        from web_document_preview import prepare, unseal
+        try:
+            async with preview_lock:
+                if not row.get('private_preview'):
+                    fresh = await db.web_personal_documents.find_one({'document_id':document_id,'subject_id':subject,'deleted':{'$ne':True},'scan_state':'CLEAN'})
+                    if not fresh: fail('document_not_found',404)
+                    row = fresh
+                    if not row.get('private_preview'):
+                        raw = await asyncio.to_thread(web_personal_storage.read,row)
+                        row['private_preview'] = await asyncio.to_thread(prepare,raw,row)
+                        saved = await db.web_personal_documents.update_one({'document_id':document_id,'subject_id':subject,'sha256':row['sha256'],'deleted':{'$ne':True},'scan_state':'CLEAN'},{'$set':{'private_preview':row['private_preview']}})
+                        if not saved.matched_count: fail('document_not_found',404)
+                data = unseal(row['private_preview'],row)
+        except Exception:
+            fail('document_preview_unavailable',503)
+        await db.web_security_audit.insert_one({'subject_id':subject,'actor_subject_id':actor,'event':'PERSONAL_DOCUMENT_PREVIEW','document_id':document_id,'at':datetime.now(timezone.utc)})
+        return StreamingResponse(io.BytesIO(data),media_type='image/jpeg',headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'})
     try:
         data = await asyncio.to_thread(web_personal_storage.read, row)
     except Exception:

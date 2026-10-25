@@ -96,6 +96,12 @@ def promote(row):
     if file_type(data)[0] != row["mime"]:
         raise ValueError("document_type_mismatch")
     storage.write(data, row)
+    try:
+        from web_document_preview import prepare
+        row['private_preview'] = prepare(data, row)
+    except Exception:
+        # A missing preview never blocks the intact original or grants access.
+        pass
     return row
 
 
@@ -174,7 +180,7 @@ async def reconcile_document(db, row):
         except Exception:
             await db.web_personal_documents.update_one({"_id": row["_id"], "promotion_claim": claim}, {"$set": {"scan_state": "QUARANTINED"}})
             return {"document_id": document_id, "scan_state": "QUARANTINED", "review_state": "PENDING"}
-        values = {k: promoted[k] for k in ("storage_backend", "storage_bucket", "encryption_key_id") if k in promoted}
+        values = {k: promoted[k] for k in ("storage_backend", "storage_bucket", "encryption_key_id", "private_preview") if k in promoted}
         values.update(scan_state="CLEAN", scanned_at=stamp)
         saved = await db.web_personal_documents.update_one({"_id": row["_id"], "promotion_claim": claim}, {"$set": values})
         if not saved.matched_count:
