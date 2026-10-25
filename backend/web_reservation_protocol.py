@@ -16,29 +16,31 @@ class Approval(BaseModel):
     required_documents: list[str] = Field(min_length=1,max_length=6)
     confirmation: str
 
-async def outstanding(db,row):
+async def outstanding(db,row,verified=True):
     docs=await db.web_personal_documents.find({'subject_id':row['subject_id'],'deleted':{'$ne':True},
         'scan_state':'CLEAN','dossier_state':'FILED','created_at':{'$lte':row['deadline_at']}}).to_list(100)
-    supplied={k for d in docs if not expired(d) and not d.get('identity_discrepancy') for k in d.get('document_kinds',[])}
+    supplied={k for d in docs if not expired(d) and not d.get('identity_discrepancy') and (not verified or d.get('review_state')=='APPROVED') for k in d.get('document_kinds',[])}
     return [k for k in row['required_documents'] if k not in supplied]
 
 async def advance(db,row,stamp=None):
     stamp=stamp or now()
-    if row['state']!='ACTIVE':return row
+    if row['state'] not in ('ACTIVE','INITIAL_REVIEW_PENDING','DOCUMENTS_COMPLETE'):return row
     reservation=await db.web_reservations.find_one({'checkout_request_id':row['_id']})
     if reservation and reservation.get('state') in ('CANCELLED','REFUNDED','REJECTED'):
-        await db.web_reservation_protocols.update_one({'_id':row['_id'],'state':'ACTIVE'},{'$set':{'state':'CANCELLED','checked_at':stamp}})
+        await db.web_reservation_protocols.update_one({'_id':row['_id'],'state':row['state']},{'$set':{'state':'CANCELLED','checked_at':stamp}})
         return await db.web_reservation_protocols.find_one({'_id':row['_id']})
+    if row['state']=='DOCUMENTS_COMPLETE':return row
     missing=await outstanding(db,row)
-    # Only documents uploaded within the original deadline count; no extensions.
-    state='DOCUMENTS_COMPLETE' if not missing else ('EXPIRED' if stamp>=row['deadline_at'] else 'ACTIVE')
-    await db.web_reservation_protocols.update_one({'_id':row['_id'],'state':'ACTIVE'},
+    awaiting_review=bool(missing) and not await outstanding(db,row,verified=False)
+    # Initial requirements are fixed at approval. Later compliance requests do not reopen this clock.
+    state='DOCUMENTS_COMPLETE' if not missing else ('INITIAL_REVIEW_PENDING' if awaiting_review else ('EXPIRED' if stamp>=row['deadline_at'] else 'ACTIVE'))
+    await db.web_reservation_protocols.update_one({'_id':row['_id'],'state':row['state']},
         {'$set':{'state':state,'missing_documents':missing,'checked_at':stamp}})
     return await db.web_reservation_protocols.find_one({'_id':row['_id']})
 
 async def tick(db,stamp=None):
     stamp=stamp or now()
-    rows=await db.web_reservation_protocols.find({'state':'ACTIVE'}).to_list(1000)
+    rows=await db.web_reservation_protocols.find({'state':{'$in':['ACTIVE','INITIAL_REVIEW_PENDING','DOCUMENTS_COMPLETE']}}).to_list(1000)
     for row in rows:
         row=await advance(db,row,stamp)
         if row['state']!='ACTIVE':continue
