@@ -14,6 +14,7 @@ from pymongo.errors import DuplicateKeyError
 from investor_access import missing_profile_fields
 from web_dossier import expired
 from web_personal_storage import read
+from web_document_reader import READER_VERSION
 
 def server_read(row,profile):
     from web_document_processing import document_processing_slot
@@ -48,11 +49,12 @@ async def process_profile(db,draft):
     for doc in docs:
         if expired(doc):continue
         evidence=doc.get('server_reading',{})
-        if evidence.get('profile_revision')!=revision or evidence.get('sha256')!=doc.get('sha256'):
-            if doc.get('server_read_failures',0)>=2:continue
+        if evidence.get('profile_revision')!=revision or evidence.get('sha256')!=doc.get('sha256') or evidence.get('reader_version')!=READER_VERSION:
+            failures=doc.get('server_read_failures',0) if doc.get('server_read_failure_version')==READER_VERSION else 0
+            if failures>=2:continue
             try:result=await asyncio.to_thread(server_read,doc,profile)
             except Exception:
-                await db.web_personal_documents.update_one({'_id':doc['_id']},{'$inc':{'server_read_failures':1},'$set':{'server_read_state':'RETRY_OR_EXCEPTION'}})
+                await db.web_personal_documents.update_one({'_id':doc['_id']},{'$set':{'server_read_failures':failures+1,'server_read_failure_version':READER_VERSION,'server_read_state':'RETRY_OR_EXCEPTION'}})
                 continue
             evidence={**result,'profile_revision':revision,'sha256':doc['sha256'],'at':datetime.now(timezone.utc)}
             await db.web_personal_documents.update_one({'_id':doc['_id'],'sha256':doc['sha256']},{'$set':{'server_reading':evidence,'server_read_state':'COMPLETE'}})

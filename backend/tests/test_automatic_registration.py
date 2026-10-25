@@ -126,3 +126,49 @@ def test_admin_hold_during_reader_is_not_overwritten(system,monkeypatch):
     assert asyncio.run(automatic.process_profile(db,draft))=='EXCEPTION'
     assert db.raw.web_access_reviews.find_one({'subject_id':subject})['revoked']
     assert db.raw.web_notifications.count_documents({'title':'Alta aprobada'})==0
+
+@pytest.mark.parametrize('subject_type',['PF','PJ'])
+def test_complete_profile_approval_and_dossier_with_real_field_rules(system,monkeypatch,subject_type):
+    c,db,mail=system;login(c,mail)
+    subject=db.raw.web_users.find_one({})['subject_id']
+    profile={'account_kind':'inversor','subject_type':subject_type,'full_name':'Ana Garcia Lopez','email':'one@example.com','tax_id':'12345678Z','birth_date':'1980-01-01','fiscal_address':'Calle Prueba','fiscal_address_number':'1','address':'Calle Prueba','address_number':'1','municipality':'Madrid','province':'Madrid','region':'Madrid','country':'ES','nationality':'ES','professional_activity':'Prueba','consents':{k:True for k in ('privacy','truthfulness','no_commitment','terms')}}
+    if subject_type=='PJ':profile.update(company_name='Empresa Ensayo SL',company_tax_id='B12345674',registered_address='Calle Prueba',registered_address_number='1',representative='Ana Garcia Lopez',representative_id='12345678Z',representative_position='Administrador')
+    assert automatic.missing_profile_fields(profile)==[]
+    assert c.post('/api/investor/profile-draft',json=profile).status_code==200
+    draft=db.raw.web_profile_drafts.find_one({'subject_id':subject})
+    text='DOCUMENTO NACIONAL DE IDENTIDAD\nAPELLIDOS\nGARCIA LOPEZ\nNOMBRE\nANA\n12345678Z\n01/01/1980\nVALIDEZ 01/01/2090'
+    texts={'identity':text,'fiscal':'AGENCIA TRIBUTARIA\nIDENTIFICACION FISCAL\nEMPRESA ENSAYO SL\nB12345674'}
+    for kind in (['identity','fiscal'] if subject_type=='PJ' else ['identity']):
+        db.raw.web_personal_documents.insert_one({'subject_id':subject,'document_id':kind,'sha256':kind,'scan_state':'CLEAN','created_at':datetime.now(timezone.utc)})
+    monkeypatch.setattr(automatic,'server_read',lambda row,p:evaluate_text(texts[row['document_id']],.99,p))
+    assert asyncio.run(automatic.process_profile(db,draft))=='APPROVED'
+    access=c.get('/api/investor/access').json()
+    assert access['identity_status']=='VERIFIED' and access['dossier_status']=='APPROVED'
+    assert access['pbc_status']=='PENDING' and not access['premium']
+    assert db.raw.web_operation_grants.count_documents({})==0
+    kinds={k for d in db.raw.web_personal_documents.find({'review_state':'APPROVED'}) for k in d['document_kinds']}
+    assert kinds==({'representative_identity','company_tax_document'} if subject_type=='PJ' else {'identity'})
+
+
+def test_inline_labels_and_spaced_number_are_read_without_fuzzy_identity_matching():
+    text='DOCUMENTO NACIONAL DE IDENTIDAD\nAPELLIDOS: GARCIA LOPEZ\nNOMBRE: ANA\n12345678 Z\n01/01/1980\nVALIDEZ 01/01/2090'
+    profile={'subject_type':'PF','full_name':'Ana Garcia Lopez','tax_id':'12345678Z','birth_date':'1980-01-01'}
+    result=evaluate_text(text,.99,profile)
+    assert result['name_matches'] and result['number_matches']
+    assert not evaluate_text(text,.99,{**profile,'full_name':'Ana Garcia'})['name_matches']
+    assert not evaluate_text(text+'\n87654321X',.99,profile)['number_matches']
+
+
+def test_new_reader_version_retries_old_failures_but_keeps_current_limit(monkeypatch):
+    db=DB();draft={'subject_id':'fixture','revision':'r','state':'PENDING_REVIEW','profile':{'subject_type':'PF'}}
+    db.raw.web_users.insert_one({'subject_id':'fixture','active':True,'email_verified':True})
+    db.raw.web_profile_drafts.insert_one(draft)
+    db.raw.web_personal_documents.insert_one({'subject_id':'fixture','document_id':'d','sha256':'a','scan_state':'CLEAN','server_read_failures':2,'server_read_failure_version':automatic.READER_VERSION-1})
+    monkeypatch.setattr(automatic,'missing_profile_fields',lambda p:[])
+    attempts=[]
+    def failed(*args):attempts.append(1);raise ValueError('fixture')
+    monkeypatch.setattr(automatic,'server_read',failed)
+    for _ in range(3):asyncio.run(automatic.process_profile(db,draft))
+    assert len(attempts)==2
+    assert db.raw.web_personal_documents.find_one({})['server_read_failure_version']==automatic.READER_VERSION
+    assert db.raw.web_access_reviews.count_documents({})==0

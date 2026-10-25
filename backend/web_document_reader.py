@@ -9,6 +9,8 @@ import sys
 import unicodedata
 from datetime import date
 
+READER_VERSION = 2
+
 def norm(value):
     return re.sub(r'[^A-Z0-9]', '', ''.join(c for c in unicodedata.normalize('NFKD', str(value).upper()) if not unicodedata.combining(c)))
 
@@ -26,7 +28,7 @@ def evaluate_text(text, confidence, profile):
     if mrz:detected=re.findall(r'[A-Z]+',mrz[1]+' '+mrz[2])
     else:
         for label in ('NOMBRE','APELLIDOS'):
-            m=re.search(r'(?:^|\n)\s*'+label+r'(?:\s*/\s*[A-Z ]+)?\s*[:.]?\s*\n\s*([A-Z ]+)(?=\n|$)',upper)
+            m=re.search(r'(?:^|\n)[ \t]*'+label+r'(?:[ \t]*/[ \t]*[A-Z]+)*[ \t]*[:.]?[ \t]*(?:\n[ \t]*)?([A-Z][A-Z \t]+)(?=\n|$)',upper)
             if m:detected.extend(m[1].split())
     name_matches=len(tokens)>=2 and sorted(tokens)==sorted(detected)
     valid_number=False
@@ -47,8 +49,8 @@ def evaluate_text(text, confidence, profile):
     company_number=norm(profile.get('company_tax_id',''))
     company_name=norm(profile.get('company_name',''))
     fictitious=bool(re.search(r'FICTICIO|SIN\s+VALIDEZ|SPECIMEN|\bSAMPLE\b',text,re.I))
-    observed_ids=set(re.findall(r'\b(?:\d{8}|[XYZ]\d{7})[A-Z]\b',upper))
-    return {'reader_version':1,'confidence':round(float(confidence),3),'legible':len(compact)>=40 and confidence>=.8,
+    observed_ids={norm(v) for v in re.findall(r'\b(?:\d{8}|[XYZ]\d{7})[ \t]*[A-Z]\b',upper)}
+    return {'reader_version':READER_VERSION,'confidence':round(float(confidence),3),'legible':len(compact)>=40 and confidence>=.8,
         'identity':identity,'fiscal':fiscal,'name_matches':name_matches,'number_matches':valid_number and observed_ids=={number},
         'birth_matches':birth_matches if not company else True,'expiry_read_and_valid':expiry,
         'company_matches':bool(company_number and company_name and company_number in compact and company_name in compact),
