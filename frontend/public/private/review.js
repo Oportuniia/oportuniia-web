@@ -1,4 +1,4 @@
-import {accountActions,historyButton} from './account-actions.js';
+import {accountActions,historyButton} from './account-actions.js?v=20261025-red';
 import {mountDossier} from './dossier.js';
 import {documentViewer} from './document-viewer.js';
 import {api,post,esc} from './api.js';
@@ -11,3 +11,4 @@ for(const d of r.documents.filter(d=>!d.deleted&&d.review_state!=='APPROVED'&&d.
 const openAction=accountActions(host,subject,r.account_state||{},()=>review(subject));host.querySelector('[name=decision]').onchange=e=>{if(e.target.value==='REMOVE')openAction('REMOVE')};
 host.querySelector('form').onsubmit=async e=>{e.preventDefault();const f=e.target,b=f.querySelector('[type=submit]');if(f.elements.decision.value==='REMOVE'){openAction('REMOVE');return}b.disabled=true;try{await post('account/reviews/'+encodeURIComponent(subject),{expected_revision:r.revision,decision:f.elements.decision.value,reason:f.elements.reason.value,discrepancy_resolution:f.elements.discrepancy_resolution.value,reviewed_document_ids:[...f.querySelectorAll('[name=document]:checked')].map(n=>n.value),identity_contrasted:f.elements.identity_contrasted.checked,dossier_contrasted:f.elements.dossier_contrasted.checked,pbc_cleared:false});await queue()}catch(err){host.querySelector('#review-status').textContent=err.message;b.disabled=false}}}catch(e){host.innerHTML=`<p>${esc(e.message)}</p><a class="button" href="/cuenta">Acceder con la cuenta de revisor y verificación en dos pasos</a>`}}
 if(location.hash.length>1)review(decodeURIComponent(location.hash.slice(1)));else queue();
+
