@@ -73,7 +73,7 @@ def project_operation(op_ref, item):
 
 
 def register_fund_routes(router, db):
-    @router.get("/funds/entities")
+    @router.get("/account/funds/entities")
     async def my_entities(request: Request):
         user, _ = await resolve_session(request, db)
         admin = user.get("role") == "superadmin"
@@ -86,7 +86,7 @@ def register_fund_routes(router, db):
         rows = await db.web_fund_entities.find(query, {"_id": 0, "entity_id": 1, "name": 1}).to_list(500)
         return {"items": rows, "administrator": admin}
 
-    @router.get("/funds/entities/{entity_id}/portfolio")
+    @router.get("/account/funds/entities/{entity_id}/portfolio")
     async def portfolio(entity_id: str, request: Request):
         owner = await member_access(request, db, entity_id)
         assignments = await db.web_fund_operations.find({"entity_id": entity_id, "active": True}).to_list(1001)
@@ -105,7 +105,7 @@ def register_fund_routes(router, db):
             "total": len(rows), "by_phase": dict(Counter(r.get("phase") or "Sin fase informada" for r in rows)),
             "scope": "ASSIGNED_APPROVED_PUBLICATIONS", "limited": limited, "checked_at": now()}
 
-    @router.post("/staff/funds/entities", status_code=201)
+    @router.post("/account/funds/manage/entities", status_code=201)
     async def create(payload: Entity, request: Request):
         actor = await administrator(request, db)
         row = {"entity_id": str(uuid.uuid4()), "name": payload.name.strip(), "active": True,
@@ -114,7 +114,7 @@ def register_fund_routes(router, db):
         await audit(db, actor["subject_id"], "FUND_ENTITY_CREATED:" + row["entity_id"])
         return {"entity_id": row["entity_id"], "name": row["name"]}
 
-    @router.get("/staff/funds/entities/{entity_id}/access")
+    @router.get("/account/funds/manage/entities/{entity_id}/access")
     async def accesses(entity_id: str, request: Request):
         await administrator(request, db)
         await entity(db, entity_id)
@@ -124,7 +124,7 @@ def register_fund_routes(router, db):
             {"_id": 0, "op_ref": 1}).to_list(1000)
         return {"members": members, "operations": operations}
 
-    @router.post("/staff/funds/entities/{entity_id}/members")
+    @router.post("/account/funds/manage/entities/{entity_id}/members")
     async def grant(entity_id: str, payload: Member, request: Request):
         actor = await administrator(request, db)
         await entity(db, entity_id)
@@ -140,7 +140,7 @@ def register_fund_routes(router, db):
         await audit(db, actor["subject_id"], "FUND_MEMBER_GRANTED:" + entity_id + ":" + target["subject_id"])
         return {"authorized": True}
 
-    @router.delete("/staff/funds/entities/{entity_id}/members/{subject_id}")
+    @router.delete("/account/funds/manage/entities/{entity_id}/members/{subject_id}")
     async def revoke(entity_id: str, subject_id: str, request: Request):
         actor = await administrator(request, db)
         result = await db.web_fund_members.update_one({"entity_id": entity_id, "subject_id": subject_id, "active": True},
@@ -150,7 +150,7 @@ def register_fund_routes(router, db):
         await audit(db, actor["subject_id"], "FUND_MEMBER_REVOKED:" + entity_id + ":" + subject_id)
         return {"revoked": True}
 
-    @router.post("/staff/funds/entities/{entity_id}/operations")
+    @router.post("/account/funds/manage/entities/{entity_id}/operations")
     async def assign(entity_id: str, payload: Operation, request: Request):
         actor = await administrator(request, db)
         await entity(db, entity_id)
@@ -167,7 +167,7 @@ def register_fund_routes(router, db):
         await audit(db, actor["subject_id"], "FUND_OPERATION_ASSIGNED:" + entity_id + ":" + payload.op_ref)
         return {"assigned": True}
 
-    @router.delete("/staff/funds/entities/{entity_id}/operations/{op_ref}")
+    @router.delete("/account/funds/manage/entities/{entity_id}/operations/{op_ref}")
     async def unassign(entity_id: str, op_ref: str, request: Request):
         actor = await administrator(request, db)
         result = await db.web_fund_operations.update_one({"entity_id": entity_id, "op_ref": op_ref, "active": True},
