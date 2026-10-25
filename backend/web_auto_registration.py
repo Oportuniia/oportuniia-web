@@ -80,8 +80,13 @@ async def run(db):
     try:
         drafts=await db.web_profile_drafts.find({'state':'PENDING_REVIEW'}).sort('auto_checked_at',1).to_list(1)
         for draft in drafts:
-            await process_profile(db,draft)
-            await db.web_profile_drafts.update_one({'subject_id':draft['subject_id'],'revision':draft.get('revision')},{'$set':{'auto_checked_at':stamp}})
+            try:
+                result=await process_profile(db,draft)
+                status={'auto_last_result':result,'auto_error_type':None}
+            except Exception as error:
+                # A malformed old profile must not starve every later account.
+                status={'auto_last_result':'PROCESSING_ERROR','auto_error_type':type(error).__name__}
+            await db.web_profile_drafts.update_one({'subject_id':draft['subject_id'],'revision':draft.get('revision')},{'$set':{'auto_checked_at':stamp,**status}})
     finally:
         await db.web_job_leases.update_one({'_id':'automatic-registration','token':token},{'$set':{'until':datetime.now(timezone.utc)}})
 

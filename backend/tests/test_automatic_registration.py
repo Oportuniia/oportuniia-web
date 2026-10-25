@@ -74,3 +74,17 @@ def test_digest_deduplicates_sends_aggregate_not_documents(monkeypatch):
 def test_digest_period_uses_madrid_calendar_across_dst():
     start,end=digest.period(datetime(2026,10,26,8,tzinfo=timezone.utc))
     assert (end-start).total_seconds()==25*3600
+
+def test_failed_profile_does_not_block_queue(monkeypatch):
+    db=DB()
+    for name in ('bad','good'):
+        db.raw.web_profile_drafts.insert_one({'subject_id':name,'revision':'r','state':'PENDING_REVIEW'})
+    seen=[]
+    async def process(db,draft):
+        seen.append(draft['subject_id'])
+        if draft['subject_id']=='bad':raise ValueError('fixture')
+        return 'WAITING_DETAILS'
+    monkeypatch.setattr(automatic,'process_profile',process)
+    asyncio.run(automatic.run(db));asyncio.run(automatic.run(db))
+    assert seen==['bad','good']
+    assert db.raw.web_profile_drafts.find_one({'subject_id':'bad'})['auto_last_result']=='PROCESSING_ERROR'

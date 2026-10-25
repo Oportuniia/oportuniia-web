@@ -39,8 +39,28 @@ class DocumentReview(BaseModel):
     legible: bool
     reason: str = Field(min_length=10, max_length=1000)
 
+class DocumentRemoval(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    removed: bool
+    reason: str = Field(min_length=10, max_length=1000)
+
 
 def register_review_routes(router, db, prefix="/staff/reviews"):
+    @router.post(prefix + "/{subject}/documents/{document_id}/removal")
+    async def remove_document(subject: str, document_id: str, payload: DocumentRemoval, request: Request):
+        actor = await reviewer(request, db)
+        if actor['subject_id'] == subject: fail('self_review_forbidden')
+        row = await db.web_personal_documents.find_one({'subject_id': subject, 'document_id': document_id})
+        if not row: fail('document_not_found', 404)
+        if not payload.removed and not row.get('removed_by_reviewer'): fail('document_not_in_review_trash', 409)
+        stamp = datetime.now(timezone.utc)
+        await db.web_document_review_events.insert_one({'subject_id': subject, 'document_id': document_id,
+            'reviewer_subject_id': actor['subject_id'], 'at': stamp, 'action': 'REMOVE' if payload.removed else 'RESTORE', 'reason': payload.reason})
+        await db.web_personal_documents.update_one({'_id': row['_id']}, {'$set': {'deleted': payload.removed, 'removed_by_reviewer': payload.removed, 'removed_at': stamp if payload.removed else None}})
+        if payload.removed and row.get('review_state') == 'APPROVED':
+            await db.web_access_reviews.update_one({'subject_id': subject}, {'$set': {'revoked': True, 'dossier_status': 'PENDING', 'documents_complete': False}})
+        return {'saved': True, 'removed': payload.removed, 'restored_approval': False}
+
     @router.post(prefix + "/{subject}/documents/{document_id}/classify")
     async def classify_document(subject: str, document_id: str, payload: DocumentReview, request: Request):
         from web_dossier import LABELS, expired
@@ -82,7 +102,7 @@ def register_review_routes(router, db, prefix="/staff/reviews"):
         if actor["subject_id"] == subject: fail("self_review_forbidden")
         draft = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0})
         if not draft: draft = {"profile": {}, "revision": ""}
-        docs = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "dossier_state": 1, "document_kinds": 1, "declared_identity": 1, "identity_discrepancy": 1, "discrepancy_explanation": 1, "quality": 1, "identity_read_status": 1}).to_list(100)
+        docs = await db.web_personal_documents.find({"subject_id": subject, "$or": [{"deleted": {"$ne": True}}, {"removed_by_reviewer": True}]}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "dossier_state": 1, "document_kinds": 1, "declared_identity": 1, "identity_discrepancy": 1, "discrepancy_explanation": 1, "quality": 1, "identity_read_status": 1, "review_state": 1, "deleted": 1}).to_list(100)
         return {"revision": draft.get("revision"), "profile": draft["profile"], "documents": docs, "missing_fields": missing_profile_fields(draft["profile"])}
 
     @router.get(prefix + "/{subject}/documents/{document_id}")
