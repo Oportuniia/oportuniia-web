@@ -6,6 +6,7 @@ import asyncio
 import base64
 import json
 import logging
+import os
 import subprocess
 import sys
 import uuid
@@ -26,7 +27,8 @@ def _server_read(row,profile):
     raw=read(row)  # decrypt and verify original SHA-256 before any parser
     payload=json.dumps({'data':base64.b64encode(raw).decode(),'profile':profile}).encode()
     result=subprocess.run([sys.executable,str(Path(__file__).with_name('web_document_reader.py'))],input=payload,
-        stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=120,check=True)
+        stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=120,check=True,
+        env={**os.environ,'OPENBLAS_NUM_THREADS':'1','OMP_NUM_THREADS':'1','MKL_NUM_THREADS':'1','MALLOC_ARENA_MAX':'2'})
     if len(result.stdout)>16000:raise ValueError('reader_output_limit')
     return json.loads(result.stdout)
 

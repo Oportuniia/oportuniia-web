@@ -9,7 +9,7 @@ import sys
 import unicodedata
 from datetime import date
 
-READER_VERSION = 4
+READER_VERSION = 5
 
 def norm(value):
     return re.sub(r'[^A-Z0-9]', '', ''.join(c for c in unicodedata.normalize('NFKD', str(value).upper()) if not unicodedata.combining(c)))
@@ -88,6 +88,8 @@ def create_engine():
         'EngineConfig.onnxruntime.intra_op_num_threads':1,'EngineConfig.onnxruntime.inter_op_num_threads':1})
 
 def read_bytes(data,profile):
+    import cv2
+    cv2.setNumThreads(1)
     import numpy as np
     from PIL import Image
     engine=create_engine()
