@@ -1,8 +1,24 @@
 """MFA-only team inbox over existing investor conversations."""
+import asyncio
+import logging
 from fastapi import Request, Query
 from web_accounts import administrator
 from web_identity import denied, audit
 from investor_access import TeamReply, save_team_reply
+
+NEW_REPLY_SCOPE = 'MASTER_NEW_REPLIES_20261025'
+
+
+async def mail_worker(db):
+    from web_workers import dispatch_email_once
+    while True:
+        try:
+            result = await dispatch_email_once(db, notification_scope=NEW_REPLY_SCOPE)
+            delay = 2 if result.get('processed') else 30
+        except Exception:
+            logging.getLogger(__name__).warning('new_team_reply_notification_retry')
+            delay = 30
+        await asyncio.sleep(delay)
 
 
 def register_team_message_routes(router, db):
@@ -26,7 +42,7 @@ def register_team_message_routes(router, db):
         thread = await db.web_message_threads.find_one({'thread_id': payload.thread_id})
         if not thread or not await db.web_users.find_one({'subject_id': thread['subject_id'], 'active': True}):
             denied('thread_not_found', 404)
-        result = await save_team_reply(db, payload)
+        result = await save_team_reply(db, payload, notification_scope=NEW_REPLY_SCOPE)
         if not result.get('idempotent'):
             await audit(db, actor['subject_id'], 'team_reply:' + payload.event_id)
         return result

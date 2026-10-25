@@ -436,7 +436,7 @@ def register_investor_routes(router: APIRouter, db):
 
 
 
-async def save_team_reply(db, payload):
+async def save_team_reply(db, payload, notification_scope=None):
     thread = await db.web_message_threads.find_one({"thread_id": payload.thread_id}, {"_id": 0})
     if not thread: fail("thread_not_found", 404)
     if not payload.body.strip(): fail("message_body_required", 422)
@@ -446,13 +446,16 @@ async def save_team_reply(db, payload):
     if not existing:
         from pymongo.errors import DuplicateKeyError
         try:
-            await db.web_message_events.insert_one({"_id": payload.event_id, "event_id": payload.event_id, "fingerprint": fingerprint, "thread_id": payload.thread_id})
+            await db.web_message_events.insert_one({"_id": payload.event_id, "event_id": payload.event_id, "fingerprint": fingerprint, "thread_id": payload.thread_id, "notification_scope": notification_scope})
         except DuplicateKeyError:
             raced = await db.web_message_events.find_one({"_id": payload.event_id}, {"_id": 0})
             if not raced or raced.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
+    # Persist consent scope on first event creation only. Retrying an older
+    # reply must never enroll a historical message in the new mail worker.
+    stored_event = await db.web_message_events.find_one({'_id': payload.event_id}) or {}
     now = datetime.now(timezone.utc).isoformat()
     await db.web_message_threads.update_one({"thread_id": payload.thread_id, "messages.event_id": {"$ne": payload.event_id}}, {"$push": {"messages": {"event_id": payload.event_id, "sender": "OPORTUNIIA", "body": payload.body.strip(), "at": now}}, "$set": {"state": "TEAM_REPLIED", "updated_at": now}})
     await db.web_notifications.update_one({"id": payload.event_id, "subject_id": thread["subject_id"]}, {"$setOnInsert": {"id": payload.event_id, "subject_id": thread["subject_id"], "title": "Tienes una respuesta de OPORTUNIIA", "body": "Consulta la respuesta en tu área privada.", "read": False, "created_at": now}}, upsert=True)
     await db.web_email_outbox.update_one({"_id": payload.event_id}, {"$setOnInsert": {"event_id": payload.event_id, "subject_id": thread["subject_id"], "thread_id": payload.thread_id,
-        "purpose": "OPERATIONAL_ONLY", "state": "PENDING_EMAIL_PROVIDER", "email_sent": False, "created_at": now}}, upsert=True)
+        "purpose": "OPERATIONAL_ONLY", "notification_scope": stored_event.get('notification_scope'), "state": "PENDING_EMAIL_PROVIDER", "email_sent": False, "created_at": now}}, upsert=True)
     return {"saved": True, "idempotent": bool(existing), "email_sent": False, "delivery_state": "PENDING_EMAIL_PROVIDER"}

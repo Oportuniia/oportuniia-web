@@ -18,10 +18,13 @@ from web_identity import send_transactional, mail_ready, public_origin
 from web_workspace import s3_client, MAX_BYTES, storage_ready
 
 
-async def dispatch_email_once(db):
+async def dispatch_email_once(db, notification_scope=None):
     if not mail_ready(): return {"processed": False, "reason": "MAIL_NOT_CONFIGURED"}
     stamp = datetime.now(timezone.utc)
-    row = await db.web_email_outbox.find_one_and_update({"state": {"$in": ["PENDING_EMAIL_PROVIDER", "PENDING_RETRY"]}, "$or": [{"next_attempt": {"$exists": False}}, {"next_attempt": {"$lte": stamp}}]},
+    query = {"state": {"$in": ["PENDING_EMAIL_PROVIDER", "PENDING_RETRY"]}, "$or": [{"next_attempt": {"$exists": False}}, {"next_attempt": {"$lte": stamp}}]}
+    if notification_scope is not None:
+        query['notification_scope'] = notification_scope
+    row = await db.web_email_outbox.find_one_and_update(query,
         {"$set": {"state": "SENDING", "claimed_at": stamp}, "$inc": {"attempts": 1}}, return_document=ReturnDocument.AFTER)
     if not row: return {"processed": False}
     user = await db.web_users.find_one({"subject_id": row["subject_id"], "active": True, "email_verified": True}, {"_id": 0})

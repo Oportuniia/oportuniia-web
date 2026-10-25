@@ -1,6 +1,10 @@
 from fastapi import APIRouter
 from test_web_identity import system, login, Cursor
 from web_team_messages import register_team_message_routes
+import asyncio
+from web_team_messages import NEW_REPLY_SCOPE
+from investor_access import TeamReply, save_team_reply
+import web_workers
 
 
 def setup(system, monkeypatch):
@@ -53,3 +57,38 @@ def test_inactive_recipient_not_exposed_or_contacted(system, monkeypatch):
     assert c.get('/api/account/team-messages').json()['items'] == []
     assert c.post('/api/account/team-messages/reply', json={'thread_id': 'closed-thread', 'event_id': 'x', 'body': 'No enviar'}).status_code == 404
     assert db.raw.web_email_outbox.count_documents({}) == 0
+
+
+def test_only_new_master_replies_send_and_old_retry_stays_excluded(system, monkeypatch):
+    c, db = setup(system, monkeypatch)
+    ident = c.post('/api/investor/messages', json={'body': 'Consulta ficticia'}).json()['thread_id']
+    old = TeamReply(thread_id=ident, event_id='old-event', body='Respuesta anterior')
+    asyncio.run(save_team_reply(db, old))
+    master(db)
+    assert c.post('/api/account/team-messages/reply', json=old.model_dump()).status_code == 200
+    assert db.raw.web_email_outbox.find_one({'_id': 'old-event'}).get('notification_scope') is None
+    new = {'thread_id': ident, 'event_id': 'new-event', 'body': 'Respuesta nueva'}
+    assert c.post('/api/account/team-messages/reply', json=new).status_code == 200
+    sent = []
+    async def send(*args): sent.append(args)
+    monkeypatch.setattr(web_workers, 'mail_ready', lambda: True)
+    monkeypatch.setattr(web_workers, 'send_transactional', send)
+    assert asyncio.run(web_workers.dispatch_email_once(db, NEW_REPLY_SCOPE))['submitted']
+    assert not asyncio.run(web_workers.dispatch_email_once(db, NEW_REPLY_SCOPE))['processed']
+    assert len(sent) == 1
+    assert 'Respuesta nueva' not in sent[0][2]
+    assert db.raw.web_email_outbox.find_one({'_id': 'old-event'})['state'] == 'PENDING_EMAIL_PROVIDER'
+
+
+def test_new_reply_respects_recipient_opt_out(system, monkeypatch):
+    c, db = setup(system, monkeypatch)
+    ident = c.post('/api/investor/messages', json={'body': 'Consulta ficticia'}).json()['thread_id']
+    subject = db.raw.web_users.find_one({})['subject_id']
+    db.raw.web_workspace_settings.insert_one({'subject_id': subject, 'email_copies': False})
+    master(db)
+    c.post('/api/account/team-messages/reply', json={'thread_id': ident, 'event_id': 'no-mail', 'body': 'Respuesta privada'})
+    monkeypatch.setattr(web_workers, 'mail_ready', lambda: True)
+    async def forbidden(*args): raise AssertionError('Must not send')
+    monkeypatch.setattr(web_workers, 'send_transactional', forbidden)
+    assert not asyncio.run(web_workers.dispatch_email_once(db, NEW_REPLY_SCOPE))['submitted']
+    assert db.raw.web_email_outbox.find_one({'_id': 'no-mail'})['state'] == 'SKIPPED_ACCOUNT_OR_PREFERENCE'
