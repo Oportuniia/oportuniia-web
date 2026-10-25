@@ -420,25 +420,7 @@ def register_investor_routes(router: APIRouter, db):
         if not expected: fail("message_authority_not_configured", 503)
         supplied = request.headers.get("X-OPORTUNIIA-Messages-Key", "")
         if not supplied or not hmac.compare_digest(supplied, expected): fail("invalid_message_authority", 401)
-        thread = await db.web_message_threads.find_one({"thread_id": payload.thread_id}, {"_id": 0})
-        if not thread: fail("thread_not_found", 404)
-        if not payload.body.strip(): fail("message_body_required", 422)
-        existing = await db.web_message_events.find_one({"event_id": payload.event_id}, {"_id": 0})
-        fingerprint = hashlib.sha256((payload.thread_id+"|"+payload.body).encode()).hexdigest()
-        if existing and existing.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
-        if not existing:
-            from pymongo.errors import DuplicateKeyError
-            try:
-                await db.web_message_events.insert_one({"_id": payload.event_id, "event_id": payload.event_id, "fingerprint": fingerprint, "thread_id": payload.thread_id})
-            except DuplicateKeyError:
-                raced = await db.web_message_events.find_one({"_id": payload.event_id}, {"_id": 0})
-                if not raced or raced.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
-        now = datetime.now(timezone.utc).isoformat()
-        await db.web_message_threads.update_one({"thread_id": payload.thread_id, "messages.event_id": {"$ne": payload.event_id}}, {"$push": {"messages": {"event_id": payload.event_id, "sender": "OPORTUNIIA", "body": payload.body.strip(), "at": now}}, "$set": {"state": "TEAM_REPLIED", "updated_at": now}})
-        await db.web_notifications.update_one({"id": payload.event_id, "subject_id": thread["subject_id"]}, {"$setOnInsert": {"id": payload.event_id, "subject_id": thread["subject_id"], "title": "Tienes una respuesta de OPORTUNIIA", "body": "Consulta la respuesta en tu área privada.", "read": False, "created_at": now}}, upsert=True)
-        await db.web_email_outbox.update_one({"_id": payload.event_id}, {"$setOnInsert": {"event_id": payload.event_id, "subject_id": thread["subject_id"], "thread_id": payload.thread_id,
-            "purpose": "OPERATIONAL_ONLY", "state": "PENDING_EMAIL_PROVIDER", "email_sent": False, "created_at": now}}, upsert=True)
-        return {"saved": True, "idempotent": bool(existing), "email_sent": False, "delivery_state": "PENDING_EMAIL_PROVIDER"}
+        return await save_team_reply(db, payload)
 
     @router.get("/investor/operations/{op_ref}/offer-draft")
     async def offer(op_ref: str, subject: str = Depends(authenticated_subject)):
@@ -452,3 +434,25 @@ def register_investor_routes(router: APIRouter, db):
         return {"op_ref": op_ref, "applicant": {k: profile.get("profile", {}).get(k, "") for k in allowed},
                 "state": "DATA_DRAFT_ONLY", "template_approved": False, "signed": False, "submitted_to_provider": False}
 
+
+
+async def save_team_reply(db, payload):
+    thread = await db.web_message_threads.find_one({"thread_id": payload.thread_id}, {"_id": 0})
+    if not thread: fail("thread_not_found", 404)
+    if not payload.body.strip(): fail("message_body_required", 422)
+    existing = await db.web_message_events.find_one({"event_id": payload.event_id}, {"_id": 0})
+    fingerprint = hashlib.sha256((payload.thread_id+"|"+payload.body).encode()).hexdigest()
+    if existing and existing.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
+    if not existing:
+        from pymongo.errors import DuplicateKeyError
+        try:
+            await db.web_message_events.insert_one({"_id": payload.event_id, "event_id": payload.event_id, "fingerprint": fingerprint, "thread_id": payload.thread_id})
+        except DuplicateKeyError:
+            raced = await db.web_message_events.find_one({"_id": payload.event_id}, {"_id": 0})
+            if not raced or raced.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
+    now = datetime.now(timezone.utc).isoformat()
+    await db.web_message_threads.update_one({"thread_id": payload.thread_id, "messages.event_id": {"$ne": payload.event_id}}, {"$push": {"messages": {"event_id": payload.event_id, "sender": "OPORTUNIIA", "body": payload.body.strip(), "at": now}}, "$set": {"state": "TEAM_REPLIED", "updated_at": now}})
+    await db.web_notifications.update_one({"id": payload.event_id, "subject_id": thread["subject_id"]}, {"$setOnInsert": {"id": payload.event_id, "subject_id": thread["subject_id"], "title": "Tienes una respuesta de OPORTUNIIA", "body": "Consulta la respuesta en tu área privada.", "read": False, "created_at": now}}, upsert=True)
+    await db.web_email_outbox.update_one({"_id": payload.event_id}, {"$setOnInsert": {"event_id": payload.event_id, "subject_id": thread["subject_id"], "thread_id": payload.thread_id,
+        "purpose": "OPERATIONAL_ONLY", "state": "PENDING_EMAIL_PROVIDER", "email_sent": False, "created_at": now}}, upsert=True)
+    return {"saved": True, "idempotent": bool(existing), "email_sent": False, "delivery_state": "PENDING_EMAIL_PROVIDER"}

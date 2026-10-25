@@ -26,6 +26,7 @@ from web_workers import register_worker_routes
 from web_quarantine import register_quarantine_routes
 from web_funds import register_fund_routes, ensure_fund_indexes
 from web_reservation_protocol import register_protocol_routes, worker as protocol_worker
+from web_team_messages import register_team_message_routes
 
 mongo_url, database_name = os.getenv("MONGO_URL", ""), os.getenv("DB_NAME", "")
 client = db = None
@@ -108,5 +109,6 @@ register_worker_routes(router, db)
 register_quarantine_routes(router, db)
 register_fund_routes(router, db)
 register_protocol_routes(router, db)
+register_team_message_routes(router, db)
 app.include_router(router)
 
