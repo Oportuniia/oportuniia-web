@@ -17,6 +17,9 @@ for (const name of ['web2.html', 'oportunidades.html']) {
   fs.writeFileSync(file, html);
 }
 fs.copyFileSync(path.join(destination, 'web2.html'), path.join(destination, 'index.html'));
+// Preserve the existing clean admin URL as well as the explicit HTML page.
+fs.mkdirSync(path.join(destination, 'gestion-usuarios'), {recursive: true});
+fs.copyFileSync(path.join(destination, 'gestion-usuarios.html'), path.join(destination, 'gestion-usuarios/index.html'));
 for (const file of ['secretary-engines.js', 'pdf.worker.min.mjs', 'ocr/worker.min.js',
                     'ocr/lang/spa.traineddata.gz', 'ocr/lang/eng.traineddata.gz']) {
   if (!fs.statSync(path.join(destination, 'private/vendor', file)).size) throw Error('Missing OCR artifact: ' + file);
