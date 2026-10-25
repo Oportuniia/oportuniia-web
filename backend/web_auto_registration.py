@@ -79,7 +79,7 @@ async def process_profile(db,draft):
 async def run(db):
     stamp=datetime.now(timezone.utc);token=str(uuid.uuid4())
     try:
-        claimed=await db.web_job_leases.update_one({'_id':'automatic-registration','$or':[{'until':{'$lt':stamp}},{'until':{'$exists':False}}]}, {'$set':{'until':stamp+timedelta(minutes=25),'token':token}},upsert=True)
+        claimed=await db.web_job_leases.update_one({'_id':'automatic-registration','$or':[{'until':{'$lte':stamp}},{'until':{'$exists':False}}]}, {'$set':{'until':stamp+timedelta(minutes=25),'token':token}},upsert=True)
     except DuplicateKeyError:return
     if not (claimed.modified_count or claimed.upserted_id):return
     try:
