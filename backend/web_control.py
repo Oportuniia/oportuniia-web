@@ -45,8 +45,24 @@ async def data(db,days):
  included={p['_id'] for p in prof if p.get('kind')=='suscriptor' and future(p.get('valid_until'))}
  active={e['subject_id']:e for e in ent if premium_period_active(e)}
  result['segments']={'premium_paid':sum(u['subject_id'] in active and active[u['subject_id']].get('provider')!='MASTER_TEST' for u in users),'premium_test':sum(u['subject_id'] in active and active[u['subject_id']].get('provider')=='MASTER_TEST' for u in users),'premium_included':sum(u['subject_id'] in included and u['subject_id'] not in active for u in users),'standard':sum(u['subject_id'] not in active and u['subject_id'] not in included for u in users)}
+ result['segment_members']={key:[] for key in result['segments']}
+ for u in users:
+  ident=u['subject_id'];key=('premium_test' if active[ident].get('provider')=='MASTER_TEST' else 'premium_paid') if ident in active else 'premium_included' if ident in included else 'standard'
+  person=await db.web_users.find_one({'subject_id':ident},{'name':1,'account_kind':1}) or {}
+  result['segment_members'][key].append({'subject_id':ident,'name':person.get('name','Usuario'),'kind':person.get('account_kind','Sin clasificar')})
  result['profiles']=dict(Counter(u.get('account_kind','Sin clasificar') for u in users))
  result['technical']=await db.web_technical_minutes.find({'minute':{'$gte':start.isoformat()}},{'_id':0}).sort('minute',-1).to_list(1500)
+ shares=await db.web_recommendations.find({}, {'sender_id':1,'created_at':1,'viewed_at':1,'channel':1}).to_list(10001)
+ selected=[r for r in shares[:10000] if stamp(r.get('created_at')) and start<=stamp(r['created_at'])<=now]
+ result['recommendation_conversion']={'sent_or_prepared':len(selected),'viewed':sum(bool(r.get('viewed_at')) for r in selected)}
+ ranking={}
+ for row in selected:
+  ident=row.get('sender_id','');item=ranking.setdefault(ident,{'subject_id':ident,'recommendations':0,'viewed':0,'email':0,'whatsapp':0});item['recommendations']+=1;item['viewed']+=int(bool(row.get('viewed_at')));item[row.get('channel','email')]=item.get(row.get('channel','email'),0)+1
+ for ident,item in ranking.items():
+  person=await db.web_users.find_one({'subject_id':ident},{'name':1,'role':1,'account_kind':1}) or {}
+  professional=await db.web_professionals.find_one({'_id':ident},{'kind':1}) or {}
+  item['name']=person.get('name','Usuario');item['kind']='master' if person.get('role')=='superadmin' else professional.get('kind',person.get('account_kind','Sin clasificar'))
+ result['professionals']=sorted(ranking.values(),key=lambda r:r['recommendations'],reverse=True)
  result['coverage']=['Los periodos son ventanas móviles; se comparan con el periodo anterior de igual duración.','Premium indica derechos vigentes, no facturación ni aprobación del expediente.','Los registros sin fecha no se atribuyen a ningún periodo.','No hay seguimiento público de visitantes ni campañas conectado todavía.','Los tiempos técnicos miden la respuesta de la API, no la carga visual de la página.']
  return result
 
