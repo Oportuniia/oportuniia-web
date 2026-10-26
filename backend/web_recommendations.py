@@ -127,7 +127,7 @@ async def recommendation_mail(db, outbox):
     url = public_origin() + '/mi-oportuniia#ficha/' + row['_id']
     return (f"{name} te recomienda {row['op_ref']} · OPORTUNIIA",
         f"Hola,\n\n{name} te ha recomendado la operación {row['op_ref']}.\n"
-        f"Consulta el resumen y comenta tus dudas con {name} desde tu área privada:\n\n{url}\n\n"
+        f"Consulta el resumen y comenta tus dudas con {name} desde tu área privada:\n\nVer operación {row['op_ref']}: {url}\n\n"
         "El acceso es personal. Esta recomendación no activa Premium ni implica una reserva.")
 
 
