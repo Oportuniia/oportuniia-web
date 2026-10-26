@@ -68,7 +68,8 @@ body .access-stages .stage-approved{background:#fff;border-color:#fff;color:#0a1
 body .access-stages .stage-approved :is(b,small){color:#0a1622}
 body .access-stages .stage-enabled{background:#fff;border-color:#fff;color:#0a1622}
 body .access-stages .stage-enabled :is(b,small){color:#0a1622}
-body .access-stages .premium-active{position:relative;overflow:hidden;isolation:isolate;background:#f2c94c;border-color:#f2c94c;color:#101010}
+body .access-stages .premium-active{position:relative;overflow:hidden;isolation:isolate;container-type:inline-size;background:#f2c94c;border-color:#f2c94c;color:#101010}
+body .access-stages .premium-permissions{display:block;white-space:nowrap;font-size:min(12px,4.5cqi)}
 body .access-stages .premium-active :is(b,small){position:relative;z-index:1;color:#101010}
 body .access-stages .premium-active::after{content:"";position:absolute;inset:-50%;pointer-events:none;background:linear-gradient(110deg,transparent 40%,#ffffffa6 50%,transparent 60%);transform:translateX(-120%);animation:premium-shine 20s linear infinite}
 @keyframes premium-shine{0%,90%{transform:translateX(-120%)}98%,100%{transform:translateX(120%)}}

@@ -10,5 +10,7 @@ export function paintAccess(host,a={}) {
   cards[2].classList.toggle('stage-approved',s.dossier);
   cards[3].classList.toggle('stage-enabled',s.enabled&&!s.active);
   cards[3].classList.toggle('premium-active',s.active);
-  cards[3].querySelector('small').textContent=s.active?'Premium activo · Cada operación requiere sus permisos':s.enabled?'Perfil habilitado · Premium disponible para contratar':'Bloqueados hasta 100% y verificación';
+  const description=cards[3].querySelector('small');
+  if(s.active)description.innerHTML='Premium activo<br><span class="premium-permissions">Cada operación requiere sus permisos</span>';
+  else description.textContent=s.enabled?'Perfil habilitado · Premium disponible para contratar':'Bloqueados hasta 100% y verificación';
 }
