@@ -22,7 +22,7 @@ def setup(system, monkeypatch):
 
 
 def share(c, channel='email', ids=None):
-    return c.post('/api/professional/recommendations', json={'op_ref': 'OP-TEST', 'investor_ids': ids or ['client'], 'channel': channel})
+    return c.post('/api/account/professional/recommendations', json={'op_ref': 'OP-TEST', 'investor_ids': ids or ['client'], 'channel': channel})
 
 
 def test_share_is_recipient_bound_safe_and_idempotent(system, monkeypatch):
@@ -31,7 +31,7 @@ def test_share_is_recipient_bound_safe_and_idempotent(system, monkeypatch):
     assert share(c).json() == a.json()
     assert db.raw.web_email_outbox.count_documents({}) == 1
     ident=a.json()['items'][0]['id']
-    result=c.get('/api/professional/recommendations/'+ident)
+    result=c.get('/api/account/professional/recommendations/'+ident)
     assert result.status_code == 200
     assert 'SECRET' not in result.text and 'provider' not in result.text
     assert 'Uso personal' in result.json()['watermark']
@@ -55,8 +55,8 @@ def test_no_arbitrary_recipient_or_browser_role(system, monkeypatch):
 def test_revocation_and_expiry_block_access_and_mail(system, monkeypatch):
     c,db,sender=setup(system,monkeypatch)
     ident=share(c).json()['items'][0]['id']
-    assert c.post('/api/professional/recommendations/'+ident+'/revoke',json={}).status_code==200
-    assert c.get('/api/professional/recommendations/'+ident).status_code==404
+    assert c.post('/api/account/professional/recommendations/'+ident+'/revoke',json={}).status_code==200
+    assert c.get('/api/account/professional/recommendations/'+ident).status_code==404
     monkeypatch.setattr(web_workers,'mail_ready',lambda:True)
     async def never(*args): raise AssertionError('Revoked mail must not send')
     monkeypatch.setattr(web_workers,'send_transactional',never)
@@ -118,18 +118,18 @@ def test_recipient_can_read_reply_but_stranger_cannot(system, monkeypatch):
     ident=share(c).json()['items'][0]['id']
     from investor_access import authenticated_subject
     c.app.dependency_overrides[authenticated_subject]=lambda:'client'
-    assert c.get('/api/professional/recommendations/'+ident).status_code==200
+    assert c.get('/api/account/professional/recommendations/'+ident).status_code==200
     assert db.raw.web_recommendations.find_one({})['viewed_at']
     payload={'body':'Me interesa esta operación ficticia','event_id':'reply-test-123'}
-    assert c.post('/api/professional/recommendations/'+ident+'/reply',json=payload).status_code==200
-    assert c.post('/api/professional/recommendations/'+ident+'/reply',json=payload).status_code==200
+    assert c.post('/api/account/professional/recommendations/'+ident+'/reply',json=payload).status_code==200
+    assert c.post('/api/account/professional/recommendations/'+ident+'/reply',json=payload).status_code==200
     assert db.raw.web_recommendation_messages.count_documents({})==1
     c.app.dependency_overrides[authenticated_subject]=lambda:'stranger'
-    assert c.get('/api/professional/recommendations/'+ident).status_code==404
-    assert c.post('/api/professional/recommendations/'+ident+'/reply',json=payload).status_code==404
+    assert c.get('/api/account/professional/recommendations/'+ident).status_code==404
+    assert c.post('/api/account/professional/recommendations/'+ident+'/reply',json=payload).status_code==404
     c.app.dependency_overrides[authenticated_subject]=lambda:'client'
     db.raw.web_recommendations.update_one({}, {'$set':{'valid_until':'2000-01-01T00:00:00Z'}})
-    assert c.get('/api/professional/recommendations/'+ident).status_code==404
+    assert c.get('/api/account/professional/recommendations/'+ident).status_code==404
 
 
 def test_revoked_link_and_source_grant_close_existing_summary(system, monkeypatch):
@@ -137,9 +137,9 @@ def test_revoked_link_and_source_grant_close_existing_summary(system, monkeypatc
     ident=share(c).json()['items'][0]['id']
     async def no_catalog(*args):return {'premium':True,'stage':2,'grant':{'permissions':[]}}
     monkeypatch.setattr(rec,'context',no_catalog)
-    assert c.get('/api/professional/recommendations/'+ident).status_code==403
+    assert c.get('/api/account/professional/recommendations/'+ident).status_code==403
     db.raw.web_client_links.update_one({}, {'$set':{'state':'REVOKED'}})
-    assert c.get('/api/professional/recommendations/'+ident).status_code==403
+    assert c.get('/api/account/professional/recommendations/'+ident).status_code==403
 
 
 def test_subscriber_free_premium_requires_active_period_and_verification(system, monkeypatch):

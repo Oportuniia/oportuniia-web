@@ -158,7 +158,7 @@ def register_recommendation_routes(router, db):
             sender.get('name', 'Tu profesional') + ' solicita vincularte a su cartera. Revisa la invitación en Mis inversores y recomendaciones.')
         return {'state': 'PENDING'}
 
-    @router.post('/professional/invitation')
+    @router.post('/account/professional/invitation')
     async def decide(payload: Decision, subject: str = Depends(authenticated_subject)):
         row = await db.web_client_links.find_one_and_update({'_id': subject, 'state': 'PENDING'},
             {'$set': {'state': 'ACCEPTED' if payload.accept else 'DECLINED', 'decided_at': now().isoformat(),
@@ -176,7 +176,7 @@ def register_recommendation_routes(router, db):
         await audit(db, actor['subject_id'], 'share_summary:' + payload.op_ref)
         return {'saved': True}
 
-    @router.get('/professional/workspace')
+    @router.get('/account/professional/workspace')
     async def workspace(subject: str = Depends(authenticated_subject)):
         grant = await db.web_professionals.find_one({'_id': subject, 'active': True}) or {}
         is_prof = grant.get('kind') in {'colaborador', 'suscriptor'} and future(grant.get('valid_until'))
@@ -201,7 +201,7 @@ def register_recommendation_routes(router, db):
             row['mail_state'] = mail.get('state')
         return {'kind': grant.get('kind') if is_prof else None, 'clients': clients, 'invitation': invitation, 'recommendations': rows}
 
-    @router.post('/professional/recommendations')
+    @router.post('/account/professional/recommendations')
     async def recommend(payload: Share, request: Request, subject: str = Depends(authenticated_subject)):
         sender, _ = await professional(db, subject)
         await summary_allowed(db, subject, payload.op_ref)
@@ -242,7 +242,7 @@ def register_recommendation_routes(router, db):
                 if phone else None})
         return {'items': result}
 
-    @router.get('/professional/recommendations/{ident}')
+    @router.get('/account/professional/recommendations/{ident}')
     async def read(ident: str, subject: str = Depends(authenticated_subject)):
         row, summary = await authorized_share(db, ident, subject)
         if subject == row['investor_id']:
@@ -255,7 +255,7 @@ def register_recommendation_routes(router, db):
                 'watermark': 'Uso personal · ' + hashlib.sha256(row['investor_id'].encode()).hexdigest()[:12] + ' · ' + row['op_ref'] + ' · ' + now().date().isoformat(),
                 'valid_until': row['valid_until'], 'can_revoke': subject == row['sender_id'], 'messages': messages}
 
-    @router.post('/professional/recommendations/{ident}/reply')
+    @router.post('/account/professional/recommendations/{ident}/reply')
     async def reply(ident: str, payload: Reply, request: Request, subject: str = Depends(authenticated_subject)):
         row, _ = await authorized_share(db, ident, subject)
         await rate_limit(db, request, 'recommendation-reply', subject)
@@ -267,7 +267,7 @@ def register_recommendation_routes(router, db):
         await notification(db, other, key, 'Respuesta sobre ' + row['op_ref'], 'Tienes una respuesta en Mis inversores y recomendaciones.')
         return {'saved': True}
 
-    @router.post('/professional/recommendations/{ident}/revoke')
+    @router.post('/account/professional/recommendations/{ident}/revoke')
     async def revoke(ident: str, subject: str = Depends(authenticated_subject)):
         row = await db.web_recommendations.find_one({'_id': ident, 'sender_id': subject})
         if not row: fail('recommendation_not_available', 404)
