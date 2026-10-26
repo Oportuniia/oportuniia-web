@@ -194,8 +194,16 @@ async def publish_active_draft(db, internal_id: str) -> dict[str, Any]:
     item = materialize_catalog_item(payload)
     existing = await db.presentation_web_published.find_one(
         {"internal_id": internal_id},
-        {"_id": 0, "source_output_hash": 1, "published_at": 1},
+        {"_id": 0, "source_output_hash": 1, "source_output_id": 1,
+         "publication_state": 1, "published_at": 1, "slug": 1},
     )
+    if (existing and existing.get("source_output_id") == payload["output_id"]
+            and existing.get("source_output_hash") == payload["output_hash"]
+            and existing.get("publication_state") == "PUBLISHED"):
+        # A delivery retry must not change catalogue order or publication history.
+        return {"published": True, "idempotent": True, "internal_id": internal_id,
+                "slug": existing["slug"], "output_id": payload["output_id"],
+                "output_version": payload["output_version"], "output_hash": payload["output_hash"]}
     now = datetime.now(timezone.utc)
     published_at = (existing or {}).get("published_at") or now.isoformat()
     item["order"] = int(now.timestamp())

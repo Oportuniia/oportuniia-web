@@ -14,6 +14,17 @@ if str(BACKEND) not in sys.path:
 import presentation_publish as pub
 
 
+@pytest.mark.asyncio
+async def test_publication_replay_preserves_all_stored_bytes():
+    payload = _payload()
+    db = FakeDB(payload)
+    await pub.publish_active_draft(db, payload["internal_id"])
+    before = copy.deepcopy({name: value.docs for name, value in vars(db).items()})
+    result = await pub.publish_active_draft(db, payload["internal_id"])
+    assert result["idempotent"] is True
+    assert before == {name: value.docs for name, value in vars(db).items()}
+
+
 def _canonical(obj):
     return json.dumps(
         obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False, default=str

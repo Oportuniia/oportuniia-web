@@ -1009,3 +1009,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
 <!-- END doc-019 -->
+
+## Integracion del circuito de 72 horas — 2026-10-21 (en desarrollo)
+
+Un replay de la misma publicacion ya PUBLISHED devuelve idempotent=true sin modificar fechas, orden ni registros. Una version nueva de la misma OP conserva su internal_id. Pruebas locales ejecutadas test_presentation_publish y test_presentation_ingress: 12 passed, 0 failed, incluyendo igualdad de todos los registros antes/despues del replay.
+
+Pendiente: transporte y publicacion automatica de la version individual tardia con su provenance de cierre, prueba real de extremo a extremo y revision de requisitos legales/cookies antes de apertura publica. No se ha desplegado.
