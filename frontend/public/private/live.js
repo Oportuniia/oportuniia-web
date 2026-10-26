@@ -36,4 +36,17 @@ try{const session=await api('account/session');user=session.user;if(user.must_ch
 
 // Refresh only visible profile status, without replacing unsaved form fields.
 let statusRefreshBusy=false;
-setInterval(async()=>{if(document.hidden||!document.querySelector('#real-profile .access-stages')||statusRefreshBusy)return;statusRefreshBusy=true;try{access=await api('investor/access');paintAccess(document.querySelector('#real-profile'),access)}catch{}finally{statusRefreshBusy=false}},30000);
+async function refreshProfileStatus(){
+  if(document.hidden||!document.querySelector('#real-profile .access-stages')||statusRefreshBusy)return;
+  statusRefreshBusy=true;
+  try{
+    access=await api('investor/access');
+    const host=document.querySelector('#real-profile');
+    if(host)paintAccess(host,access);
+    navigation();
+  }catch{/* Preserve the last confirmed state during a transient connection failure. */}
+  finally{statusRefreshBusy=false}
+}
+setInterval(refreshProfileStatus,30000);
+document.addEventListener('visibilitychange',refreshProfileStatus);
+addEventListener('focus',refreshProfileStatus);
