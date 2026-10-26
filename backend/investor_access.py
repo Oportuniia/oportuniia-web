@@ -121,6 +121,9 @@ async def context(db, subject: str, op_ref: str | None = None):
     result = {"subject": subject, "review": review, "stage": access_stage(review),
               "premium": premium_period_active(entitlement), "grant": {}}
     result["founder_access"] = founder
+    professional = await db.web_professionals.find_one({'_id': subject, 'active': True, 'kind': 'suscriptor'}) or {}
+    if future(professional.get('valid_until')):
+        result['premium'] = True
     if founder:
         result.update(stage=2, premium=True)
         result["review"] = {"identity_status": "ADMINISTRATOR", "dossier_status": "NOT_REQUIRED"}
@@ -213,11 +216,11 @@ def missing_profile_fields(profile):
     required = ["account_kind", "subject_type", "full_name", "email", "tax_id", "fiscal_address", "fiscal_address_number", "municipality", "province", "region", "country"]
     required += (["company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position", "registered_address_number"] if profile.get("subject_type") == "PJ" else ["birth_date"])
     if profile.get("account_kind") == "inversor": required += ["address", "address_number", "nationality", "professional_activity"]
-    else: required += ["collaborator_model"]
+    elif profile.get('account_kind') == 'colaborador': required += ["collaborator_model"]
     missing = [k for k in required if not str(profile.get(k, "")).strip()]
     consents = ["privacy", "confidentiality", "ethics"] if profile.get("account_kind") == "colaborador" else ["privacy", "truthfulness", "no_commitment", "terms"]
     missing += ["consent_"+k for k in consents if profile.get("consents", {}).get(k) is not True]
-    if profile.get("account_kind") not in {"inversor", "colaborador"}: missing.append("valid_account_kind")
+    if profile.get("account_kind") not in {"inversor", "colaborador", "suscriptor"}: missing.append("valid_account_kind")
     if profile.get("subject_type") not in {"PF", "PJ"}: missing.append("valid_subject_type")
     if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", str(profile.get("email", ""))): missing.append("valid_email")
     if profile.get("account_kind") == "colaborador" and profile.get("collaborator_model") not in {"A", "B"}: missing.append("valid_collaborator_model")
@@ -311,15 +314,20 @@ def register_investor_routes(router: APIRouter, db):
 
     @router.post("/investor/profile-draft")
     async def profile(payload: ProfileDraft, request: Request, subject: str = Depends(authenticated_subject)):
-        if payload.account_kind not in {"inversor", "colaborador"} or payload.subject_type not in {"PF", "PJ"}:
+        if payload.account_kind not in {"inversor", "colaborador", "suscriptor"} or payload.subject_type not in {"PF", "PJ"}:
             fail("invalid_profile_type", 422)
         if payload.account_kind == "inversor" and payload.collaborator_model:
             fail("investor_has_no_permanent_modality", 422)
+        professional = await db.web_professionals.find_one({'_id': subject, 'kind': 'suscriptor', 'active': True}) or {}
+        subscriber = future(professional.get('valid_until'))
+        if payload.account_kind == 'suscriptor' and not subscriber: fail('professional_access_required')
+        if subscriber and payload.collaborator_model: fail('subscriber_has_no_modality', 422)
         if payload.account_kind == "colaborador" and payload.collaborator_model not in {"A", "B"}:
             fail("collaborator_model_required", 422)
         if os.getenv("WEB_IDENTITY_MODE") == "web_sessions":
             owner = request.state.web_user
-            if payload.email.lower() != owner["email"] or payload.account_kind != owner["account_kind"]: fail("account_identity_mismatch", 422)
+            expected_kind = 'suscriptor' if subscriber else owner['account_kind']
+            if payload.email.lower() != owner["email"] or payload.account_kind != expected_kind: fail("account_identity_mismatch", 422)
         from web_access_restrictions import blocked
         if await blocked(db, {"subject_id": subject, "email": payload.email}, payload.model_dump()): fail("account_access_restricted", 403)
         # Editing the profile cannot retain an approval of an older identity snapshot.

@@ -14,6 +14,9 @@ async def mail_worker(db):
     while True:
         try:
             result = await dispatch_email_once(db, notification_scope=NEW_REPLY_SCOPE)
+            from web_recommendations import SCOPE
+            recommendation = await dispatch_email_once(db, notification_scope=SCOPE)
+            result['processed'] = result.get('processed') or recommendation.get('processed')
             delay = 2 if result.get('processed') else 30
         except Exception:
             logging.getLogger(__name__).warning('new_team_reply_notification_retry')

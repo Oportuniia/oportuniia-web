@@ -34,7 +34,18 @@ async def dispatch_email_once(db, notification_scope=None):
         return {"processed": True, "submitted": False}
     try:
         # Never copy judicial/personal documents into SMTP. Link to the protected inbox.
-        await send_transactional(user["email"], "Tienes una respuesta · OPORTUNIIA", "Tienes una nueva respuesta del equipo en MI OPORTUNIIA.\n\n"+public_origin()+"/mi-oportuniia#notificaciones\n\nEste aviso es operativo y corresponde a tu relación con OPORTUNIIA.")
+        from web_recommendations import SCOPE, recommendation_mail
+        if row.get('notification_scope') == SCOPE:
+            from fastapi import HTTPException
+            try:
+                title, body = await recommendation_mail(db, row)
+            except HTTPException:
+                await db.web_email_outbox.update_one({'_id': row['_id']}, {'$set': {'state': 'SKIPPED_REVOKED_OR_PREFERENCE'}})
+                return {'processed': True, 'submitted': False}
+        else:
+            title = "Tienes una respuesta · OPORTUNIIA"
+            body = "Tienes una nueva respuesta del equipo en MI OPORTUNIIA.\n\n"+public_origin()+"/mi-oportuniia#notificaciones\n\nEste aviso es operativo y corresponde a tu relación con OPORTUNIIA."
+        await send_transactional(user['email'], title, body)
     except Exception:
         await db.web_email_outbox.update_one({"_id": row["_id"]}, {"$set": {"state": "PENDING_RETRY" if row["attempts"] < 5 else "NEEDS_MANUAL_REVIEW", "next_attempt": stamp+timedelta(minutes=20)}})
         return {"processed": True, "submitted": False}
