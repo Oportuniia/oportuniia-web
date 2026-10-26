@@ -33,6 +33,10 @@ async def report(db,start,end,weekly=False):
         lines.append('Pagos confirmados de Premium/reservas: '+str(len(payments))+' (no equivalen a compraventas).')
         lines.append('Compraventas por zona: pendiente de disponer de una fuente de cierres de compraventa confirmados. No se infiere a partir de altas ni reservas.')
         lines.append('La procedencia refleja el perfil actual de las altas del periodo, no geolocalización ni seguimiento individual.')
+    from web_control import data
+    control=await data(db,7 if weekly else 1)
+    lines.extend(m['label']+': '+str(m['value'])+' · periodo anterior: '+str(m['previous']) for m in control['metrics'] if m['key'] not in {'users','reports'})
+    lines.append('Detalle e histórico: https://oportuniia.com/mi-oportuniia#resumen')
     lines.append('Consulta perfiles y excepciones en https://oportuniia.com/revision-cuentas.html')
     return '\n\n'.join(lines)
 
@@ -50,6 +54,7 @@ async def tick(db,now=None):
         if not (claimed.modified_count or claimed.upserted_id):continue
         try:
             body=await report(db,start,end,weekly)
+            await db.web_management_reports.update_one({'_id':ident,'token':token},{'$set':{'body_summary':body,'start':start,'end':end}})
             await send_transactional('info@oportuniia.com','OPORTUNIIA · '+('Informe semanal' if weekly else 'Resumen diario')+' de altas',body)
             await db.web_management_reports.update_one({'_id':ident,'token':token},{'$set':{'state':'SENT','sent_at':now,'start':start,'end':end}})
         except Exception:

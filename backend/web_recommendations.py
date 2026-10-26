@@ -73,6 +73,7 @@ async def active_user(db, subject):
 
 async def professional(db, subject):
     user = await active_user(db, subject)
+    if user.get('role') == 'superadmin': return user, {'kind':'master'}
     grant = await db.web_professionals.find_one({'_id': subject, 'active': True}) or {}
     if grant.get('kind') not in {'colaborador', 'suscriptor'} or not future(grant.get('valid_until')):
         fail('professional_access_required')
@@ -80,6 +81,8 @@ async def professional(db, subject):
 
 
 async def accepted_link(db, sender, recipient):
+    owner = await db.web_users.find_one({'subject_id':sender,'role':'superadmin','active':True})
+    if owner: return {'state':'ACCEPTED','source':'MASTER_DIRECT'}
     link = await db.web_client_links.find_one({'_id': recipient, 'professional_id': sender, 'state': 'ACCEPTED'})
     if not link:
         fail('accepted_client_link_required')
@@ -95,6 +98,11 @@ async def summary_allowed(db, sender, op):
         fail('operation_permission_required')
     binding = await db.web_operation_bindings.find_one({'public_ref': op, 'publication_approved': True, 'catalog_reference_safe': True})
     summary = await db.web_share_summaries.find_one({'_id': op, 'approved': True})
+    if binding and not summary:
+        publication = await db.presentation_web_published.find_one({'internal_id':binding.get('internal_id'),'publication_state':'PUBLISHED'}) or {}
+        item=publication.get('item') or {}
+        if item:
+            summary={'op_ref':op,'title':item.get('title') or op,'location':item.get('municipio_name') or 'Consultar','investment':str(item.get('price') or 'Consultar'),'roi':str(item.get('roi') or 'Consultar'),'timeframe':str(item.get('timeframe') or 'Consultar'),'profit':'Consultar','assumptions':'Resumen de los datos comerciales publicados. Solicita las condiciones de esta operación.'}
     if not binding or not summary:
         fail('summary_not_published', 404)
     return summary
@@ -181,7 +189,12 @@ def register_recommendation_routes(router, db):
         grant = await db.web_professionals.find_one({'_id': subject, 'active': True}) or {}
         is_prof = grant.get('kind') in {'colaborador', 'suscriptor'} and future(grant.get('valid_until'))
         clients = []
-        if is_prof:
+        owner=await db.web_users.find_one({'subject_id':subject,'role':'superadmin','active':True})
+        if owner:
+            grant={'kind':'master'};is_prof=True
+            people=await db.web_users.find({'active':True,'email_verified':True,'role':{'$ne':'superadmin'}},{'subject_id':1,'name':1}).to_list(500)
+            clients=[{'id':u['subject_id'],'name':u.get('name','Inversor'),'state':'ACCEPTED'} for u in people if not await blocked(db,u)]
+        if is_prof and not owner:
             links = await db.web_client_links.find({'professional_id': subject}, {'_id': 0}).to_list(500)
             for link in links:
                 user = await db.web_users.find_one({'subject_id': link['investor_id'], 'active': True})
