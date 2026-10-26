@@ -8,6 +8,7 @@ import os
 import uuid
 import httpx
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 
 from fastapi import Request
 from pydantic import BaseModel, ConfigDict, Field
@@ -19,6 +20,16 @@ from web_identity import public_origin, resolve_session
 
 def plain(value):
     return value if isinstance(value, dict) else value.to_dict()
+
+
+def premium_expiry(period_end):
+    """Use the provider's rolling anniversary date, at midnight in Madrid.
+
+    A November 9 subscription ends as December 9 begins, not December 1.
+    The provider supplies month-end/leap-year handling and the paid term.
+    """
+    anniversary = datetime.fromtimestamp(period_end, ZoneInfo('Europe/Madrid'))
+    return anniversary.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(timezone.utc).isoformat()
 
 
 def provider():
@@ -92,7 +103,7 @@ async def confirm_intent(db, client, intent, *, payment_received_at=None):
         items = list(subscription["items"]["data"])
         if subscription["status"] != "active" or len(items) != 1 or items[0]["price"]["id"] != intent["price_id"]: return False
         end = items[0].get("current_period_end") or subscription.get("current_period_end", 0)
-        expiry = datetime.fromtimestamp(end, timezone.utc).isoformat()
+        expiry = premium_expiry(end)
         if not future(expiry): return False
         await db.web_entitlements.update_one({"subject_id": intent["subject_id"], "product": "PREMIUM"}, {"$set": {"subject_id": intent["subject_id"], "product": "PREMIUM", "active": True,
             "valid_until": expiry, "provider": "STRIPE", "subscription_id": checkout.subscription, "customer_id": checkout.customer}}, upsert=True)
