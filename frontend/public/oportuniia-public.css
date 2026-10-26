@@ -1,4 +1,12 @@
 /* Shared structural styles scoped to public navigation and footer. */
+/* Reserve the launch bar before its deferred script runs. */
+:root{--launch-height:62px}
+html:has(script[src^="/launch-notice.js"]) body{padding-top:var(--launch-height)}
+html:has(script[src^="/launch-notice.js"]) header{top:var(--launch-height)!important}
+@media(max-width:600px){:root{--launch-height:56.5px}}
+/* The message and actions are readable on first paint; keep the decorative beam. */
+.hero h1 .l,.hero .hero-bottom{opacity:1!important;animation:none!important;filter:none!important;transform:none!important}
+.hero-lead,.hero-cta,.hero .strip{opacity:1!important;transform:none!important;transition:none!important}
 header.opp-public-header{display:block;position:sticky;top:0;z-index:50;padding:0;background:#081a2a;border-bottom:1px solid #315061;color:#edf6fa;font-family:Poppins,Arial,sans-serif}
 header.opp-public-header .nav{width:100%;max-width:1600px;min-height:76px;height:auto;margin:0 auto;padding:12px clamp(18px,3.5vw,58px);display:flex;align-items:center;gap:20px}
 header.opp-public-header .brand{margin-right:auto;flex:0 0 auto}header.opp-public-header .brand img{width:168px;height:44px;max-width:36vw;object-fit:contain;filter:brightness(0) invert(1)}
@@ -12,3 +20,17 @@ header.opp-public-header .mobile[hidden]{display:none!important}header.opp-publi
 header.opp-public-header,header.opp-public-header *,footer.opp-public-footer,footer.opp-public-footer *{box-sizing:border-box}
 
 header.opp-public-header .mobile.open{max-height:calc(100dvh - var(--launch-height,60px) - 90px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}header.opp-public-header .mobile a{flex-shrink:0}
+
+/* Keep the original shield coloured, with only the two I letters accented. */
+html body header .opp-brand-lockup,footer .opp-brand-lockup{display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap;color:#f7fbfd}
+html body header .opp-brand-lockup img.opp-brand-shield,footer.opp-public-footer .opp-brand-lockup img.opp-brand-shield{width:36px!important;height:40px!important;max-width:none!important;object-fit:contain!important;filter:none!important;margin:0!important}
+.opp-brand-name{font-family:Poppins,Arial,sans-serif;font-size:18px;font-weight:700;letter-spacing:-.07em;line-height:1}
+.opp-brand-ii{color:#27c5ed}
+html body header.opp-over-light .opp-brand-name{color:#101820}
+html body header.opp-over-light .opp-brand-ii{color:#007eae}
+.opp-public-footer .opp-footer-brand{width:max-content;max-width:100%;text-align:center;justify-self:start}
+.opp-public-footer .opp-footer-brand>a{display:flex;justify-content:center;margin:0}
+.opp-public-footer .opp-footer-brand p{margin:12px 0 0;text-align:center}
+body.acuerdos #producto .access-explanation,body.acuerdos #producto .access-explanation h3{color:#0c1d28}
+body.acuerdos #producto .trust-copy p{color:#365466}
+body.acuerdos #producto .access-explanation .eyebrow{color:#176383}
