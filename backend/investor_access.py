@@ -40,6 +40,24 @@ def future(value: Any) -> bool:
         return False
 
 
+def premium_period_active(entitlement: dict, now: datetime | None = None) -> bool:
+    """Paid period is [valid_from, valid_until); dates must include a timezone.
+
+    Existing subscriptions without valid_from started immediately.
+    """
+    if entitlement.get("active") is not True:
+        return False
+    now = now or datetime.now(timezone.utc)
+    try:
+        end = datetime.fromisoformat(entitlement["valid_until"].replace("Z", "+00:00"))
+        start_value = entitlement.get("valid_from")
+        start = datetime.fromisoformat(start_value.replace("Z", "+00:00")) if start_value else None
+        return bool(end.tzinfo and (start is None or start.tzinfo) and now < end
+                    and (start is None or start <= now))
+    except (KeyError, ValueError, TypeError, AttributeError):
+        return False
+
+
 @lru_cache(maxsize=4)
 def _jwks(url):
     from jwt import PyJWKClient
@@ -101,7 +119,7 @@ async def context(db, subject: str, op_ref: str | None = None):
         if current.get("revision") != review["profile_revision"]: review["revoked"] = True
     entitlement = await db.web_entitlements.find_one({"subject_id": subject, "product": "PREMIUM", "active": True}, {"_id": 0}) or {}
     result = {"subject": subject, "review": review, "stage": access_stage(review),
-              "premium": future(entitlement.get("valid_until")), "grant": {}}
+              "premium": premium_period_active(entitlement), "grant": {}}
     result["founder_access"] = founder
     if founder:
         result.update(stage=2, premium=True)
