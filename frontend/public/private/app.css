@@ -63,3 +63,13 @@ body dialog.premium-dialog .button{background:#183b50;color:white;border-color:#
 .button.account-danger{background:#b42332;color:#fff;border-color:#b42332}.button.account-danger:hover{background:#8f1926;color:#fff}
 
 .avatar{padding:0}.avatar img{display:block;min-width:100%;min-height:100%}.photo-modal{padding:24px;width:min(560px,calc(100% - 24px));text-align:center}.photo-modal label{display:grid;text-align:left;gap:6px;margin:15px 0}.photo-modal input{width:100%}.photo-circle{width:min(320px,100%);height:auto;border-radius:50%;display:block;margin:20px auto;border:3px solid #54c8e9;touch-action:none}.photo-large{display:block;max-width:100%;max-height:65vh;margin:16px auto;object-fit:contain}.profile-photo-preview{width:100px;height:100px;margin:15px auto}
+
+body .access-stages .stage-approved{background:#fff;border-color:#fff;color:#0a1622}
+body .access-stages .stage-approved :is(b,small){color:#0a1622}
+body .access-stages .stage-enabled{background:#fff;border-color:#fff;color:#176541}
+body .access-stages .stage-enabled :is(b,small){color:#176541}
+body .access-stages .premium-active{position:relative;overflow:hidden;isolation:isolate;background:#f2c94c;border-color:#f2c94c;color:#101010}
+body .access-stages .premium-active :is(b,small){position:relative;z-index:1;color:#101010}
+body .access-stages .premium-active::after{content:"";position:absolute;inset:-50%;pointer-events:none;background:linear-gradient(110deg,transparent 40%,#ffffffa6 50%,transparent 60%);transform:translateX(-120%);animation:premium-shine 20s linear infinite}
+@keyframes premium-shine{0%,90%{transform:translateX(-120%)}98%,100%{transform:translateX(120%)}}
+@media(prefers-reduced-motion:reduce){body .access-stages .premium-active::after{animation:none;display:none}}
