@@ -46,7 +46,16 @@ def test_existing_account_keeps_username_and_password(api):
     assert 'token' not in record
 
 
-@pytest.mark.parametrize('changes', [{'active': False}, {'role': 'superadmin'}, {'app_subject': 'someone-else'}])
+def test_legacy_investor_without_role_keeps_account(api):
+    post, database, user = api
+    user.pop('role')
+    user['account_kind'] = 'inversor'
+    assert post().status_code == 200
+    assert user['account_kind'] == 'inversor'
+    database.web_users.insert_one.assert_not_called()
+
+
+@pytest.mark.parametrize('changes', [{'active': False}, {'role': 'superadmin'}, {'role': None}, {'app_subject': 'someone-else'}])
 def test_never_reactivates_or_overwrites_privileged_accounts(api, changes):
     post, database, user = api
     user.update(changes)
