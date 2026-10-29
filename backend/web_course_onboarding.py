@@ -44,7 +44,8 @@ def register_course_onboarding_routes(router, db):
                 user = await db.web_users.find_one({'email': email})
                 if not user:
                     raise HTTPException(409, 'subscriber_code_in_use')
-        if not user.get('active') or user.get('role') != 'user' or await blocked(db, user):
+        # Investor registrations predate the explicit role field; missing means ordinary user.
+        if not user.get('active') or user.get('role', 'user') != 'user' or await blocked(db, user):
             raise HTTPException(409, 'account_requires_review')
         if user.get('app_subject') not in (None, payload.app_subject):
             raise HTTPException(409, 'account_mapping_conflict')
