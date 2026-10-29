@@ -40,6 +40,24 @@ def future(value: Any) -> bool:
         return False
 
 
+def premium_period_active(entitlement: dict, now: datetime | None = None) -> bool:
+    """Paid period is [valid_from, valid_until); dates must include a timezone.
+
+    Existing subscriptions without valid_from started immediately.
+    """
+    if entitlement.get("active") is not True:
+        return False
+    now = now or datetime.now(timezone.utc)
+    try:
+        end = datetime.fromisoformat(entitlement["valid_until"].replace("Z", "+00:00"))
+        start_value = entitlement.get("valid_from")
+        start = datetime.fromisoformat(start_value.replace("Z", "+00:00")) if start_value else None
+        return bool(end.tzinfo and (start is None or start.tzinfo) and now < end
+                    and (start is None or start <= now))
+    except (KeyError, ValueError, TypeError, AttributeError):
+        return False
+
+
 @lru_cache(maxsize=4)
 def _jwks(url):
     from jwt import PyJWKClient
@@ -74,6 +92,10 @@ async def authenticated_subject(request: Request) -> str:
     subject = claims.get("sub")
     if not isinstance(subject, str) or not 1 <= len(subject) <= 200:
         fail("invalid_subject", 401)
+    db = getattr(request.app.state, "web_db", None)
+    if db is not None:
+        from web_access_restrictions import blocked
+        if await blocked(db, {"subject_id": subject}): fail("account_access_restricted", 403)
     return subject
 
 
@@ -89,13 +111,22 @@ def access_stage(review: dict) -> int:
 
 
 async def context(db, subject: str, op_ref: str | None = None):
+    owner = await db.web_users.find_one({"subject_id": subject, "active": True}, {"role": 1, "username": 1, "email": 1}) or {}
+    founder = owner.get("role") == "superadmin" and owner.get("username") == "rafamaster" and owner.get("email") == "info@oportuniia.com"
     review = await db.web_access_reviews.find_one({"subject_id": subject}, {"_id": 0}) or {}
     if review.get("profile_revision"):
         current = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0, "revision": 1}) or {}
         if current.get("revision") != review["profile_revision"]: review["revoked"] = True
     entitlement = await db.web_entitlements.find_one({"subject_id": subject, "product": "PREMIUM", "active": True}, {"_id": 0}) or {}
     result = {"subject": subject, "review": review, "stage": access_stage(review),
-              "premium": future(entitlement.get("valid_until")), "grant": {}}
+              "premium": premium_period_active(entitlement), "grant": {}}
+    result["founder_access"] = founder
+    professional = await db.web_professionals.find_one({'_id': subject, 'active': True, 'kind': 'suscriptor'}) or {}
+    if future(professional.get('valid_until')):
+        result['premium'] = True
+    if founder:
+        result.update(stage=2, premium=True)
+        result["review"] = {"identity_status": "ADMINISTRATOR", "dossier_status": "NOT_REQUIRED"}
     if op_ref:
         if not OP_RE.fullmatch(op_ref): fail("invalid_public_reference", 400)
         grant = await db.web_operation_grants.find_one({"subject_id": subject, "op_ref": op_ref}, {"_id": 0}) or {}
@@ -185,11 +216,11 @@ def missing_profile_fields(profile):
     required = ["account_kind", "subject_type", "full_name", "email", "tax_id", "fiscal_address", "fiscal_address_number", "municipality", "province", "region", "country"]
     required += (["company_name", "company_tax_id", "registered_address", "representative", "representative_id", "representative_position", "registered_address_number"] if profile.get("subject_type") == "PJ" else ["birth_date"])
     if profile.get("account_kind") == "inversor": required += ["address", "address_number", "nationality", "professional_activity"]
-    else: required += ["collaborator_model"]
+    elif profile.get('account_kind') == 'colaborador': required += ["collaborator_model"]
     missing = [k for k in required if not str(profile.get(k, "")).strip()]
     consents = ["privacy", "confidentiality", "ethics"] if profile.get("account_kind") == "colaborador" else ["privacy", "truthfulness", "no_commitment", "terms"]
     missing += ["consent_"+k for k in consents if profile.get("consents", {}).get(k) is not True]
-    if profile.get("account_kind") not in {"inversor", "colaborador"}: missing.append("valid_account_kind")
+    if profile.get("account_kind") not in {"inversor", "colaborador", "suscriptor"}: missing.append("valid_account_kind")
     if profile.get("subject_type") not in {"PF", "PJ"}: missing.append("valid_subject_type")
     if not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", str(profile.get("email", ""))): missing.append("valid_email")
     if profile.get("account_kind") == "colaborador" and profile.get("collaborator_model") not in {"A", "B"}: missing.append("valid_collaborator_model")
@@ -197,6 +228,9 @@ def missing_profile_fields(profile):
 
 
 async def contracting_eligibility(db, ctx):
+    if ctx.get("founder_access"):
+        return {"can_contract": True, "profile_complete": True, "documents_verified": False,
+                "verified": True, "reason": "FOUNDER_ADMINISTRATOR_ACCESS", "verification_basis": "SERVER_ROLE"}
     review = ctx["review"]
     version = review.get("profile_version")
     snapshot = await db.web_verified_profiles.find_one({"subject_id": ctx["subject"], "version": version}, {"_id": 0}) if version else None
@@ -233,7 +267,10 @@ def register_investor_routes(router: APIRouter, db):
     @router.get("/investor/access")
     async def access(subject: str = Depends(authenticated_subject)):
         ctx = await context(db, subject)
-        return {"stage": ctx["stage"], "premium": ctx["premium"], "identity_status": ctx["review"].get("identity_status", "PENDING"),
+        from web_registration_feedback import CODES
+        draft = await db.web_profile_drafts.find_one({'subject_id': subject}) or {}
+        return {"founder_access": ctx.get("founder_access", False), "stage": ctx["stage"], "premium": ctx["premium"], "identity_status": ctx["review"].get("identity_status", "PENDING"),
+                "automatic_issues": [c for c in draft.get('automatic_issues', []) if c in CODES] if ctx['stage'] < 2 else [],
                 "dossier_status": ctx["review"].get("dossier_status", "PENDING"), "pbc_status": ctx["review"].get("pbc_status", "PENDING"),
                 "contracting": await contracting_eligibility(db, ctx), "rule": "UPLOADING_AND_PAYMENT_DO_NOT_GRANT_ACCESS"}
 
@@ -277,19 +314,32 @@ def register_investor_routes(router: APIRouter, db):
 
     @router.post("/investor/profile-draft")
     async def profile(payload: ProfileDraft, request: Request, subject: str = Depends(authenticated_subject)):
-        if payload.account_kind not in {"inversor", "colaborador"} or payload.subject_type not in {"PF", "PJ"}:
+        if payload.account_kind not in {"inversor", "colaborador", "suscriptor"} or payload.subject_type not in {"PF", "PJ"}:
             fail("invalid_profile_type", 422)
         if payload.account_kind == "inversor" and payload.collaborator_model:
             fail("investor_has_no_permanent_modality", 422)
+        professional = await db.web_professionals.find_one({'_id': subject, 'kind': 'suscriptor', 'active': True}) or {}
+        subscriber = future(professional.get('valid_until'))
+        if payload.account_kind == 'suscriptor' and not subscriber: fail('professional_access_required')
+        if subscriber and payload.collaborator_model: fail('subscriber_has_no_modality', 422)
         if payload.account_kind == "colaborador" and payload.collaborator_model not in {"A", "B"}:
             fail("collaborator_model_required", 422)
         if os.getenv("WEB_IDENTITY_MODE") == "web_sessions":
             owner = request.state.web_user
-            if payload.email.lower() != owner["email"] or payload.account_kind != owner["account_kind"]: fail("account_identity_mismatch", 422)
+            expected_kind = 'suscriptor' if subscriber else owner['account_kind']
+            if payload.email.lower() != owner["email"] or payload.account_kind != expected_kind: fail("account_identity_mismatch", 422)
+        from web_access_restrictions import blocked
+        if await blocked(db, {"subject_id": subject, "email": payload.email}, payload.model_dump()): fail("account_access_restricted", 403)
         # Editing the profile cannot retain an approval of an older identity snapshot.
-        await db.web_access_reviews.update_one({"subject_id": subject}, {"$set": {"revoked": True, "identity_status": "PENDING", "dossier_status": "PENDING"}})
+        revision = str(uuid.uuid4())
+        # Re-reading an edited profile is allowed only when its previous review
+        # was not administratively revoked. A profile edit must not lift a hold.
+        await db.web_access_reviews.update_one({"subject_id": subject, "$or": [
+            {"revoked": {"$ne": True}}, {"automatic_recheck_revision": {"$exists": True}}]},
+            {"$set": {"revoked": True, "identity_status": "PENDING", "dossier_status": "PENDING",
+                      "automatic_recheck_revision": revision}})
         await db.web_profile_drafts.update_one({"subject_id": subject}, {"$set": {"subject_id": subject, "profile": payload.model_dump(),
-            "state": "PENDING_REVIEW", "revision": str(uuid.uuid4()), "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
+            "state": "PENDING_REVIEW", "revision": revision, "automatic_issues": [], "automatic_state": "PENDING", "updated_at": datetime.now(timezone.utc).isoformat()}}, upsert=True)
         return {"saved": True, "state": "PENDING_REVIEW", "access_granted": False}
 
     @router.get("/investor/operations/{op_ref}/documents")
@@ -396,25 +446,7 @@ def register_investor_routes(router: APIRouter, db):
         if not expected: fail("message_authority_not_configured", 503)
         supplied = request.headers.get("X-OPORTUNIIA-Messages-Key", "")
         if not supplied or not hmac.compare_digest(supplied, expected): fail("invalid_message_authority", 401)
-        thread = await db.web_message_threads.find_one({"thread_id": payload.thread_id}, {"_id": 0})
-        if not thread: fail("thread_not_found", 404)
-        if not payload.body.strip(): fail("message_body_required", 422)
-        existing = await db.web_message_events.find_one({"event_id": payload.event_id}, {"_id": 0})
-        fingerprint = hashlib.sha256((payload.thread_id+"|"+payload.body).encode()).hexdigest()
-        if existing and existing.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
-        if not existing:
-            from pymongo.errors import DuplicateKeyError
-            try:
-                await db.web_message_events.insert_one({"_id": payload.event_id, "event_id": payload.event_id, "fingerprint": fingerprint, "thread_id": payload.thread_id})
-            except DuplicateKeyError:
-                raced = await db.web_message_events.find_one({"_id": payload.event_id}, {"_id": 0})
-                if not raced or raced.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
-        now = datetime.now(timezone.utc).isoformat()
-        await db.web_message_threads.update_one({"thread_id": payload.thread_id, "messages.event_id": {"$ne": payload.event_id}}, {"$push": {"messages": {"event_id": payload.event_id, "sender": "OPORTUNIIA", "body": payload.body.strip(), "at": now}}, "$set": {"state": "TEAM_REPLIED", "updated_at": now}})
-        await db.web_notifications.update_one({"id": payload.event_id, "subject_id": thread["subject_id"]}, {"$setOnInsert": {"id": payload.event_id, "subject_id": thread["subject_id"], "title": "Tienes una respuesta de OPORTUNIIA", "body": "Consulta la respuesta en tu área privada.", "read": False, "created_at": now}}, upsert=True)
-        await db.web_email_outbox.update_one({"_id": payload.event_id}, {"$setOnInsert": {"event_id": payload.event_id, "subject_id": thread["subject_id"], "thread_id": payload.thread_id,
-            "purpose": "OPERATIONAL_ONLY", "state": "PENDING_EMAIL_PROVIDER", "email_sent": False, "created_at": now}}, upsert=True)
-        return {"saved": True, "idempotent": bool(existing), "email_sent": False, "delivery_state": "PENDING_EMAIL_PROVIDER"}
+        return await save_team_reply(db, payload)
 
     @router.get("/investor/operations/{op_ref}/offer-draft")
     async def offer(op_ref: str, subject: str = Depends(authenticated_subject)):
@@ -428,3 +460,28 @@ def register_investor_routes(router: APIRouter, db):
         return {"op_ref": op_ref, "applicant": {k: profile.get("profile", {}).get(k, "") for k in allowed},
                 "state": "DATA_DRAFT_ONLY", "template_approved": False, "signed": False, "submitted_to_provider": False}
 
+
+
+async def save_team_reply(db, payload, notification_scope=None):
+    thread = await db.web_message_threads.find_one({"thread_id": payload.thread_id}, {"_id": 0})
+    if not thread: fail("thread_not_found", 404)
+    if not payload.body.strip(): fail("message_body_required", 422)
+    existing = await db.web_message_events.find_one({"event_id": payload.event_id}, {"_id": 0})
+    fingerprint = hashlib.sha256((payload.thread_id+"|"+payload.body).encode()).hexdigest()
+    if existing and existing.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
+    if not existing:
+        from pymongo.errors import DuplicateKeyError
+        try:
+            await db.web_message_events.insert_one({"_id": payload.event_id, "event_id": payload.event_id, "fingerprint": fingerprint, "thread_id": payload.thread_id, "notification_scope": notification_scope})
+        except DuplicateKeyError:
+            raced = await db.web_message_events.find_one({"_id": payload.event_id}, {"_id": 0})
+            if not raced or raced.get("fingerprint") != fingerprint: fail("message_event_conflict", 409)
+    # Persist consent scope on first event creation only. Retrying an older
+    # reply must never enroll a historical message in the new mail worker.
+    stored_event = await db.web_message_events.find_one({'_id': payload.event_id}) or {}
+    now = datetime.now(timezone.utc).isoformat()
+    await db.web_message_threads.update_one({"thread_id": payload.thread_id, "messages.event_id": {"$ne": payload.event_id}}, {"$push": {"messages": {"event_id": payload.event_id, "sender": "OPORTUNIIA", "body": payload.body.strip(), "at": now}}, "$set": {"state": "TEAM_REPLIED", "updated_at": now}})
+    await db.web_notifications.update_one({"id": payload.event_id, "subject_id": thread["subject_id"]}, {"$setOnInsert": {"id": payload.event_id, "subject_id": thread["subject_id"], "title": "Tienes una respuesta de OPORTUNIIA", "body": "Consulta la respuesta en tu área privada.", "read": False, "created_at": now}}, upsert=True)
+    await db.web_email_outbox.update_one({"_id": payload.event_id}, {"$setOnInsert": {"event_id": payload.event_id, "subject_id": thread["subject_id"], "thread_id": payload.thread_id,
+        "purpose": "OPERATIONAL_ONLY", "notification_scope": stored_event.get('notification_scope'), "state": "PENDING_EMAIL_PROVIDER", "email_sent": False, "created_at": now}}, upsert=True)
+    return {"saved": True, "idempotent": bool(existing), "email_sent": False, "delivery_state": "PENDING_EMAIL_PROVIDER"}

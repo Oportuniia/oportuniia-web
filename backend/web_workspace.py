@@ -24,6 +24,13 @@ from web_personal_storage import ready as storage_ready, client as s3_client
 import web_personal_storage
 
 
+def upload_ready():
+    if os.getenv("WEB_SCAN_MODE") == "guardduty-s3":
+        from web_quarantine import configured
+        return bool(configured())
+    return bool(storage_ready())
+
+
 def file_type(data):
     if data.startswith(b"%PDF-"): return "application/pdf", "pdf"
     if data.startswith(b"\x89PNG\r\n\x1a\n"): return "image/png", "png"
@@ -44,16 +51,24 @@ class Photo(BaseModel):
 
 
 def register_workspace_routes(router, db):
+    from web_perimeters import register_perimeter_routes
+    register_perimeter_routes(router, db)
+    from web_dossier import register_dossier_routes
+    register_dossier_routes(router, db)
     @router.get("/investor/workspace")
     async def workspace(subject: str = Depends(authenticated_subject)):
         draft = await db.web_profile_drafts.find_one({"subject_id": subject}, {"_id": 0}) or {}
         settings = await db.web_workspace_settings.find_one({"subject_id": subject}, {"_id": 0}) or {}
-        documents = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "review_state": 1, "size": 1}).to_list(100)
-        notifications = await db.web_notifications.find({"subject_id": subject}, {"_id": 0, "id": 1, "title": 1, "body": 1, "read": 1, "created_at": 1}).sort("created_at", -1).to_list(100)
+        documents = await db.web_personal_documents.find({"subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0, "document_id": 1, "category": 1, "name": 1, "scan_state": 1, "review_state": 1, "size": 1, "sha256": 1, "dossier_state": 1, "document_kinds": 1, "identity_discrepancy": 1, "temporary_until": 1, "analysis_version": 1, "declared_identity": 1, "identity_read_status": 1, "quality": 1}).to_list(100)
+        notifications = await db.web_notifications.find({"subject_id": subject, "resolved": {"$ne": True}}, {"_id": 0, "id": 1, "title": 1, "body": 1, "read": 1, "created_at": 1}).sort("created_at", -1).to_list(100)
         operations = await db.web_investor_operations.find({"subject_id": subject}, {"_id": 0, "op_ref": 1, "status": 1, "created_at": 1}).to_list(100)
-        return {"profile": draft.get("profile", {}), "profile_state": draft.get("state", "DRAFT"), "documents": documents,
+        from investor_access import future
+        professional = await db.web_professionals.find_one({"_id": subject, "active": True}) or {}
+        kind = professional.get("kind") if future(professional.get("valid_until")) else None
+        return {"professional_kind": kind, "profile": draft.get("profile", {}), "profile_state": draft.get("state", "DRAFT"), "documents": documents,
             "preferences": {"email_copies": settings.get("email_copies", True), "operation_alerts": settings.get("operation_alerts", True)},
-            "photo": settings.get("photo", ""), "notifications": notifications, "operations": operations, "uploads_enabled": bool(storage_ready())}
+            "photo": settings.get("photo", ""), "notifications": notifications, "operations": operations, "uploads_enabled": upload_ready(),
+            "required_documents": __import__("web_dossier").required_documents(draft.get("profile", {})), "upload_mode": "external-quarantine" if os.getenv("WEB_SCAN_MODE") == "guardduty-s3" else "legacy"}
 
     @router.post("/investor/preferences")
     async def preferences(payload: Preferences, subject: str = Depends(authenticated_subject)):
@@ -91,6 +106,7 @@ def register_workspace_routes(router, db):
 
     @router.post("/investor/personal-documents")
     async def upload(request: Request, category: str = Form(...), file: UploadFile = File(...), subject: str = Depends(authenticated_subject)):
+        if os.getenv("WEB_SCAN_MODE") == "guardduty-s3": fail("direct_quarantine_upload_required", 409)
         if not storage_ready(): fail("private_document_storage_not_activated", 503)
         from web_identity import rate_limit
         await rate_limit(db, request, "personal-upload")
@@ -117,15 +133,37 @@ def register_workspace_routes(router, db):
         return {"document_id": ident, "category": category, "size": size, "scan_state": "QUARANTINED", "review_state": "PENDING", "access_granted": False}
 
     @router.get("/investor/personal-documents/{document_id}")
-    async def own_document(document_id: str, subject: str = Depends(authenticated_subject)):
-        return await stream_personal_document(db, subject, document_id, subject)
+    async def own_document(document_id: str, preview: bool = False, subject: str = Depends(authenticated_subject)):
+        return await stream_personal_document(db, subject, document_id, subject, preview=preview)
 
 
-async def stream_personal_document(db, subject, document_id, actor):
+preview_lock = asyncio.Semaphore(1)
+
+async def stream_personal_document(db, subject, document_id, actor, preview=False):
     row = await db.web_personal_documents.find_one({"document_id": document_id, "subject_id": subject, "deleted": {"$ne": True}}, {"_id": 0})
     if not row: fail("document_not_found", 404)
     if row.get("scan_state") != "CLEAN": fail("document_awaiting_security_scan", 409)
+    from web_dossier import expired
+    if expired(row): fail("document_not_found", 404)
     if not storage_ready(): fail("private_document_storage_not_activated", 503)
+    if preview:
+        from web_document_preview import prepare, unseal
+        try:
+            async with preview_lock:
+                if not row.get('private_preview'):
+                    fresh = await db.web_personal_documents.find_one({'document_id':document_id,'subject_id':subject,'deleted':{'$ne':True},'scan_state':'CLEAN'})
+                    if not fresh: fail('document_not_found',404)
+                    row = fresh
+                    if not row.get('private_preview'):
+                        raw = await asyncio.to_thread(web_personal_storage.read,row)
+                        row['private_preview'] = await asyncio.to_thread(prepare,raw,row)
+                        saved = await db.web_personal_documents.update_one({'document_id':document_id,'subject_id':subject,'sha256':row['sha256'],'deleted':{'$ne':True},'scan_state':'CLEAN'},{'$set':{'private_preview':row['private_preview']}})
+                        if not saved.matched_count: fail('document_not_found',404)
+                data = unseal(row['private_preview'],row)
+        except Exception:
+            fail('document_preview_unavailable',503)
+        await db.web_security_audit.insert_one({'subject_id':subject,'actor_subject_id':actor,'event':'PERSONAL_DOCUMENT_PREVIEW','document_id':document_id,'at':datetime.now(timezone.utc)})
+        return StreamingResponse(io.BytesIO(data),media_type='image/jpeg',headers={'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff'})
     try:
         data = await asyncio.to_thread(web_personal_storage.read, row)
     except Exception:

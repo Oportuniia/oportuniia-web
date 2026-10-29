@@ -96,6 +96,7 @@ async def ensure_indexes(db):
     await db.web_identity_tokens.create_index("token_hash", unique=True)
     await db.web_identity_tokens.create_index("expires_at", expireAfterSeconds=0)
     await db.web_profile_drafts.create_index("subject_id", unique=True)
+    await db.web_access_reviews.create_index("subject_id", unique=True)
     await db.web_verified_profiles.create_index([("subject_id", 1), ("version", 1)], unique=True)
     await db.web_entitlements.create_index([("subject_id", 1), ("product", 1)], unique=True)
     await db.web_notifications.create_index([("subject_id", 1), ("id", 1)], unique=True)
@@ -168,12 +169,16 @@ async def mail_token(db, user, purpose):
     raw = secrets.token_urlsafe(32)
     timestamp = now()
     await db.web_identity_tokens.insert_one({"token_hash": digest(raw), "subject_id": user["subject_id"], "purpose": purpose,
-        "version": user.get("session_version", 0), "expires_at": timestamp + timedelta(minutes=30), "used": False})
+        "version": user.get("session_version", 0), "expires_at": timestamp + timedelta(minutes=30), "used": False,
+        "course_email_verification": purpose == "reset" and user.get("created_via") == "course_onboarding"})
     # Fragment tokens do not enter HTTP access logs or referrer headers.
     link = public_origin()+"/cuenta#"+purpose+"="+raw
     if purpose == "verify":
         from web_mail_templates import registration_confirmation
         title, body = registration_confirmation(user.get("name", ""), link)
+        if user.get("acceptance", {}).get("snapshot"):
+            from web_legal_acceptance import receipt_text
+            body += "\n\n" + receipt_text(user["acceptance"])
     else:
         title = "Restablece tu contraseña · OPORTUNIIA"
         body = "Restablece tu contraseña en este enlace de un solo uso (30 minutos):\n\n"+link+"\n\nSi no lo has solicitado, ignora este mensaje."
@@ -211,6 +216,8 @@ async def resolve_session(request: Request, db, *, check_csrf=True):
     user = await db.web_users.find_one({"subject_id": session["subject_id"], "active": True, "email_verified": True})
     if not user or user.get("session_version", 0) != session.get("version", 0):
         denied("session_revoked", 401)
+    from web_access_restrictions import blocked
+    if await blocked(db, user): denied("account_access_restricted", 403)
     if user.get("must_change_password") and request.url.path not in {"/api/account/change-password", "/api/account/logout", "/api/account/session"}:
         denied("initial_password_change_required", 403)
     if check_csrf and request.method not in {"GET", "HEAD", "OPTIONS"}:
@@ -227,6 +234,8 @@ async def resolve_session(request: Request, db, *, check_csrf=True):
 
 
 async def issue_session(db, user, response, mfa_verified=False):
+    from web_access_restrictions import blocked
+    if not user.get("active") or await blocked(db, user): denied("account_access_restricted", 403)
     token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
     stamp = now()
     await db.web_sessions.insert_one({"token_hash": digest(token), "csrf_hash": digest(csrf), "subject_id": user["subject_id"], "version": user.get("session_version", 0),
@@ -248,11 +257,19 @@ class Signup(Credentials):
     account_kind: str
     accept_privacy: bool
     accept_terms: bool
+    legal_bundle_id: str | None = Field(default=None, max_length=64)
 
 
 class MailRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     email: str = Field(max_length=180)
+
+
+class LegalConfirmation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    legal_bundle_id: str = Field(min_length=64, max_length=64)
+    accept_terms: bool
+    accept_privacy: bool
 
 
 class LinkToken(BaseModel):
@@ -265,6 +282,44 @@ class Reset(LinkToken):
 
 
 def register_identity_routes(router: APIRouter, db):
+    @router.get("/account/legal-bundle")
+    async def legal_bundle():
+        from web_legal_acceptance import bundle
+        return bundle()
+
+    @router.get("/account/legal-receipt")
+    async def legal_receipt(request: Request):
+        from web_legal_acceptance import receipt_text
+        user, _ = await resolve_session(request, db, check_csrf=False)
+        acceptance = user.get("legal_confirmation") or user.get("acceptance", {})
+        return {"text": receipt_text(acceptance), "has_snapshot": bool(acceptance.get("snapshot"))}
+
+    @router.get("/account/legal-status")
+    async def legal_status(request: Request):
+        from web_legal_acceptance import bundle
+        user, _ = await resolve_session(request, db, check_csrf=False)
+        current = bundle()
+        acceptance = user.get("legal_confirmation") or user.get("acceptance", {})
+        return {"pending": acceptance.get("snapshot", {}).get("id") != current["id"], "version": current["version"]}
+
+    @router.post("/account/legal-confirmation")
+    async def legal_confirmation(payload: LegalConfirmation, request: Request):
+        from web_legal_acceptance import bundle
+        user, _ = await resolve_session(request, db)
+        current = bundle()
+        if payload.legal_bundle_id != current["id"]:
+            denied("legal_version_changed", 409)
+        if not payload.accept_terms or not payload.accept_privacy:
+            denied("registration_requirements_missing", 422)
+        acceptance = user.get("legal_confirmation") or user.get("acceptance", {})
+        if acceptance.get("snapshot", {}).get("id") != current["id"]:
+            confirmation = {"snapshot": current, "accepted_at": now(), "channel": "web_existing_account", "privacy_read": True, "terms_accepted": True}
+            await db.web_users.update_one(
+                {"subject_id": user["subject_id"], "active": True, "legal_confirmation.snapshot.id": {"$ne": current["id"]}},
+                {"$set": {"legal_confirmation": confirmation}, "$push": {"legal_confirmation_history": confirmation}},
+            )
+        return {"accepted": True, "version": current["version"]}
+
     @router.get("/account/config")
     async def config():
         catalog_state = "error"
@@ -285,11 +340,19 @@ def register_identity_routes(router: APIRouter, db):
             denied("registration_not_activated", 503)
         if payload.account_kind not in {"inversor", "colaborador"} or not payload.accept_privacy or not payload.accept_terms:
             denied("registration_requirements_missing", 422)
+        from web_legal_acceptance import bundle
+        legal = bundle()
+        if payload.legal_bundle_id is not None and payload.legal_bundle_id != legal["id"]:
+            denied("legal_version_changed", 409)
         email = str(payload.email).strip().lower()
         await rate_limit(db, request, "register", email)
+        from web_access_restrictions import blocked
+        if await blocked(db, {"email": email}): denied("registration_unavailable_contact_support", 403)
         hashed = await hash_password(payload.password)
         user = {"subject_id": str(uuid.uuid4()), "email": email, "name": payload.name.strip(), "password_hash": hashed, "account_kind": payload.account_kind,
             "active": True, "email_verified": False, "session_version": 0, "created_at": now(), "acceptance": {"privacy": os.environ["WEB_PRIVACY_VERSION"], "terms": os.environ["WEB_TERMS_VERSION"], "accepted_at": now()}}
+        if payload.legal_bundle_id:
+            user["acceptance"].update({"snapshot": legal, "channel": "web_signup", "privacy_read": True, "terms_accepted": True})
         try:
             await db.web_users.insert_one(user)
         except DuplicateKeyError:
@@ -366,7 +429,8 @@ def register_identity_routes(router: APIRouter, db):
         if not enabled() or not mail_ready(): denied("account_recovery_not_activated", 503)
         email = str(payload.email).strip().lower()
         await rate_limit(db, request, "forgot", email)
-        user = await db.web_users.find_one({"$or": [{"email": email}, {"username": email}], "active": True, "email_verified": True})
+        user = await db.web_users.find_one({"$and": [{"$or": [{"email": email}, {"username": email}]},
+            {"$or": [{"email_verified": True}, {"created_via": "course_onboarding"}]}], "active": True})
         if user: await mail_token(db, user, "reset")
         return GENERIC_MAIL
 
@@ -377,6 +441,10 @@ def register_identity_routes(router: APIRouter, db):
         await rate_limit(db, request, "reset")
         hashed = await hash_password(payload.password)
         token = await consume_token(db, payload.token, "reset")
+        if token.get('course_email_verification'):
+            await db.web_users.update_one({'subject_id': token['subject_id'], 'active': True,
+                'session_version': token['version'], 'created_via': 'course_onboarding'},
+                {'$set': {'email_verified': True, 'email_verified_at': now()}})
         result = await db.web_users.update_one({"subject_id": token["subject_id"], "active": True, "session_version": token["version"]}, {"$set": {"password_hash": hashed, "password_changed_at": now(), "must_change_password": False}, "$inc": {"session_version": 1}})
         if not result.matched_count: denied("invalid_or_expired_link", 400)
         await db.web_sessions.update_many({"subject_id": token["subject_id"]}, {"$set": {"revoked": True}})

@@ -3,7 +3,8 @@ It can be deployed before credentials exist, but cannot open accounts or access.
 No public demo catalog, CORE roles or producer credentials are exposed here.
 """
 import os
-from contextlib import asynccontextmanager
+import asyncio
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -22,6 +23,12 @@ from web_security import BodyLimitMiddleware
 from web_review import register_review_routes
 from web_payments import register_payment_routes
 from web_workers import register_worker_routes
+from web_quarantine import register_quarantine_routes
+from web_funds import register_fund_routes, ensure_fund_indexes
+from web_reservation_protocol import register_protocol_routes, worker as protocol_worker
+from web_team_messages import register_team_message_routes, mail_worker
+from web_control import register_control_routes, install_technical
+from web_recommendations import register_recommendation_routes
 
 mongo_url, database_name = os.getenv("MONGO_URL", ""), os.getenv("DB_NAME", "")
 client = db = None
@@ -39,9 +46,31 @@ async def lifespan(app):
         if os.getenv("WEB_REQUIRE_MFA", "true") == "true": cipher()
         await db.command("ping")
         await ensure_indexes(db)
+        await ensure_fund_indexes(db)
         await bootstrap_accounts(db)
-    yield
-    if client: client.close()
+    from web_quarantine import configured, quarantine_worker
+    task = asyncio.create_task(quarantine_worker(db)) if db is not None and configured() else None
+    from web_auto_registration import worker
+    registration_task = asyncio.create_task(worker(db)) if db is not None and configured() else None
+    protocol_task = asyncio.create_task(protocol_worker(db)) if db is not None and enabled() else None
+    message_task = asyncio.create_task(mail_worker(db)) if db is not None and enabled() else None
+    try:
+        yield
+    finally:
+        if message_task:
+            message_task.cancel()
+            with suppress(asyncio.CancelledError): await message_task
+        if protocol_task:
+            protocol_task.cancel()
+            with suppress(asyncio.CancelledError): await protocol_task
+        if registration_task:
+            registration_task.cancel()
+            with suppress(asyncio.CancelledError):await registration_task
+        if task:
+            task.cancel()
+            with suppress(asyncio.CancelledError):
+                await task
+        if client: client.close()
 
 
 app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None)
@@ -80,7 +109,17 @@ register_secondfactor_routes(router, db)
 register_investor_routes(router, db)
 register_workspace_routes(router, db)
 register_review_routes(router, db)
+register_review_routes(router, db, prefix="/account/reviews")
 register_payment_routes(router, db)
 register_worker_routes(router, db)
+register_quarantine_routes(router, db)
+register_fund_routes(router, db)
+register_protocol_routes(router, db)
+register_team_message_routes(router, db)
+register_recommendation_routes(router, db)
+register_control_routes(router, db)
+from web_course_onboarding import register_course_onboarding_routes
+register_course_onboarding_routes(router, db)
 app.include_router(router)
+install_technical(app, db)
 
