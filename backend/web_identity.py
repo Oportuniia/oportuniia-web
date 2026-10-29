@@ -169,7 +169,8 @@ async def mail_token(db, user, purpose):
     raw = secrets.token_urlsafe(32)
     timestamp = now()
     await db.web_identity_tokens.insert_one({"token_hash": digest(raw), "subject_id": user["subject_id"], "purpose": purpose,
-        "version": user.get("session_version", 0), "expires_at": timestamp + timedelta(minutes=30), "used": False})
+        "version": user.get("session_version", 0), "expires_at": timestamp + timedelta(minutes=30), "used": False,
+        "course_email_verification": purpose == "reset" and user.get("created_via") == "course_onboarding"})
     # Fragment tokens do not enter HTTP access logs or referrer headers.
     link = public_origin()+"/cuenta#"+purpose+"="+raw
     if purpose == "verify":
@@ -428,7 +429,8 @@ def register_identity_routes(router: APIRouter, db):
         if not enabled() or not mail_ready(): denied("account_recovery_not_activated", 503)
         email = str(payload.email).strip().lower()
         await rate_limit(db, request, "forgot", email)
-        user = await db.web_users.find_one({"$or": [{"email": email}, {"username": email}], "active": True, "email_verified": True})
+        user = await db.web_users.find_one({"$and": [{"$or": [{"email": email}, {"username": email}]},
+            {"$or": [{"email_verified": True}, {"created_via": "course_onboarding"}]}], "active": True})
         if user: await mail_token(db, user, "reset")
         return GENERIC_MAIL
 
@@ -439,6 +441,10 @@ def register_identity_routes(router: APIRouter, db):
         await rate_limit(db, request, "reset")
         hashed = await hash_password(payload.password)
         token = await consume_token(db, payload.token, "reset")
+        if token.get('course_email_verification'):
+            await db.web_users.update_one({'subject_id': token['subject_id'], 'active': True,
+                'session_version': token['version'], 'created_via': 'course_onboarding'},
+                {'$set': {'email_verified': True, 'email_verified_at': now()}})
         result = await db.web_users.update_one({"subject_id": token["subject_id"], "active": True, "session_version": token["version"]}, {"$set": {"password_hash": hashed, "password_changed_at": now(), "must_change_password": False}, "$inc": {"session_version": 1}})
         if not result.matched_count: denied("invalid_or_expired_link", 400)
         await db.web_sessions.update_many({"subject_id": token["subject_id"]}, {"$set": {"revoked": True}})

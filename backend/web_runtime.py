@@ -118,6 +118,8 @@ register_protocol_routes(router, db)
 register_team_message_routes(router, db)
 register_recommendation_routes(router, db)
 register_control_routes(router, db)
+from web_course_onboarding import register_course_onboarding_routes
+register_course_onboarding_routes(router, db)
 app.include_router(router)
 install_technical(app, db)
 
