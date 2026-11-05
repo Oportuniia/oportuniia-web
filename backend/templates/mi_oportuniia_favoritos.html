@@ -1,0 +1,36 @@
+{% extends "mi_oportuniia_base.html" %}
+{% block title %}Favoritos · MI OPORTUNIIA{% endblock %}{% block nav_fav %}active{% endblock %}
+{% block styles %}
+.op-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(245px,1fr));gap:14px}.op-card{position:relative;background:#fff;border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:.25s;min-width:0}.op-card:hover{transform:translateY(-3px);box-shadow:var(--shadow)}.op-hit{position:absolute;inset:0;z-index:2}.op-img{height:155px;position:relative;background:#dce7ed;overflow:hidden}.op-img img{width:100%;height:100%;object-fit:cover}.fav-toggle{position:absolute;right:10px;bottom:10px;z-index:4;width:34px;height:34px;border:0;border-radius:50%;background:rgba(255,255,255,.94);color:#d84d67;font-size:20px;cursor:pointer;box-shadow:0 8px 20px rgba(0,0,0,.16)}.badge,.loc{position:absolute;top:10px;color:#fff;background:rgba(12,29,42,.68);padding:5px 8px;border-radius:7px;font-size:10px;font-weight:600}.badge{left:10px}.loc{right:10px}.op-body{padding:12px}.cat{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);font-weight:700}.op-body h3{font-size:14px;margin:5px 0}.meta{font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;border-top:1px solid var(--line);padding-top:9px}.metrics small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase}.metrics strong{font-size:22px;color:var(--brand)}.metrics b{font-size:12px}.situation{font-size:10px;color:var(--muted);margin-top:6px}.empty{background:#fff;border:1px solid var(--line);border-radius:14px;padding:34px;text-align:center;color:var(--muted)}.empty a{display:inline-block;margin-top:12px;background:var(--brand);color:#fff;padding:10px 14px;border-radius:9px;font-size:12px;font-weight:600}
+@media(max-width:680px){.op-grid{grid-template-columns:1fr 1fr}.op-img{height:120px}}@media(max-width:480px){.op-grid{grid-template-columns:1fr}}
+{% endblock %}
+{% block content %}
+<div class="page-head"><div><h2>Favoritos</h2><p>Tus oportunidades guardadas para revisar después.</p></div></div>
+<div class="empty" id="favEmpty" style="display:none">Todavía no has guardado ninguna oportunidad.<br><a href="/mi-oportuniia/oportunidades">Ver oportunidades</a></div>
+<div class="op-grid" id="favGrid">{% for o in opps %}<div data-fav-card="{{ o.slug }}" style="display:none">{% include 'partials/private_opportunity_card.html' %}</div>{% endfor %}</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(async function(){
+  try{
+    const r=await fetch("/api/favorites"); const data=await r.json(); const set=new Set(data.slugs||[]);
+    let count=0;
+    document.querySelectorAll("[data-fav-card]").forEach(w=>{
+      const on=set.has(w.dataset.favCard); w.style.display=on?"block":"none"; if(on) count++;
+      const b=w.querySelector("[data-fav-slug]"); if(b){b.classList.toggle("on",on);b.textContent=on?"♥":"♡";}
+    });
+    document.getElementById("favEmpty").style.display=count?"none":"block";
+  }catch(e){document.getElementById("favEmpty").style.display="block";}
+  document.addEventListener("click",async function(ev){
+    const btn=ev.target.closest("[data-fav-slug]"); if(!btn)return;
+    ev.preventDefault();ev.stopPropagation();
+    const r=await fetch("/api/favorites/toggle",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({slug:btn.dataset.favSlug})});
+    const data=await r.json(); if(!r.ok)return;
+    if(!data.favorited){
+      const wrap=btn.closest("[data-fav-card]"); if(wrap)wrap.remove();
+      if(!document.querySelector("[data-fav-card]")) document.getElementById("favEmpty").style.display="block";
+    }
+  });
+})();
+</script>
+{% endblock %}

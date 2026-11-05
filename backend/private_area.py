@@ -145,6 +145,21 @@ def register_private_area_routes(app, templates):
                        fase_principal, "recientes", q)
         return templates.TemplateResponse("mi_oportuniia_perimetros.html", ctx)
 
+
+    @app.get("/mi-oportuniia/favoritos", response_class=HTMLResponse)
+    async def mi_oportuniia_favoritos(request: Request):
+        opps = [cat.enrich(o) for o in cat.OPPORTUNITIES]
+        return templates.TemplateResponse("mi_oportuniia_favoritos.html", {
+            "request": request,
+            "opps": opps,
+        })
+
+    @app.get("/mi-oportuniia/busquedas-guardadas", response_class=HTMLResponse)
+    async def mi_oportuniia_busquedas_guardadas(request: Request):
+        return templates.TemplateResponse("mi_oportuniia_busquedas_guardadas.html", {
+            "request": request,
+        })
+
     @app.get("/mi-oportuniia/oportunidades/{slug}", response_class=HTMLResponse)
     async def mi_oportuniia_detalle(request: Request, slug: str):
         o = cat.get_by_slug(slug)
