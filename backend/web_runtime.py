@@ -19,6 +19,7 @@ from web_accounts import bootstrap_accounts, register_account_admin_routes
 from web_identity import register_password_change_routes
 from web_secondfactor import register_secondfactor_routes, cipher
 from web_workspace import register_workspace_routes
+from web_collaborator_documents import register_collaborator_document_routes
 from web_security import BodyLimitMiddleware
 from web_review import register_review_routes
 from web_payments import register_payment_routes
@@ -108,6 +109,7 @@ register_account_admin_routes(router, db)
 register_secondfactor_routes(router, db)
 register_investor_routes(router, db)
 register_workspace_routes(router, db)
+register_collaborator_document_routes(router, db)
 register_review_routes(router, db)
 register_review_routes(router, db, prefix="/account/reviews")
 register_payment_routes(router, db)
