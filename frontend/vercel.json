@@ -46,7 +46,7 @@
     },
     {
       "source": "/acceso",
-      "destination": "/acceso.html"
+      "destination": "/cuenta.html"
     },
     {
       "source": "/grupo-oportuniia",
