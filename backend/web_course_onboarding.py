@@ -21,6 +21,8 @@ class CourseSubscriber(BaseModel):
 
 
 def register_course_onboarding_routes(router, db):
+    from web_agency_access import register_agency_access_routes
+    register_agency_access_routes(router, db)
     @router.post('/course-onboarding/provision')
     async def provision(payload: CourseSubscriber, request: Request):
         expected = os.getenv('COURSE_WEB_BRIDGE_KEY', '')
