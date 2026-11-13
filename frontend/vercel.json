@@ -1,5 +1,9 @@
 {
   "rewrites": [
+    {
+      "source": "/api/referrals/:path*",
+      "destination": "https://oportuniia-web-private-staging.onrender.com/api/referrals/:path*"
+    },
     {"source": "/como-funciona", "destination": "/como-funciona.html"},
     {"source": "/acceso", "destination": "/acceso.html"},
     {"source": "/grupo-oportuniia", "destination": "/grupo-oportuniia.html"},
