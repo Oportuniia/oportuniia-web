@@ -103,6 +103,8 @@ async def ready():
 
 
 router = APIRouter(prefix="/api")
+from web_referrals import register_routes as register_referral_routes
+register_referral_routes(router, db)
 register_identity_routes(router, db)
 register_password_change_routes(router, db)
 register_account_admin_routes(router, db)
