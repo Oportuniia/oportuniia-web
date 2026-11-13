@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {matchesPerimeter} from '../public/private/perimeters.js';
+const item={provincia_name:'León',municipio_name:'León',asset_type:'Vivienda',price:100000,roi:12};
+assert(matchesPerimeter(item,{province:'leon',min_price:100000,max_price:100000,min_roi:12}));
+assert(!matchesPerimeter(item,{province:'Madrid'}));
+assert(!matchesPerimeter(item,{max_price:99999}));
+assert(!matchesPerimeter(item,{min_roi:13}));
+assert(!matchesPerimeter({...item,price:null},{max_price:200000}));
+assert(!matchesPerimeter({...item,roi:'12%'},{min_roi:10}));
+assert(matchesPerimeter(item,{}));
+assert(matchesPerimeter(item,{asset_type:'vivienda',municipality:'león'}));
+console.log('8 perimeter matching checks passed');

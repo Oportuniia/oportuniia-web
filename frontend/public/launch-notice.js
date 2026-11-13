@@ -25,9 +25,8 @@
   const pause=document.createElement('button');pause.type='button';pause.className='launch-pause';pause.textContent='Pausar aviso';pause.setAttribute('aria-pressed','false');
   pause.onclick=()=>{const stopped=notice.classList.toggle('paused');pause.textContent=stopped?'Animar aviso':'Pausar aviso';pause.setAttribute('aria-pressed',String(stopped));};
   notice.append(viewport,pause);document.body.prepend(notice);
-  const spacer=document.createElement('div');spacer.setAttribute('aria-hidden','true');notice.after(spacer);
   const header=document.querySelector('header');
-  const layout=()=>{const height=notice.getBoundingClientRect().height;spacer.style.height=`${height}px`;document.documentElement.style.setProperty("--launch-height",`${height}px`);if(header&&['fixed','sticky'].includes(getComputedStyle(header).position))header.style.top=`${height}px`;};
+  const layout=()=>{const height=notice.getBoundingClientRect().height;document.documentElement.style.setProperty("--launch-height",`${height}px`);document.body.style.paddingTop=`${height}px`;if(header&&['fixed','sticky'].includes(getComputedStyle(header).position))header.style.top=`${height}px`;};
   new ResizeObserver(layout).observe(notice);layout();
   const status=document.getElementById('reg-status');
   if(status){const form=status.closest('form');const warning=document.createElement('aside');warning.className='launch-registration-warning';warning.setAttribute('aria-label','Aviso de lanzamiento');const title=document.createElement('strong');title.textContent='La plataforma todavía no está abierta';const message=document.createElement('span');message.textContent='Estamos preparando el lanzamiento. El registro de cuentas aún no está habilitado. No se guardarán datos ni se activarán servicios desde este formulario.';warning.append(title,message);form.before(warning);}
