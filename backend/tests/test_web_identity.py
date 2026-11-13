@@ -27,6 +27,7 @@ class Collection:
     async def insert_one(self, *a, **kw): return self.c.insert_one(*a, **kw)
     async def update_one(self, *a, **kw): return self.c.update_one(*a, **kw)
     async def update_many(self, *a, **kw): return self.c.update_many(*a, **kw)
+    async def delete_many(self, *a, **kw): return self.c.delete_many(*a, **kw)
     async def create_index(self, *a, **kw): return self.c.create_index(*a, **kw)
 
 

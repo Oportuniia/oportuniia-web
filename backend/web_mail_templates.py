@@ -11,6 +11,11 @@ def html_alternative(body: str) -> str:
         r'<a href="\1" style="display:inline-block;background:#087f8c;color:#fff;padding:14px 22px;border-radius:8px;text-decoration:none;font-weight:bold">Confirmar mi correo</a>',
         content,
     )
+    content = re.sub(
+        r"Ver operación (OP-[A-Za-z0-9_-]+): (https://[^\s<]+/mi-oportuniia#ficha/[a-f0-9]{40})",
+        r'<a href="\2" style="color:#087fa4;font-weight:bold;text-decoration:underline">\1</a>',
+        content,
+    )
     return '<!doctype html><html lang="es"><body style="font-family:Arial,sans-serif;line-height:1.6;color:#163342"><div style="max-width:600px;margin:auto;padding:24px">'+content.replace("\n", "<br>")+"</div></body></html>"
 
 

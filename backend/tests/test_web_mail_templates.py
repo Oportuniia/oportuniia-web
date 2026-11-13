@@ -17,3 +17,11 @@ def test_blank_name_and_no_tracking():
     assert text.startswith('Hola,')
     assert subject == 'Confirma tu correo y prepara tu acceso a OPORTUNIIA'
     assert '<img' not in html_alternative(text)
+
+
+def test_recommendation_reference_is_protected_link():
+    url = 'https://oportuniia.com/mi-oportuniia#ficha/' + 'a' * 40
+    html = html_alternative('Ver operación OP-2514: ' + url)
+    assert 'href="' + url + '"' in html
+    assert '>OP-2514</a>' in html
+    assert 'font-weight:bold' in html

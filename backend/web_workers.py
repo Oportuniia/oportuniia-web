@@ -18,10 +18,13 @@ from web_identity import send_transactional, mail_ready, public_origin
 from web_workspace import s3_client, MAX_BYTES, storage_ready
 
 
-async def dispatch_email_once(db):
+async def dispatch_email_once(db, notification_scope=None):
     if not mail_ready(): return {"processed": False, "reason": "MAIL_NOT_CONFIGURED"}
     stamp = datetime.now(timezone.utc)
-    row = await db.web_email_outbox.find_one_and_update({"state": {"$in": ["PENDING_EMAIL_PROVIDER", "PENDING_RETRY"]}, "$or": [{"next_attempt": {"$exists": False}}, {"next_attempt": {"$lte": stamp}}]},
+    query = {"state": {"$in": ["PENDING_EMAIL_PROVIDER", "PENDING_RETRY"]}, "$or": [{"next_attempt": {"$exists": False}}, {"next_attempt": {"$lte": stamp}}]}
+    if notification_scope is not None:
+        query['notification_scope'] = notification_scope
+    row = await db.web_email_outbox.find_one_and_update(query,
         {"$set": {"state": "SENDING", "claimed_at": stamp}, "$inc": {"attempts": 1}}, return_document=ReturnDocument.AFTER)
     if not row: return {"processed": False}
     user = await db.web_users.find_one({"subject_id": row["subject_id"], "active": True, "email_verified": True}, {"_id": 0})
@@ -31,7 +34,18 @@ async def dispatch_email_once(db):
         return {"processed": True, "submitted": False}
     try:
         # Never copy judicial/personal documents into SMTP. Link to the protected inbox.
-        await send_transactional(user["email"], "Tienes una respuesta · OPORTUNIIA", "Tienes una nueva respuesta del equipo en MI OPORTUNIIA.\n\n"+public_origin()+"/mi-oportuniia#notificaciones\n\nEste aviso es operativo y corresponde a tu relación con OPORTUNIIA.")
+        from web_recommendations import SCOPE, recommendation_mail
+        if row.get('notification_scope') == SCOPE:
+            from fastapi import HTTPException
+            try:
+                title, body = await recommendation_mail(db, row)
+            except HTTPException:
+                await db.web_email_outbox.update_one({'_id': row['_id']}, {'$set': {'state': 'SKIPPED_REVOKED_OR_PREFERENCE'}})
+                return {'processed': True, 'submitted': False}
+        else:
+            title = "Tienes una respuesta · OPORTUNIIA"
+            body = "Tienes una nueva respuesta del equipo en MI OPORTUNIIA.\n\n"+public_origin()+"/mi-oportuniia#notificaciones\n\nEste aviso es operativo y corresponde a tu relación con OPORTUNIIA."
+        await send_transactional(user['email'], title, body)
     except Exception:
         await db.web_email_outbox.update_one({"_id": row["_id"]}, {"$set": {"state": "PENDING_RETRY" if row["attempts"] < 5 else "NEEDS_MANUAL_REVIEW", "next_attempt": stamp+timedelta(minutes=20)}})
         return {"processed": True, "submitted": False}
