@@ -76,6 +76,21 @@ def test_own_portfolio_qr_and_bridge_fail_closed(system):
     login(client,mail)
     data=client.get('/api/account/referrals').json()
     assert data['financial_status']=='NOT_CONNECTED'
+    assert '/api/account/referrals/visit/' in data['link']
+    assert client.get(data['link'],follow_redirects=False).status_code==303
     image=client.get('/api/account/referrals/qr')
     assert image.status_code==200 and '<svg' in image.text
     assert client.get('/api/integrations/oportuniiapp/v1/referral-portfolio').status_code==503
+
+
+def test_app_bridge_validates_identity_mapping(system,monkeypatch):
+    client,db,mail=system
+    router=APIRouter(prefix='/api');ref.register_routes(router,db);client.app.include_router(router)
+    monkeypatch.setenv('WEB_OPORTUNIIAPP_CONTROL_M2M_KEY','k'*32)
+    path='/api/integrations/oportuniiapp/v1/referral-portfolio'
+    headers={'x-oportuniia-web-app-m2m-key':'k'*32,'x-app-subject':'app-one'}
+    assert client.get(path,headers=headers).status_code==409
+    seed(db,'web-one')
+    run(db.oportuniiapp_web_identity_map.insert_one({'app_subject':'app-one','web_subject_id':'web-one','active':True}))
+    result=client.get(path,headers=headers)
+    assert result.status_code==200 and '/api/account/referrals/visit/' in result.json()['link']

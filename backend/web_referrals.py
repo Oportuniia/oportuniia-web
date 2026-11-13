@@ -131,11 +131,13 @@ def register_routes(router, db):
     @router.get('/integrations/oportuniiapp/v1/referral-portfolio')
     async def app_portfolio(request: Request):
         import os
-        key = os.getenv('WEB_OPORTUNIIAPP_CONTROL_M2M_KEY', '')
-        supplied = request.headers.get('x-oportuniia-web-app-m2m-key', '')
+        # Reuse the existing personal-identity bridge when the separate control
+        # bridge is absent. Both routes require an explicit APP→WEB mapping.
+        course = bool(request.headers.get('x-oportuniia-course-key'))
+        key = os.getenv('COURSE_WEB_BRIDGE_KEY' if course else 'WEB_OPORTUNIIAPP_CONTROL_M2M_KEY', '')
+        supplied = request.headers.get('x-oportuniia-course-key' if course else 'x-oportuniia-web-app-m2m-key', '')
         if len(key) < 32: denied('referral_bridge_not_configured', 503)
         if not secrets.compare_digest(key, supplied): denied('unauthorized', 401)
-        await rate_limit(db, request, 'referral_bridge')
         subject = request.headers.get('x-app-subject', '')
         if not 1 <= len(subject) <= 200: denied('invalid_subject', 400)
         mapping = await db.oportuniiapp_web_identity_map.find_one({'app_subject': subject, 'active': True})
@@ -143,8 +145,8 @@ def register_routes(router, db):
             denied('web_identity_mapping_required', 409)
         link = await own_link(db, mapping['web_subject_id'])
         if not link: denied('referral_link_disabled', 403)
-        return {'link': public_origin() + '/api/referrals/visit/' + link['code'],
-                'qr_value': public_origin() + '/api/referrals/visit/' + link['code'] + '?channel=QR',
+        return {'link': public_origin() + '/api/account/referrals/visit/' + link['code'],
+                'qr_value': public_origin() + '/api/account/referrals/visit/' + link['code'] + '?channel=QR',
                 'portal': public_origin() + '/mi-oportuniia#referidos',
                 'financial_status': 'NOT_CONNECTED'}
 
@@ -156,7 +158,7 @@ def register_routes(router, db):
         rows = await db.web_users.find({'acquisition.referrer_id': user['subject_id']},
             {'_id': 0, 'subject_id': 1, 'account_kind': 1, 'created_at': 1,
              'acquisition.source': 1, 'acquisition.revision': 1}).sort('created_at', -1).to_list(101)
-        return {'link': public_origin() + '/api/referrals/visit/' + link['code'],
+        return {'sender_name': user.get('name', ''), 'link': public_origin() + '/api/account/referrals/visit/' + link['code'],
                 'qr_image': public_origin() + '/api/account/referrals/qr', 'items': rows[:100],
                 'limited': len(rows) > 100, 'financial_status': 'NOT_CONNECTED', 'client_access_granted': False}
 
@@ -167,11 +169,12 @@ def register_routes(router, db):
         user, _ = await resolve_session(request, db)
         link = await own_link(db, user['subject_id'])
         if not link: denied('referral_link_disabled', 403)
-        url = public_origin() + '/api/referrals/visit/' + link['code'] + '?channel=QR'
+        url = public_origin() + '/api/account/referrals/visit/' + link['code'] + '?channel=QR'
         image = qrcode.make(url, image_factory=qrcode.image.svg.SvgPathFillImage, border=4)
         buffer = io.BytesIO(); image.save(buffer)
         return Response(buffer.getvalue(), media_type='image/svg+xml', headers={'Cache-Control': 'private, no-store'})
 
+    @router.get('/account/referrals/visit/{code}')
     @router.get('/referrals/visit/{code}')
     async def visit(code: str, request: Request, channel: Literal['LINK', 'QR'] = 'LINK'):
         await rate_limit(db, request, 'referral_visit')
