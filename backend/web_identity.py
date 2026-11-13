@@ -88,6 +88,8 @@ def safe_user(user):
 
 
 async def ensure_indexes(db):
+    from web_referrals import ensure_indexes as ensure_referral_indexes
+    await ensure_referral_indexes(db)
     await db.web_users.create_index("email", unique=True, partialFilterExpression={"email": {"$type": "string"}})
     await db.web_users.create_index("subject_id", unique=True, partialFilterExpression={"subject_id": {"$type": "string"}})
     await db.web_users.create_index("username", unique=True, partialFilterExpression={"username": {"$type": "string"}})
@@ -354,6 +356,8 @@ def register_identity_routes(router: APIRouter, db):
         if payload.legal_bundle_id:
             user["acceptance"].update({"snapshot": legal, "channel": "web_signup", "privacy_read": True, "terms_accepted": True})
         try:
+            from web_referrals import signup_origin
+            user['acquisition'] = await signup_origin(db, request)
             await db.web_users.insert_one(user)
         except DuplicateKeyError:
             existing = await db.web_users.find_one({"email": email})

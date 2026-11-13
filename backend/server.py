@@ -638,6 +638,8 @@ async def interest_signal(slug: str):
 
 
 # Register sovereign PRESENTACIÓN → WEB M2M ingress/publication routes.
+from web_referrals import register_routes as register_referral_routes
+register_referral_routes(api_router, db)
 register_identity_routes(api_router, db)
 register_secondfactor_routes(api_router, db)
 register_review_routes(api_router, db)
