@@ -777,3 +777,8 @@ logger = logging.getLogger(__name__)
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+
+# Administrative observability: read-only metadata, no business transitions.
+from control_observer import build_router as build_control_observer
+app.include_router(build_control_observer("WEB", db_factory=lambda: db))
