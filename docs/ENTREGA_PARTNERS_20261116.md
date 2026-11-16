@@ -18,6 +18,7 @@ GET /api/account/referrals/dossiers/{partner|suscriptor|equipo|colaborador|inver
 Todas requieren la sesión WEB existente. No reciben claves en URL ni permiten asignarse bonos.
 
 ## Pendiente para operación real
+Rafael confirma en esta entrega que el cobro Premium todavía no se ha activado. No activar pagos ni contratar un proveedor como efecto de publicar estos documentos. El bloqueo de facturación debe mantenerse explícito.
 1. Conectar el cierre y cobro verificados con la concesión del bono. La reserva Stripe existente NO prueba por sí sola el cobro de honorarios propios. No usar generated_income como base propia sin reparto verificado.
 2. Conectar la elección de canje con la siguiente mensualidad y la confirmación del proveedor de facturación. Por eso la API devuelve BILLING_NOT_CONNECTED y no expone un canje público que aparente funcionar.
 3. Completar registro y comprobación del reconocimiento firmado de apadrinamiento y modalidad A; el origen por cookie no basta.
@@ -27,3 +28,6 @@ Todas requieren la sesión WEB existente. No reciben claves en URL ni permiten a
 7. Verificar el recorrido autenticado en producción y la facturación en modo de pruebas, sin cargos reales.
 
 No declarar terminada la implantación completa hasta resolver los puntos anteriores. Los dosieres explican la norma aprobada, no certifican la disponibilidad técnica.
+
+## Identidad visual corregida
+Logo aportado expresamente por Rafael el 16 de noviembre: OPORTUNIIA SIN FONDO PNG.png, conservado sin modificación en docs/brand/oportuniia-oficial-20261116.png. Sustituye en estos dosieres al logo histórico y al emblema de OPORTUNIIAPP usados inicialmente por error. Poppins, fondo azul oscuro, cian y blanco.
