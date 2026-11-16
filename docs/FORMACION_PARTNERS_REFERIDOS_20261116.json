@@ -1,0 +1,14 @@
+{
+  "version": "2026-11-16",
+  "title": "Aportación de negocio, atribución y bonos Premium",
+  "policy_source": "POLITICA_PARTNERS_REFERIDOS_20261116.md",
+  "questions": [
+    {"id":"fees","question":"¿Sobre qué se calcula el 15% del partner?","options":[{"id":"collected","text":"Sobre las cuotas efectivamente cobradas de los suscriptores o colaboradores Premium aportados."},{"id":"sale","text":"Sobre el precio de venta de todos los inmuebles."},{"id":"registered","text":"Sobre todas las altas, aunque no paguen."}],"correct_option_id":"collected"},
+    {"id":"term","question":"¿Cuándo empiezan los dos años de operaciones de una agencia aportada?","options":[{"id":"registration","text":"Desde su alta original."},{"id":"first","text":"Desde su primera operación."},{"id":"correction","text":"Desde la última corrección del enlace."}],"correct_option_id":"registration"},
+    {"id":"first","question":"¿Qué corresponde al simple aportador en la primera operación del inversor, cumpliendo las condiciones firmadas?","options":[{"id":"fifty","text":"El 50% de los honorarios netos correspondientes efectivamente cobrados por OPORTUNIIA, sin añadir otro 5%."},{"id":"fiftyfive","text":"El 55%."},{"id":"price","text":"El 50% del precio de la vivienda."}],"correct_option_id":"fifty"},
+    {"id":"consent","question":"¿Basta con que el inversor visite un enlace para generar derecho económico?","options":[{"id":"no","text":"No. Debe existir el reconocimiento firmado y cumplirse las condiciones de modalidad A y atribución."},{"id":"yes","text":"Sí, la visita al enlace equivale a una firma."},{"id":"claim","text":"Sí, basta con que el colaborador lo reclame."}],"correct_option_id":"no"},
+    {"id":"bonus","question":"¿Cómo se usan los bonos Premium?","options":[{"id":"choice","text":"Se elige gastar un bono por un mes al 50% o guardar tres para un mes gratis; los consumidos no vuelven a contar."},{"id":"both","text":"Tres bonos dan tres meses al 50% y además otro gratis."},{"id":"repeat","text":"Cada operación del mismo inversor genera un bono nuevo."}],"correct_option_id":"choice"},
+    {"id":"team","question":"¿A quién pertenece el trabajo y cuándo empieza el plazo de 72 horas?","options":[{"id":"agency","text":"A la agencia suscriptora; el plazo comienza cuando recibe el trabajo y no se reinicia al asignarlo a un adherido."},{"id":"agent","text":"Al adherido, que inicia un plazo nuevo al aceptarlo."}],"correct_option_id":"agency"}
+  ],
+  "integration_note": "Barajar opciones por intento conservando sus IDs. No incluir correct_option_id en respuestas públicas al alumno. Este archivo es material de integración, no prueba de publicación del curso en GHL o APP."
+}

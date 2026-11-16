@@ -18,13 +18,13 @@ def test_unique_link_and_integer_fee_policy():
     db=DB();run(ref.ensure_indexes(db))
     a=run(ref.own_link(db,'a'));b=run(ref.own_link(db,'a'));c=run(ref.own_link(db,'b'))
     assert a==b and a['code']!=c['code']
-    assert ref.incentive_preview(kind='FEE',collected_minor=240000,partner=True,referred_kind='suscriptor')['amount_minor']==36000
-    assert ref.incentive_preview(kind='FEE',collected_minor=240000,refunded_minor=40000,partner=True,referred_kind='colaborador_premium')['amount_minor']==30000
+    assert ref.incentive_preview(kind='FEE',collected_minor=240000,partner=True,referred_kind='suscriptor',active_paying=True,partner_agreement_signed=True)['amount_minor']==36000
+    assert ref.incentive_preview(kind='FEE',collected_minor=240000,refunded_minor=40000,partner=True,referred_kind='colaborador_premium',active_paying=True,partner_agreement_signed=True)['amount_minor']==30000
     assert ref.incentive_preview(kind='FEE',collected_minor=240000,referred_kind='suscriptor')['amount_minor']==0
-    assert ref.incentive_preview(kind='AGENCY_OPERATION',collected_minor=100)['amount_minor'] is None
-    assert ref.incentive_preview(kind='COLLABORATOR_FIRST_OPERATION',collected_minor=100)['amount_minor'] is None
+    assert ref.incentive_preview(kind='AGENCY_OPERATION',collected_minor=100)['status']=='DATES_REQUIRED'
+    assert ref.incentive_preview(kind='COLLABORATOR_FIRST_OPERATION',collected_minor=100)['status']=='DATES_REQUIRED'
     recognition=dict(kind='COLLABORATOR_FIRST_OPERATION',collected_minor=100000,referred_kind='colaborador',first_operation_verified=True)
-    assert ref.incentive_preview(**recognition)['amount_minor']==15000
+    assert ref.incentive_preview(**recognition)['amount_minor']==0
     assert ref.incentive_preview(**recognition,recognition_already_recorded=True)['amount_minor']==0
     with pytest.raises(ValueError):ref.incentive_preview(kind='FEE',collected_minor=-1)
 

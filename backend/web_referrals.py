@@ -108,26 +108,70 @@ async def attribute(db, actor, payload):
 
 def incentive_preview(*, kind, collected_minor, refunded_minor=0, referred_kind='', partner=False,
                       participation_verified=False, results_verified=False, first_operation_verified=False,
-                      recognition_already_recorded=False):
+                      recognition_already_recorded=False, registered_at=None, closed_at=None,
+                      consent_signed=False, modality_a_signed=False, active_paying=False,
+                      partner_agreement_signed=False, preexisting_investor=False):
     """Integer cents; preview only, never an entitlement or a payable ledger."""
     if type(collected_minor) is not int or type(refunded_minor) is not int or not 0 <= refunded_minor <= collected_minor:
         raise ValueError('invalid_collected_amount')
-    net = collected_minor - refunded_minor
-    if kind == 'FEE' and partner and referred_kind in {'suscriptor', 'colaborador_premium'}:
-        return {'status': 'PREVIEW_ONLY', 'amount_minor': (net * 15 + 50) // 100, 'rate_percent': 15}
+    from referral_policy import calculate
+    # Removed the superseded 15% single collaborator-operation proposal.
     if kind == 'COLLABORATOR_FIRST_OPERATION':
-        if recognition_already_recorded:
-            return {'status': 'ALREADY_RECOGNIZED', 'amount_minor': 0}
-        if first_operation_verified and referred_kind == 'colaborador':
-            return {'status': 'PREVIEW_ONLY', 'amount_minor': (net * 15 + 50) // 100, 'rate_percent': 15,
-                    'basis': 'OPORTUNIIA_NET_FEES_ACTUALLY_COLLECTED', 'once_per_collaborator': True}
-        return {'status': 'FIRST_COLLECTED_OPERATION_EVIDENCE_REQUIRED', 'amount_minor': None}
-    if kind == 'AGENCY_OPERATION':
-        return {'status': 'TERMS_REVIEW_REQUIRED' if participation_verified and results_verified else 'ACTIVE_PARTICIPATION_AND_RESULTS_REQUIRED', 'amount_minor': None}
-    return {'status': 'NOT_ELIGIBLE', 'amount_minor': 0}
+        kind = 'COLLABORATOR_OPERATION'
+    if kind == 'FEE':
+        if not partner or referred_kind not in {'suscriptor', 'colaborador_premium'}:
+            return {'status': 'NOT_ELIGIBLE', 'amount_minor': 0}
+        kind = 'SUBSCRIPTION_FEE'
+    if kind not in {'SUBSCRIPTION_FEE', 'COLLABORATOR_OPERATION', 'AGENCY_OPERATION', 'INVESTOR_OPERATION'}:
+        return {'status': 'NOT_ELIGIBLE', 'amount_minor': 0}
+    result = calculate(kind=kind, collected_minor=collected_minor, refunded_minor=refunded_minor,
+        registered_at=registered_at, closed_at=closed_at, first_operation=first_operation_verified,
+        consent_signed=consent_signed, modality_a_signed=modality_a_signed,
+        active_paying=active_paying, partner_agreement_signed=partner_agreement_signed,
+        preexisting_investor=preexisting_investor)
+    if result['status'] == 'CALCULATED_NOT_PAID': result['status'] = 'PREVIEW_ONLY'
+    return result
 
 
 def register_routes(router, db):
+    dossier_names = {'partner': '01_partner.pdf', 'suscriptor': '02_suscriptor.pdf',
+                     'equipo': '03_mi_equipo.pdf', 'colaborador': '04_colaborador.pdf',
+                     'inversor': '05_inversor.pdf'}
+
+    @router.get('/account/referrals/dossiers/{figure}')
+    async def dossier(figure: str, request: Request):
+        await resolve_session(request, db)
+        from pathlib import Path
+        from fastapi.responses import FileResponse
+        if figure not in dossier_names: denied('dossier_not_found', 404)
+        path = Path(__file__).parent / 'role_dossiers' / dossier_names[figure]
+        if not path.is_file(): denied('dossier_not_available', 503)
+        return FileResponse(path, media_type='application/pdf', filename=path.name,
+                            headers={'Cache-Control': 'private, no-store'})
+
+    @router.get('/account/referrals/policy')
+    async def policy(request: Request):
+        await resolve_session(request, db)
+        from referral_policy import VERSION
+        return {'version': VERSION, 'fee_percent': 15, 'network_operation_percent': 5,
+                'investor_first_operation_percent': 50, 'investor_later_operation_percent': 5,
+                'operation_term_months': 24, 'term_starts': 'REFERRED_ACCOUNT_REGISTRATION',
+                'automatic_renewal': False, 'signed_attribution_required': True,
+                'signed_modality_a_required': True, 'existing_investors_excluded': True,
+                'premium': {'qualifies': 'FIRST_CLOSED_OPERATION_PER_DISTINCT_REFERRED_INVESTOR',
+                    'eligible_referrers': ['inversor', 'colaborador'],
+                    'half_price_month_per_credit': 1, 'credits_per_free_month': 3,
+                    'redemption_is_user_choice': True, 'free_month_replaces_half_price_credits': True,
+                    'consumed_credits_count_again': False, 'additional_to_cash': True},
+                'cash_payout_status': 'NOT_CONNECTED', 'premium_redemption_status': 'NOT_CONNECTED'}
+
+    @router.get('/account/referrals/bonuses')
+    async def bonuses(request: Request):
+        user, _ = await resolve_session(request, db)
+        from referral_bonus_bank import snapshot
+        wallet = await db.web_referral_bonus_wallets.find_one({'_id': user['subject_id']}) or {}
+        return {**snapshot(wallet), 'redemption_status': 'BILLING_NOT_CONNECTED'}
+
     @router.get('/integrations/oportuniiapp/v1/referral-portfolio')
     async def app_portfolio(request: Request):
         import os
